@@ -104,7 +104,7 @@ public class TasksController {
     private static String processForGetCompositeScheduleTask(
             GetCompositeScheduleTask task, String chargeBoxId, Model model) {
         model.addAttribute("chargeBoxId", chargeBoxId);
-        var response = extractResult(task, chargeBoxId).getDetails();
+        var response = extractResult(task, chargeBoxId).getResponse();
         model.addAttribute("response", response);
 
         return "op16/GetCompositeScheduleResponse";
@@ -112,7 +112,7 @@ public class TasksController {
 
     private static String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
         model.addAttribute("chargeBoxId", chargeBoxId);
-        var response = extractResult(k, chargeBoxId).getDetails();
+        var response = extractResult(k, chargeBoxId).getResponse();
         model.addAttribute("response", response);
 
         return "GetConfigurationResponse";

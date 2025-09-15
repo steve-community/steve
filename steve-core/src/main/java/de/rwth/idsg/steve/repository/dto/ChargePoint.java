@@ -44,7 +44,21 @@ public final class ChargePoint {
     public static final class Details {
         private final Integer chargeBoxPk;
         private final String chargeBoxId;
+        private final String endpointAddress;
         private final String ocppProtocol;
+        private final String chargePointVendor;
+        private final String chargePointModel;
+        private final String chargePointSerialNumber;
+        private final String chargeBoxSerialNumber;
+        private final String fwVersion;
+        private final Instant fwUpdateTimestamp;
+        private final String iccid;
+        private final String imsi;
+        private final String meterType;
+        private final String meterSerialNumber;
+        private final String diagnosticsStatus;
+        private final Instant diagnosticsTimestamp;
+        private final Instant lastHeartbeatTimestamp;
         private final String description;
         private final BigDecimal locationLatitude;
         private final BigDecimal locationLongitude;

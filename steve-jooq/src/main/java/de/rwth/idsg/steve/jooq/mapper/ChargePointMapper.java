@@ -23,17 +23,33 @@ import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChargePointMapper {
 
-    public static ChargePoint.Details fromRecord(ChargeBoxRecord r, Optional<Address> address) {
+    public static ChargePoint.Details fromRecord(ChargeBoxRecord r, @Nullable Address address) {
+        r.getAdminAddress();
         var builder = ChargePoint.Details.builder()
                 .chargeBoxPk(r.getChargeBoxPk())
                 .chargeBoxId(r.getChargeBoxId())
+                .endpointAddress(r.getEndpointAddress())
                 .ocppProtocol(r.getOcppProtocol())
+                .chargePointVendor(r.getChargePointVendor())
+                .chargePointModel(r.getChargePointModel())
+                .chargePointSerialNumber(r.getChargePointSerialNumber())
+                .chargeBoxSerialNumber(r.getChargeBoxSerialNumber())
+                .fwVersion(r.getFwVersion())
+                .fwUpdateTimestamp(toInstant(r.getFwUpdateTimestamp()))
+                .iccid(r.getIccid())
+                .imsi(r.getImsi())
+                .meterType(r.getMeterType())
+                .meterSerialNumber(r.getMeterSerialNumber())
+                .diagnosticsStatus(r.getDiagnosticsStatus())
+                .diagnosticsTimestamp(toInstant(r.getDiagnosticsTimestamp()))
+                .lastHeartbeatTimestamp(toInstant(r.getLastHeartbeatTimestamp()))
                 .description(r.getDescription())
                 .locationLatitude(r.getLocationLatitude())
                 .locationLongitude(r.getLocationLongitude())
@@ -42,11 +58,13 @@ public final class ChargePointMapper {
                 .insertConnectorStatusAfterTransactionMsg(r.getInsertConnectorStatusAfterTransactionMsg())
                 .registrationStatus(r.getRegistrationStatus());
 
-        address.ifPresent(a -> builder.street(a.getStreet())
-                .houseNumber(a.getHouseNumber())
-                .zipCode(a.getZipCode())
-                .city(a.getCity())
-                .country(a.getCountry()));
+        if (address != null) {
+            builder.street(address.getStreet())
+                    .houseNumber(address.getHouseNumber())
+                    .zipCode(address.getZipCode())
+                    .city(address.getCity())
+                    .country(address.getCountry());
+        }
 
         return builder.build();
     }

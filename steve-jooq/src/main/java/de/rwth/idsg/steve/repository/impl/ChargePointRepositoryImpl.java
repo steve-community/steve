@@ -202,7 +202,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         var ar = addressRepository.get(cbr.getAddressPk());
 
-        return Optional.of(ChargePointMapper.fromRecord(cbr, ar));
+        return Optional.of(ChargePointMapper.fromRecord(cbr, ar.orElse(null)));
     }
 
     @Override

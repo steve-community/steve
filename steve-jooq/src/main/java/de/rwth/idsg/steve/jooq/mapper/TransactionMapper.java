@@ -57,6 +57,6 @@ public final class TransactionMapper {
         if (actor == null) {
             return null;
         }
-        return TransactionStopEventActor.valueOf(actor.name());
+        return TransactionStopEventActor.valueOf(actor.getLiteral().toUpperCase());
     }
 }

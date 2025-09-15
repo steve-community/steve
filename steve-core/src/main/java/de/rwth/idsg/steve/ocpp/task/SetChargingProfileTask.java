@@ -37,7 +37,6 @@ import ocpp.cp._2015._10.RecurrencyKindType;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 import ocpp.cp._2015._10.SetChargingProfileResponse;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
@@ -47,23 +46,32 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
 
     private static final TaskDefinition<SetChargingProfileParams, String> TASK_DEFINITION =
             TaskDefinition.<SetChargingProfileParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_16,
                             new OcppVersionHandler<>(
                                     task -> ((SetChargingProfileTask) task).getRequest(),
                                     (SetChargingProfileResponse response) ->
-                                            response.getStatus().value())))
+                                            response.getStatus().value()))
                     .build();
 
     private final SetChargingProfileRequest request;
+    private final ChargingProfile.Details details;
+    private final ChargingProfileRepository repo;
 
     /**
      * Constructor for ad-hoc SetChargingProfile task
      */
-    public SetChargingProfileTask(SetChargingProfileParams params, SetChargingProfileRequest request, String caller) {
-        super(params, caller, TASK_DEFINITION);
+    public SetChargingProfileTask(
+            SetChargingProfileParams params,
+            ChargingProfile.Details details,
+            ChargingProfileRepository repo,
+            String caller,
+            SetChargingProfileRequest request) {
+        super(TASK_DEFINITION, params, caller);
         this.request = request;
         checkAdditionalConstraints(this.request);
+        this.details = details;
+        this.repo = repo;
     }
 
     /**
@@ -74,12 +82,12 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
             ChargingProfile.Details details,
             ChargingProfileRepository repo,
             String caller) {
-        super(params, caller, TASK_DEFINITION);
-        this.request = buildRequestFromDb(params, details);
-        checkAdditionalConstraints(this.request);
+        this(params, details, repo, caller, buildRequestFromDb(params, details));
+    }
 
-        // Add custom callback to update DB
-        addCallback(new OcppCallback<>() {
+    @Override
+    public OcppCallback<String> createDefaultCallback() {
+        return new OcppCallback<>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
@@ -97,30 +105,10 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
             public void failed(String chargeBoxId, Exception e) {
                 addNewError(chargeBoxId, e.getMessage());
             }
-        });
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
         };
     }
 
-    private SetChargingProfileRequest buildRequestFromDb(
+    private static SetChargingProfileRequest buildRequestFromDb(
             SetChargingProfileParams params, ChargingProfile.Details details) {
         var schedulePeriods = details.getPeriods().stream()
                 .map(k -> {

@@ -19,15 +19,12 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
 import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 public class DataTransferTask extends CommunicationTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
@@ -49,54 +46,31 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
 
     private static final TaskDefinition<DataTransferParams, ResponseWrapper> TASK_DEFINITION =
             TaskDefinition.<DataTransferParams, ResponseWrapper>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_15,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2012._06.DataTransferRequest()
-                                                    .withData(task.getParams().getData())
-                                                    .withMessageId(
-                                                            task.getParams().getMessageId())
-                                                    .withVendorId(
-                                                            task.getParams().getVendorId()),
-                                            (ocpp.cp._2012._06.DataTransferResponse r) -> new ResponseWrapper(
-                                                    r.getStatus().value(), r.getData())),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.DataTransferRequest()
+                                            .withData(task.getParams().getData())
+                                            .withMessageId(task.getParams().getMessageId())
+                                            .withVendorId(task.getParams().getVendorId()),
+                                    (ocpp.cp._2012._06.DataTransferResponse r) ->
+                                            new ResponseWrapper(r.getStatus().value(), r.getData())))
+                    .versionHandler(
                             OcppVersion.V_16,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2015._10.DataTransferRequest()
-                                                    .withData(task.getParams().getData())
-                                                    .withMessageId(
-                                                            task.getParams().getMessageId())
-                                                    .withVendorId(
-                                                            task.getParams().getVendorId()),
-                                            (ocpp.cp._2015._10.DataTransferResponse r) -> new ResponseWrapper(
-                                                    r.getStatus().value(), r.getData()))))
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.DataTransferRequest()
+                                            .withData(task.getParams().getData())
+                                            .withMessageId(task.getParams().getMessageId())
+                                            .withVendorId(task.getParams().getVendorId()),
+                                    (ocpp.cp._2015._10.DataTransferResponse r) ->
+                                            new ResponseWrapper(r.getStatus().value(), r.getData())))
                     .build();
 
     public DataTransferTask(DataTransferParams params) {
-        super(params, TASK_DEFINITION);
+        super(TASK_DEFINITION, params);
     }
 
     public DataTransferTask(DataTransferParams params, String caller) {
-        super(params, caller, TASK_DEFINITION);
-    }
-
-    @Override
-    public OcppCallback<ResponseWrapper> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, ResponseWrapper response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

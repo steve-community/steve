@@ -19,79 +19,52 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
 import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 
-import java.util.Map;
-
 public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailabilityParams, String> {
 
     private static final TaskDefinition<ChangeAvailabilityParams, String> TASK_DEFINITION =
             TaskDefinition.<ChangeAvailabilityParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_12,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2010._08.ChangeAvailabilityRequest()
-                                                    .withConnectorId(
-                                                            task.getParams().getConnectorId())
-                                                    .withType(ocpp.cp._2010._08.AvailabilityType.fromValue(
-                                                            task.getParams()
-                                                                    .getAvailType()
-                                                                    .value())),
-                                            (ocpp.cp._2010._08.ChangeAvailabilityResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.ChangeAvailabilityRequest()
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withType(ocpp.cp._2010._08.AvailabilityType.fromValue(task.getParams()
+                                                    .getAvailType()
+                                                    .value())),
+                                    (ocpp.cp._2010._08.ChangeAvailabilityResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_15,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2012._06.ChangeAvailabilityRequest()
-                                                    .withConnectorId(
-                                                            task.getParams().getConnectorId())
-                                                    .withType(ocpp.cp._2012._06.AvailabilityType.fromValue(
-                                                            task.getParams()
-                                                                    .getAvailType()
-                                                                    .value())),
-                                            (ocpp.cp._2012._06.ChangeAvailabilityResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.ChangeAvailabilityRequest()
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withType(ocpp.cp._2012._06.AvailabilityType.fromValue(task.getParams()
+                                                    .getAvailType()
+                                                    .value())),
+                                    (ocpp.cp._2012._06.ChangeAvailabilityResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_16,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2015._10.ChangeAvailabilityRequest()
-                                                    .withConnectorId(
-                                                            task.getParams().getConnectorId())
-                                                    .withType(ocpp.cp._2015._10.AvailabilityType.fromValue(
-                                                            task.getParams()
-                                                                    .getAvailType()
-                                                                    .value())),
-                                            (ocpp.cp._2015._10.ChangeAvailabilityResponse r) ->
-                                                    r.getStatus().value())))
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.ChangeAvailabilityRequest()
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withType(ocpp.cp._2015._10.AvailabilityType.fromValue(task.getParams()
+                                                    .getAvailType()
+                                                    .value())),
+                                    (ocpp.cp._2015._10.ChangeAvailabilityResponse r) ->
+                                            r.getStatus().value()))
                     .build();
 
     public ChangeAvailabilityTask(ChangeAvailabilityParams params) {
-        super(params, TASK_DEFINITION);
+        super(TASK_DEFINITION, params);
     }
 
     public ChangeAvailabilityTask(ChangeAvailabilityParams params, String caller) {
-        super(params, caller, TASK_DEFINITION);
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

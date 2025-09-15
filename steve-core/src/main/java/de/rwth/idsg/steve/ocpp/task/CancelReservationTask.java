@@ -26,53 +26,32 @@ import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 
-import java.util.Map;
-
 public class CancelReservationTask extends CommunicationTask<CancelReservationParams, String> {
 
     private static final TaskDefinition<CancelReservationParams, String> TASK_DEFINITION =
             TaskDefinition.<CancelReservationParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_15,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2012._06.CancelReservationRequest()
-                                                    .withReservationId(
-                                                            task.getParams().getReservationId()),
-                                            (ocpp.cp._2012._06.CancelReservationResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.CancelReservationRequest()
+                                            .withReservationId(task.getParams().getReservationId()),
+                                    (ocpp.cp._2012._06.CancelReservationResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_16,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2015._10.CancelReservationRequest()
-                                                    .withReservationId(
-                                                            task.getParams().getReservationId()),
-                                            (ocpp.cp._2015._10.CancelReservationResponse r) ->
-                                                    r.getStatus().value())))
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.CancelReservationRequest()
+                                            .withReservationId(task.getParams().getReservationId()),
+                                    (ocpp.cp._2015._10.CancelReservationResponse r) ->
+                                            r.getStatus().value()))
                     .build();
+
+    private final ReservationRepository reservationRepository;
 
     public CancelReservationTask(
             CancelReservationParams params, ReservationRepository reservationRepository, String caller) {
-        super(params, caller, TASK_DEFINITION);
-
-        addCallback(new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String statusValue) {
-                addNewResponse(chargeBoxId, statusValue);
-
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    reservationRepository.cancelled(getParams().getReservationId());
-                }
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        });
+        super(TASK_DEFINITION, params, caller);
+        this.reservationRepository = reservationRepository;
     }
 
     public CancelReservationTask(CancelReservationParams params, ReservationRepository reservationRepository) {
@@ -80,11 +59,15 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
+    protected OcppCallback<String> createDefaultCallback() {
         return new OcppCallback<>() {
             @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
+            public void success(String chargeBoxId, String statusValue) {
+                addNewResponse(chargeBoxId, statusValue);
+
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
+                    reservationRepository.cancelled(params.getReservationId());
+                }
             }
 
             @Override

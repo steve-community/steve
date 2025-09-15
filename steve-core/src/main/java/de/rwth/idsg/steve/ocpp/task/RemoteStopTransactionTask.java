@@ -19,67 +19,43 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
 import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 
-import java.util.Map;
-
 public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, String> {
 
     private static final TaskDefinition<RemoteStopTransactionParams, String> TASK_DEFINITION =
             TaskDefinition.<RemoteStopTransactionParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_12,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2010._08.RemoteStopTransactionRequest()
-                                                    .withTransactionId(
-                                                            task.getParams().getTransactionId()),
-                                            (ocpp.cp._2010._08.RemoteStopTransactionResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2010._08.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_15,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2012._06.RemoteStopTransactionRequest()
-                                                    .withTransactionId(
-                                                            task.getParams().getTransactionId()),
-                                            (ocpp.cp._2012._06.RemoteStopTransactionResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2012._06.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_16,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2015._10.RemoteStopTransactionRequest()
-                                                    .withTransactionId(
-                                                            task.getParams().getTransactionId()),
-                                            (ocpp.cp._2015._10.RemoteStopTransactionResponse r) ->
-                                                    r.getStatus().value())))
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2015._10.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
                     .build();
 
     public RemoteStopTransactionTask(RemoteStopTransactionParams params) {
-        super(params, TASK_DEFINITION);
+        super(TASK_DEFINITION, params);
     }
 
     public RemoteStopTransactionTask(RemoteStopTransactionParams params, String caller) {
-        super(params, caller, TASK_DEFINITION);
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

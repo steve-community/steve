@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
 import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
@@ -27,14 +26,12 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import ocpp.cp._2015._10.GetCompositeScheduleRequest;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 
-import java.util.Map;
-
 public class GetCompositeScheduleTask
         extends CommunicationTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
 
     private static final TaskDefinition<GetCompositeScheduleParams, GetCompositeScheduleResponse> TASK_DEFINITION =
             TaskDefinition.<GetCompositeScheduleParams, GetCompositeScheduleResponse>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_16,
                             new OcppVersionHandler<>(
                                     task -> {
@@ -44,34 +41,14 @@ public class GetCompositeScheduleTask
                                                 .withDuration(p.getDurationInSeconds())
                                                 .withChargingRateUnit(p.getChargingRateUnit());
                                     },
-                                    (GetCompositeScheduleResponse r) -> r)))
+                                    (GetCompositeScheduleResponse r) -> r))
                     .build();
 
     public GetCompositeScheduleTask(GetCompositeScheduleParams params) {
-        super(params, TASK_DEFINITION);
+        super(TASK_DEFINITION, params);
     }
 
     public GetCompositeScheduleTask(GetCompositeScheduleParams params, String caller) {
-        super(params, caller, TASK_DEFINITION);
-    }
-
-    @Override
-    public OcppCallback<GetCompositeScheduleResponse> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, GetCompositeScheduleResponse response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

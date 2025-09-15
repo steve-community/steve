@@ -22,11 +22,14 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.Singular;
 
 import java.util.Map;
 
 @Builder
 @Getter
 public class TaskDefinition<S extends ChargePointSelection, U> {
-    private final Map<OcppVersion, OcppVersionHandler<S, U>> versionHandlers;
+    @Singular
+    @NonNull private final Map<OcppVersion, OcppVersionHandler<S, U>> versionHandlers;
 }

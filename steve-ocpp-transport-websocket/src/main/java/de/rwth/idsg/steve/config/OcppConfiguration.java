@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.InvocationContext;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
@@ -54,14 +53,11 @@ public class OcppConfiguration {
             Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint) {
         var invocationContexts = new EnumMap<OcppVersion, InvocationContext>(OcppVersion.class);
         invocationContexts.put(
-                V_12,
-                new InvocationContext(ocpp12WebSocketEndpoint, ocpp12TypeStore, CommunicationTask::getOcpp12Request));
+                V_12, new InvocationContext(ocpp12WebSocketEndpoint, ocpp12TypeStore, task -> task.getRequest(V_12)));
         invocationContexts.put(
-                V_15,
-                new InvocationContext(ocpp15WebSocketEndpoint, ocpp15TypeStore, CommunicationTask::getOcpp15Request));
+                V_15, new InvocationContext(ocpp15WebSocketEndpoint, ocpp15TypeStore, task -> task.getRequest(V_15)));
         invocationContexts.put(
-                V_16,
-                new InvocationContext(ocpp16WebSocketEndpoint, ocpp16TypeStore, CommunicationTask::getOcpp16Request));
+                V_16, new InvocationContext(ocpp16WebSocketEndpoint, ocpp16TypeStore, task -> task.getRequest(V_16)));
         return invocationContexts;
     }
 

@@ -30,14 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 import ocpp.cp._2015._10.ClearChargingProfileResponse;
 
-import java.util.Map;
-
 @Slf4j
 public class ClearChargingProfileTask extends CommunicationTask<ClearChargingProfileParams, String> {
 
     private static final TaskDefinition<ClearChargingProfileParams, String> TASK_DEFINITION =
             TaskDefinition.<ClearChargingProfileParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_16,
                             new OcppVersionHandler<>(
                                     task -> new ClearChargingProfileRequest()
@@ -47,27 +45,38 @@ public class ClearChargingProfileTask extends CommunicationTask<ClearChargingPro
                                                     task.getParams().getChargingProfilePurpose())
                                             .withStackLevel(task.getParams().getStackLevel()),
                                     (ClearChargingProfileResponse r) ->
-                                            r.getStatus().value())))
+                                            r.getStatus().value()))
                     .build();
+
+    private final ChargingProfileRepository chargingProfileRepository;
 
     public ClearChargingProfileTask(
             ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository, String caller) {
-        super(params, caller, TASK_DEFINITION);
+        super(TASK_DEFINITION, params, caller);
+        this.chargingProfileRepository = chargingProfileRepository;
+    }
 
-        addCallback(new OcppCallback<>() {
+    public ClearChargingProfileTask(
+            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository) {
+        this(params, chargingProfileRepository, "SteVe");
+    }
+
+    @Override
+    public OcppCallback<String> createDefaultCallback() {
+        return new OcppCallback<>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                switch (getParams().getFilterType()) {
+                switch (params.getFilterType()) {
                     case ChargingProfileId ->
-                        chargingProfileRepository.clearProfile(getParams().getChargingProfilePk(), chargeBoxId);
+                        chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
                     case OtherParameters ->
                         chargingProfileRepository.clearProfile(
                                 chargeBoxId,
-                                getParams().getConnectorId(),
-                                getParams().getChargingProfilePurpose(),
-                                getParams().getStackLevel());
+                                params.getConnectorId(),
+                                params.getChargingProfilePurpose(),
+                                params.getStackLevel());
                     default -> {
                         log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                         return;
@@ -80,31 +89,6 @@ public class ClearChargingProfileTask extends CommunicationTask<ClearChargingPro
                             chargeBoxId,
                             statusValue);
                 }
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
-            }
-        });
-    }
-
-    public ClearChargingProfileTask(
-            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository) {
-        this(params, chargingProfileRepository, "SteVe");
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
             }
 
             @Override

@@ -26,63 +26,68 @@ import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 
-import java.util.Map;
-
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 
 public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, String> {
 
     private static final TaskDefinition<EnhancedReserveNowParams, String> TASK_DEFINITION =
             TaskDefinition.<EnhancedReserveNowParams, String>builder()
-                    .versionHandlers(Map.of(
+                    .versionHandler(
                             OcppVersion.V_15,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2012._06.ReserveNowRequest()
-                                                    .withConnectorId(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getConnectorId())
-                                                    .withExpiryDate(toOffsetDateTime(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getExpiry()))
-                                                    .withIdTag(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getIdTag())
-                                                    .withReservationId(
-                                                            task.getParams().getReservationId())
-                                                    .withParentIdTag(
-                                                            task.getParams().getParentIdTag()),
-                                            (ocpp.cp._2012._06.ReserveNowResponse r) ->
-                                                    r.getStatus().value()),
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.ReserveNowRequest()
+                                            .withConnectorId(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getConnectorId())
+                                            .withExpiryDate(toOffsetDateTime(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getExpiry()))
+                                            .withIdTag(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getIdTag())
+                                            .withReservationId(task.getParams().getReservationId())
+                                            .withParentIdTag(task.getParams().getParentIdTag()),
+                                    (ocpp.cp._2012._06.ReserveNowResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
                             OcppVersion.V_16,
-                                    new OcppVersionHandler<>(
-                                            task -> new ocpp.cp._2015._10.ReserveNowRequest()
-                                                    .withConnectorId(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getConnectorId())
-                                                    .withExpiryDate(toOffsetDateTime(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getExpiry()))
-                                                    .withIdTag(task.getParams()
-                                                            .getReserveNowParams()
-                                                            .getIdTag())
-                                                    .withReservationId(
-                                                            task.getParams().getReservationId())
-                                                    .withParentIdTag(
-                                                            task.getParams().getParentIdTag()),
-                                            (ocpp.cp._2015._10.ReserveNowResponse r) ->
-                                                    r.getStatus().value())))
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.ReserveNowRequest()
+                                            .withConnectorId(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getConnectorId())
+                                            .withExpiryDate(toOffsetDateTime(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getExpiry()))
+                                            .withIdTag(task.getParams()
+                                                    .getReserveNowParams()
+                                                    .getIdTag())
+                                            .withReservationId(task.getParams().getReservationId())
+                                            .withParentIdTag(task.getParams().getParentIdTag()),
+                                    (ocpp.cp._2015._10.ReserveNowResponse r) ->
+                                            r.getStatus().value()))
                     .build();
 
-    public ReserveNowTask(EnhancedReserveNowParams params, ReservationRepository reservationRepository, String caller) {
-        super(params, caller, TASK_DEFINITION);
+    private final ReservationRepository reservationRepository;
 
-        addCallback(new OcppCallback<>() {
+    public ReserveNowTask(EnhancedReserveNowParams params, ReservationRepository reservationRepository, String caller) {
+        super(TASK_DEFINITION, params, caller);
+        this.reservationRepository = reservationRepository;
+    }
+
+    public ReserveNowTask(EnhancedReserveNowParams params, ReservationRepository reservationRepository) {
+        this(params, reservationRepository, "SteVe");
+    }
+
+    @Override
+    public OcppCallback<String> createDefaultCallback() {
+        return new OcppCallback<>() {
             @Override
             public void success(String chargeBoxId, String responseStatus) {
                 addNewResponse(chargeBoxId, responseStatus);
 
                 if ("Accepted".equalsIgnoreCase(responseStatus)) {
-                    reservationRepository.accepted(getParams().getReservationId());
+                    reservationRepository.accepted(params.getReservationId());
                 } else {
                     delete(reservationRepository);
                 }
@@ -98,30 +103,6 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
             public void failed(String chargeBoxId, Exception e) {
                 addNewError(chargeBoxId, e.getMessage());
                 delete(reservationRepository);
-            }
-        });
-    }
-
-    public ReserveNowTask(EnhancedReserveNowParams params, ReservationRepository reservationRepository) {
-        this(params, reservationRepository, "SteVe");
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void successError(String chargeBoxId, Object error) {
-                addNewError(chargeBoxId, error.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                addNewError(chargeBoxId, e.getMessage());
             }
         };
     }

@@ -20,9 +20,11 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
+import lombok.Getter;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
+import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.ee10.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -32,20 +34,16 @@ import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,6 +62,12 @@ public class SteveAppContext {
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
 
+    @Getter
+    private final Handler handler;
+    // ClosedFileSystemException if the resource factory is linked to the context
+    // https://github.com/jetty/jetty.project/issues/13592
+    private final ResourceFactory.Closeable webAppResourceFactory = ResourceFactory.closeable();
+
     public SteveAppContext(SteveConfiguration config, LogFileRetriever logFileRetriever, EndpointInfo info) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
@@ -75,11 +79,13 @@ public class SteveAppContext {
         context.setParent(springContext.getParent());
         springContext.setParent(context);
         springContext.scan("de.rwth.idsg.steve.config");
-        webAppContext = initWebApp();
+        webAppContext = createWebAppContext();
+        // Run rewrite first, then dispatch to contexts
+        handler = new Handler.Sequence(createRedirectHandler(config), webAppContext);
     }
 
-    public ContextHandlerCollection getHandlers() {
-        return new ContextHandlerCollection(new ContextHandler(getRedirectHandler()), new ContextHandler(getWebApp()));
+    public void close() {
+        webAppResourceFactory.close();
     }
 
     /**
@@ -91,20 +97,10 @@ public class SteveAppContext {
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
 
-    private Handler getWebApp() {
-        if (!config.getJetty().isGzipEnabled()) {
-            return webAppContext;
-        }
-
-        // Wraps the whole web app in a gzip handler to make Jetty return compressed content
-        // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
-        return new GzipHandler(webAppContext);
-    }
-
-    private WebAppContext initWebApp() {
+    private WebAppContext createWebAppContext() {
         var ctx = new WebAppContext();
         ctx.setContextPath(config.getPaths().getContextPath());
-        ctx.setBaseResourceAsString(getWebAppURIAsString());
+        ctx.setBaseResource(webAppResourceFactory.newClassLoaderResource("webapp/"));
 
         // if during startup an exception happens, do not swallow it, throw it
         ctx.setThrowUnavailableOnStartupException(true);
@@ -128,13 +124,27 @@ public class SteveAppContext {
                 config.getPaths().getRootMapping() + "*",
                 EnumSet.allOf(DispatcherType.class));
 
-        initJSP(ctx);
+        /*
+         * Help by:
+         * https://github.com/jetty/jetty-examples/tree/12.0.x/embedded/ee10-jsp
+         * https://github.com/jetty-project/embedded-jetty-jsp
+         * https://github.com/jasonish/jetty-springmvc-jsp-template
+         * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
+         */
+        ctx.addBean(new EmbeddedJspStarter(ctx));
+        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+
+        if (config.getJetty().isGzipEnabled()) {
+            // Insert compression in front of the webapp handler chain, keep the context intact
+            ctx.insertHandler(new CompressionHandler());
+        }
+
         return ctx;
     }
 
-    private Handler getRedirectHandler() {
+    private static Handler createRedirectHandler(SteveConfiguration config) {
         var rewrite = new RewriteHandler();
-        for (var redirect : getRedirectSet()) {
+        for (var redirect : getRedirectSet(config)) {
             var rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
@@ -145,7 +155,7 @@ public class SteveAppContext {
         return rewrite;
     }
 
-    private Set<String> getRedirectSet() {
+    private static Set<String> getRedirectSet(SteveConfiguration config) {
         var path = config.getPaths().getContextPath();
 
         var redirectSet = HashSet.<String>newHashSet(3);
@@ -159,26 +169,6 @@ public class SteveAppContext {
         }
 
         return redirectSet;
-    }
-
-    /**
-     * Help by:
-     * https://github.com/jetty/jetty-examples/tree/12.0.x/embedded/ee10-jsp
-     * https://github.com/jetty-project/embedded-jetty-jsp
-     * https://github.com/jasonish/jetty-springmvc-jsp-template
-     * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
-     */
-    private void initJSP(WebAppContext ctx) {
-        ctx.addBean(new EmbeddedJspStarter(ctx));
-        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-    }
-
-    private static String getWebAppURIAsString() {
-        try {
-            return new ClassPathResource("webapp").getURI().toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

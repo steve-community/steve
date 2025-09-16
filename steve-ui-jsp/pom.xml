@@ -55,12 +55,10 @@
     <dependency>
       <groupId>org.eclipse.jetty.ee10</groupId>
       <artifactId>jetty-ee10-apache-jsp</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <!--        <dependency>-->
     <!--            <groupId>org.eclipse.jetty</groupId>-->
     <!--            <artifactId>apache-jstl</artifactId>-->
-    <!--            <version>${jetty.version}</version>-->
     <!--        </dependency>-->
     <dependency>
       <groupId>org.owasp.encoder</groupId>

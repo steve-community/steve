@@ -126,7 +126,7 @@ public class JettyServer {
         }
 
         steveAppContext = new SteveAppContext(config, logFileRetriever, info);
-        server.setHandler(steveAppContext.getHandlers());
+        server.setHandler(steveAppContext.getHandler());
     }
 
     private ServerConnector httpConnector(HttpConfiguration httpconfig) {
@@ -186,6 +186,7 @@ public class JettyServer {
     public void stop() throws Exception {
         if (server != null) {
             server.stop();
+            steveAppContext.close();
         }
     }
 

@@ -73,4 +73,11 @@ public class SteveException extends RuntimeException {
             super(message);
         }
     }
+
+    public static class BadRequest extends SteveException {
+
+        public BadRequest(String message) {
+            super(message);
+        }
+    }
 }

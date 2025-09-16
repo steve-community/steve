@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.web.DateTimeEditor;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -74,9 +73,9 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(SteveException.BadRequest.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, BadRequestException exception) {
+    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, SteveException.BadRequest exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());

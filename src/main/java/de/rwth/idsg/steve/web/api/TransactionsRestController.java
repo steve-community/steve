@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,7 +75,7 @@ public class TransactionsRestController {
         log.debug("Read request for query: {}", params);
 
         if (params.isReturnCSV()) {
-            throw new BadRequestException("returnCSV=true is not supported for API calls");
+            throw new SteveException.BadRequest("returnCSV=true is not supported for API calls");
         }
 
         var response = transactionRepository.getTransactions(params);

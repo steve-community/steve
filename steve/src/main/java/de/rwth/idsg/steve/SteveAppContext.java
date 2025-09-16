@@ -20,6 +20,7 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
+import lombok.Getter;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -32,8 +33,7 @@ import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
@@ -61,6 +61,9 @@ public class SteveAppContext {
     private final SteveConfiguration config;
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
+
+    @Getter
+    private final Handler handler;
     // ClosedFileSystemException if the resource factory is linked to the context
     // https://github.com/jetty/jetty.project/issues/13592
     private final ResourceFactory.Closeable webAppResourceFactory = ResourceFactory.closeable();
@@ -76,15 +79,13 @@ public class SteveAppContext {
         context.setParent(springContext.getParent());
         springContext.setParent(context);
         springContext.scan("de.rwth.idsg.steve.config");
-        webAppContext = initWebApp();
+        webAppContext = createWebAppContext();
+        // Run rewrite first, then dispatch to contexts
+        handler = new Handler.Sequence(createRedirectHandler(config), webAppContext);
     }
 
     public void close() {
         webAppResourceFactory.close();
-    }
-
-    public ContextHandlerCollection getHandlers() {
-        return new ContextHandlerCollection(getRedirectHandler(), getWebAppHandler());
     }
 
     /**
@@ -96,15 +97,7 @@ public class SteveAppContext {
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
 
-    private ContextHandler getWebAppHandler() {
-        if (config.getJetty().isGzipEnabled()) {
-            // Insert compression in front of the webapp handler chain, keep the context intact
-            webAppContext.insertHandler(new CompressionHandler());
-        }
-        return webAppContext;
-    }
-
-    private WebAppContext initWebApp() {
+    private WebAppContext createWebAppContext() {
         var ctx = new WebAppContext();
         ctx.setContextPath(config.getPaths().getContextPath());
         ctx.setBaseResource(webAppResourceFactory.newClassLoaderResource("webapp/"));
@@ -141,12 +134,17 @@ public class SteveAppContext {
         ctx.addBean(new EmbeddedJspStarter(ctx));
         ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
 
+        if (config.getJetty().isGzipEnabled()) {
+            // Insert compression in front of the webapp handler chain, keep the context intact
+            ctx.insertHandler(new CompressionHandler());
+        }
+
         return ctx;
     }
 
-    private ContextHandler getRedirectHandler() {
+    private static Handler createRedirectHandler(SteveConfiguration config) {
         var rewrite = new RewriteHandler();
-        for (var redirect : getRedirectSet()) {
+        for (var redirect : getRedirectSet(config)) {
             var rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
@@ -154,10 +152,10 @@ public class SteveAppContext {
                     config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
             rewrite.addRule(rule);
         }
-        return new ContextHandler(rewrite);
+        return rewrite;
     }
 
-    private Set<String> getRedirectSet() {
+    private static Set<String> getRedirectSet(SteveConfiguration config) {
         var path = config.getPaths().getContextPath();
 
         var redirectSet = HashSet.<String>newHashSet(3);

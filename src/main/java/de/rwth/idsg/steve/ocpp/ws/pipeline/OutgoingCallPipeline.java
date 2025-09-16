@@ -20,8 +20,6 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -33,12 +31,10 @@ import java.util.function.Consumer;
  * @since 27.03.2015
  */
 @Component
-@Slf4j
 public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
 
     private final Consumer<CommunicationContext> chainedConsumers;
 
-    @Autowired
     public OutgoingCallPipeline(FutureResponseContextStore store) {
         chainedConsumers = OutgoingCallPipeline.start(Serializer.INSTANCE)
                                                .andThen(Sender.INSTANCE)

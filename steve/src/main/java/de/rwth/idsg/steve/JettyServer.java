@@ -186,6 +186,7 @@ public class JettyServer {
     public void stop() throws Exception {
         if (server != null) {
             server.stop();
+            steveAppContext.close();
         }
     }
 

@@ -37,15 +37,15 @@
     <tr><td>System Time Zone:</td><td>${systemTimeZone}</td></tr>
 </table>
 <section><span>Endpoint Info</span></section>
-    <table class="userInputFullPage">
-        <tr>
-            <td>${endpointInfo.ocppSoap.info}:</td>
-            <td><c:forEach items="${endpointInfo.ocppSoap.data}" var="i">${i}<br></c:forEach></td>
-        <tr>
-            <td>${endpointInfo.ocppWebSocket.info}:</td>
-            <td><c:forEach items="${endpointInfo.ocppWebSocket.data}" var="i">${i}<br></c:forEach></td>
-        </tr>
+<table class="userInputFullPage">
+    <tr>
+        <td>SOAP endpoint for OCPP:</td>
+        <td>${endpointInfo.ocppSoap}</td>
+    <tr>
+        <td>WebSocket/JSON endpoint for OCPP:</td>
+        <td>${endpointInfo.ocppWebSocket}</td>
     </tr>
-    </table>
+    </tr>
+</table>
 </div>
 <%@ include file="00-footer.jsp" %>

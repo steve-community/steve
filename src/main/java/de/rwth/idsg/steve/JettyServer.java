@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
@@ -185,11 +184,11 @@ public class JettyServer {
     public void populateEndpointInfo() {
         List<String> list = getConnectorPathList();
 
-        EndpointInfo info = EndpointInfo.INSTANCE;
-
-        info.getWebInterface().setData(buildList(list, false));
-        info.getOcppSoap().setData(buildList(list, false));
-        info.getOcppWebSocket().setData(buildList(list, true));
+//        EndpointInfo info = EndpointInfo.INSTANCE;
+//
+//        info.getWebInterface().setData(buildList(list, false));
+//        info.getOcppSoap().setData(buildList(list, false));
+//        info.getOcppWebSocket().setData(buildList(list, true));
     }
 
     private List<String> getConnectorPathList() {

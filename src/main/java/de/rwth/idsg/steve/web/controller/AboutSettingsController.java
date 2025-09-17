@@ -28,13 +28,16 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -67,14 +70,16 @@ public class AboutSettingsController {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
-    public String getAbout(Model model) {
+    public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
+        String scheme = request.getScheme();
+
         model.addAttribute("version", CONFIG.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host));
         return "about";
     }
 

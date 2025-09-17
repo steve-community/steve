@@ -26,10 +26,12 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.websocket.core.WebSocketConstants;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
@@ -57,7 +59,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
-            new DefaultHandshakeHandler(),
+            defaultHandshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
             chargePointRegistrationService
         );
@@ -65,5 +67,21 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
+    }
+
+    /**
+     * https://docs.spring.io/spring-framework/reference/web/websocket/server.html#websocket-server-runtime-configuration
+     *
+     * Otherwise, defaults come from {@link WebSocketConstants}
+     */
+    private static DefaultHandshakeHandler defaultHandshakeHandler() {
+        JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
+
+        strategy.addWebSocketConfigurer(configurable -> {
+            configurable.setMaxTextMessageSize(MAX_MSG_SIZE);
+            configurable.setIdleTimeout(IDLE_TIMEOUT);
+        });
+
+        return new DefaultHandshakeHandler(strategy);
     }
 }

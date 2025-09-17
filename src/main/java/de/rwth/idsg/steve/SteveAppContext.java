@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve;
 
-import jakarta.servlet.DispatcherType;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -27,7 +26,6 @@ import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
-import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
@@ -35,7 +33,6 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import org.eclipse.jetty.websocket.core.WebSocketConstants;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -43,13 +40,13 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import jakarta.servlet.DispatcherType;
+
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT;
-import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -71,15 +68,6 @@ public class SteveAppContext {
             new ContextHandler(getRedirectHandler()),
             new ContextHandler(getWebApp())
         );
-    }
-
-    /**
-     * Otherwise, defaults come from {@link WebSocketConstants}
-     */
-    public void configureWebSocket() {
-        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
-        container.setMaxTextMessageSize(MAX_MSG_SIZE);
-        container.setIdleTimeout(IDLE_TIMEOUT);
     }
 
     private Handler getWebApp() {

@@ -141,7 +141,6 @@ public class JettyServer {
 
         if (server != null) {
             server.start();
-            steveAppContext.configureWebSocket();
         }
     }
 

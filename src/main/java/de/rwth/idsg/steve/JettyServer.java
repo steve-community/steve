@@ -21,7 +21,6 @@ package de.rwth.idsg.steve;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -33,22 +32,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -158,7 +142,6 @@ public class JettyServer {
         if (server != null) {
             server.start();
             steveAppContext.configureWebSocket();
-            populateEndpointInfo();
         }
     }
 
@@ -175,125 +158,5 @@ public class JettyServer {
         if (server != null) {
             server.stop();
         }
-    }
-
-    public boolean isStarted() {
-        return server != null && server.isStarted();
-    }
-
-    public void populateEndpointInfo() {
-        List<String> list = getConnectorPathList();
-
-//        EndpointInfo info = EndpointInfo.INSTANCE;
-//
-//        info.getWebInterface().setData(buildList(list, false));
-//        info.getOcppSoap().setData(buildList(list, false));
-//        info.getOcppWebSocket().setData(buildList(list, true));
-    }
-
-    private List<String> getConnectorPathList() {
-        if (server == null) {
-            return Collections.emptyList();
-        }
-
-        return Arrays.stream(server.getConnectors())
-                     .map(JettyServer::getConnectorPath)
-                     .flatMap(Collection::stream)
-                     .collect(Collectors.toList());
-    }
-
-    private static List<String> getConnectorPath(Connector c) {
-        ServerConnector sc = (ServerConnector) c;
-
-        final String prefix;
-        if (sc.getDefaultConnectionFactory() instanceof SslConnectionFactory) {
-            prefix = "https";
-        } else {
-            prefix = "http";
-        }
-
-        Set<String> ips = new HashSet<>();
-        String host = sc.getHost();
-        if (host == null || host.equals("0.0.0.0")) {
-            ips.addAll(getPossibleIpAddresses());
-        } else {
-            ips.add(host);
-        }
-
-        String layout = "%s://%s:%d" + CONFIG.getContextPath();
-
-        return ips.stream()
-                  .map(k -> String.format(layout, prefix, k, sc.getPort()))
-                  .collect(Collectors.toList());
-    }
-
-    private List<String> buildList(List<String> list, boolean replaceHttp) {
-        return list.stream()
-                   .map(s -> getElementPrefix(s, replaceHttp))
-                   .collect(Collectors.toList());
-    }
-
-    private String getElementPrefix(String str, boolean replaceHttp) {
-        if (replaceHttp) {
-            return str.replaceFirst("http", "ws");
-        } else {
-            return str;
-        }
-    }
-
-    /**
-     * Uses different APIs to find out the IP of this machine.
-     */
-    private static List<String> getPossibleIpAddresses() {
-        final String host = "treibhaus.informatik.rwth-aachen.de";
-        final List<String> ips = new ArrayList<>();
-
-        try {
-            ips.add(InetAddress.getLocalHost().getHostAddress());
-        } catch (Exception e) {
-            // fail silently
-        }
-
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(host, 80));
-            ips.add(socket.getLocalAddress().getHostAddress());
-        } catch (Exception e) {
-            // fail silently
-        }
-
-        // https://stackoverflow.com/a/38342964
-        try (DatagramSocket socket = new DatagramSocket()) {
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            ips.add(socket.getLocalAddress().getHostAddress());
-        } catch (Exception e) {
-            // fail silently
-        }
-
-        // https://stackoverflow.com/a/20418809
-        try {
-            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
-                NetworkInterface iface = ifaces.nextElement();
-                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
-                    InetAddress inetAddr = inetAddrs.nextElement();
-                    if (!inetAddr.isLoopbackAddress() && (inetAddr instanceof Inet4Address)) {
-                        ips.add(inetAddr.getHostAddress());
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            // fail silently
-        }
-
-        ips.removeIf("0.0.0.0"::equals);
-
-        if (ips.isEmpty()) {
-            // Well, we failed to read from system, fall back to main.properties.
-            // Better than nothing
-            ips.add(CONFIG.getJetty().getServerHost());
-        }
-
-        return ips;
     }
 }

@@ -34,7 +34,6 @@ import org.apache.cxf.message.Message;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -62,32 +61,33 @@ public class OcppConfiguration {
     private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
     private final MessageHeaderInterceptor messageHeaderInterceptor;
 
-    @PostConstruct
-    public void init() {
+    @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
+    public SpringBus cxf() {
+        SpringBus bus = new SpringBus();
+        configure(bus);
+        return bus;
+    }
+
+    private void configure(Bus bus) {
         List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
         List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
 
-        createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
-        createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
-        createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors, logging);
+        createOcppService(bus, ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
+        createOcppService(bus, ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
+        createOcppService(bus, ocpp16Server, "/CentralSystemServiceOCPP16", interceptors, logging);
 
         // Just a dummy service to route incoming messages to the appropriate service version. This should be the last
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
-        List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus()));
-        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+        List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(bus));
+        createOcppService(bus, ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
     }
 
-    @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
-    public SpringBus springBus() {
-        return new SpringBus();
-    }
-
-    private void createOcppService(Object serviceBean, String address,
+    private void createOcppService(Bus bus, Object serviceBean, String address,
                                    List<Interceptor<? extends Message>> interceptors,
                                    Collection<? extends Feature> features) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
-        f.setBus(springBus());
+        f.setBus(bus);
         f.setServiceBean(serviceBean);
         f.setAddress(address);
         f.getFeatures().addAll(features);

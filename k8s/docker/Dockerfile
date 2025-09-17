@@ -1,5 +1,4 @@
-# Build Stage
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:21-jdk AS base
 MAINTAINER daynnnnn
 
 # Setting environment variables
@@ -11,6 +10,9 @@ ARG DB_USERNAME
 ARG DB_PASSWORD
 ARG DB_DATABASE
 ARG DB_PORT
+
+# Build Stage
+FROM base as build
 
 # Set the working directory for the build stage
 WORKDIR /code
@@ -37,7 +39,7 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
 # Release Stage
-FROM eclipse-temurin:21-jdk AS release
+FROM base AS release
 
 # Copy relevant files from the build stage
 COPY --from=build /code/target/steve.jar /app/steve.jar

@@ -18,10 +18,6 @@
  */
 package de.rwth.idsg.steve;
 
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.ee10.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -29,7 +25,6 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -68,8 +63,6 @@ public class SteveAppContext {
         // https://jetty.org/docs/jetty/12.1/programming-guide/maven-jetty/jetty-maven-plugin.html
         // https://jetty.org/docs/jetty/12.1/operations-guide/annotations/index.html#og-container-include-jar-pattern
         webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", SCAN_PATTERN);
-
-        initJSP(webAppContext);
     }
 
     public ContextHandlerCollection getHandlers() {
@@ -117,64 +110,11 @@ public class SteveAppContext {
         return redirectSet;
     }
 
-    /**
-     * Help by:
-     * https://github.com/jetty/jetty-examples/tree/12.0.x/embedded/ee10-jsp
-     * https://github.com/jetty-project/embedded-jetty-jsp
-     * https://github.com/jasonish/jetty-springmvc-jsp-template
-     * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
-     */
-    private void initJSP(WebAppContext ctx) {
-        ctx.addBean(new EmbeddedJspStarter(ctx));
-        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-    }
-
     private static String getWebAppURIAsString() {
         try {
             return new ClassPathResource("webapp").getURI().toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * From: https://github.com/jetty/jetty-examples/blob/12.0.x/embedded/ee10-jsp/src/main/java/examples/EmbeddedJspStarter.java
-     *
-     * JspStarter for embedded ServletContextHandlers
-     *
-     * This is added as a bean that is a jetty LifeCycle on the ServletContextHandler.
-     * This bean's doStart method will be called as the ServletContextHandler starts,
-     * and will call the ServletContainerInitializer for the jsp engine.
-     */
-    public static class EmbeddedJspStarter extends AbstractLifeCycle {
-
-        private final JettyJasperInitializer sci;
-        private final ServletContextHandler context;
-
-        public EmbeddedJspStarter(ServletContextHandler context) {
-            this.sci = new JettyJasperInitializer();
-            this.context = context;
-
-            // we dont need all this from the example, since our JSPs are precompiled
-            //
-            // StandardJarScanner jarScanner = new StandardJarScanner();
-            // StandardJarScanFilter jarScanFilter = new StandardJarScanFilter();
-            // jarScanFilter.setTldScan("taglibs-standard-impl-*");
-            // jarScanFilter.setTldSkip("apache-*,ecj-*,jetty-*,asm-*,javax.servlet-*,javax.annotation-*,taglibs-standard-spec-*");
-            // jarScanner.setJarScanFilter(jarScanFilter);
-            // this.context.setAttribute("org.apache.tomcat.JarScanner", jarScanner);
-        }
-
-        @Override
-        protected void doStart() throws Exception {
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(context.getClassLoader());
-            try {
-                sci.onStartup(null, context.getServletContext());
-                super.doStart();
-            } finally {
-                Thread.currentThread().setContextClassLoader(old);
-            }
         }
     }
 }

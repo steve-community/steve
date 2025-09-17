@@ -19,16 +19,11 @@
 package de.rwth.idsg.steve;
 
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
-import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
-import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -65,11 +60,8 @@ public class SteveAppContext {
         webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", SCAN_PATTERN);
     }
 
-    public ContextHandlerCollection getHandlers() {
-        return new ContextHandlerCollection(
-            new ContextHandler(getRedirectHandler()),
-            new ContextHandler(getWebApp())
-        );
+    public Handler getHandler() {
+        return getWebApp();
     }
 
     private Handler getWebApp() {
@@ -80,34 +72,6 @@ public class SteveAppContext {
         // Wraps the whole web app in a gzip handler to make Jetty return compressed content
         // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
         return new GzipHandler(webAppContext);
-    }
-
-    private Handler getRedirectHandler() {
-        RewriteHandler rewrite = new RewriteHandler();
-        for (String redirect : getRedirectSet()) {
-            RedirectPatternRule rule = new RedirectPatternRule();
-            rule.setTerminating(true);
-            rule.setPattern(redirect);
-            rule.setLocation(CONFIG.getContextPath() + "/manager/home");
-            rewrite.addRule(rule);
-        }
-        return rewrite;
-    }
-
-    private HashSet<String> getRedirectSet() {
-        String path = CONFIG.getContextPath();
-
-        HashSet<String> redirectSet = new HashSet<>(3);
-        redirectSet.add("");
-        redirectSet.add(path + "");
-
-        // Otherwise (if path = ""), we would already be at root of the server ("/")
-        // and using the redirection below would cause an infinite loop.
-        if (!"".equals(path)) {
-            redirectSet.add(path + "/");
-        }
-
-        return redirectSet;
     }
 
     private static String getWebAppURIAsString() {

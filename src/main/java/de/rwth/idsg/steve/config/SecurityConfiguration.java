@@ -64,6 +64,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 req -> req
                     .requestMatchers(
+                        "/", // we have RootRedirectController to redirect "/" to "/manager"
                         "/static/**",
                         CONFIG.getCxfMapping() + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",

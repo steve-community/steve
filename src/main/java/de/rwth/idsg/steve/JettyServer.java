@@ -99,7 +99,7 @@ public class JettyServer {
         }
 
         steveAppContext = new SteveAppContext();
-        server.setHandler(steveAppContext.getHandlers());
+        server.setHandler(steveAppContext.getHandler());
     }
 
     private ServerConnector httpConnector(HttpConfiguration httpConfig) {

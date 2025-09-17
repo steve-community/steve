@@ -18,13 +18,10 @@
  */
 package de.rwth.idsg.steve;
 
-import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.ee10.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -34,16 +31,8 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.servlet.DispatcherServlet;
-
-import jakarta.servlet.DispatcherType;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.HashSet;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -54,13 +43,33 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 public class SteveAppContext {
 
-    private final AnnotationConfigWebApplicationContext springContext;
+    // scan all jars in the classpath for ServletContainerInitializers
+    // (e.g. Spring's WebApplicationInitializer)
+    private static final String SCAN_PATTERN = ".*\\.jar$|.*/classes/.*";
+
     private final WebAppContext webAppContext;
 
     public SteveAppContext() {
-        springContext = new AnnotationConfigWebApplicationContext();
-        springContext.scan("de.rwth.idsg.steve.config");
-        webAppContext = initWebApp();
+        webAppContext = new WebAppContext();
+        webAppContext.setContextPath(CONFIG.getContextPath());
+        webAppContext.setBaseResourceAsString(getWebAppURIAsString());
+
+        // if during startup an exception happens, do not swallow it, throw it
+        webAppContext.setThrowUnavailableOnStartupException(true);
+
+        // Disable directory listings if no index.html is found.
+        webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+
+        // Crucial for Spring's WebApplicationInitializer to be discovered
+        // and for the DispatcherServlet to be initialized.
+        // It tells Jetty to scan for classes implementing WebApplicationInitializer.
+        // The pattern ensures that Jetty finds the Spring classes in the classpath.
+        //
+        // https://jetty.org/docs/jetty/12.1/programming-guide/maven-jetty/jetty-maven-plugin.html
+        // https://jetty.org/docs/jetty/12.1/operations-guide/annotations/index.html#og-container-include-jar-pattern
+        webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", SCAN_PATTERN);
+
+        initJSP(webAppContext);
     }
 
     public ContextHandlerCollection getHandlers() {
@@ -78,36 +87,6 @@ public class SteveAppContext {
         // Wraps the whole web app in a gzip handler to make Jetty return compressed content
         // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
         return new GzipHandler(webAppContext);
-    }
-
-    private WebAppContext initWebApp() {
-        WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(CONFIG.getContextPath());
-        ctx.setBaseResourceAsString(getWebAppURIAsString());
-
-        // if during startup an exception happens, do not swallow it, throw it
-        ctx.setThrowUnavailableOnStartupException(true);
-
-        // Disable directory listings if no index.html is found.
-        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
-        ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
-
-        ctx.addEventListener(new ContextLoaderListener(springContext));
-        ctx.addServlet(web, CONFIG.getSpringMapping());
-        ctx.addServlet(cxf, CONFIG.getCxfMapping() + "/*");
-
-        // add spring security
-        ctx.addFilter(
-            // The bean name is not arbitrary, but is as expected by Spring
-            new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-            CONFIG.getSpringMapping() + "*",
-            EnumSet.allOf(DispatcherType.class)
-        );
-
-        initJSP(ctx);
-        return ctx;
     }
 
     private Handler getRedirectHandler() {

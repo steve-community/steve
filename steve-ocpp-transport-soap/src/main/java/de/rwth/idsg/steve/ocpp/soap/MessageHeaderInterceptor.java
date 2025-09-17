@@ -55,7 +55,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * @since 15.06.2015
  */
 @Slf4j
-@Component("messageHeaderInterceptor")
+@Component
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";

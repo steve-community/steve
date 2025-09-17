@@ -23,15 +23,17 @@ import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
-import de.rwth.idsg.steve.web.dto.WebEndpointInfo;
+import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -68,10 +70,8 @@ public class AboutSettingsController {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
-    public String getAbout(HttpServletRequest request, Model model) {
-        WebEndpointInfo info = new WebEndpointInfo();
-        info.getOcppSoap().setUrlPrefix("http", request.getServerName());
-        info.getOcppWebSocket().setUrlPrefix("ws", request.getServerName());
+    public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
+        String scheme = request.getScheme();
 
         model.addAttribute("version", CONFIG.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
@@ -79,7 +79,7 @@ public class AboutSettingsController {
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", info);
+        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host));
         return "about";
     }
 

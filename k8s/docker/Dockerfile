@@ -39,8 +39,9 @@ RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,
 # Release Stage
 FROM eclipse-temurin:21-jdk AS release
 
-# Copy only the generated jar file from the build stage
-COPY --from=build /code/target /app
+# Copy relevant files from the build stage
+COPY --from=build /code/target/steve.jar /app/steve.jar
+COPY --from=build /code/target/libs /app/libs
 
 # Expose any necessary ports (example: 8080)
 EXPOSE 8080

@@ -513,6 +513,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.13</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>tomcat-embed-el</artifactId>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -524,11 +530,21 @@
             <groupId>com.github.steve-community</groupId>
             <artifactId>ocpp-jaxb</artifactId>
             <version>0.0.9</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jakarta.activation</artifactId>
+                    <groupId>com.sun.activation</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jakarta.activation-api</artifactId>
+                    <groupId>jakarta.activation</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-            <version>2.0.2</version>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.3</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

@@ -33,7 +33,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -53,11 +53,12 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.2")
+@RequiredArgsConstructor
 public class Ocpp12Controller {
 
-    @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppTagService ocppTagService;
-    @Autowired protected ChargePointServiceClient chargePointServiceClient;
+    protected final OcppTagService ocppTagService;
+    protected final ChargePointHelperService chargePointHelperService;
+    protected final ChargePointServiceClient chargePointServiceClient;
 
     protected static final String PARAMS = "params";
 

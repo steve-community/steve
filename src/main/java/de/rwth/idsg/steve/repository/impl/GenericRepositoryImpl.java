@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -32,7 +33,6 @@ import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Record8;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Repository;
@@ -55,9 +55,10 @@ import static org.jooq.impl.DSL.select;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class GenericRepositoryImpl implements GenericRepository {
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {

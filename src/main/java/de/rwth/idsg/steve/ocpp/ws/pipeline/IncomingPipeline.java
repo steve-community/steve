@@ -42,7 +42,7 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
     private final Sender sender = Sender.INSTANCE;
 
     private final Deserializer deserializer;
-    private final AbstractCallHandler handler;
+    private final OcppCallHandler handler;
 
     @Override
     public void accept(CommunicationContext context) {

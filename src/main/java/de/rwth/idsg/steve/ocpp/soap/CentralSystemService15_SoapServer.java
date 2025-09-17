@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.converter.Convert;
 import de.rwth.idsg.steve.ocpp.converter.Server15to16Impl;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.AuthorizeRequest;
 import ocpp.cs._2012._06.AuthorizeResponse;
@@ -45,7 +46,6 @@ import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StatusNotificationResponse;
 import ocpp.cs._2012._06.StopTransactionRequest;
 import ocpp.cs._2012._06.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.jws.WebService;
@@ -54,6 +54,7 @@ import jakarta.xml.ws.BindingType;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.Addressing;
 import jakarta.xml.ws.soap.SOAPBinding;
+
 import java.util.concurrent.Future;
 
 /**
@@ -62,6 +63,7 @@ import java.util.concurrent.Future;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Addressing(enabled = true, required = false)
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
@@ -72,7 +74,7 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2012._06.CentralSystemService")
 public class CentralSystemService15_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService16_Service service;
+    private final CentralSystemService16_Service service;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {

@@ -25,10 +25,10 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
 import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm.OcppSettings;
 import jooq.steve.db.tables.records.SettingsRecord;
+import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
@@ -46,6 +46,7 @@ import static jooq.steve.db.tables.Settings.SETTINGS;
  * @since 06.11.2015
  */
 @Repository
+@RequiredArgsConstructor
 public class SettingsRepositoryImpl implements SettingsRepository {
 
     // Totally unnecessary to specify charset here. We just do it to make findbugs plugin happy.
@@ -55,7 +56,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         StandardCharsets.UTF_8
     );
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
 
     @Override
     public SettingsForm getForm() {

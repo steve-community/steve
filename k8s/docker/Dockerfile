@@ -1,5 +1,5 @@
 # Build Stage
-FROM eclipse-temurin:17-jdk AS build
+FROM eclipse-temurin:21-jdk AS build
 MAINTAINER daynnnnn
 
 # Setting environment variables
@@ -37,7 +37,7 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
 # Release Stage
-FROM eclipse-temurin:17-jdk AS release
+FROM eclipse-temurin:21-jdk AS release
 
 # Copy only the generated jar file from the build stage
 COPY --from=build /code/target /app

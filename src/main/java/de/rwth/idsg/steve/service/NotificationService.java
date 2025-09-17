@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,22 +21,26 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static java.lang.String.format;
 
 /**
@@ -45,75 +49,82 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired private MailService mailService;
+    private final MailService mailService;
 
-    public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
+    @EventListener
+    public void ocppStationBooted(OccpStationBooted notification) {
         if (isDisabled(OcppStationBooted)) {
             return;
         }
 
-        String subject = format("Received boot notification from '%s'", chargeBoxId);
+        String subject = format("Received boot notification from '%s'", notification.getChargeBoxId());
         String body;
-        if (status.isPresent()) {
-            body = format("Charging station '%s' is in database and has registration status '%s'.", chargeBoxId, status.get().value());
+        if (notification.getStatus().isPresent()) {
+            body = format("Charging station '%s' is in database and has registration status '%s'.", notification.getChargeBoxId(), notification.getStatus().get().value());
         } else {
-            body = format("Charging station '%s' is NOT in database", chargeBoxId);
+            body = format("Charging station '%s' is NOT in database", notification.getChargeBoxId());
         }
 
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
-    public void ocppStationWebSocketConnected(String chargeBoxId) {
+    @EventListener
+    public void ocppStationWebSocketConnected(OcppStationWebSocketConnected notification) {
         if (isDisabled(OcppStationWebSocketConnected)) {
             return;
         }
 
-        String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
+        String subject = format("Connected to JSON charging station '%s'", notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
-    public void ocppStationWebSocketDisconnected(String chargeBoxId) {
+    @EventListener
+    public void ocppStationWebSocketDisconnected(OcppStationWebSocketDisconnected notification) {
         if (isDisabled(OcppStationWebSocketDisconnected)) {
             return;
         }
 
-        String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
+        String subject = format("Disconnected from JSON charging station '%s'", notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
-    public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
+    @EventListener
+    public void ocppStationStatusFailure(OcppStationStatusFailure notification) {
         if (isDisabled(OcppStationStatusFailure)) {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", connectorId, chargeBoxId);
-        String body = format("Status Error Code: '%s'", errorCode);
+        String subject = format("Connector '%s' of charging station '%s' is FAULTED", notification.getConnectorId(), notification.getChargeBoxId());
+        String body = format("Status Error Code: '%s'", notification.getErrorCode());
 
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
-    public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
+    @EventListener
+    public void ocppTransactionStarted(OcppTransactionStarted notification) {
         if (isDisabled(OcppTransactionStarted)) {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
+        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", notification.getTransactionId(), notification.getParams().getChargeBoxId(), notification.getParams().getConnectorId());
 
-        mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
 
-    public void ocppTransactionEnded(UpdateTransactionParams params) {
+    @EventListener
+    public void ocppTransactionEnded(OcppTransactionEnded notification) {
        if (isDisabled(OcppTransactionEnded)) {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
+        String subject = format("Transaction '%s' has ended on charging station '%s'", notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
 
-        mailService.sendAsync(subject, addTimestamp(createContent(params)));
+        mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
 
     // -------------------------------------------------------------------------
@@ -150,7 +161,7 @@ public class NotificationService {
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();
 
-        boolean isEnabled = settings.isEnabled()
+        boolean isEnabled = Boolean.TRUE.equals(settings.getEnabled())
                 && settings.getEnabledFeatures().contains(f)
                 && !settings.getRecipients().isEmpty();
 

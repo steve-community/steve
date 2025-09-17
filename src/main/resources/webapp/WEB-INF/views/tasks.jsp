@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,8 @@
         Request Tasks <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle"><span>Click on Task IDs for detailed task information.</span></a>
     </span></section>
     <form:form action="${ctxPath}/manager/operations/tasks">
-        <input type="submit" value="Delete Finished"/>
+        <input type="submit" name="finished" value="Delete Finished"/>
+        <input type="submit" name="unfinished" value="Delete Unfinished"/>
     </form:form>
     <br>
     <table class="res">

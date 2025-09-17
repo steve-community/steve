@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,12 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -29,16 +32,68 @@ import org.joda.time.DateTime;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
+@Schema(description = """
+        For active transactions, all 'stop'-prefixed fields would be null.
+        The energy consumed during the transaction can be calculated by subtracting the 'startValue' from the 'stopValue'.
+        The unit of the 'startValue' and 'stopValue' is watt-hours (Wh).
+        """)
 @Getter
 @Builder
+@ToString
 public final class Transaction {
-    private final int id, connectorId, chargeBoxPk, ocppTagPk;
-    private final String chargeBoxId, ocppIdTag, startTimestamp, startValue;
-    private final DateTime startTimestampDT;
 
-    @Nullable private final String stopTimestamp;
-    @Nullable private final String stopValue;
-    @Nullable private final String stopReason; // new in OCPP 1.6
-    @Nullable private final DateTime stopTimestampDT;
-    @Nullable private final TransactionStopEventActor stopEventActor;
+    @Schema(description = "PK of the transaction")
+    private final int id;
+
+    @Schema(description = "Connector ID of the charge box at which the transaction took place")
+    private final int connectorId;
+
+    @Schema(description = "PK of the charge box at which the transaction took place")
+    private final int chargeBoxPk;
+
+    @Schema(description = "PK of the OCPP tag used in the transaction")
+    private final int ocppTagPk;
+
+    @Schema(description = "The identifier of the charge box at which the transaction took place")
+    private final String chargeBoxId;
+
+    @Schema(description = "The Ocpp Tag used in the transaction")
+    private final String ocppIdTag;
+
+    /**
+     * Only relevant for the web pages. Disabled for API
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    private final String startTimestampFormatted;
+
+    @Schema(description = "The meter value reading at the start of the transaction")
+    private final String startValue;
+
+    @Schema(description = "The timestamp at which the transaction started")
+    private final DateTime startTimestamp;
+
+    /**
+     * Only relevant for the web pages. Disabled for API
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @Nullable
+    private final String stopTimestampFormatted;
+
+    @Nullable
+    @Schema(description = "The meter value reading at the end of the transaction")
+    private final String stopValue;
+
+    @Nullable
+    @Schema(description = "The reason for the transaction being stopped")
+    private final String stopReason; // new in OCPP 1.6
+
+    @Nullable
+    @Schema(description = "The timestamp at which the transaction ended")
+    private final DateTime stopTimestamp;
+
+    @Nullable
+    @Schema(description = "The actor who stopped the transaction")
+    private final TransactionStopEventActor stopEventActor;
 }

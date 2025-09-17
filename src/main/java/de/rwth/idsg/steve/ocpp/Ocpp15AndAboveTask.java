@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -30,8 +30,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public abstract class Ocpp15AndAboveTask<S extends ChargePointSelection, RESPONSE> extends CommunicationTask<S, RESPONSE> {
 
-    public Ocpp15AndAboveTask(OcppVersion ocppVersion, S params) {
-        super(ocppVersion, params);
+    public Ocpp15AndAboveTask(S params) {
+        super(params);
     }
 
     @Deprecated

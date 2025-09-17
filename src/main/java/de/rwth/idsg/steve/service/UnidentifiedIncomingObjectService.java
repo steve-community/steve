@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,16 +61,6 @@ public class UnidentifiedIncomingObjectService {
                 objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
                              .updateStats();
             } catch (ExecutionException e) {
-                log.error("Error occurred", e);
-            }
-        }
-    }
-
-    public void remove(String key) {
-        synchronized (changeLock) {
-            try {
-                objectsHolder.invalidate(key);
-            } catch (Exception e) {
                 log.error("Error occurred", e);
             }
         }

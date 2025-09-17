@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -27,9 +29,8 @@ import org.springframework.web.socket.WebSocketSession;
  * @since 10.05.2018
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WebSocketLogger {
-
-    private WebSocketLogger() { }
 
     public static void connected(String chargeBoxId, WebSocketSession session) {
         log.info("[chargeBoxId={}, sessionId={}] Connection is established", chargeBoxId, session.getId());
@@ -60,14 +61,10 @@ public final class WebSocketLogger {
     }
 
     public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Ping error", t);
-        }
+        log.error("[chargeBoxId={}, sessionId={}] Ping error", chargeBoxId, session.getId(), t);
     }
 
     public static void transportError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Transport error", t);
-        }
+        log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
     }
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,13 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.TimeZone;
 
 /**
@@ -29,11 +32,11 @@ import java.util.TimeZone;
  * @since 14.01.2015
  */
 @Slf4j
-public class Application implements ApplicationStarter, AutoCloseable {
+public class Application {
 
-    private final ApplicationStarter delegate;
+    private final JettyServer server = new JettyServer();
 
-    public Application() {
+    public static void main(String[] args) throws Exception {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
@@ -44,49 +47,38 @@ public class Application implements ApplicationStarter, AutoCloseable {
         DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
 
-        switch (sc.getProfile()) {
-            case DEV:
-                delegate = new SteveDevStarter();
-                break;
-            case TEST:
-            case PROD:
-                delegate = new SteveProdStarter();
-                break;
-            default:
-                throw new RuntimeException("Unexpected profile");
+        Optional<Path> path = LogFileRetriever.INSTANCE.getPath();
+        boolean loggingToFile = path.isPresent();
+        if (loggingToFile) {
+            System.out.println("Log file: " + path.get().toAbsolutePath());
         }
-    }
 
-    public static void main(String[] args) throws Exception {
-        Application app = null;
+        Application app = new Application();
+
         try {
-            app = new Application();
             app.start();
             app.join();
         } catch (Exception e) {
-            if (app != null) {
-                app.stop();
+            log.error("Application failed to start", e);
+
+            if (loggingToFile) {
+                System.err.println("Application failed to start");
+                e.printStackTrace();
             }
+
+            app.stop();
         }
     }
 
-    @Override
     public void start() throws Exception {
-        delegate.start();
+        server.start();
     }
 
-    @Override
     public void join() throws Exception {
-        delegate.join();
+        server.join();
     }
 
-    @Override
     public void stop() throws Exception {
-        delegate.stop();
-    }
-
-    @Override
-    public void close() throws Exception {
-        stop();
+        server.stop();
     }
 }

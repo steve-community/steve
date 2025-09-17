@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,9 +24,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -44,9 +43,11 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     @NotNull(message = "Key type is required")
     private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
-    // Disabled @NotBlank after https://github.com/RWTH-i5-IDSG/steve/issues/148
+    // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
-    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
+    //
+    // Disabled @Pattern after https://github.com/steve-community/steve/issues/920
+    // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")
@@ -81,7 +82,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     /**
      * Because we want to permit empty values
      *
-     * https://github.com/RWTH-i5-IDSG/steve/issues/148
+     * https://github.com/steve-community/steve/issues/148
      */
     public String getValue() {
         return Objects.requireNonNullElse(value, "");

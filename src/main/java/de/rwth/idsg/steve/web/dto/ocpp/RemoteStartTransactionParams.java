@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,14 +22,16 @@ import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.01.2015
  */
 @Getter
+@Setter
 public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
@@ -37,7 +39,10 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @NotBlank(message = "User ID Tag is required")
     @IdTag
-    @Setter private String idTag;
+    private String idTag;
+
+    @Positive
+    private Integer chargingProfilePk;
 
     /**
      * Not for a specific connector, when frontend sends the value 0.

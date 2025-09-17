@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,9 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,8 +30,12 @@ import javax.xml.ws.AsyncHandler;
  */
 public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
 
-    public RemoteStartTransactionTask(OcppVersion ocppVersion, RemoteStartTransactionParams params) {
-        super(ocppVersion, params);
+    private final ocpp.cp._2015._10.ChargingProfile chargingProfile;
+
+    public RemoteStartTransactionTask(RemoteStartTransactionParams params,
+                                      ocpp.cp._2015._10.ChargingProfile chargingProfile) {
+        super(params);
+        this.chargingProfile = chargingProfile;
     }
 
     @Override
@@ -54,14 +57,12 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                 .withConnectorId(params.getConnectorId());
     }
 
-    /**
-     * TODO: RemoteStartTransactionRequest.chargingProfile not implemented
-     */
     @Override
     public ocpp.cp._2015._10.RemoteStartTransactionRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.RemoteStartTransactionRequest()
                 .withIdTag(params.getIdTag())
-                .withConnectorId(params.getConnectorId());
+                .withConnectorId(params.getConnectorId())
+                .withChargingProfile(chargingProfile);
     }
 
     @Override

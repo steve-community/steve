@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,33 +20,35 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
+import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.OcppTagActivity;
+import jooq.steve.db.tables.UserOcppTag;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.OcppTagRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
-import org.jooq.Record7;
+import org.jooq.Record11;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
+import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -54,22 +56,19 @@ import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     private final DSLContext ctx;
 
-    @Autowired
-    public OcppTagRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
-
     @Override
     @SuppressWarnings("unchecked")
-    public List<Overview> getOverview(OcppTagQueryForm form) {
+    public List<OcppTagOverview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
         OcppTagActivity parentTable = OCPP_TAG_ACTIVITY.as("parent");
+        UserOcppTag userOcppTagTable = USER_OCPP_TAG.as("user_ocpp_tag");
 
         selectQuery.addSelect(
                 OCPP_TAG_ACTIVITY.OCPP_TAG_PK,
@@ -78,10 +77,19 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 OCPP_TAG_ACTIVITY.PARENT_ID_TAG,
                 OCPP_TAG_ACTIVITY.EXPIRY_DATE,
                 OCPP_TAG_ACTIVITY.IN_TRANSACTION,
-                OCPP_TAG_ACTIVITY.BLOCKED
+                OCPP_TAG_ACTIVITY.BLOCKED,
+                OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT,
+                OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT,
+                OCPP_TAG_ACTIVITY.NOTE,
+                userOcppTagTable.USER_PK
         );
 
         selectQuery.addJoin(parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG_ACTIVITY.PARENT_ID_TAG));
+        selectQuery.addJoin(userOcppTagTable, JoinType.LEFT_OUTER_JOIN, userOcppTagTable.OCPP_TAG_PK.eq(OCPP_TAG_ACTIVITY.OCPP_TAG_PK));
+
+        if (form.isOcppTagPkSet()) {
+            selectQuery.addConditions(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.eq(form.getOcppTagPk()));
+        }
 
         if (form.isIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.ID_TAG.eq(form.getIdTag()));
@@ -89,6 +97,25 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         if (form.isParentIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.PARENT_ID_TAG.eq(form.getParentIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            selectQuery.addConditions(userOcppTagTable.USER_PK.eq(form.getUserId()));
+        }
+
+        if (form.isNoteSet()) {
+            selectQuery.addConditions(includes(OCPP_TAG_ACTIVITY.NOTE, form.getNote()));
+        }
+
+        switch (form.getUserFilter()) {
+            case OnlyTagsWithUser:
+                selectQuery.addConditions(userOcppTagTable.USER_PK.isNotNull());
+                break;
+            case OnlyTagsWithoutUser:
+                selectQuery.addConditions(userOcppTagTable.USER_PK.isNull());
+                break;
+            default:
+                break;
         }
 
         switch (form.getExpired()) {
@@ -150,12 +177,25 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
+    public List<String> getIdTagsWithoutUser() {
+        return ctx.select(OCPP_TAG.ID_TAG)
+            .from(OCPP_TAG)
+            .leftJoin(USER_OCPP_TAG).on(OCPP_TAG.OCPP_TAG_PK.eq(USER_OCPP_TAG.OCPP_TAG_PK))
+            .where(USER_OCPP_TAG.OCPP_TAG_PK.isNull())
+            .orderBy(OCPP_TAG.ID_TAG)
+            .fetch(OCPP_TAG.ID_TAG);
+    }
+
+    @Override
     public List<String> getActiveIdTags() {
         return ctx.select(OCPP_TAG_ACTIVITY.ID_TAG)
                   .from(OCPP_TAG_ACTIVITY)
-                  .where(OCPP_TAG_ACTIVITY.IN_TRANSACTION.isFalse())
+                  .where(OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT
+                          .lessThan(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.cast(Long.class))
+                          .or(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.lessThan(0)))
                     .and(OCPP_TAG_ACTIVITY.BLOCKED.isFalse())
-                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull().or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
+                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull()
+                            .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
                   .fetch(OCPP_TAG_ACTIVITY.ID_TAG);
     }
 
@@ -192,7 +232,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             return ctx.insertInto(OCPP_TAG)
                       .set(OCPP_TAG.ID_TAG, u.getIdTag())
                       .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
-                      .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
+                      .set(OCPP_TAG.EXPIRY_DATE, u.getExpiryDate())
                       .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                       .set(OCPP_TAG.NOTE, u.getNote())
                       .returning(OCPP_TAG.OCPP_TAG_PK)
@@ -201,7 +241,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
+                throw new SteveException.AlreadyExists("A user with idTag '%s' already exists.", u.getIdTag());
             } else {
                 throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
             }
@@ -213,7 +253,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         try {
             ctx.update(OCPP_TAG)
                .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
-               .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
+               .set(OCPP_TAG.EXPIRY_DATE, u.getExpiryDate())
                .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                .set(OCPP_TAG.NOTE, u.getNote())
                .where(OCPP_TAG.OCPP_TAG_PK.equal(u.getOcppTagPk()))
@@ -243,18 +283,22 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean>, Overview> {
+            implements RecordMapper<Record11<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String, Integer>, OcppTagOverview> {
         @Override
-        public Overview map(Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean> r) {
-            return Overview.builder()
+        public OcppTagOverview map(Record11<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String, Integer> r) {
+            return OcppTagOverview.builder()
                           .ocppTagPk(r.value1())
                           .parentOcppTagPk(r.value2())
                           .idTag(r.value3())
                           .parentIdTag(r.value4())
-                          .expiryDateDT(r.value5())
-                          .expiryDate(humanize(r.value5()))
+                          .expiryDate(r.value5())
+                          .expiryDateFormatted(humanize(r.value5()))
                           .inTransaction(r.value6())
                           .blocked(r.value7())
+                          .maxActiveTransactionCount(r.value8())
+                          .activeTransactionCount(r.value9())
+                          .note(r.value10())
+                          .userPk(r.value11())
                           .build();
         }
     }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,12 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -53,7 +58,7 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -64,20 +69,20 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
-
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private NotificationService notificationService;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final OcppServerRepository ocppServerRepository;
+    private final SettingsRepository settingsRepository;
+    private final OcppTagService ocppTagService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChargePointRegistrationService chargePointRegistrationService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, status);
+        Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxIdentity);
+        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -138,19 +143,21 @@ public class CentralSystemService16_Service {
         ocppServerRepository.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            notificationService.ocppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value());
+            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
         return new StatusNotificationResponse();
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
+        Integer transactionId = getTransactionId(parameters);
+
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
                 parameters.getMeterValue(),
                 parameters.getConnectorId(),
-                parameters.getTransactionId()
+                transactionId
         );
 
         return new MeterValuesResponse();
@@ -168,6 +175,8 @@ public class CentralSystemService16_Service {
         IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 true,
+                chargeBoxIdentity,
+                parameters.getConnectorId(),
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
         );
 
@@ -184,7 +193,7 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        notificationService.ocppTransactionStarted(transactionId, params);
+        applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -199,6 +208,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> null
         );
 
@@ -217,7 +228,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
-        notificationService.ocppTransactionEnded(params);
+        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
@@ -234,6 +245,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
         );
 
@@ -253,7 +266,25 @@ public class CentralSystemService16_Service {
         }
 
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
-        // https://github.com/RWTH-i5-IDSG/steve/pull/36
+        // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * https://github.com/steve-community/steve/issues/1415
+     */
+    private Integer getTransactionId(MeterValuesRequest parameters) {
+        Integer transactionId = parameters.getTransactionId();
+        if (transactionId == null) {
+            return null;
+        } else if (transactionId < 1) {
+            log.warn("MeterValues transactionId is invalid ({}), ignoring it", transactionId);
+            return null;
+        }
+        return transactionId;
     }
 }

@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,17 @@
 --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <table class="userInput">
-	<thead><tr><th>OCPP</th><th></th></thead>
+	<thead><tr><th>OCPP ID Tags</th><th></th></tr></thead>
 	<tbody>
 	<tr>
-		<td>OCPP ID Tag:</td>
-		<td><form:select path="ocppIdTag" items="${idTagList}" /></td>
+		<td style="vertical-align:top">
+			<input type="button" value="Select None" onClick="selectNone(document.getElementById('idTagList'))">
+		</td>
+		<td>
+			<form:select path="idTagList" size="5" multiple="true">
+				<form:options items="${idTagList}"/>
+			</form:select>
+		</td>
 	</tr>
 	<tr><td></td>
 		<td id="add_space">

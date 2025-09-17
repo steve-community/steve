@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -56,6 +56,10 @@ Transactions
                         <form:options items="${idTagList}"/>
                     </form:select>
                 </td>
+            </tr>
+            <tr>
+                <td>User ID:</td>
+                <td><form:input path="userId"/></td>
             </tr>
             <tr>
                 <td>Transaction Type:</td>
@@ -115,15 +119,15 @@ Transactions
                 <td><a href="${ctxPath}/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
                 <td>${ta.connectorId}</td>
                 <td><a href="${ctxPath}/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>
-                <td data-sort-value="${ta.startTimestampDT.millis}">${ta.startTimestamp}</td>
+                <td data-sort-value="${ta.startTimestamp.millis}">${ta.startTimestampFormatted}</td>
                 <td>${ta.startValue}</td>
-                <td data-sort-value="${ta.stopTimestampDT.millis}">${ta.stopTimestamp}</td>
+                <td data-sort-value="${ta.stopTimestamp.millis}">${ta.stopTimestampFormatted}</td>
                 <td>${ta.stopValue}</td>
-                <td>${ta.stopReason}</td>
+                <td><encode:forHtml value="${ta.stopReason}" /></td>
                 <td>
                     <c:if test="${empty ta.stopValue}">
                         <form:form action="${ctxPath}/manager/transactions/stop/${ta.id}">
-                            <input type="submit" class="redSubmit" title="Manually stop this active transaction" value="Stop">
+                            <input type="submit" class="redSubmit" title="Manually set this transaction from 'active' to 'stopped'. The actual transaction is not affected by this!" value="Stop">
                         </form:form>
                     </c:if>
                 </td>

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ public final class ConnectorStatusFilter {
      * station). Connector id 0 should have upper hand while providing status information if its timestamp is
      * more recent than the others and mask status info of other connectors.
      *
-     * Link: https://github.com/RWTH-i5-IDSG/steve/issues/16
+     * Link: https://github.com/steve-community/steve/issues/16
      *
      * Logic walk-through:
      *

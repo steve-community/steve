@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,13 +22,16 @@ import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.web.validation.EmailCollection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -37,40 +40,53 @@ import java.util.List;
  */
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@ToString
 public class SettingsForm {
 
-    // -------------------------------------------------------------------------
-    // OCPP
-    // -------------------------------------------------------------------------
+    @Valid
+    private OcppSettings ocppSettings;
+    @Valid
+    private MailSettings mailSettings;
 
-    @Min(value = 1, message = "Heartbeat Interval must be at least {value}")
-    @NotNull(message = "Heartbeat Interval is required")
-    private Integer heartbeat;
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OcppSettings {
+        @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
+        @NotNull(message = "Heartbeat Interval is required")
+        private Integer heartbeat;
 
-    @Min(value = 0, message = "Expiration must be at least {value}")
-    @NotNull(message = "Expiration is required")
-    private Integer expiration;
+        @Min(value = 0, message = "Expiration must be at least {value}")
+        @NotNull(message = "Expiration is required")
+        private Integer expiration;
+    }
 
-    // -------------------------------------------------------------------------
-    // Mail notification
-    // -------------------------------------------------------------------------
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MailSettings {
+        @NotNull
+        private Boolean enabled;
 
-    @NotNull
-    private Boolean enabled;
+        private String protocol;
 
-    @Email(message = "'From' field is not a valid e-mail address")
-    private String from;
+        private String mailHost;
 
-    private String host, username, password, protocol;
+        @Min(value = 1, message = "Port must be positive")
+        private Integer port;
 
-    @Min(value = 1, message = "Port must be positive")
-    private Integer port;
+        @Email(message = "'From' field is not a valid e-mail address")
+        private String from;
 
-    @EmailCollection
-    private List<String> recipients;
+        private String username;
 
-    private List<NotificationFeature> enabledFeatures;
+        private String password;
+
+        @EmailCollection
+        private List<String> recipients;
+
+        private List<NotificationFeature> enabledFeatures;
+    }
 }

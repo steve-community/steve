@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -31,17 +30,17 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,12 +50,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -64,36 +59,18 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChargePointHelperService {
 
-    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
-    private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
-
-    @Autowired private GenericRepository genericRepository;
+    private final GenericRepository genericRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address
-    @Autowired private ChargePointRepository chargePointRepository;
+    private final ChargePointRepository chargePointRepository;
 
     // For WebSocket-based charge points, the active sessions are stored in memory
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
-
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
-
-    public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
-        Lock l = isRegisteredLocks.get(chargeBoxId);
-        l.lock();
-        try {
-            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
-            if (status.isEmpty()) {
-                unknownChargePointService.processNewUnidentified(chargeBoxId);
-            }
-            return status;
-        } finally {
-            l.unlock();
-        }
-    }
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public Statistics getStats() {
         Statistics stats = genericRepository.getStats();
@@ -117,7 +94,7 @@ public class ChargePointHelperService {
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
 
         // iterate over JSON stations and mark disconnected ones
-        // https://github.com/RWTH-i5-IDSG/steve/issues/355
+        // https://github.com/steve-community/steve/issues/355
         //
         for (ConnectorStatus status : latestList) {
             OcppProtocol protocol = status.getOcppProtocol();
@@ -147,77 +124,56 @@ public class ChargePointHelperService {
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED));
+        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
+        return getChargePoints(version, inStatusFilter, Collections.emptyList());
+    }
+
+    public List<ChargePointSelect> getChargePointsWithIds(OcppVersion version, List<String> chargeBoxIdFilter) {
+        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
+    }
+
+    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
         switch (version) {
             case V_12:
-                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, ocpp12WebSocketEndpoint);
+                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
             case V_15:
-                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, ocpp15WebSocketEndpoint);
+                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
             case V_16:
-                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, ocpp16WebSocketEndpoint);
+                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + version);
         }
-    }
-
-    public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
-        return unknownChargePointService.getObjects();
-    }
-
-    public void removeUnknown(String chargeBoxId) {
-        unknownChargePointService.remove(chargeBoxId);
-    }
-
-    public void removeUnknown(List<String> chargeBoxIdList) {
-        unknownChargePointService.removeAll(chargeBoxIdList);
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
-        // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
-        if (status.isPresent()) {
-            try {
-                return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
-            } catch (Exception e) {
-                // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
-                log.error("Exception happened", e);
-                return Optional.empty();
-            }
-        }
-
-        // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
-        if (!autoRegisterUnknownStations) {
-            return Optional.empty();
-        }
-
-        // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
-        try {
-            chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
-            log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
-        } catch (Exception e) {
-            log.error("Failed to auto-register unknown chargebox '" + chargeBoxId + "'", e);
-            return Optional.empty();
-        }
-    }
-
     private List<ChargePointSelect> getChargePoints(OcppProtocol protocol, List<RegistrationStatus> inStatusFilter,
-                                                    AbstractWebSocketEndpoint jsonEndpoint) {
+                                                    List<String> chargeBoxIdFilter, AbstractWebSocketEndpoint jsonEndpoint) {
+        // soap stations
+        //
         List<String> statusFilter = inStatusFilter.stream()
                                                   .map(RegistrationStatus::value)
                                                   .collect(Collectors.toList());
 
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter);
-        for (String chargeBoxId : jsonEndpoint.getChargeBoxIdList()) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
+
+        // json stations
+        //
+        List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
+            ? jsonEndpoint.getChargeBoxIdList()
+            : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+
+        var jsonProtocol = OcppProtocol.from(jsonEndpoint.getVersion(), OcppTransport.JSON);
+
+        for (String chargeBoxId : chargeBoxIdList) {
+            returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId));
         }
+
         return returnList;
     }
 

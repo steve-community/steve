@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
     <center>
         <table id='details' class='cpd'>
             <thead><tr><th>Task Details</th><th></th></tr></thead>
-            <tr><td>Operation name</td><td>${task.ocppVersion.value} / ${task.operationName}</td></tr>
+            <tr><td>Operation name</td><td>${task.operationName}</td></tr>
             <tr><td>Origin</td><td>${task.origin} (${task.caller})</td></tr>
             <tr><td>Start timestamp</td><td>${task.startTimestamp}</td></tr>
             <tr><td>End timestamp</td><td>${task.endTimestamp}</td></tr>
@@ -52,10 +52,10 @@
                 <td>
                     <c:choose>
                         <c:when test="${result.value.details == null}">
-                            ${result.value.response}
+                            <encode:forHtml value="${result.value.response}" />
                         </c:when>
                         <c:otherwise>
-                            ${result.value.response} (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}/">Details</a>)
+                            <encode:forHtml value="${result.value.response}" /> (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}/">Details</a>)
                         </c:otherwise>
                     </c:choose>
                 </td>

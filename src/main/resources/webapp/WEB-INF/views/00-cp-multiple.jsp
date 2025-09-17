@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <table class="userInput">
 	<tr>
 		<td style="vertical-align:top">
@@ -27,7 +27,7 @@
 		<td>
 			<form:select path="chargePointSelectList" size="5" multiple="true">
 				<c:forEach items="${cpList}" var="cp">
-					<form:option value="${cp.ocppTransport};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
+					<form:option value="${cp.ocppProtocol};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
 				</c:forEach>
 			</form:select>
 		</td>

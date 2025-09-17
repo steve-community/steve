@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,13 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,10 +37,9 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
 
     private final ChargingProfileRepository chargingProfileRepository;
 
-    public ClearChargingProfileTask(OcppVersion ocppVersion,
-                                    ClearChargingProfileParams params,
+    public ClearChargingProfileTask(ClearChargingProfileParams params,
                                     ChargingProfileRepository chargingProfileRepository) {
-        super(ocppVersion, params);
+        super(params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
 
@@ -52,18 +50,22 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    switch (params.getFilterType()) {
-                        case ChargingProfileId:
-                            chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
-                            break;
-                        case OtherParameters:
-                            chargingProfileRepository.clearProfile(chargeBoxId,
-                                    params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
-                            break;
-                        default:
-                            log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
-                    }
+                switch (params.getFilterType()) {
+                    case ChargingProfileId:
+                        chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
+                        break;
+                    case OtherParameters:
+                        chargingProfileRepository.clearProfile(chargeBoxId,
+                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+                        break;
+                    default:
+                        log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
+                        return;
+                }
+
+                // https://github.com/steve-community/steve/pull/968
+                if (!"Accepted".equalsIgnoreCase(statusValue)) {
+                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, statusValue);
                 }
             }
         };

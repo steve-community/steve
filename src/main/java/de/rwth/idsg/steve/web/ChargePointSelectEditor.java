@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web;
 
-import de.rwth.idsg.steve.ocpp.OcppTransport;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
 import java.beans.PropertyEditorSupport;
@@ -34,11 +34,11 @@ public class ChargePointSelectEditor extends PropertyEditorSupport {
         if (!text.isEmpty()) {
             String[] chargePointItem = text.split(";");
 
-            // chargePointItem[0] : ocpp transport type
+            // chargePointItem[0] : ocpp protocol
             // chargePointItem[1] : chargebox id
             // chargePointItem[2] : endpoint (IP) address
             ChargePointSelect cps = new ChargePointSelect(
-                    OcppTransport.fromName(chargePointItem[0]),
+                    OcppProtocol.valueOf(chargePointItem[0]),
                     chargePointItem[1],
                     chargePointItem[2]
             );

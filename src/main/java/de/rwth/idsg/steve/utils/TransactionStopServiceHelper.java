@@ -1,3 +1,21 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
@@ -20,7 +38,7 @@ public class TransactionStopServiceHelper {
 
     public static boolean isEnergyValue(TransactionDetails.MeterValues v) {
         // should not happen, but check it to be safe.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/249
+        // https://github.com/steve-community/steve/issues/249
         if (Strings.isNullOrEmpty(v.getValue())) {
             return false;
         }
@@ -33,40 +51,49 @@ public class TransactionStopServiceHelper {
             return false;
         }
 
-        // from 1.6 docs: "To retain backward compatibility, the default values of all of the optional fields on a
-        // sampledValue element are such that a value without any additional fields will be interpreted, as a register
-        // reading of active import energy in Wh (Watt-hour) units."
-        if (Strings.isNullOrEmpty(v.getReadingContext())
-            && Strings.isNullOrEmpty(v.getFormat())
-            && Strings.isNullOrEmpty(v.getMeasurand())
-            && Strings.isNullOrEmpty(v.getLocation())
-            && Strings.isNullOrEmpty(v.getUnit())
-            && Strings.isNullOrEmpty(v.getPhase())) {
-            return true;
+        // edge case handling for format
+        {
+            ValueFormat format = Strings.isNullOrEmpty(v.getFormat())
+                ? ValueFormat.RAW
+                : ValueFormat.fromValue(v.getFormat());
+
+            // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
+            // https://github.com/steve-community/steve/issues/816
+            if (ValueFormat.SIGNED_DATA == format) {
+                return false;
+            }
         }
 
-        // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/816
-        if (ValueFormat.SIGNED_DATA.value().equals(v.getFormat())) {
-            return false;
+        // edge case handling for measurand
+        {
+            Measurand measurand = Strings.isNullOrEmpty(v.getMeasurand())
+                ? Measurand.ENERGY_ACTIVE_IMPORT_REGISTER
+                : Measurand.fromValue(v.getMeasurand());
+
+            if (Measurand.ENERGY_ACTIVE_IMPORT_REGISTER != measurand) {
+                return false;
+            }
         }
 
-        if (!isWHOrKWH(v.getUnit())) {
-            return false;
-        }
+        // edge case handling for unit
+        {
+            UnitOfMeasure unit = Strings.isNullOrEmpty(v.getUnit())
+                ? UnitOfMeasure.WH
+                : UnitOfMeasure.fromValue(v.getUnit());
 
-        if (!Measurand.ENERGY_ACTIVE_IMPORT_REGISTER.value().equals(v.getMeasurand())) {
-            return false;
+            if (!isWHOrKWH(unit)) {
+                return false;
+            }
         }
 
         // at this point, we have a value with
-        // - RAW or null format
+        // - RAW format
         // - Wh or kWh unit
         // - Energy.Active.Import.Register as the measurand
         return true;
     }
 
-    private static boolean isWHOrKWH(String str) {
-        return UnitOfMeasure.WH.value().equals(str) || UnitOfMeasure.K_WH.value().equals(str);
+    private static boolean isWHOrKWH(UnitOfMeasure unit) {
+        return UnitOfMeasure.WH == unit || UnitOfMeasure.K_WH == unit;
     }
 }

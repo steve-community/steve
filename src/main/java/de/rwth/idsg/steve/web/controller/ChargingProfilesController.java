@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,18 +34,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.11.2018
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargingProfileRepository repository;
+    private final ChargePointRepository chargePointRepository;
+    private final ChargingProfileRepository repository;
 
     private static final String PARAMS = "params";
 

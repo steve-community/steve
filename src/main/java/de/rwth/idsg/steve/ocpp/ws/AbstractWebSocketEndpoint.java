@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,16 +19,22 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.service.NotificationService;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -37,43 +43,53 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
-
-    @Autowired private ScheduledExecutorService service;
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private NotificationService notificationService;
+public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable, OcppCallHandler {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final SessionContextStore sessionContextStore = new SessionContextStore();
+    private final DelegatingTaskScheduler asyncTaskScheduler;
+    private final OcppServerRepository ocppServerRepository;
+    private final FutureResponseContextStore futureResponseContextStore;
+    private final IncomingPipeline pipeline;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final SessionContextStore sessionContextStore = new SessionContextStoreImpl();
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
 
-    private IncomingPipeline pipeline;
+    public AbstractWebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
+                                     OcppServerRepository ocppServerRepository,
+                                     FutureResponseContextStore futureResponseContextStore,
+                                     ApplicationEventPublisher applicationEventPublisher,
+                                     AbstractTypeStore typeStore) {
+        this.asyncTaskScheduler = asyncTaskScheduler;
+        this.ocppServerRepository = ocppServerRepository;
+        this.futureResponseContextStore = futureResponseContextStore;
+        this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
+
+        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+    }
 
     public abstract OcppVersion getVersion();
 
-    public void init(IncomingPipeline pipeline) {
-        this.pipeline = pipeline;
-
-        connectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketConnected(chargeBoxId));
-        disconnectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketDisconnected(chargeBoxId));
+    @Override
+    public Logger getLogger() {
+        return log;
     }
 
     @Override
@@ -101,7 +117,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/66
+        // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
             WebSocketLogger.receivedEmptyText(chargeBoxId, session);
             return;
@@ -129,11 +145,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
+        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfiguration.PING_INTERVAL,
-                WebSocketConfiguration.PING_INTERVAL,
-                TimeUnit.MINUTES);
+                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
+                WebSocketConfiguration.PING_INTERVAL
+        );
 
         futureResponseContextStore.addSession(session);
 

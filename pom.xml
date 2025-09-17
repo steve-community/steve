@@ -3,12 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.rwth.idsg</groupId>
     <artifactId>steve</artifactId>
-    <version>3.4.9</version>
+    <version>3.9.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>SteVe</name>
+    <description>SteckdosenVerwaltung</description>
+
     <organization>
-        <name>RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG)</name>
-        <url>http://dbis.rwth-aachen.de/cms/teaching/IDSG</url>
+        <name>SteVe Community Team</name>
+        <url>https://github.com/steve-community/steve</url>
     </organization>
 
     <inceptionYear>2013</inceptionYear>
@@ -29,17 +32,20 @@
     </licenses>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jooq.version>3.16.6</jooq.version>
-        <cxf.version>3.5.2</cxf.version>
-        <spring.version>5.3.19</spring.version>
-        <spring.security.version>5.6.3</spring.security.version>
-        <mysql.jdbc.version>8.0.29</mysql.jdbc.version>
-        <jetty.version>10.0.7</jetty.version>
-        <lombok.version>1.18.24</lombok.version>
-        <jackson.version>2.13.2</jackson.version>
+        <jooq.version>3.19.18</jooq.version>
+        <flyway.version>11.12.0</flyway.version>
+        <cxf.version>4.1.3</cxf.version>
+        <spring.version>6.2.0</spring.version>
+        <spring.security.version>6.5.3</spring.security.version>
+        <mysql.jdbc.version>9.4.0</mysql.jdbc.version>
+        <jetty.version>12.1.1</jetty.version>
+        <lombok.version>1.18.40</lombok.version>
+        <jackson.version>2.19.2</jackson.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
@@ -107,14 +113,10 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>4.1</version>
+                <version>${plugin.license-maven.version}</version>
                 <configuration>
                     <header>LICENSE-HEADER.txt</header>
-                    <properties>
-                        <owner>${project.organization.name}</owner>
-                        <year>${project.inceptionYear}</year>
-                        <currentYear>2022</currentYear>
-                    </properties>
+                    <properties/>
                     <excludes>
                         <exclude>**/*.txt</exclude>
                         <exclude>**/*.md</exclude>
@@ -142,12 +144,19 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin-git</artifactId>
+                        <version>${plugin.license-maven.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -157,8 +166,11 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[11,)</version>
+                                    <version>[21,)</version>
                                 </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>[3.3.9,)</version>
+                                </requireMavenVersion>
                             </rules>
                         </configuration>
                     </execution>
@@ -166,10 +178,17 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.14.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -177,19 +196,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.5.4</version>
             </plugin>
 
             <!-- Static analysis and check style -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.16.0</version>
+                <version>3.27.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${project.basedir}/maven-pmd-plugin-default.xml</ruleset>
+                    </rulesets>
+                </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.9.4.2</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>
@@ -197,7 +221,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>check</goal>
+                            <goal>spotbugs</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -205,16 +229,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.6.0</version>
                 <configuration>
-                    <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
 
             <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.9.10</version>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.2</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -233,7 +257,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.1</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -252,7 +276,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.8.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -270,7 +294,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -284,8 +308,8 @@
 
             <!-- Pre-compiles JSPs -->
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-jspc-maven-plugin</artifactId>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-jspc-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <executions>
                     <execution>
@@ -306,7 +330,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>7.15.0</version>
+                <version>${flyway.version}</version>
 
                 <!-- Must be in the same phase as Jooq -->
                 <executions>
@@ -319,7 +343,7 @@
                 </executions>
 
                 <configuration>
-                    <!-- https://github.com/RWTH-i5-IDSG/steve/issues/157 -->
+                    <!-- https://github.com/steve-community/steve/issues/157 -->
                     <initSql>SET default_storage_engine=InnoDB;</initSql>
                     <!-- we need this because of extensions. they have a higher version number
                          namespace reserved (e.g. 8.x.x). new migrations in core version should
@@ -346,6 +370,13 @@
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-mysql</artifactId>
+                        <version>${flyway.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -377,8 +408,8 @@
                         <version>${jooq.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
                         <version>${mysql.jdbc.version}</version>
                     </dependency>
                 </dependencies>
@@ -410,6 +441,10 @@
                                 <forcedType>
                                     <name>BOOLEAN</name>
                                     <includeExpression>.*\.OCPP_TAG_ACTIVITY\.(IN_TRANSACTION|BLOCKED)</includeExpression>
+                                </forcedType>
+                                <forcedType>
+                                    <name>JSON</name>
+                                    <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
                                 </forcedType>
                                 <forcedType>
                                     <userType>org.joda.time.DateTime</userType>
@@ -464,35 +499,41 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>2.17.2</version>
-                <scope>import</scope>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.13.4</version>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.13</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.goekay</groupId>
             <artifactId>CompositeJKS</artifactId>
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.RWTH-i5-IDSG</groupId>
+            <groupId>com.github.steve-community</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.9</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
+            <version>26.0.2-1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -505,32 +546,68 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.14</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.1.7.Final</version>
+            <version>8.0.2.Final</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>33.4.0-jre</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.2.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <!-- Needed for Joda fields in de.rwth.idsg.steve.web.api -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-client-api</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.1</version>
         </dependency>
 
         <!-- Spring -->
@@ -566,36 +643,19 @@
 
         <!-- Logging -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
-            <scope>runtime</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.18</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.36</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.36</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>3.4.4</version>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <!-- CXF -->
@@ -627,46 +687,46 @@
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-annotations</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-annotations</artifactId>
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jsp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-apache-jsp</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jstl</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.eclipse.jetty</groupId>-->
+<!--            <artifactId>apache-jstl</artifactId>-->
+<!--            <version>${jetty.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-rewrite</artifactId>
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jetty-server</artifactId>
+            <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+            <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
             <version>${jetty.version}</version>
         </dependency>
 
         <!-- DB -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.jdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>5.0.1</version>
+            <version>7.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
@@ -682,20 +742,42 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jetty-client</artifactId>
+            <artifactId>jetty-websocket-jetty-client</artifactId>
             <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.19.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.17.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.9.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -703,7 +785,7 @@
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
             <artifactId>java-semver</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.2</version>
         </dependency>
 
         <!-- Codes according to ISO standards
@@ -714,5 +796,10 @@
             <version>1.29</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder-jakarta-jsp</artifactId>
+            <version>1.3.1</version>
+        </dependency>
     </dependencies>
 </project>

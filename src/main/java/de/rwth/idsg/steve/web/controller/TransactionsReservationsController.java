@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,14 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,8 +35,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+
 import java.io.IOException;
 
 /**
@@ -46,14 +47,15 @@ import java.io.IOException;
  * @since 15.08.2014
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class TransactionsReservationsController {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private TransactionStopService transactionStopService;
+    private final TransactionRepository transactionRepository;
+    private final ReservationRepository reservationRepository;
+    private final ChargePointRepository chargePointRepository;
+    private final OcppTagService ocppTagService;
+    private final TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
 
@@ -145,7 +147,7 @@ public class TransactionsReservationsController {
 
     private void initList(Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     private void initResList(Model model) {

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,5 +64,14 @@ public enum OcppProtocol {
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public static OcppProtocol from(OcppVersion version, OcppTransport transport) {
+        for (OcppProtocol value : OcppProtocol.values()) {
+            if (value.getVersion() == version && value.getTransport() == transport) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Could not find OcppProtocol for " + version + " and " + transport);
     }
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,13 +22,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
+import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
 
 import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
@@ -56,6 +58,9 @@ public enum JsonObjectMapper {
 
         mapper.configure(WRITE_BIGDECIMAL_AS_PLAIN, true);
 
+        mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        mapper.registerModule(new CustomStringModule());
         mapper.registerModule(new Ocpp12JacksonModule());
         mapper.registerModule(new Ocpp15JacksonModule());
         mapper.registerModule(new Ocpp16JacksonModule());
@@ -63,7 +68,7 @@ public enum JsonObjectMapper {
         mapper.setAnnotationIntrospector(
                 AnnotationIntrospector.pair(
                         new JacksonAnnotationIntrospector(),
-                        new JaxbAnnotationIntrospector(mapper.getTypeFactory())
+                        new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())
                 )
         );
     }

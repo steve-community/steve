@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @since 06.08.2018
  */
 @Getter
+@ToString
 public enum EndpointInfo {
     INSTANCE;
 
@@ -37,6 +39,7 @@ public enum EndpointInfo {
     private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
 
     @Getter
+    @ToString
     public static class ItemsWithInfo {
         private final String info;
         private final String dataElementPostFix;

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,7 +59,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -209,8 +209,8 @@ public class OperationalTestSoapOCPP16 {
     }
 
     /**
-     * https://github.com/RWTH-i5-IDSG/steve/issues/217
-     * https://github.com/RWTH-i5-IDSG/steve/issues/219
+     * https://github.com/steve-community/steve/issues/217
+     * https://github.com/steve-community/steve/issues/219
      */
     @Test
     public void testAuthorizationStatus() {

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -96,6 +97,10 @@ public class JettyServer {
         httpConfig.setSendDateHeader(false);
         httpConfig.setSendXPoweredBy(false);
 
+        // make sure X-Forwarded-For headers are picked up if set (e.g. by a load balancer)
+        // https://github.com/steve-community/steve/pull/570
+        httpConfig.addCustomizer(new ForwardedRequestCustomizer());
+
         // Extra options
         server.setDumpAfterStart(false);
         server.setDumpBeforeStop(false);
@@ -130,14 +135,6 @@ public class JettyServer {
         sslContextFactory.setKeyStorePath(CONFIG.getJetty().getKeyStorePath());
         sslContextFactory.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
         sslContextFactory.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());
-        sslContextFactory.setExcludeCipherSuites(
-                "SSL_RSA_WITH_DES_CBC_SHA",
-                "SSL_DHE_RSA_WITH_DES_CBC_SHA",
-                "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
 
         // SSL HTTP Configuration
         HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);

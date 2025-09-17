@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.ChargePointService12_Client;
+import de.rwth.idsg.steve.service.ChargePointServiceClient;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
@@ -33,8 +33,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,7 +41,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 import java.util.Map;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
@@ -53,14 +53,12 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.2")
+@RequiredArgsConstructor
 public class Ocpp12Controller {
 
-    @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppTagRepository ocppTagRepository;
-
-    @Autowired
-    @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client12;
+    protected final OcppTagService ocppTagService;
+    protected final ChargePointHelperService chargePointHelperService;
+    protected final ChargePointServiceClient chargePointServiceClient;
 
     protected static final String PARAMS = "params";
 
@@ -84,8 +82,12 @@ public class Ocpp12Controller {
     // Helpers
     // -------------------------------------------------------------------------
 
-    protected ChargePointService12_Client getClient12() {
-        return client12;
+    /**
+     * https://github.com/steve-community/steve/issues/1759
+     * used to create form in order to send charging profile within remote start tx for ocpp 1.6.
+     */
+    protected void setCommonAttributesForRemoteStartTx(Model model) {
+        // nothing to do for versions below 1.6
     }
 
     protected void setCommonAttributesForTx(Model model) {
@@ -111,7 +113,7 @@ public class Ocpp12Controller {
     }
 
     protected void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
+        model.addAttribute("idTagList", ocppTagService.getActiveIdTags());
     }
 
     // -------------------------------------------------------------------------
@@ -156,6 +158,7 @@ public class Ocpp12Controller {
     public String getRemoteStartTx(Model model) {
         setCommonAttributesForTx(model);
         setActiveUserIdTagList(model);
+        setCommonAttributesForRemoteStartTx(model);
         model.addAttribute(PARAMS, new RemoteStartTransactionParams());
         return getPrefix() + REMOTE_START_TX_PATH;
     }
@@ -199,7 +202,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + CHANGE_AVAIL_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().changeAvailability(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeAvailability(params);
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
@@ -210,7 +213,7 @@ public class Ocpp12Controller {
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
             return getPrefix() + CHANGE_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().changeConfiguration(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeConfiguration(params);
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
@@ -220,7 +223,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CACHE_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().clearCache(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearCache(params);
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
@@ -230,7 +233,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + GET_DIAG_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().getDiagnostics(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getDiagnostics(params);
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
@@ -239,9 +242,10 @@ public class Ocpp12Controller {
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             setActiveUserIdTagList(model);
+            setCommonAttributesForRemoteStartTx(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().remoteStartTransaction(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStartTransaction(params);
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
@@ -251,7 +255,7 @@ public class Ocpp12Controller {
             setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().remoteStopTransaction(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStopTransaction(params);
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
@@ -261,7 +265,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + RESET_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().reset(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.reset(params);
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
@@ -271,7 +275,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + UNLOCK_CON_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().unlockConnector(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.unlockConnector(params);
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
@@ -281,6 +285,6 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + UPDATE_FIRM_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient12().updateFirmware(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.updateFirmware(params);
     }
 }

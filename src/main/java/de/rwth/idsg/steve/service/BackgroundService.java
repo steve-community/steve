@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -32,10 +32,11 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor
 public class BackgroundService {
-    private final ExecutorService executorService;
 
-    public static BackgroundService with(ExecutorService executorService) {
-        return new BackgroundService(executorService);
+    private final DelegatingTaskExecutor asyncTaskExecutor;
+
+    public static BackgroundService with(DelegatingTaskExecutor asyncTaskExecutor) {
+        return new BackgroundService(asyncTaskExecutor);
     }
 
     public Runner forFirst(List<ChargePointSelect> list) {
@@ -56,7 +57,7 @@ public class BackgroundService {
 
         @Override
         public void execute(Consumer<ChargePointSelect> consumer) {
-            executorService.execute(() -> consumer.accept(cps));
+            asyncTaskExecutor.execute(() -> consumer.accept(cps));
         }
     }
 
@@ -66,7 +67,7 @@ public class BackgroundService {
 
         @Override
         public void execute(Consumer<ChargePointSelect> consumer) {
-            executorService.execute(() -> list.forEach(consumer));
+            asyncTaskExecutor.execute(() -> list.forEach(consumer));
         }
     }
 }

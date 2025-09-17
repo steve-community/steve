@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,8 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.repository.TaskStore;
+import lombok.RequiredArgsConstructor;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +37,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @since 29.12.2014
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/operations/tasks")
 public class TaskController {
 
-    @Autowired private TaskStore taskStore;
+    private final TaskStore taskStore;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -59,9 +60,15 @@ public class TaskController {
         return "tasks";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(params = "finished", method = RequestMethod.POST)
     public String clearFinished(Model model) {
         taskStore.clearFinished();
+        return getOverview(model);
+    }
+
+    @RequestMapping(params = "unfinished", method = RequestMethod.POST)
+    public String clearUnfinished(Model model) {
+        taskStore.clearUnfinished();
         return getOverview(model);
     }
 

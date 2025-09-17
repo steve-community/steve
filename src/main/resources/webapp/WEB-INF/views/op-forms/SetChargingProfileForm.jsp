@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -33,6 +33,10 @@
         <tr>
             <td>Connector ID (integer):</td>
             <td><form:input path="connectorId" placeholder="0 = charge point as a whole"/></td>
+        </tr>
+        <tr>
+            <td>Transaction ID (integer):</td>
+            <td><form:input path="transactionId" placeholder="only necessary for TxProfile"/></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

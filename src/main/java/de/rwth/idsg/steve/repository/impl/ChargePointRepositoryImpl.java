@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
@@ -45,8 +46,8 @@ import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -65,16 +66,11 @@ import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     private final DSLContext ctx;
     private final AddressRepository addressRepository;
-
-    @Autowired
-    public ChargePointRepositoryImpl(DSLContext ctx, AddressRepository addressRepository) {
-        this.ctx = ctx;
-        this.addressRepository = addressRepository;
-    }
 
     @Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {
@@ -87,14 +83,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
+    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
+        Condition chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
+            ? DSL.trueCondition()
+            : CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIdFilter);
+
         return ctx.select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.OCPP_PROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGE_BOX.ENDPOINT_ADDRESS.isNotNull())
                   .and(CHARGE_BOX.REGISTRATION_STATUS.in(inStatusFilter))
+                  .and(chargeBoxIdCondition)
                   .fetch()
-                  .map(r -> new ChargePointSelect(protocol.getTransport(), r.value1(), r.value2()));
+                  .map(r -> new ChargePointSelect(protocol, r.value1(), r.value2()));
     }
 
     @Override
@@ -150,6 +151,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         if (form.isSetChargeBoxId()) {
             selectQuery.addConditions(includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId()));
+        }
+
+        if (form.isSetNote()) {
+            selectQuery.addConditions(includes(CHARGE_BOX.NOTE, form.getNote()));
         }
 
         switch (form.getHeartbeatPeriod()) {
@@ -221,7 +226,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/691
+        // https://github.com/steve-community/steve/issues/691
         Condition chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
 
         if (form != null && form.getChargeBoxId() != null) {

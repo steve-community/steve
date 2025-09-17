@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,10 +28,10 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.xml.ws.soap.SOAPBinding;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.ws.soap.SOAPBinding;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -42,10 +42,9 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Component
 public class ClientProvider {
 
-    @Nullable private TLSClientParameters tlsClientParams;
+    @Nullable private final TLSClientParameters tlsClientParams;
 
-    @PostConstruct
-    private void init() {
+    public ClientProvider() {
         if (shouldInitSSL()) {
             tlsClientParams = new TLSClientParameters();
             tlsClientParams.setSSLSocketFactory(setupSSL());

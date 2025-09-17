@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,17 +18,19 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveProdCondition;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -36,10 +38,11 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.01.2015
  */
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@Conditional(SteveProdCondition.class)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
@@ -48,40 +51,50 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
      */
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-            .passwordEncoder(CONFIG.getAuth().getPasswordEncoder())
-            .withUser(CONFIG.getAuth().getUserName())
-            .password(CONFIG.getAuth().getEncodedPassword())
-            .roles("ADMIN");
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return CONFIG.getAuth().getPasswordEncoder();
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring()
-           .antMatchers("/static/**")
-           .antMatchers("/views/**");
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        final String prefix = CONFIG.getSpringManagerMapping();
+
+        return http
+            .authorizeHttpRequests(
+                req -> req
+                    .requestMatchers(
+                        "/static/**",
+                        CONFIG.getCxfMapping() + "/**",
+                        WebSocketConfiguration.PATH_INFIX + "**",
+                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    ).permitAll()
+                    .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
+            )
+            // SOAP stations are making POST calls for communication. even though the following path is permitted for
+            // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
+            // we need to disable CSRF for SOAP paths explicitly.
+            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
+            .sessionManagement(
+                req -> req.invalidSessionUrl(prefix + "/signin")
+            )
+            .formLogin(
+                req -> req.loginPage(prefix + "/signin").permitAll()
+            )
+            .logout(
+                req -> req.logoutUrl(prefix + "/signout")
+            )
+            .build();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        final String prefix = "/manager/";
-        http
-            .authorizeRequests()
-                .antMatchers(prefix + "**").hasRole("ADMIN")
-                .and()
-            .sessionManagement()
-                .invalidSessionUrl(prefix + "signin")
-                .and()
-            .formLogin()
-                .loginPage(prefix + "signin")
-                .permitAll()
-                .and()
-            .logout()
-                .logoutUrl(prefix + "signout")
-                .and()
-            .httpBasic();
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ApiAuthenticationManager apiAuthenticationManager) throws Exception {
+        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+            .csrf(k -> k.disable())
+            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))
+            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
+            .build();
     }
-
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +33,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import java.util.List;
  * @since 15.08.2014
  */
 @Slf4j
+@RequiredArgsConstructor
 @Controller
 @ResponseBody
 @RequestMapping(
@@ -51,17 +53,11 @@ import java.util.List;
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    private final ObjectMapper objectMapper = createMapper();
 
-    private ObjectMapper objectMapper;
-
-    @PostConstruct
-    private void init() {
-        objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
+    private final ChargePointRepository chargePointRepository;
+    private final TransactionRepository transactionRepository;
+    private final ReservationRepository reservationRepository;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -116,6 +112,12 @@ public class AjaxCallController {
     private void writeOutput(HttpServletResponse response, String str) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(str);
+    }
+
+    private static ObjectMapper createMapper() {
+        var objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        return objectMapper;
     }
 
 }

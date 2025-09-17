@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,7 +37,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,11 +50,12 @@ import java.util.stream.Collectors;
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired protected ChargePointRepository chargePointRepository;
-    @Autowired protected ChargePointHelperService chargePointHelperService;
+    protected final ChargePointRepository chargePointRepository;
+    protected final ChargePointRegistrationService chargePointRegistrationService;
 
     protected static final String PARAMS = "params";
 
@@ -80,7 +82,7 @@ public class ChargePointsController {
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
     // We need the slash at the end to support chargeBoxIds with dots etc. in them
-    // Issue: https://github.com/RWTH-i5-IDSG/steve/issues/270
+    // Issue: https://github.com/steve-community/steve/issues/270
     // Solution: https://stackoverflow.com/a/18378817
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}/";
     protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}/";
@@ -104,7 +106,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("unknownList", chargePointRegistrationService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -195,7 +197,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(chargeBoxId);
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -234,11 +236,11 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(form.getChargeBoxId());
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
         chargePointRepository.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
+        chargePointRegistrationService.removeUnknown(idList);
     }
 }

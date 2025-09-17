@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.WebEndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,8 +35,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -46,14 +46,15 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
-    @Autowired private GenericRepository genericRepository;
-    @Autowired private LogController logController;
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private MailService mailService;
-    @Autowired private ReleaseCheckService releaseCheckService;
+    private final GenericRepository genericRepository;
+    private final LogController logController;
+    private final SettingsRepository settingsRepository;
+    private final MailService mailService;
+    private final ReleaseCheckService releaseCheckService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -99,7 +100,6 @@ public class AboutSettingsController {
         }
 
         settingsRepository.update(settingsForm);
-        mailService.loadSettingsFromDB();
         return "redirect:/manager/settings";
     }
 
@@ -112,7 +112,6 @@ public class AboutSettingsController {
         }
 
         settingsRepository.update(settingsForm);
-        mailService.loadSettingsFromDB();
         mailService.sendTestMail();
 
         return "redirect:/manager/settings";

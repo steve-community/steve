@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,10 +28,10 @@ import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -45,10 +45,11 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
  * @since 09.12.2018
  */
 @Service
+@RequiredArgsConstructor
 public class TransactionStopService {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private OcppServerRepository ocppServerRepository;
+    private final TransactionRepository transactionRepository;
+    private final OcppServerRepository ocppServerRepository;
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()
@@ -57,7 +58,7 @@ public class TransactionStopService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, false);
+        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk);
         Transaction thisTx = thisTxDetails.getTransaction();
 
         // early exit, if transaction is already stopped
@@ -121,7 +122,7 @@ public class TransactionStopService {
 
         return TerminationValues.builder()
                                 .stopValue(thisTx.getStartValue())
-                                .stopTimestamp(thisTx.getStartTimestampDT())
+                                .stopTimestamp(thisTx.getStartTimestamp())
                                 .build();
     }
 

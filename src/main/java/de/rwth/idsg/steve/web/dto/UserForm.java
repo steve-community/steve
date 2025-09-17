@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,14 @@ package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDate;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,12 +35,13 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@ToString
 public class UserForm {
 
     // Internal database id
     private Integer userPk;
 
-    private String ocppIdTag;
+    private List<String> idTagList = Collections.emptyList();
 
     private String firstName;
     private String lastName;

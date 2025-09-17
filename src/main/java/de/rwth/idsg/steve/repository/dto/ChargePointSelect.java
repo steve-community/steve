@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +30,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public final class ChargePointSelect {
-    private final OcppTransport ocppTransport;
+    private final OcppProtocol ocppProtocol;
     private final String chargeBoxId;
     private final String endpointAddress;
 
-    public ChargePointSelect(OcppTransport ocppTransport, String chargeBoxId) {
+    public ChargePointSelect(OcppProtocol ocppProtocol, String chargeBoxId) {
         // Provide a non-null value (or placeholder if you will) to frontend for JSON charge points.
         // This is clearly a hack. Not my proudest moment.
-        this(ocppTransport, chargeBoxId, "-");
+        this(ocppProtocol, chargeBoxId, "-");
     }
 
     public boolean isEndpointAddressSet() {
@@ -44,6 +45,6 @@ public final class ChargePointSelect {
     }
 
     public boolean isSoap() {
-        return OcppTransport.SOAP == ocppTransport;
+        return OcppTransport.SOAP == ocppProtocol.getTransport();
     }
 }

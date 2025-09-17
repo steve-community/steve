@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,9 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 
-import javax.xml.ws.AsyncHandler;
-
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,8 +30,8 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
  */
 public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, String> {
 
-    public UpdateFirmwareTask(OcppVersion ocppVersion, UpdateFirmwareParams params) {
-        super(ocppVersion, params);
+    public UpdateFirmwareTask(UpdateFirmwareParams params) {
+        super(params);
     }
 
     @Override
@@ -46,7 +43,7 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public ocpp.cp._2010._08.UpdateFirmwareRequest getOcpp12Request() {
         return new ocpp.cp._2010._08.UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(toDateTime(params.getRetrieve()))
+                .withRetrieveDate(params.getRetrieve())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }
@@ -55,7 +52,7 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public ocpp.cp._2012._06.UpdateFirmwareRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(toDateTime(params.getRetrieve()))
+                .withRetrieveDate(params.getRetrieve())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }
@@ -64,7 +61,7 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public ocpp.cp._2015._10.UpdateFirmwareRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(toDateTime(params.getRetrieve()))
+                .withRetrieveDate(params.getRetrieve())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }

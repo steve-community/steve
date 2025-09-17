@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,96 +18,29 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import ocpp.cp._2015._10.ChargingProfile;
-import ocpp.cp._2015._10.ChargingProfileKindType;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import ocpp.cp._2015._10.ChargingRateUnitType;
-import ocpp.cp._2015._10.ChargingSchedule;
-import ocpp.cp._2015._10.ChargingSchedulePeriod;
-import ocpp.cp._2015._10.RecurrencyKindType;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
+import ocpp.cp._2015._10.SetChargingProfileResponse;
 
-import javax.xml.ws.AsyncHandler;
-import java.util.List;
-import java.util.stream.Collectors;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2018
+ * @since 06.02.2025
  */
-public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargingProfileParams, String> {
+public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<MultipleChargePointSelect, String> {
 
-    private final ChargingProfileRepository chargingProfileRepository;
-
-    public SetChargingProfileTask(OcppVersion ocppVersion,
-                                  EnhancedSetChargingProfileParams params,
-                                  ChargingProfileRepository chargingProfileRepository) {
-        super(ocppVersion, params);
-        this.chargingProfileRepository = chargingProfileRepository;
+    public SetChargingProfileTask(MultipleChargePointSelect params) {
+        super(params);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new DefaultOcppCallback<String>() {
-            @Override
-            public void success(String chargeBoxId, String statusValue) {
-                addNewResponse(chargeBoxId, statusValue);
-
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    int chargingProfilePk = params.getDetails().getProfile().getChargingProfilePk();
-                    int connectorId = params.getDelegate().getConnectorId();
-                    chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
-                }
-            }
-        };
-    }
+    public abstract SetChargingProfileRequest getOcpp16Request();
 
     @Override
-    public ocpp.cp._2015._10.SetChargingProfileRequest getOcpp16Request() {
-        ChargingProfileRecord profile = params.getDetails().getProfile();
-
-        List<ChargingSchedulePeriod> schedulePeriods =
-                params.getDetails().getPeriods()
-                       .stream()
-                       .map(k -> {
-                           ChargingSchedulePeriod p = new ChargingSchedulePeriod();
-                           p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimit());
-                           p.setNumberPhases(k.getNumberPhases());
-                           return p;
-                       })
-                       .collect(Collectors.toList());
-
-        ChargingSchedule schedule = new ChargingSchedule()
-                .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(profile.getStartSchedule())
-                .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
-                .withMinChargingRate(profile.getMinChargingRate())
-                .withChargingSchedulePeriod(schedulePeriods);
-
-        ChargingProfile ocppProfile = new ChargingProfile()
-                .withChargingProfileId(profile.getChargingProfilePk())
-                .withStackLevel(profile.getStackLevel())
-                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
-                .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
-                .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(profile.getValidFrom())
-                .withValidTo(profile.getValidTo())
-                .withChargingSchedule(schedule);
-
-        return new SetChargingProfileRequest()
-                .withConnectorId(params.getDelegate().getConnectorId())
-                .withCsChargingProfiles(ocppProfile);
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -115,5 +48,32 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                 failed(chargeBoxId, e);
             }
         };
+    }
+
+    /**
+     * Do some additional checks defined by OCPP spec, which cannot be captured with javax.validation
+     */
+    protected static void checkAdditionalConstraints(SetChargingProfileRequest request) {
+        ChargingProfilePurposeType purpose = request.getCsChargingProfiles().getChargingProfilePurpose();
+
+        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose
+            && request.getConnectorId() != 0) {
+            throw new SteveException("ChargePointMaxProfile can only be set at Charge Point ConnectorId 0");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+            && request.getConnectorId() < 1) {
+            throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+            && request.getCsChargingProfiles().getTransactionId() == null) {
+            throw new SteveException("transaction id is required for TxProfile");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE != purpose
+            && request.getCsChargingProfiles().getTransactionId() != null) {
+            throw new SteveException("transaction id should only be set for TxProfile");
+        }
     }
 }

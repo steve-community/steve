@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -33,6 +33,16 @@
                 </form:select>
             </td>
         </tr>
+        <c:if test="${profileForRemoteStartTx}">
+            <tr>
+                <td>Charging Profile ID:</td>
+                <td><form:select path="chargingProfilePk">
+                    <option value="" selected>-- Empty --</option>
+                    <form:options items="${profileList}" itemLabel="itemDescription" itemValue="chargingProfilePk"/>
+                </form:select>
+                </td>
+            </tr>
+        </c:if>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

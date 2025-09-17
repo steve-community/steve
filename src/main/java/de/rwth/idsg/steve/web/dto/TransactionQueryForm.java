@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,14 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.AssertTrue;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,34 +33,39 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
+    @Schema(description = "Database primary key of the transaction")
     private Integer transactionPk;
 
-    private boolean returnCSV;
+    @Schema(description = "Disabled for the Web APIs. Do not use and set", hidden = true)
+    private boolean returnCSV = false;
 
-    @NotNull(message = "Query type is required")
-    private QueryType type;
+    @Schema(description = "Return active or all transactions? Defaults to ALL")
+    private QueryType type = QueryType.ACTIVE;
 
-    private QueryPeriodType periodType;
+    @Schema(description = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
+    private QueryPeriodType periodType = QueryPeriodType.ALL;
 
-    /**
-     * Init with sensible default values
-     */
-    public TransactionQueryForm() {
-        returnCSV = false;
-        periodType = QueryPeriodType.ALL;
-        type = QueryType.ACTIVE;
-    }
-
+    @Schema(hidden = true)
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }
 
+    @Schema(hidden = true)
     public boolean isTransactionPkSet() {
         return transactionPk != null;
+    }
+
+    public QueryType getType() {
+        return Objects.requireNonNullElse(type, QueryType.ALL);
+    }
+
+    public QueryPeriodType getPeriodType() {
+        return Objects.requireNonNullElse(periodType, QueryPeriodType.ALL);
     }
 
     // -------------------------------------------------------------------------
@@ -68,7 +75,8 @@ public class TransactionQueryForm extends QueryForm {
     @RequiredArgsConstructor
     public enum QueryType {
         ALL("All"),
-        ACTIVE("Active");
+        ACTIVE("Active"),
+        STOPPED("Stopped");
 
         @Getter private final String value;
 
@@ -108,6 +116,16 @@ public class TransactionQueryForm extends QueryForm {
                 }
             }
             throw new IllegalArgumentException(v);
+        }
+    }
+
+    @ToString(callSuper = true)
+    public static class TransactionQueryFormForApi extends TransactionQueryForm {
+
+        public TransactionQueryFormForApi() {
+            super();
+            setType(QueryType.ALL);
+            setPeriodType(QueryPeriodType.ALL);
         }
     }
 }

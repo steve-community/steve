@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -43,15 +44,15 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Response;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.SOAPBinding;
+
 import java.util.concurrent.Future;
 
 /**
@@ -59,6 +60,7 @@ import java.util.concurrent.Future;
  * @since 13.03.2018
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Addressing(enabled = true, required = false)
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
@@ -69,7 +71,7 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2015._10.CentralSystemService")
 public class CentralSystemService16_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService16_Service service;
+    private final CentralSystemService16_Service service;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {

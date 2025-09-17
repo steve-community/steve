@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.ocpp.converter.Convert;
 import de.rwth.idsg.steve.ocpp.converter.Server12to15Impl;
 import de.rwth.idsg.steve.ocpp.converter.Server15to16Impl;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -44,15 +45,15 @@ import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StatusNotificationResponse;
 import ocpp.cs._2010._08.StopTransactionRequest;
 import ocpp.cs._2010._08.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.jws.WebService;
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.Response;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.AsyncHandler;
+import jakarta.xml.ws.BindingType;
+import jakarta.xml.ws.Response;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.SOAPBinding;
+
 import java.util.concurrent.Future;
 
 /**
@@ -61,6 +62,7 @@ import java.util.concurrent.Future;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Addressing(enabled = true, required = false)
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
@@ -71,7 +73,7 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
 public class CentralSystemService12_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService16_Service service;
+    private final CentralSystemService16_Service service;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {

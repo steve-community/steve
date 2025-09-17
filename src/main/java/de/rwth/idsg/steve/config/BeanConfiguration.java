@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -26,7 +28,6 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.InternetChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -38,24 +39,27 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.format.support.FormattingConversionService;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import javax.annotation.PreDestroy;
-import javax.validation.Validator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import jakarta.validation.Validator;
+
+import javax.sql.DataSource;
+import java.util.List;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -72,13 +76,11 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
-    private HikariDataSource dataSource;
-    private ScheduledThreadPoolExecutor executor;
-
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
-    private void initDataSource() {
+    @Bean
+    public DataSource dataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
@@ -97,10 +99,10 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/736
+        // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
-        dataSource = new HikariDataSource(hc);
+        return new HikariDataSource(hc);
     }
 
     /**
@@ -116,9 +118,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
-    public DSLContext dslContext() {
-        initDataSource();
-
+    public DSLContext dslContext(DataSource dataSource) {
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
@@ -137,13 +137,28 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
-    @Bean
-    public ScheduledExecutorService scheduledExecutorService() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("SteVe-Executor-%d")
-                                                                .build();
+    @Bean(destroyMethod = "close")
+    public DelegatingTaskScheduler asyncTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
+        scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        scheduler.setAwaitTerminationSeconds(30);
+        scheduler.initialize();
 
-        executor = new ScheduledThreadPoolExecutor(5, threadFactory);
-        return executor;
+        return new DelegatingTaskScheduler(scheduler);
+    }
+
+    @Bean(destroyMethod = "close")
+    public DelegatingTaskExecutor asyncTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setThreadNamePrefix("SteVe-TaskExecutor-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+
+        return new DelegatingTaskExecutor(executor);
     }
 
     @Bean
@@ -163,38 +178,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
             return new GithubReleaseCheckService();
         } else {
             return new DummyReleaseCheckService();
-        }
-    }
-
-    @EventListener
-    public void afterStart(ContextRefreshedEvent event) {
-        DateTimeUtils.checkJavaAndMySQLOffsets(dslContext());
-    }
-
-    @PreDestroy
-    public void shutDown() {
-        if (dataSource != null) {
-            dataSource.close();
-        }
-
-        if (executor != null) {
-            gracefulShutDown(executor);
-        }
-    }
-
-    private void gracefulShutDown(ExecutorService executor) {
-        try {
-            executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-
-        } catch (InterruptedException e) {
-            log.error("Termination interrupted", e);
-
-        } finally {
-            if (!executor.isTerminated()) {
-                log.warn("Killing non-finished tasks");
-            }
-            executor.shutdownNow();
         }
     }
 
@@ -228,4 +211,38 @@ public class BeanConfiguration implements WebMvcConfigurer {
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
+    // -------------------------------------------------------------------------
+    // API config
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
+                ObjectMapper objectMapper = conv.getObjectMapper();
+                objectMapper.findAndRegisterModules();
+                // if the client sends unknown props, just ignore them instead of failing
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                // default is true
+                objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
+     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
+     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
+     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
+     */
+    @Bean
+    public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        return requestMappingHandlerAdapter.getMessageConverters().stream()
+            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+            .findAny()
+            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    }
 }

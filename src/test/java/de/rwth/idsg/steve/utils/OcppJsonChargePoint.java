@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,14 @@
 package de.rwth.idsg.steve.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
@@ -32,14 +37,18 @@ import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -49,12 +58,16 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+
+import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -68,11 +81,15 @@ public class OcppJsonChargePoint {
     private final String chargeBoxId;
     private final String connectionPath;
     private final Map<String, ResponseContext> responseContextMap;
-    private final ResponseDeserializer deserializer;
+    private final Map<String, RequestContext> requestContextMap;
+    private final MessageDeserializer deserializer;
     private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
 
-    private CountDownLatch receivedResponsesSignal;
+    private final Thread testerThread;
+    private RuntimeException testerThreadInterruptReason;
+
+    private CountDownLatch receivedMessagesSignal;
     private Session session;
 
     public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
@@ -84,12 +101,14 @@ public class OcppJsonChargePoint {
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
         this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
-        this.deserializer = new ResponseDeserializer();
+        this.requestContextMap = new HashMap<>();
+        this.deserializer = new MessageDeserializer();
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
+        this.testerThread = Thread.currentThread();
     }
 
-    @OnWebSocketConnect
+    @OnWebSocketOpen
     public void onConnect(Session session) {
         this.session = session;
     }
@@ -108,19 +127,22 @@ public class OcppJsonChargePoint {
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
-            OcppJsonResponse response = deserializer.extractResponse(msg);
-            ResponseContext ctx = responseContextMap.remove(response.getMessageId());
+            OcppJsonMessage ocppMsg = deserializer.extract(msg);
 
-            if (response instanceof OcppJsonResult) {
-                ctx.responseHandler.accept(((OcppJsonResult) response).getPayload());
-            } else if (response instanceof OcppJsonError) {
-                ctx.errorHandler.accept((OcppJsonError) response);
+            if (ocppMsg instanceof OcppJsonResult) {
+                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
+                ctx.responseHandler.accept(((OcppJsonResult) ocppMsg).getPayload());
+            } else if (ocppMsg instanceof OcppJsonError) {
+                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
+                ctx.errorHandler.accept((OcppJsonError) ocppMsg);
+            } else if (ocppMsg instanceof OcppJsonCallForTesting) {
+                handleCall((OcppJsonCallForTesting) ocppMsg);
             }
         } catch (Exception e) {
             log.error("Exception", e);
         } finally {
-            if (receivedResponsesSignal != null) {
-                receivedResponsesSignal.countDown();
+            if (receivedMessagesSignal != null) {
+                receivedMessagesSignal.countDown();
             }
         }
     }
@@ -143,12 +165,17 @@ public class OcppJsonChargePoint {
 
     public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
                                                  Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+        prepare(request, getOperationName(request), responseClass, responseHandler, errorHandler);
+    }
+
+    public <T extends ResponseType> void prepare(RequestType payload, String action, Class<T> responseClass,
+                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
         String messageId = UUID.randomUUID().toString();
 
         OcppJsonCall call = new OcppJsonCall();
         call.setMessageId(messageId);
-        call.setPayload(request);
-        call.setAction(getOperationName(request));
+        call.setPayload(payload);
+        call.setAction(action);
 
         // session is null, because we do not need org.springframework.web.socket.WebSocketSession
         CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
@@ -160,26 +187,46 @@ public class OcppJsonChargePoint {
         responseContextMap.put(messageId, resCtx);
     }
 
+    public void expectRequest(RequestType expectedRequest, ResponseType plannedResponse) {
+        String requestPayload;
+        JsonNode responsePayload;
+        try {
+            ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+            requestPayload = mapper.writeValueAsString(expectedRequest);
+            responsePayload = mapper.valueToTree(plannedResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        String action = getOperationName(expectedRequest);
+        requestContextMap.put(action, new RequestContext(requestPayload, responsePayload));
+    }
+
     public void process() {
+        int requestCount = requestContextMap.values().size();
+        int responseCount = responseContextMap.values().size();
+        receivedMessagesSignal = new CountDownLatch(requestCount + responseCount);
+
         // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
         // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
         ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
 
-        receivedResponsesSignal = new CountDownLatch(values.size());
-
         // send all messages
         for (ResponseContext ctx : values) {
             try {
-                session.getRemote().sendString(ctx.outgoingMessage);
-            } catch (IOException e) {
+                session.sendText(ctx.outgoingMessage, NOOP);
+            } catch (Exception e) {
                 log.error("Exception", e);
             }
         }
 
         // wait for all responses to arrive and be processed
         try {
-            receivedResponsesSignal.await();
+            receivedMessagesSignal.await();
         } catch (InterruptedException e) {
+            if (testerThreadInterruptReason != null) {
+                throw testerThreadInterruptReason;
+            }
             throw new RuntimeException(e);
         }
     }
@@ -187,7 +234,7 @@ public class OcppJsonChargePoint {
     public void close() {
         try {
             // "enqueue" a graceful close
-            session.close(StatusCode.NORMAL, "Finished");
+            session.close(StatusCode.NORMAL, "Finished", NOOP);
 
             // wait for close to happen
             closeHappenedSignal.await();
@@ -216,6 +263,27 @@ public class OcppJsonChargePoint {
         return s;
     }
 
+    private void handleCall(OcppJsonCallForTesting call) {
+        try {
+            ArrayNode node = JsonObjectMapper.INSTANCE.getMapper()
+                .createArrayNode()
+                .add(MessageType.CALL_RESULT.getTypeNr())
+                .add(call.getMessageId())
+                .add(call.getContext().getResponsePayload());
+
+            String str = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(node);
+            session.sendText(str, NOOP);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Value
+    private static class RequestContext {
+        String requestPayload;
+        JsonNode responsePayload;
+    }
+
     private static class ResponseContext {
         private final String outgoingMessage;
         private final Class<ResponseType> responseClass;
@@ -234,9 +302,9 @@ public class OcppJsonChargePoint {
         }
     }
 
-    private class ResponseDeserializer {
+    private class MessageDeserializer {
 
-        private OcppJsonResponse extractResponse(String msg) throws Exception {
+        private OcppJsonMessage extract(String msg) throws Exception {
             ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
             try (JsonParser parser = mapper.getFactory().createParser(msg)) {
@@ -254,6 +322,8 @@ public class OcppJsonChargePoint {
                         return handleResult(messageId, parser);
                     case CALL_ERROR:
                         return handleError(messageId, parser);
+                    case CALL:
+                        return handleCall(messageId, parser);
                     default:
                         throw new SteveException("Unknown enum type");
                 }
@@ -296,6 +366,54 @@ public class OcppJsonChargePoint {
             error.setErrorDetails(details);
             return error;
         }
+
+        private OcppJsonCall handleCall(String messageId, JsonParser parser) {
+            // parse action
+            String action;
+            try {
+                parser.nextToken();
+                action = parser.getText();
+            } catch (IOException e) {
+                throw new RuntimeException();
+            }
+
+            // parse request payload
+            String req;
+            try {
+                parser.nextToken();
+                JsonNode requestPayload = parser.readValueAsTree();
+
+                // https://github.com/steve-community/steve/issues/1109
+                if (requestPayload instanceof NullNode) {
+                    requestPayload = new ObjectNode(JsonNodeFactory.instance);
+                }
+
+                req = requestPayload.toString();
+            } catch (IOException e) {
+                log.error("Exception occurred", e);
+                throw new RuntimeException();
+            }
+
+            RequestContext context = requestContextMap.get(action);
+            if (context == null) {
+                testerThreadInterruptReason = new RuntimeException("Unexpected message arrived: " + req);
+                testerThread.interrupt();
+            } else if (Objects.equals(context.requestPayload, req)) {
+                requestContextMap.remove(action);
+            }
+
+            OcppJsonCallForTesting call = new OcppJsonCallForTesting();
+            call.setAction(action);
+            call.setMessageId(messageId);
+            call.setContext(context);
+            return call;
+        }
+    }
+
+    @Setter
+    @Getter
+    private static class OcppJsonCallForTesting extends OcppJsonCall {
+        private RequestContext context;
     }
 
 }

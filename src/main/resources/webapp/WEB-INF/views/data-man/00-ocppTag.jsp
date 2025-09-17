@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 			<td>Parent ID Tag:</td>
 			<td><form:select path="parentIdTag" items="${idTagList}"/></td>
 		</tr>
-		<tr><td>Expiry Date/Time:</td><td><form:input path="expiration" cssClass="dateTimePicker"/></td></tr>
+		<tr><td>Expiry Date/Time:</td><td><form:input path="expiryDate" cssClass="dateTimePicker"/></td></tr>
 		<tr><td>Max. Active Transaction Count:</td><td><form:input path="maxActiveTransactionCount" placeholder="if empty, 1 will be assumed"/></td></tr>
 		<tr><td><i>
 			Set to <b>0</b> to block this tag. Set to a <b>negative</b> value to disable concurrent transaction checks

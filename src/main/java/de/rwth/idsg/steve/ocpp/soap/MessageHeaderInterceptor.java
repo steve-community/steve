@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.cxf.binding.soap.Soap12;
@@ -36,12 +37,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
 import java.util.Optional;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -60,15 +59,20 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ScheduledExecutorService executorService;
+    private final OcppServerRepository ocppServerRepository;
+    private final ChargePointRegistrationService chargePointRegistrationService;
+    private final DelegatingTaskExecutor asyncTaskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public MessageHeaderInterceptor() {
+    public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository,
+                                    ChargePointRegistrationService chargePointRegistrationService,
+                                    DelegatingTaskExecutor asyncTaskExecutor) {
         super(Phase.PRE_INVOKE);
+        this.ocppServerRepository = ocppServerRepository;
+        this.chargePointRegistrationService = chargePointRegistrationService;
+        this.asyncTaskExecutor = asyncTaskExecutor;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+            Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
             boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
             if (!allow) {
                 throw createAuthFault(opName);
@@ -93,7 +97,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {

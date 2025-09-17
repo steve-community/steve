@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -79,9 +81,18 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public void clearFinished() {
+        removeTasks(entry -> entry.getValue().isFinished());
+    }
+
+    @Override
+    public void clearUnfinished() {
+        removeTasks(entry -> !entry.getValue().isFinished());
+    }
+
+    private void removeTasks(Predicate<Map.Entry<Integer, CommunicationTask>> filterPredicate) {
         lookupTable.entrySet()
                    .stream()
-                   .filter(entry -> entry.getValue().isFinished())
+                   .filter(filterPredicate)
                    .forEach(entry -> lookupTable.remove(entry.getKey()));
     }
 }

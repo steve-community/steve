@@ -32,7 +32,7 @@
     </licenses>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jooq.version>3.19.18</jooq.version>
@@ -166,7 +166,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[17,)</version>
+                                    <version>[21,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.3.9,)</version>

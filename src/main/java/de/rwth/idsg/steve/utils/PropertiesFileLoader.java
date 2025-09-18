@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,8 +25,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -96,18 +93,6 @@ public class PropertiesFileLoader {
         return trim(key, s);
     }
 
-    public List<String> getStringList(String key) {
-        String s = prop.getProperty(key);
-        if (Strings.isNullOrEmpty(s)) {
-            return Collections.emptyList();
-        }
-        s = resolveIfSystemEnv(s);
-        return Splitter.on(",")
-                       .trimResults()
-                       .omitEmptyStrings()
-                       .splitToList(s);
-    }
-
     public boolean getOptionalBoolean(String key) {
         String s = getOptionalString(key);
         if (s == null) {
@@ -116,15 +101,6 @@ public class PropertiesFileLoader {
             return false;
         } else {
             return Boolean.parseBoolean(s);
-        }
-    }
-
-    public Integer getOptionalInt(String key) {
-        String s = getOptionalString(key);
-        if (s == null) {
-            return null;
-        } else {
-            return Integer.parseInt(s);
         }
     }
 

@@ -24,8 +24,10 @@ package de.rwth.idsg.steve;
  */
 public enum ApplicationProfile {
     DEV,
-    TEST,
-    PROD;
+    DOCKER,
+    KUBERNETES,
+    PROD,
+    TEST;
 
     public static ApplicationProfile fromName(String v) {
         for (ApplicationProfile ap : ApplicationProfile.values()) {
@@ -34,9 +36,5 @@ public enum ApplicationProfile {
             }
         }
         throw new IllegalArgumentException(v);
-    }
-
-    public boolean isProd() {
-        return this == PROD;
     }
 }

@@ -289,7 +289,7 @@ public class JettyServer {
         ips.removeIf("0.0.0.0"::equals);
 
         if (ips.isEmpty()) {
-            // Well, we failed to read from system, fall back to main.properties.
+            // Well, we failed to read from system, fall back to application.properties.
             // Better than nothing
             ips.add(CONFIG.getJetty().getServerHost());
         }

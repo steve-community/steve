@@ -48,7 +48,7 @@ public enum SteveConfiguration {
     private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
-    // main.properties
+    // application.properties
     // -------------------------------------------------------------------------
 
     private final String contextPath;
@@ -62,7 +62,10 @@ public enum SteveConfiguration {
     private final Jetty jetty;
 
     SteveConfiguration() {
-        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
+        // Load the profile in order to load the correct application-<profile>.properties file
+        String profileTemp = new PropertiesFileLoader("application.properties").getString("profile");
+
+        PropertiesFileLoader p = new PropertiesFileLoader("application-" + profileTemp.toLowerCase() + ".properties");
 
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");

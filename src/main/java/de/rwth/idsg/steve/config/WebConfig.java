@@ -35,7 +35,7 @@ import java.util.EnumSet;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * Jetty will automatically detect this class because of {@link de.rwth.idsg.steve.SteveAppContext#SCAN_PATTERN} and
+ * Jetty will automatically detect this class because of {@link de.rwth.idsg.steve.JettyServer#SCAN_PATTERN} and
  * use it to initialize the Spring and servlets and filters.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>

@@ -19,19 +19,24 @@
 package de.rwth.idsg.steve;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -44,7 +49,6 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class JettyServer {
 
     private Server server;
-    private SteveAppContext steveAppContext;
 
     private static final int MIN_THREADS = 4;
     private static final int MAX_THREADS = 50;
@@ -52,10 +56,14 @@ public class JettyServer {
     private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
+    // scan all jars in the classpath for ServletContainerInitializers
+    // (e.g. Spring's WebApplicationInitializer)
+    private static final String SCAN_PATTERN = ".*\\.jar$|.*/classes/.*";
+
     /**
      * A fully configured Jetty Server instance
      */
-    private void prepare() {
+    private void prepare() throws IOException {
 
         // === jetty.xml ===
         // Setup Threadpool
@@ -98,8 +106,7 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        steveAppContext = new SteveAppContext();
-        server.setHandler(steveAppContext.getHandler());
+        server.setHandler(getWebApp());
     }
 
     private ServerConnector httpConnector(HttpConfiguration httpConfig) {
@@ -131,6 +138,35 @@ public class JettyServer {
         https.setPort(CONFIG.getJetty().getHttpsPort());
         https.setIdleTimeout(IDLE_TIMEOUT);
         return https;
+    }
+
+    private Handler getWebApp() throws IOException {
+        var webAppContext = new WebAppContext();
+        webAppContext.setContextPath(CONFIG.getContextPath());
+        webAppContext.setBaseResourceAsString(new ClassPathResource("webapp").getURI().toString());
+
+        // if during startup an exception happens, do not swallow it, throw it
+        webAppContext.setThrowUnavailableOnStartupException(true);
+
+        // Disable directory listings if no index.html is found.
+        webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+
+        // Crucial for Spring's WebApplicationInitializer to be discovered
+        // and for the DispatcherServlet to be initialized.
+        // It tells Jetty to scan for classes implementing WebApplicationInitializer.
+        // The pattern ensures that Jetty finds the Spring classes in the classpath.
+        //
+        // https://jetty.org/docs/jetty/12.1/programming-guide/maven-jetty/jetty-maven-plugin.html
+        // https://jetty.org/docs/jetty/12.1/operations-guide/annotations/index.html#og-container-include-jar-pattern
+        webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", SCAN_PATTERN);
+
+        if (CONFIG.getJetty().isGzipEnabled()) {
+            // Wraps the whole web app in a gzip handler to make Jetty return compressed content
+            // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
+            return new GzipHandler(webAppContext);
+        } else {
+            return webAppContext;
+        }
     }
 
     /**

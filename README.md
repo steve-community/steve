@@ -72,11 +72,11 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 3. Configure SteVe **before** building:
 
-    The basic configuration is defined in [application.properties](src/main/resources/application.properties):
-      - You _must_ change [database configuration](src/main/resources/application.properties)
-      - You _must_ change [the host](src/main/resources/application.properties) to the correct IP address of your server
-      - You _must_ change [web interface credentials](src/main/resources/application.properties)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application.properties)
+    The basic configuration is defined in [application-prod.properties](src/main/resources/application-prod.properties):
+      - You _must_ change [database configuration](src/main/resources/application-prod.properties)
+      - You _must_ change [the host](src/main/resources/application-prod.properties) to the correct IP address of your server
+      - You _must_ change [web interface credentials](src/main/resources/application-prod.properties)
+      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties)
      
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
@@ -101,7 +101,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
 
 Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
-Instead of changing the [application.properties](src/main/resources/application.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
+Instead of changing the [application-prod.properties](src/main/resources/application-prod.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
 The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
 
 With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`

@@ -62,98 +62,59 @@ public enum SteveConfiguration {
     private final Jetty jetty;
 
     SteveConfiguration() {
-        PropertiesFileLoader p = new PropertiesFileLoader("application.properties");
+        // Load the profile in order to load the correct application-<profile>.properties file
+        String profileTemp = new PropertiesFileLoader("application.properties").getString("profile");
+
+        PropertiesFileLoader p = new PropertiesFileLoader("application-" + profileTemp.toLowerCase() + ".properties");
+
+        contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
+        steveVersion = p.getString("steve.version");
+        gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
+
         profile = ApplicationProfile.fromName(p.getString("profile"));
-        PropertiesFileLoader overriden = new PropertiesFileLoader("application-" + profile.name().toLowerCase() + ".properties");
-
-        contextPath = sanitizeContextPath(getOptionalString("context.path", p, overriden));
-        steveVersion = getString("steve.version", p, overriden);
-        gitDescribe = useFallbackIfNotSet(getOptionalString("git.describe", p, overriden), null);
-
         System.setProperty("spring.profiles.active", profile.name().toLowerCase());
-        System.setProperty("logging.config", "classpath:logback-" + profile.name().toLowerCase() + ".xml");
 
         jetty = Jetty.builder()
-                     .serverHost(getString("server.host", p, overriden))
-                     .gzipEnabled(getBoolean("server.gzip.enabled", p, overriden))
-                     .httpEnabled(getBoolean("http.enabled", p, overriden))
-                     .httpPort(getInt("http.port", p, overriden))
-                     .httpsEnabled(getBoolean("https.enabled", p, overriden))
-                     .httpsPort(getInt("https.port", p, overriden))
-                     .keyStorePath(getOptionalString("keystore.path", p, overriden))
-                     .keyStorePassword(getOptionalString("keystore.password", p, overriden))
+                     .serverHost(p.getString("server.host"))
+                     .gzipEnabled(p.getBoolean("server.gzip.enabled"))
+                     .httpEnabled(p.getBoolean("http.enabled"))
+                     .httpPort(p.getInt("http.port"))
+                     .httpsEnabled(p.getBoolean("https.enabled"))
+                     .httpsPort(p.getInt("https.port"))
+                     .keyStorePath(p.getOptionalString("keystore.path"))
+                     .keyStorePassword(p.getOptionalString("keystore.password"))
                      .build();
 
         db = DB.builder()
-               .ip(getString("db.ip", p, overriden))
-               .port(getInt("db.port", p, overriden))
-               .schema(getString("db.schema", p, overriden))
-               .userName(getString("db.user", p, overriden))
-               .password(getString("db.password", p, overriden))
-               .sqlLogging(getBoolean("db.sql.logging", p, overriden))
+               .ip(p.getString("db.ip"))
+               .port(p.getInt("db.port"))
+               .schema(p.getString("db.schema"))
+               .userName(p.getString("db.user"))
+               .password(p.getString("db.password"))
+               .sqlLogging(p.getBoolean("db.sql.logging"))
                .build();
 
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
         auth = Auth.builder()
                    .passwordEncoder(encoder)
-                   .userName(getString("auth.user", p, overriden))
-                   .encodedPassword(encoder.encode(getString("auth.password", p, overriden)))
+                   .userName(p.getString("auth.user"))
+                   .encodedPassword(encoder.encode(p.getString("auth.password")))
                    .build();
 
         webApi = WebApi.builder()
-                       .headerKey(getOptionalString("webapi.key", p, overriden))
-                       .headerValue(getOptionalString("webapi.value", p, overriden))
+                       .headerKey(p.getOptionalString("webapi.key"))
+                       .headerValue(p.getOptionalString("webapi.value"))
                        .build();
 
         ocpp = Ocpp.builder()
-                   .autoRegisterUnknownStations(getOptionalBoolean("auto.register.unknown.stations", p, overriden))
-                   .chargeBoxIdValidationRegex(getOptionalString("charge-box-id.validation.regex", p, overriden))
+                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
+                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
                    .wsSessionSelectStrategy(
-                           WsSessionSelectStrategyEnum.fromName(getString("ws.session.select.strategy", p, overriden)))
+                           WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
                    .build();
 
         validate();
-    }
-
-    private static String getOptionalString(String key, PropertiesFileLoader p, PropertiesFileLoader overriden) {
-      String value = overriden.getOptionalString(key);
-      if (value == null) {
-          return p.getOptionalString(key);
-      }
-      return value;
-    }
-
-    private static String getString(String key, PropertiesFileLoader p, PropertiesFileLoader overriden) {
-      String value = overriden.getOptionalString(key);
-      if (value == null) {
-          return p.getString(key);
-      }
-      return value;
-    }
-
-    private static boolean getOptionalBoolean(String key, PropertiesFileLoader p, PropertiesFileLoader overriden) {
-        if (overriden.getOptionalString(key) == null) {
-            return p.getOptionalBoolean(key);
-        } else {
-            return overriden.getOptionalBoolean(key);
-        }
-    }
-
-    private static boolean getBoolean(String key, PropertiesFileLoader p, PropertiesFileLoader overriden) {
-        if (overriden.getOptionalString(key) == null) {
-            return p.getBoolean(key);
-        } else {
-            return overriden.getOptionalBoolean(key);
-        }
-    }
-
-    private static int getInt(String key, PropertiesFileLoader p, PropertiesFileLoader overriden) {
-        if (overriden.getOptionalString(key) == null) {
-            return p.getInt(key);
-        } else {
-            return overriden.getInt(key);
-        }
     }
 
     public String getSteveCompositeVersion() {

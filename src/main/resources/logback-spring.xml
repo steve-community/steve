@@ -9,7 +9,7 @@
   </springProfile>
 
   <springProfile name="kubernetes">
-    <include resource="logback-spring-kubernetes.xml"/>
+    <include resource="logback-spring-docker.xml"/>
   </springProfile>
 
   <springProfile name="prod">
@@ -17,7 +17,7 @@
   </springProfile>
 
   <springProfile name="test">
-    <include resource="logback-spring-test.xml"/>
+    <include resource="logback-spring-dev.xml"/>
   </springProfile>
 
 </configuration>

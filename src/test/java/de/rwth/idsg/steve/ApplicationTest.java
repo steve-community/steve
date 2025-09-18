@@ -55,7 +55,7 @@ public class ApplicationTest {
 
     @BeforeAll
     public static void init() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
         app = new Application();

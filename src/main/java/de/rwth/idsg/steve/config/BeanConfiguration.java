@@ -205,12 +205,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**").addResourceLocations("static/");
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/manager/signin").setViewName("signin");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    }
-
     // -------------------------------------------------------------------------
     // API config
     // -------------------------------------------------------------------------

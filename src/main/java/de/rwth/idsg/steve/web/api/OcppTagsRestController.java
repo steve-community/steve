@@ -42,11 +42,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -80,7 +80,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "")
-    @ResponseBody
     public List<OcppTagOverview> get(@ParameterObject OcppTagQueryFormForApi params) {
         log.debug("Read request for query: {}", params);
 
@@ -100,7 +99,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Read request for ocppTagPk: {}", ocppTagPk);
 
@@ -122,7 +120,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping
-    @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public OcppTagOverview create(@RequestBody @Valid OcppTagForm params) {
         log.debug("Create request: {}", params);
@@ -145,7 +142,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PutMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
@@ -169,7 +165,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @DeleteMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Delete request for ocppTagPk: {}", ocppTagPk);
 

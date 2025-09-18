@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
-import de.rwth.idsg.steve.ApplicationProfile;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -53,7 +52,7 @@ public class Issue73Fix {
     private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
         Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
         __DatabasePreparer__.prepare();

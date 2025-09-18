@@ -64,6 +64,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(
                 req -> req
                     .requestMatchers(
+                        "/", // we have RootRedirectController to redirect "/" to "/manager"
                         "/static/**",
                         CONFIG.getCxfMapping() + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",
@@ -75,15 +76,9 @@ public class SecurityConfiguration {
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
             // we need to disable CSRF for SOAP paths explicitly.
             .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
-            .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
-            .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
-            .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
+            .sessionManagement(req -> req.invalidSessionUrl(prefix + "/signin"))
+            .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
+            .logout(req -> req.logoutUrl(prefix + "/signout"))
             .build();
     }
 

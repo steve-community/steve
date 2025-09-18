@@ -50,7 +50,7 @@ public abstract class StressTest {
     protected static final int CONNECTOR_COUNT_PER_CHARGE_BOX = 25;
 
     protected void attack() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
         Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
         __DatabasePreparer__.prepare();

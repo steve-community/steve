@@ -54,7 +54,7 @@ public enum SteveConfiguration {
     private final String contextPath;
     private final String steveVersion;
     private final String gitDescribe;
-    private final ApplicationProfile profile;
+    private final String profile;
     private final Ocpp ocpp;
     private final Auth auth;
     private final WebApi webApi;
@@ -71,8 +71,8 @@ public enum SteveConfiguration {
         steveVersion = p.getString("steve.version");
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
 
-        profile = ApplicationProfile.fromName(p.getString("profile"));
-        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
+        profile = p.getString("profile");
+        System.setProperty("spring.profiles.active", profile);
 
         jetty = Jetty.builder()
                      .serverHost(p.getString("server.host"))

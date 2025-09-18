@@ -16,25 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.web.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 05.11.2015
+ * @since 17.09.2025
  */
-public enum ApplicationProfile {
-    DEV,
-    DOCKER,
-    KUBERNETES,
-    PROD,
-    TEST;
+@Controller
+@RequestMapping("/")
+public class RootRedirectController {
 
-    public static ApplicationProfile fromName(String v) {
-        for (ApplicationProfile ap : ApplicationProfile.values()) {
-            if (ap.name().equalsIgnoreCase(v)) {
-                return ap;
-            }
-        }
-        throw new IllegalArgumentException(v);
+    @GetMapping
+    public String redirectToManager() {
+        return "redirect:/manager";
     }
 }

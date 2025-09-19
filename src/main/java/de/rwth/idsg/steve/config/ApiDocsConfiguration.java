@@ -26,18 +26,11 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springdoc.core.configuration.SpringDocConfiguration;
-import org.springdoc.core.properties.SwaggerUiConfigProperties;
-import org.springdoc.core.properties.SwaggerUiOAuthProperties;
-import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
-import org.springdoc.webmvc.ui.SwaggerConfig;
 import org.springdoc.webmvc.ui.SwaggerUiHome;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -52,12 +45,6 @@ import java.util.List;
     // exclude because SwaggerUiHome's root redirect clashes with our own RootRedirectController
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SwaggerUiHome.class)
 )
-@Import({SpringDocConfiguration.class,
-    SpringDocWebMvcConfiguration.class,
-    SwaggerConfig.class,
-    SwaggerUiConfigProperties.class,
-    SwaggerUiOAuthProperties.class,
-    JacksonAutoConfiguration.class})
 public class ApiDocsConfiguration {
 
     static {

@@ -24,6 +24,7 @@ import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration;
+import org.springframework.context.Lifecycle;
 
 import java.util.TimeZone;
 
@@ -35,7 +36,11 @@ import java.util.TimeZone;
 @SpringBootApplication(exclude = {JooqAutoConfiguration.class})
 public class SteveApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        start(args);
+    }
+
+    public static Lifecycle start(String... args) throws Exception {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
@@ -43,7 +48,7 @@ public class SteveApplication {
         DateTimeZone.setDefault(DateTimeZone.forID(SteveConfiguration.getTimeZoneId()));
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveConfiguration.getTimeZoneId(), DateTime.now());
 
-        SpringApplication.run(SteveApplication.class, args);
+        return SpringApplication.run(SteveApplication.class, args);
     }
 
 }

@@ -23,6 +23,7 @@ import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.context.Lifecycle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,13 +56,15 @@ public abstract class StressTest {
 
         __DatabasePreparer__.prepare();
 
-        Application app = new Application();
+        Lifecycle app = null;
         try {
-            app.start();
+            app = SteveApplication.start();
             attackInternal();
         } finally {
             try {
-                app.stop();
+                if (app != null) {
+                    app.stop();
+                }
             } finally {
                 __DatabasePreparer__.cleanUp();
             }

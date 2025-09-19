@@ -34,6 +34,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.Lifecycle;
 import org.springframework.http.HttpStatus;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
@@ -50,15 +51,14 @@ public class ApplicationJsonTest {
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
 
-    private static Application app;
+    private static Lifecycle app;
 
     @BeforeAll
     public static void init() throws Exception {
         Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application();
-        app.start();
+        app = SteveApplication.start();
     }
 
     @AfterAll

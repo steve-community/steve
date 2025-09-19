@@ -58,6 +58,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.Lifecycle;
 
 import jakarta.xml.ws.WebServiceException;
 import java.util.Arrays;
@@ -79,14 +80,13 @@ public class OperationalTestSoapOCPP16 {
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
     private static final int numConnectors = 5;
-    private static Application app;
+    private static Lifecycle app;
 
     @BeforeAll
     public static void initClass() throws Exception {
         Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
 
-        app = new Application();
-        app.start();
+        app = SteveApplication.start();
     }
 
     @AfterAll

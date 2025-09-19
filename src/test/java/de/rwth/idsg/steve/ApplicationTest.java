@@ -31,6 +31,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.Lifecycle;
 
 import jakarta.xml.ws.WebServiceException;
 
@@ -51,15 +52,14 @@ public class ApplicationTest {
     private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
 
-    private static Application app;
+    private static Lifecycle app;
 
     @BeforeAll
     public static void init() throws Exception {
         Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application();
-        app.start();
+        app = SteveApplication.start();
     }
 
     @AfterAll

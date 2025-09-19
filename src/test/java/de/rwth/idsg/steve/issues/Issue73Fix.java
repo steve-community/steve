@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.Application;
+import de.rwth.idsg.steve.SteveApplication;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -33,6 +33,7 @@ import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.context.Lifecycle;
 
 import java.util.List;
 
@@ -57,13 +58,15 @@ public class Issue73Fix {
 
         __DatabasePreparer__.prepare();
 
-        Application app = new Application();
+        Lifecycle app = null;
         try {
-            app.start();
+            app = SteveApplication.start();
             test();
         } finally {
             try {
-                app.stop();
+                if (app != null) {
+                    app.stop();
+                }
             } finally {
                 __DatabasePreparer__.cleanUp();
             }

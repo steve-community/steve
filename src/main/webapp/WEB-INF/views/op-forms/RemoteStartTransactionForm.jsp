@@ -33,16 +33,6 @@
                 </form:select>
             </td>
         </tr>
-        <c:if test="${profileForRemoteStartTx}">
-            <tr>
-                <td>Charging Profile ID:</td>
-                <td><form:select path="chargingProfilePk">
-                    <option value="" selected>-- Empty --</option>
-                    <form:options items="${profileList}" itemLabel="itemDescription" itemValue="chargingProfilePk"/>
-                </form:select>
-                </td>
-            </tr>
-        </c:if>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

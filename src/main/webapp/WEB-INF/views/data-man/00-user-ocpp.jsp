@@ -20,17 +20,11 @@
 --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <table class="userInput">
-	<thead><tr><th>OCPP ID Tags</th><th></th></tr></thead>
+	<thead><tr><th>OCPP</th><th></th></thead>
 	<tbody>
 	<tr>
-		<td style="vertical-align:top">
-			<input type="button" value="Select None" onClick="selectNone(document.getElementById('idTagList'))">
-		</td>
-		<td>
-			<form:select path="idTagList" size="5" multiple="true">
-				<form:options items="${idTagList}"/>
-			</form:select>
-		</td>
+		<td>OCPP ID Tag:</td>
+		<td><form:select path="ocppIdTag" items="${idTagList}" /></td>
 	</tr>
 	<tr><td></td>
 		<td id="add_space">

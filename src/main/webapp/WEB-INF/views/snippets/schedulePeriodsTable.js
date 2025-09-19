@@ -4,13 +4,11 @@ $('#periodsTable').on('click', '.removeRow', function() {
 });
 
 $('#addRow').click(function () {
-    // Find the last table row
-    let last = $('#periodsTable tbody tr').last();
-    // If there is no row (because table is empty), start with id 0. Otherwise, increment last row's id.
-    let id = last.length === 0 ? 0 : parseInt(last[0].id, 10) + 1;
-    var startPeriodInSeconds = "<td><input id=\"schedulePeriods" + id + ".startPeriodInSeconds\" name=\"schedulePeriods[" + id + "].startPeriodInSeconds\" type=\"text\" value=\"\"/></td>";
-    var powerLimit = "<td><input id=\"schedulePeriods" + id + ".powerLimit\" name=\"schedulePeriods[" + id + "].powerLimit\" type=\"text\" value=\"\"/></td>";
-    var numberPhases = "<td><input id=\"schedulePeriods" + id + ".numberPhases\" name=\"schedulePeriods[" + id + "].numberPhases\" type=\"text\" value=\"\" placeholder=\"if empty, 3 will be assumed\"/></td>";
+    // use prefix for new rows to be at the end when ordered
+    var id = "zz" + Date.now();
+    var startPeriodInSeconds = "<td><input id=\"schedulePeriodMap" + id + ".startPeriodInSeconds\" name=\"schedulePeriodMap[" + id + "].startPeriodInSeconds\" type=\"text\" value=\"\"/></td>";
+    var powerLimit = "<td><input id=\"schedulePeriodMap" + id + ".powerLimit\" name=\"schedulePeriodMap[" + id + "].powerLimit\" type=\"text\" value=\"\"/></td>";
+    var numberPhases = "<td><input id=\"schedulePeriodMap" + id + ".numberPhases\" name=\"schedulePeriodMap[" + id + "].numberPhases\" type=\"text\" value=\"\" placeholder=\"if empty, 3 will be assumed\"/></td>";
     var deleteButton = "<td><input type=\"button\" class=\"removeRow\" value=\"Delete\"></td>";
     var row = "<tr id=" + id + ">" + startPeriodInSeconds + powerLimit + numberPhases + deleteButton + "</tr>";
 

@@ -104,7 +104,7 @@
                 </includes>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main</directory>
                 <filtering>false</filtering>
                 <includes>
                     <include>webapp/static/**</include>
@@ -324,8 +324,6 @@
                             <goal>jspc</goal>
                         </goals>
                         <configuration>
-                            <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
-                            <webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>
                             <webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>
                         </configuration>
                     </execution>

@@ -31,6 +31,8 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.servlet.CXFServlet;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -60,6 +62,13 @@ public class OcppConfiguration {
     private final ocpp.cs._2012._06.CentralSystemService ocpp15Server;
     private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
     private final MessageHeaderInterceptor messageHeaderInterceptor;
+
+    @Bean
+    public ServletRegistrationBean exampleServletBean() {
+        ServletRegistrationBean bean = new ServletRegistrationBean(new CXFServlet(), CONFIG.getCxfMapping() + "/*");
+        bean.setLoadOnStartup(1);
+        return bean;
+    }
 
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
     public SpringBus cxf() {

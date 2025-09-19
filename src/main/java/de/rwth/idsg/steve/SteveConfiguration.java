@@ -45,7 +45,8 @@ public enum SteveConfiguration {
     // Dummy service path
     private final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
-    private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
+    @Getter
+    private static final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
     // application.properties
@@ -63,16 +64,14 @@ public enum SteveConfiguration {
 
     SteveConfiguration() {
         // Load the profile in order to load the correct application-<profile>.properties file
-        String profileTemp = new PropertiesFileLoader("application.properties").getString("profile");
+        String profileTemp = new PropertiesFileLoader("application.properties").getString("spring.profiles.active");
+        profile = profileTemp;
 
         PropertiesFileLoader p = new PropertiesFileLoader("application-" + profileTemp.toLowerCase() + ".properties");
 
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
-
-        profile = p.getString("profile");
-        System.setProperty("spring.profiles.active", profile);
 
         jetty = Jetty.builder()
                      .serverHost(p.getString("server.host"))

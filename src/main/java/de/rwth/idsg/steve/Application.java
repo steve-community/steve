@@ -32,6 +32,7 @@ import java.util.TimeZone;
  * @since 14.01.2015
  */
 @Slf4j
+@Deprecated
 public class Application {
 
     private final JettyServer server = new JettyServer();

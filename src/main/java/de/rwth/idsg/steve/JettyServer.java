@@ -46,6 +46,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @since 12.12.2014
  */
 @Slf4j
+@Deprecated
 public class JettyServer {
 
     private Server server;

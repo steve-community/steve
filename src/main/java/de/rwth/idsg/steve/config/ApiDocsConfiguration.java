@@ -26,11 +26,8 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springdoc.webmvc.ui.SwaggerUiHome;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 
 import java.util.List;
 
@@ -41,10 +38,6 @@ import java.util.List;
  * @since 15.09.2022
  */
 @Configuration
-@ComponentScan(basePackages = {"org.springdoc"},
-    // exclude because SwaggerUiHome's root redirect clashes with our own RootRedirectController
-    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SwaggerUiHome.class)
-)
 public class ApiDocsConfiguration {
 
     static {

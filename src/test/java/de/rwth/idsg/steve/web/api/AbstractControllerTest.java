@@ -28,16 +28,12 @@ public class AbstractControllerTest {
     ObjectMapper objectMapper;
 
     AbstractControllerTest() {
-        this.objectMapper = createObjectMapper();
-    }
-
-    public static ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         objectMapper.findAndRegisterModules();
         // if the client sends unknown props, just ignore them instead of failing
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // default is true
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        return objectMapper;
+        this.objectMapper = objectMapper;
     }
 }

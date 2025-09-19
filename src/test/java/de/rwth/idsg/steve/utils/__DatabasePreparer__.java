@@ -52,7 +52,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static de.rwth.idsg.steve.web.api.AbstractControllerTest.createObjectMapper;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
@@ -72,7 +71,7 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_CHARGE_BOX_ID_2 = "charge_box_2aa6a783d47d_2";
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
-    private static final BeanConfiguration beanConfiguration = new BeanConfiguration(createObjectMapper());
+    private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
     private static final DSLContext dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource());
 
     public static void prepare() {

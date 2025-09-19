@@ -64,8 +64,8 @@ public class OcppConfiguration {
     private final MessageHeaderInterceptor messageHeaderInterceptor;
 
     @Bean
-    public ServletRegistrationBean exampleServletBean() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new CXFServlet(), CONFIG.getCxfMapping() + "/*");
+    public ServletRegistrationBean<CXFServlet> cxfServletServletRegistrationBean() {
+        var bean = new ServletRegistrationBean<>(new CXFServlet(), CONFIG.getCxfMapping() + "/*");
         bean.setLoadOnStartup(1);
         return bean;
     }

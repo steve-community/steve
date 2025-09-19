@@ -104,6 +104,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
+                    <include>application.yml</include>
                     <include>application**.properties</include>
                     <include>logback-spring**.xml</include>
                 </includes>

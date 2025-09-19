@@ -1,4 +1,4 @@
-![SteVe](src/main/resources/webapp/static/images/logo.png) 
+![SteVe](src/main/webapp/static/images/logo.png) 
 
 [![build and run tests](https://github.com/steve-community/steve/actions/workflows/main.yml/badge.svg)](https://github.com/steve-community/steve/actions/workflows/main.yml)
 

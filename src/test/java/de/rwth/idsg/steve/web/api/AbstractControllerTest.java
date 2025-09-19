@@ -34,6 +34,7 @@ public class AbstractControllerTest {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // default is true
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
         this.objectMapper = objectMapper;
     }
 }

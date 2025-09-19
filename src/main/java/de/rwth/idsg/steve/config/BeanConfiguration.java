@@ -29,7 +29,6 @@ import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.utils.InternetChecker;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -73,7 +72,6 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Configuration
 @EnableWebMvc
 @EnableScheduling
-@RequiredArgsConstructor
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 

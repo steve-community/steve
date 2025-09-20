@@ -22,7 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class WebUserService implements UserDetailsManager {
 
     private final ObjectMapper jacksonObjectMapper;
     private final WebUserRepository webUserRepository;
+    private final SteveProperties steveProperties;
+    private final PasswordEncoder passwordEncoder;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
 
     private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
@@ -82,15 +85,15 @@ public class WebUserService implements UserDetailsManager {
             return;
         }
 
-        var headerVal = SteveConfiguration.CONFIG.getWebApi().getHeaderValue();
+        var headerVal = steveProperties.getAuth().getWebApiSecret();
 
         var encodedApiPassword = StringUtils.isEmpty(headerVal)
             ? null
-            : SteveConfiguration.CONFIG.getAuth().getPasswordEncoder().encode(headerVal);
+            : passwordEncoder.encode(headerVal);
 
         var user = new WebUserRecord()
-            .setUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
-            .setPassword(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
+            .setUsername(steveProperties.getAuth().getUsername())
+            .setPassword(passwordEncoder.encode(steveProperties.getAuth().getPassword()))
             .setApiPassword(encodedApiPassword)
             .setEnabled(true)
             .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));

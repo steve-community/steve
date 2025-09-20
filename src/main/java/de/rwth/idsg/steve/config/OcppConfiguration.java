@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -65,7 +64,7 @@ public class OcppConfiguration {
 
     @Bean
     public ServletRegistrationBean<CXFServlet> cxfServletServletRegistrationBean() {
-        var bean = new ServletRegistrationBean<>(new CXFServlet(), CONFIG.getCxfMapping() + "/*");
+        var bean = new ServletRegistrationBean<>(new CXFServlet(), SteveProperties.CXF_MAPPING + "/*");
         bean.setLoadOnStartup(1);
         return bean;
     }
@@ -89,7 +88,7 @@ public class OcppConfiguration {
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
         List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(bus));
-        createOcppService(bus, ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+        createOcppService(bus, ocpp12Server, SteveProperties.ROUTER_ENDPOINT_PATH, mediator, Collections.emptyList());
     }
 
     private void createOcppService(Bus bus, Object serviceBean, String address,

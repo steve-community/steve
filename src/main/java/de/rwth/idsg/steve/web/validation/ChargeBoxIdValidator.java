@@ -19,7 +19,10 @@
 package de.rwth.idsg.steve.web.validation;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -29,10 +32,21 @@ import java.util.regex.Pattern;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.01.2016
  */
+@Component
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
     private static final String REGEX = "[^=/()<>]*";
-    private static final Pattern PATTERN = Pattern.compile(getRegexToUse());
+
+    private final Pattern pattern;
+
+    @Autowired
+    public ChargeBoxIdValidator(SteveProperties steveProperties) {
+        this(steveProperties.getOcpp().getChargeBoxIdValidationRegex());
+    }
+
+    public ChargeBoxIdValidator(String regexFromConfig) {
+        this.pattern = Pattern.compile(Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig);
+    }
 
     @Override
     public void initialize(ChargeBoxId idTag) {
@@ -57,11 +71,6 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
             return false;
         }
 
-        return PATTERN.matcher(str).matches();
-    }
-
-    private static String getRegexToUse() {
-        String regexFromConfig = SteveConfiguration.CONFIG.getOcpp().getChargeBoxIdValidationRegex();
-        return Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig;
+        return pattern.matcher(str).matches();
     }
 }

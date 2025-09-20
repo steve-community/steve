@@ -18,13 +18,14 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration;
-import org.springframework.context.Lifecycle;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.TimeZone;
 
@@ -36,18 +37,20 @@ import java.util.TimeZone;
 @SpringBootApplication(exclude = {JooqAutoConfiguration.class})
 public class SteveApplication {
 
+    static {
+        // For Hibernate validator
+        System.setProperty("org.jboss.logging.provider", "slf4j");
+
+        TimeZone.setDefault(TimeZone.getTimeZone(SteveProperties.TIME_ZONE_ID));
+        DateTimeZone.setDefault(DateTimeZone.forID(SteveProperties.TIME_ZONE_ID));
+        log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveProperties.TIME_ZONE_ID, DateTime.now());
+    }
+
     public static void main(String[] args) throws Exception {
         start(args);
     }
 
-    public static Lifecycle start(String... args) throws Exception {
-        // For Hibernate validator
-        System.setProperty("org.jboss.logging.provider", "slf4j");
-
-        TimeZone.setDefault(TimeZone.getTimeZone(SteveConfiguration.getTimeZoneId()));
-        DateTimeZone.setDefault(DateTimeZone.forID(SteveConfiguration.getTimeZoneId()));
-        log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveConfiguration.getTimeZoneId(), DateTime.now());
-
+    public static ConfigurableApplicationContext start(String... args) throws Exception {
         return SpringApplication.run(SteveApplication.class, args);
     }
 

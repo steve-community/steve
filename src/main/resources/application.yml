@@ -1,5 +1,33 @@
 spring:
+  profiles.active: @envName@
   application:
     name: steve
+  datasource:
+    url: jdbc:mysql://${db.ip}:${db.port}/${db.schema}
+    username: ${db.user}
+    password: ${db.password}
 
-server.servlet.context-path: /${context.path}
+server:
+  address: ${server.host}
+  port: ${http.port}
+  servlet.context-path: /${context.path}
+  compression:
+    enabled: ${server.gzip.enabled}
+  ssl:
+    enabled: ${https.enabled}
+    key-store: ${keystore.path}
+    key-store-password: ${keystore.password}
+
+steve:
+  version: ${steve.version}
+  jooq:
+    executive-logging: ${db.sql.logging}
+  auth:
+    username: ${auth.user}
+    password: ${auth.password}
+    web-api-key: ${webapi.key}
+    web-api-secret: ${webapi.value}
+  ocpp:
+    ws-session-select-strategy: ${ws.session.select.strategy}
+    auto-register-unknown-stations: ${auto.register.unknown.stations}
+    charge-box-id-validation-regex: ${charge-box-id.validation.regex}

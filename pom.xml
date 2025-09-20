@@ -139,8 +139,15 @@
       </dependency>
       <dependency>
         <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator</artifactId>
+        <artifactId>hibernate-validator-bom</artifactId>
         <version>9.0.1.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+        <version>3.1.1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.annotation</groupId>

@@ -54,7 +54,7 @@ public abstract class StressTest {
 
     protected void attack() throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getProfile()).isEqualTo("test");
         assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
 
         __DatabasePreparer__.prepare(config);

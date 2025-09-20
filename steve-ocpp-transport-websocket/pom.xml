@@ -34,6 +34,10 @@
       <version>2.2.0</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>jetty-websocket-jetty-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.owasp.encoder</groupId>
       <artifactId>encoder</artifactId>
       <version>${owasp-encoder.version}</version>

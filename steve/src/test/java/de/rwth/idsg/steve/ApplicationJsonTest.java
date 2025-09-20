@@ -64,7 +64,7 @@ public class ApplicationJsonTest {
     @BeforeAll
     public static void init() throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getProfile()).isEqualTo("test");
         __DatabasePreparer__.prepare(config);
 
         path = getWsPath(config);

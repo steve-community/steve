@@ -78,7 +78,7 @@ public class OperationalTestSoapOCPP16 {
     @BeforeAll
     public static void initClass() throws Exception {
         config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getProfile()).isEqualTo("test");
 
         path = getHttpPath(config);
 

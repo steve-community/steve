@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
-import de.rwth.idsg.steve.ApplicationProfile;
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -53,7 +52,7 @@ public class Issue73Fix {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getProfile()).isEqualTo("test");
         assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
 
         __DatabasePreparer__.prepare(config);

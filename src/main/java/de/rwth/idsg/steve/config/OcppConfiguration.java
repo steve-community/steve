@@ -31,6 +31,8 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.servlet.CXFServlet;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -61,6 +62,13 @@ public class OcppConfiguration {
     private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
     private final MessageHeaderInterceptor messageHeaderInterceptor;
 
+    @Bean
+    public ServletRegistrationBean<CXFServlet> cxfServletServletRegistrationBean() {
+        var bean = new ServletRegistrationBean<>(new CXFServlet(), SteveProperties.CXF_MAPPING + "/*");
+        bean.setLoadOnStartup(1);
+        return bean;
+    }
+
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
     public SpringBus cxf() {
         SpringBus bus = new SpringBus();
@@ -80,7 +88,7 @@ public class OcppConfiguration {
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
         List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(bus));
-        createOcppService(bus, ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+        createOcppService(bus, ocpp12Server, SteveProperties.ROUTER_ENDPOINT_PATH, mediator, Collections.emptyList());
     }
 
     private void createOcppService(Bus bus, Object serviceBean, String address,

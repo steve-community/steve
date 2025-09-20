@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static de.rwth.idsg.steve.utils.Helpers.getJsonPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 
@@ -56,7 +55,6 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  */
 public class StressTestJsonOCPP16 extends StressTest {
 
-    private static final String PATH = getJsonPath();
     private static final OcppVersion VERSION = OcppVersion.V_16;
 
     public static void main(String[] args) throws Exception {
@@ -76,7 +74,7 @@ public class StressTestJsonOCPP16 extends StressTest {
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
                 String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, jsonPath));
 
                 OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
                 chargePoint.start();

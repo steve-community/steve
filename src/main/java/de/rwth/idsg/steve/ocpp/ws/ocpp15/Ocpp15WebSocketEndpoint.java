@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp15;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService15_SoapServer;
@@ -53,8 +54,9 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService15_SoapServer server) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, Ocpp15TypeStore.INSTANCE);
+                                   CentralSystemService15_SoapServer server,
+                                   SteveProperties steveProperties) {
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, steveProperties, Ocpp15TypeStore.INSTANCE);
         this.server = server;
     }
 

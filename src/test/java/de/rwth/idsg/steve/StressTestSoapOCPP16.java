@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 
@@ -54,8 +53,6 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  * @since 18.04.2018
  */
 public class StressTestSoapOCPP16 extends StressTest {
-
-    private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
         new StressTestSoapOCPP16().attack();
@@ -71,7 +68,7 @@ public class StressTestSoapOCPP16 extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                CentralSystemService client = getForOcpp16(path);
+                CentralSystemService client = getForOcpp16(soapPath);
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
                 threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
@@ -89,7 +86,7 @@ public class StressTestSoapOCPP16 extends StressTest {
 
             @Override
             public void toRepeat() {
-                CentralSystemService client = getForOcpp16(path);
+                CentralSystemService client = getForOcpp16(soapPath);
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
                 String chargeBoxId = threadLocalChargeBoxId.get();

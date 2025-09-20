@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
@@ -40,8 +41,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * One controller for about and settings pages
  *
@@ -57,6 +56,7 @@ public class AboutSettingsController {
     private final SettingsRepository settingsRepository;
     private final MailService mailService;
     private final ReleaseCheckService releaseCheckService;
+    private final SteveProperties steveProperties;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -73,7 +73,7 @@ public class AboutSettingsController {
     public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
         String scheme = request.getScheme();
 
-        model.addAttribute("version", CONFIG.getSteveVersion());
+        model.addAttribute("version", steveProperties.getVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());

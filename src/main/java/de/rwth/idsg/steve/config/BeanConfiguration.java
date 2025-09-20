@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -36,10 +35,11 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
+import org.springframework.context.annotation.Primary;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -50,7 +50,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -60,8 +59,6 @@ import jakarta.validation.Validator;
 
 import javax.sql.DataSource;
 import java.util.List;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -80,15 +77,13 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     @Bean
-    public DataSource dataSource() {
-        SteveConfiguration.DB dbConfig = CONFIG.getDb();
-
+    public HikariDataSource dataSource(DataSourceProperties properties) {
         HikariConfig hc = new HikariConfig();
 
         // set standard params
-        hc.setJdbcUrl("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
-        hc.setUsername(dbConfig.getUserName());
-        hc.setPassword(dbConfig.getPassword());
+        hc.setJdbcUrl(properties.getUrl());
+        hc.setUsername(properties.getUsername());
+        hc.setPassword(properties.getPassword());
 
         // set non-standard params
         hc.addDataSourceProperty(PropertyKey.cachePrepStmts.getKeyName(), true);
@@ -96,7 +91,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
         hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
-        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
+        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), SteveProperties.TIME_ZONE_ID);
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
         // https://github.com/steve-community/steve/issues/736
@@ -118,7 +113,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
-    public DSLContext dslContext(DataSource dataSource) {
+    public DSLContext dslContext(DataSource dataSource,
+                                 SteveProperties steveProperties) {
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
@@ -126,7 +122,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 // operations. We do not use or need that.
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+                .withExecuteLogging(steveProperties.getJooq().isExecutiveLogging());
 
         // Configuration for JOOQ
         org.jooq.Configuration conf = new DefaultConfiguration()
@@ -173,9 +169,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * steps and return a "no new version" report immediately.
      */
     @Bean
-    public ReleaseCheckService releaseCheckService() {
+    public ReleaseCheckService releaseCheckService(SteveProperties steveProperties) {
         if (InternetChecker.isInternetAvailable()) {
-            return new GithubReleaseCheckService();
+            return new GithubReleaseCheckService(steveProperties);
         } else {
             return new DummyReleaseCheckService();
         }
@@ -232,6 +228,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
      */
     @Bean
+    @Primary
     public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         return requestMappingHandlerAdapter.getMessageConverters().stream()
             .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)

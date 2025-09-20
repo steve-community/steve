@@ -18,15 +18,16 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 
 import jakarta.xml.ws.soap.SOAPBinding;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
@@ -46,40 +47,41 @@ public class Helpers {
         return list;
     }
 
-    public static String getPath() {
-        String prefix;
-        int port;
+    /**
+     * only <code>http:/</code> and <code>https:/</code> because serverProperties.getAddress() starts with a slash.
+     */
+    public static String getPath(ServerProperties serverProperties) {
+        String prefix = "http:/";
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
-            prefix = "http://";
-            port = CONFIG.getJetty().getHttpPort();
-        } else if (CONFIG.getJetty().isHttpsEnabled()) {
-            prefix = "https://";
-            port = CONFIG.getJetty().getHttpsPort();
-        } else {
-            throw new RuntimeException();
+        if (serverProperties.getSsl().isEnabled()) {
+            prefix = "https:/";
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/services" + CONFIG.getRouterEndpointPath();
+        return prefix
+               + serverProperties.getAddress()
+               + ":"
+               + serverProperties.getPort()
+               + serverProperties.getServlet().getContextPath()
+               + "/services"
+               + SteveProperties.ROUTER_ENDPOINT_PATH;
     }
 
-    public static String getJsonPath() {
-        String prefix;
-        int port;
+    /**
+     * only <code>ws:/</code> and <code>wss:/</code> because serverProperties.getAddress() starts with a slash.
+     */
+    public static String getJsonPath(ServerProperties serverProperties) {
+        String prefix = "ws:/";
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
-            prefix = "ws://";
-            port = CONFIG.getJetty().getHttpPort();
-        } else if (CONFIG.getJetty().isHttpsEnabled()) {
-            prefix = "wss://";
-            port = CONFIG.getJetty().getHttpsPort();
-        } else {
-            throw new RuntimeException();
+        if (serverProperties.getSsl().isEnabled()) {
+            prefix = "wss:/";
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/websocket/CentralSystemService/";
+        return prefix
+               + serverProperties.getAddress()
+               + ":"
+               + serverProperties.getPort()
+               + serverProperties.getServlet().getContextPath()
+               + "/websocket/CentralSystemService/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

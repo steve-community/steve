@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -64,9 +65,9 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final OcppServerRepository ocppServerRepository;
     private final FutureResponseContextStore futureResponseContextStore;
     private final IncomingPipeline pipeline;
+    private final SessionContextStore sessionContextStore;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private final SessionContextStore sessionContextStore = new SessionContextStoreImpl();
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
@@ -75,11 +76,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
                                      OcppServerRepository ocppServerRepository,
                                      FutureResponseContextStore futureResponseContextStore,
                                      ApplicationEventPublisher applicationEventPublisher,
+                                     SteveProperties steveProperties,
                                      AbstractTypeStore typeStore) {
         this.asyncTaskScheduler = asyncTaskScheduler;
         this.ocppServerRepository = ocppServerRepository;
         this.futureResponseContextStore = futureResponseContextStore;
         this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
+        this.sessionContextStore = new SessionContextStoreImpl(steveProperties.getOcpp().getWsSessionSelectStrategy());
 
         connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
         disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));

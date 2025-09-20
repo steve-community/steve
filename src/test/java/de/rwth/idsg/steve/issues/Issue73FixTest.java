@@ -19,8 +19,6 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.Application;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -32,7 +30,16 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import org.joda.time.DateTime;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -42,49 +49,53 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
  * https://github.com/steve-community/steve/issues/73
+ * https://github.com/steve-community/steve/issues/219
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.07.2018
  */
-public class Issue73Fix {
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment =  WebEnvironment.DEFINED_PORT)
+public class Issue73FixTest {
 
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
 
-    public static void main(String[] args) throws Exception {
-        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
-        Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+    @Autowired
+    private ServerProperties serverProperties;
+    @Autowired
+    private DSLContext dslContext;
 
-        __DatabasePreparer__.prepare();
+    private __DatabasePreparer__ databasePreparer;
 
-        Application app = new Application();
-        try {
-            app.start();
-            test();
-        } finally {
-            try {
-                app.stop();
-            } finally {
-                __DatabasePreparer__.cleanUp();
-            }
-        }
+    @BeforeEach
+    public void setup() {
+        databasePreparer = new __DatabasePreparer__(dslContext);
+        databasePreparer.prepare();
     }
 
-    private static void test() {
-        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
+    @AfterEach
+    public void teardown() {
+        databasePreparer.cleanUp();
+    }
 
-        String chargeBox1 = getRandomString();
-        String chargeBox2 = getRandomString();
+    @Test
+    public void test() {
+        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(getPath(serverProperties));
+
+        String chargeBox1 = __DatabasePreparer__.getRegisteredChargeBoxId();
+        String chargeBox2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
 
         sendBoot(client, Lists.newArrayList(chargeBox1, chargeBox2));
 
         sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
-        sendStartTx(client, chargeBox1);
+        sendStartTx(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
         sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
-        sendAuth(client, chargeBox2, AuthorizationStatus.CONCURRENT_TX);
+        sendAuth(client, chargeBox2, AuthorizationStatus.ACCEPTED);
+
+        sendStartTx(client, chargeBox2, AuthorizationStatus.CONCURRENT_TX);
     }
 
     private static void sendBoot(CentralSystemService client, List<String> chargeBoxIdList) {
@@ -105,7 +116,7 @@ public class Issue73Fix {
         Assertions.assertEquals(expected, auth.getIdTagInfo().getStatus());
     }
 
-    private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
+    private void sendStartTx(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
         StartTransactionResponse start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(2)
@@ -115,7 +126,8 @@ public class Issue73Fix {
                 chargeBoxId
         );
         Assertions.assertNotNull(start);
+        Assertions.assertEquals(expected, start.getIdTagInfo().getStatus());
         Assertions.assertTrue(start.getTransactionId() > 0);
-        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertTrue(databasePreparer.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 }

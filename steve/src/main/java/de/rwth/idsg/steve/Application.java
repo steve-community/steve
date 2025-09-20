@@ -36,12 +36,14 @@ import java.util.TimeZone;
 @Slf4j
 public class Application {
 
+    private final SteveConfiguration config;
+    private final LogFileRetriever logFileRetriever;
     private final JettyServer server;
 
     public Application(SteveConfiguration config, LogFileRetriever logFileRetriever) {
+        this.config = config;
+        this.logFileRetriever = logFileRetriever;
         this.server = new JettyServer(config);
-        WebConfig.config = config;
-        WebConfig.logFileRetriever = logFileRetriever;
     }
 
     public static void main(String[] args) throws Exception {
@@ -83,6 +85,7 @@ public class Application {
     }
 
     public void start() throws Exception {
+        WebConfig.initialize(config, logFileRetriever);
         server.start();
     }
 
@@ -92,5 +95,6 @@ public class Application {
 
     public void stop() throws Exception {
         server.stop();
+        WebConfig.clear();
     }
 }

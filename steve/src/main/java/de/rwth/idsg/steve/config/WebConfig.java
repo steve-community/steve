@@ -47,8 +47,22 @@ import jakarta.servlet.ServletException;
 @RequiredArgsConstructor
 public class WebConfig implements WebApplicationInitializer {
 
-    public static SteveConfiguration config;
-    public static LogFileRetriever logFileRetriever;
+    // TEMP workaround before spring boot migration
+    private static SteveConfiguration config;
+    private static LogFileRetriever logFileRetriever;
+
+    public static synchronized void initialize(SteveConfiguration cfg, LogFileRetriever retriever) {
+        if (config != null || logFileRetriever != null) {
+            throw new IllegalStateException("WebConfig already initialized");
+        }
+        config = cfg;
+        logFileRetriever = retriever;
+    }
+
+    public static void clear() {
+        config = null;
+        logFileRetriever = null;
+    }
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {

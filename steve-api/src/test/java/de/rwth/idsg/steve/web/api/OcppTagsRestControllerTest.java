@@ -326,7 +326,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)))
                 .hasStatusOk();
 
-        verify(ocppTagsService).updateOcppTag(form);
+        var captor = ArgumentCaptor.forClass(OcppTagForm.class);
+        verify(ocppTagsService).updateOcppTag(captor.capture());
+        assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(form);
     }
 
     @Test

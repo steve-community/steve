@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.config.WebConfig;
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +37,13 @@ import java.util.TimeZone;
 public class Application {
 
     private final SteveConfiguration config;
+    private final LogFileRetriever logFileRetriever;
     private final JettyServer server;
 
     public Application(SteveConfiguration config, LogFileRetriever logFileRetriever) {
         this.config = config;
-        this.server = new JettyServer(config, logFileRetriever);
+        this.logFileRetriever = logFileRetriever;
+        this.server = new JettyServer(config);
     }
 
     public static void main(String[] args) throws Exception {
@@ -82,6 +85,7 @@ public class Application {
     }
 
     public void start() throws Exception {
+        WebConfig.initialize(config, logFileRetriever);
         server.start();
     }
 
@@ -91,5 +95,6 @@ public class Application {
 
     public void stop() throws Exception {
         server.stop();
+        WebConfig.clear();
     }
 }

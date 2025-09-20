@@ -68,6 +68,7 @@ public class SecurityConfiguration {
         };
 
         return http.authorizeHttpRequests(req -> req.requestMatchers(
+                                "/", // we have RootRedirectController to redirect "/" to "/manager"
                                 "/static/**",
                                 config.getPaths().getSoapMapping() + "/**",
                                 OcppWebSocketConfiguration.PATH_INFIX + "**",

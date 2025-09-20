@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
@@ -62,12 +63,28 @@ public class OcppWebSocketConfiguration implements WebSocketConfigurer {
 
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
                 chargeBoxIdValidator,
-                new DefaultHandshakeHandler(),
+                createHandshakeHandler(),
                 Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
                 chargePointRegistrationService);
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
+    }
+
+    /**
+     * https://docs.spring.io/spring-framework/reference/web/websocket/server.html#websocket-server-runtime-configurationCheck failure[checkstyle] src/main/java/de/rwth/idsg/steve/config/WebSocketConfiguration.java#L73 <com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck>Check failure: [checkstyle] src/main/java/de/rwth/idsg/steve/config/WebSocketConfiguration.java#L73 <com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck>Line is longer than 120 characters (found 121).build and run tests / checkstyleView detailsCode has alerts. Press enter to view.
+     *
+     * Otherwise, defaults come from {@link WebSocketConstants}
+     */
+    private static DefaultHandshakeHandler createHandshakeHandler() {
+        JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
+
+        strategy.addWebSocketConfigurer(configurable -> {
+            configurable.setMaxTextMessageSize(MAX_MSG_SIZE);
+            configurable.setIdleTimeout(IDLE_TIMEOUT);
+        });
+
+        return new DefaultHandshakeHandler(strategy);
     }
 }

@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Getter
 @ToString
+@Component
 public class EndpointInfo {
 
     private final ItemsWithInfo webInterface;

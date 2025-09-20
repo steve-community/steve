@@ -55,7 +55,7 @@ public class SteveConfiguration {
     private final String timeZoneId;
     private final String steveVersion;
     private final @Nullable String gitDescribe;
-    private final ApplicationProfile profile;
+    private final String profile;
     private final Ocpp ocpp;
     private final Auth auth;
     private final WebApi webApi;

@@ -18,14 +18,11 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.ApplicationProfile;
 import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Locale;
 
 @UtilityClass
 public class SteveConfigurationReader {
@@ -33,8 +30,8 @@ public class SteveConfigurationReader {
     public static SteveConfiguration readSteveConfiguration(String name) {
         PropertiesFileLoader p = new PropertiesFileLoader(name);
 
-        var profile = ApplicationProfile.fromName(p.getString("profile"));
-        System.setProperty("spring.profiles.active", profile.name().toLowerCase(Locale.getDefault()));
+        var profile = p.getString("profile");
+        System.setProperty("spring.profiles.active", profile);
 
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 

@@ -18,18 +18,15 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -51,10 +48,10 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
 
     private final Map<String, Server> actualServers;
 
-    public MediatorInInterceptor(Bus bus) {
+    public MediatorInInterceptor(List<EndpointImpl> endpoints) {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
-        actualServers = initServerLookupMap(bus);
+        actualServers = initServerLookupMap(endpoints);
     }
 
     public final void handleMessage(SoapMessage message) {
@@ -104,30 +101,11 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
      * redirect to the version-specific implementation according to the namespace
      * of the incoming message.
      */
-    private static Map<String, Server> initServerLookupMap(Bus bus) {
-        String exceptionMsg = "The services are not created and/or registered to the bus yet.";
-
-        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
-        if (serverRegistry == null) {
-            throw new RuntimeException(exceptionMsg);
-        }
-
-        List<Server> temp = serverRegistry.getServers();
-        if (temp.isEmpty()) {
-            throw new RuntimeException(exceptionMsg);
-        }
-
-        Map<String, Server> actualServers = new HashMap<>(temp.size() - 1);
-        for (Server server : temp) {
-            EndpointInfo info = server.getEndpoint().getEndpointInfo();
-            String address = info.getAddress();
-
-            // exclude the 'dummy' routing server
-            if (SteveProperties.ROUTER_ENDPOINT_PATH.equals(address)) {
-                continue;
-            }
-
-            String serverNamespace = info.getName().getNamespaceURI();
+    private static Map<String, Server> initServerLookupMap(List<EndpointImpl> endpoints) {
+        Map<String, Server> actualServers = new HashMap<>();
+        for (EndpointImpl endpoint : endpoints) {
+            Server server = endpoint.getServer();
+            String serverNamespace = server.getEndpoint().getEndpointInfo().getName().getNamespaceURI();
             actualServers.put(serverNamespace, server);
         }
         return actualServers;

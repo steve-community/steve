@@ -20,6 +20,8 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.logging.Slf4jLogger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
@@ -38,6 +40,9 @@ import java.util.TimeZone;
 public class SteveApplication {
 
     static {
+        // Apache CXF
+        LogUtils.setLoggerClass(Slf4jLogger.class);
+
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 

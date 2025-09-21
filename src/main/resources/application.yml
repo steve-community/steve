@@ -19,7 +19,7 @@ server:
     key-store-password: ${keystore.password}
 
 steve:
-  version: ${steve.version}
+  version: @project.version@
   jooq:
     executive-logging: ${db.sql.logging}
   auth:

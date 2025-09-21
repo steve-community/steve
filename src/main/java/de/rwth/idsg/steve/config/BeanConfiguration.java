@@ -46,7 +46,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -54,8 +53,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-
-import jakarta.validation.Validator;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -155,11 +152,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         executor.initialize();
 
         return new DelegatingTaskExecutor(executor);
-    }
-
-    @Bean
-    public Validator validator() {
-        return new LocalValidatorFactoryBean();
     }
 
     /**

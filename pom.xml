@@ -438,12 +438,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.13</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>tomcat-embed-el</artifactId>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -455,16 +449,6 @@
             <groupId>com.github.steve-community</groupId>
             <artifactId>ocpp-jaxb</artifactId>
             <version>0.0.9</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jakarta.activation</artifactId>
-                    <groupId>com.sun.activation</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jakarta.activation-api</artifactId>
-                    <groupId>jakarta.activation</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

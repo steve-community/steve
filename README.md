@@ -82,7 +82,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 4. Build SteVe:
 
-    To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
+    To compile SteVe simply use Maven. A runnable `war` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```
     # ./mvnw package
@@ -93,7 +93,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To start the application run (please do not run SteVe as root):
 
     ```
-    # java -jar target/steve.jar
+    # java -jar target/steve.war
     ```
 
 # Docker

@@ -94,11 +94,20 @@
   <build>
     <resources>
       <resource>
+        <targetPath>.</targetPath>
+        <filtering>false</filtering>
+        <directory>src/main/webapp</directory>
+        <includes>
+          <include>static/**</include>
+          <include>WEB-INF/web.xml</include>
+          <include>WEB-INF/views/**</include>
+        </includes>
+      </resource>
+      <resource>
         <filtering>false</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>webapp/static/**</include>
-          <include>webapp/WEB-INF/web.xml</include>
+          <include>META-INF/datetime.tld</include>
         </includes>
       </resource>
     </resources>
@@ -117,9 +126,9 @@
             </goals>
             <phase>compile</phase>
             <configuration>
-              <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
-              <webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>
-              <webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>
+              <webAppSourceDirectory>${basedir}/src/main/webapp</webAppSourceDirectory>
+              <webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>
+              <webXmlFragment>${basedir}/target/classes/WEB-INF/web.xml-frag</webXmlFragment>
             </configuration>
           </execution>
         </executions>

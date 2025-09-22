@@ -21,11 +21,11 @@ package de.rwth.idsg.steve.ocpp.ws;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -58,18 +58,19 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
 
-    public SessionContextStoreImpl(@Value("${ws.session.select.strategy}") String strategy) {
-        this.wsSessionSelectStrategy = WsSessionSelectStrategyEnum.fromName(strategy);
+    public SessionContextStoreImpl(SteveProperties steveProperties) {
+        this.wsSessionSelectStrategy =
+                WsSessionSelectStrategyEnum.fromName(steveProperties.getOcpp().getWsSessionSelectStrategy());
     }
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
-        Lock l = locks.get(chargeBoxId);
+        var l = locks.get(chargeBoxId);
         l.lock();
         try {
-            SessionContext context = new SessionContext(session, pingSchedule, Instant.now());
+            var context = new SessionContext(session, pingSchedule, Instant.now());
 
-            Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
+            var endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
             log.debug(
@@ -83,10 +84,10 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public void remove(String chargeBoxId, WebSocketSession session) {
-        Lock l = locks.get(chargeBoxId);
+        var l = locks.get(chargeBoxId);
         l.lock();
         try {
-            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            var endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
                 return;
@@ -97,7 +98,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
             // Solution: Iterate the set, find the item, remove the item after the for-loop
             //
             SessionContext toRemove = null;
-            for (SessionContext context : endpointDeque) {
+            for (var context : endpointDeque) {
                 if (context.getSession().getId().equals(session.getId())) {
                     toRemove = context;
                     break;
@@ -116,7 +117,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 }
                 // 3. Delete empty collection from lookup table in order to correctly calculate
                 // the number of connected chargeboxes with getNumberOfChargeBoxes()
-                if (endpointDeque.size() == 0) {
+                if (endpointDeque.isEmpty()) {
                     lookupTable.remove(chargeBoxId);
                 }
             }
@@ -127,10 +128,10 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public WebSocketSession getSession(String chargeBoxId) {
-        Lock l = locks.get(chargeBoxId);
+        var l = locks.get(chargeBoxId);
         l.lock();
         try {
-            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            var endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 throw new NoSuchElementException();
             }
@@ -144,12 +145,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public int getSize(String chargeBoxId) {
-        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+        var endpointDeque = lookupTable.get(chargeBoxId);
         if (endpointDeque == null) {
             return 0;
-        } else {
-            return endpointDeque.size();
         }
+        return endpointDeque.size();
     }
 
     @Override

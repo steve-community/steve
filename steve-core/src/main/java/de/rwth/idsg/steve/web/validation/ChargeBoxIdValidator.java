@@ -19,7 +19,8 @@
 package de.rwth.idsg.steve.web.validation;
 
 import com.google.common.base.Strings;
-import org.springframework.beans.factory.annotation.Value;
+import de.rwth.idsg.steve.config.SteveProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
@@ -35,21 +36,20 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
 
     private static final String REGEX = "[^=/()<>]*";
 
-    @Value("${charge-box-id.validation.regex:#{null}}")
-    private String chargeBoxIdValidationRegex;
+    private final Pattern pattern;
 
-    private Pattern pattern;
+    @Autowired
+    public ChargeBoxIdValidator(SteveProperties steveProperties) {
+        this(steveProperties.getOcpp().getChargeBoxIdValidationRegex());
+    }
 
-    // Default constructor for Hibernate Validator
-    // Spring will inject the value from properties
-    // And then HV will call `initialize`
-    public ChargeBoxIdValidator() {
-        initialize(null);
+    public ChargeBoxIdValidator(String regexFromConfig) {
+        this.pattern = Pattern.compile(Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig);
     }
 
     @Override
     public void initialize(ChargeBoxId idTag) {
-        pattern = Pattern.compile(getRegexToUse(chargeBoxIdValidationRegex));
+        // No-op
     }
 
     @Override
@@ -71,9 +71,5 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
         }
 
         return pattern.matcher(str).matches();
-    }
-
-    private static String getRegexToUse(String chargeBoxIdValidationRegex) {
-        return Strings.isNullOrEmpty(chargeBoxIdValidationRegex) ? REGEX : chargeBoxIdValidationRegex;
     }
 }

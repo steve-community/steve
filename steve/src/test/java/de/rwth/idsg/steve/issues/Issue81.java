@@ -20,9 +20,7 @@ package de.rwth.idsg.steve.issues;
 
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
-import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -33,7 +31,6 @@ import java.time.ZoneOffset;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,15 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.07.2018
  */
-@RequiredArgsConstructor
 public class Issue81 extends StressTest {
 
-    private final String path;
-
     public static void main(String[] args) throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getHttpPath(config);
-        new Issue81(path).attack();
+        new Issue81().attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -62,10 +54,10 @@ public class Issue81 extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                client.set(getForOcpp16(path));
+                client.set(getForOcpp16(soapPath));
                 chargeBoxId.set(Helpers.getRandomString());
 
-                var boot = getForOcpp16(path)
+                var boot = client.get()
                         .bootNotification(
                                 new BootNotificationRequest()
                                         .withChargePointVendor(getRandomString())
@@ -80,7 +72,7 @@ public class Issue81 extends StressTest {
                         .withMeterStart(ThreadLocalRandom.current().nextInt(0, 1_000_000));
                 txRequest.set(req);
 
-                Integer t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
+                var t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
                 txId.set(t1);
             }
 

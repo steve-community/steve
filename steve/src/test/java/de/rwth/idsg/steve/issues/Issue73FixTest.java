@@ -19,9 +19,7 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.Application;
-import de.rwth.idsg.steve.utils.LogFileRetriever;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -29,64 +27,89 @@ import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getSoapPath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * https://github.com/steve-community/steve/issues/73
+ * https://github.com/steve-community/steve/issues/219
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.07.2018
  */
-public class Issue73Fix {
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@Testcontainers
+public class Issue73FixTest {
 
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
-    private static String path;
+    /*@Container
+    @ServiceConnection
+    private static final JdbcDatabaseContainer<?> DB_CONTAINER = new MySQLContainer("mysql:8.0");
 
-    public static void main(String[] args) throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo("test");
-        assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
+    @DynamicPropertySource
+    static void testProps(DynamicPropertyRegistry r) {
+        r.add("steve.jooq.schema", DB_CONTAINER::getDatabaseName);
+    }*/
 
-        __DatabasePreparer__.prepare(config);
+    @Autowired
+    private ServerProperties serverProperties;
 
-        path = getHttpPath(config);
+    @Autowired
+    private SteveProperties steveProperties;
 
-        var app = new Application(config, new LogFileRetriever());
-        try {
-            app.start();
-            test();
-        } finally {
-            try {
-                app.stop();
-            } finally {
-                __DatabasePreparer__.cleanUp();
-            }
-        }
+    @Autowired
+    private DSLContext dslContext;
+
+    private __DatabasePreparer__ databasePreparer;
+
+    @BeforeEach
+    public void setup() {
+        databasePreparer = new __DatabasePreparer__(dslContext, steveProperties);
+        databasePreparer.prepare();
     }
 
-    private static void test() {
-        var client = getForOcpp16(path);
+    @AfterEach
+    public void teardown() {
+        databasePreparer.cleanUp();
+    }
 
-        var chargeBox1 = getRandomString();
-        var chargeBox2 = getRandomString();
+    @Test
+    public void test() throws URISyntaxException {
+        var client = getForOcpp16(getSoapPath(serverProperties, steveProperties));
+
+        var chargeBox1 = __DatabasePreparer__.getRegisteredChargeBoxId();
+        var chargeBox2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
 
         sendBoot(client, Lists.newArrayList(chargeBox1, chargeBox2));
 
         sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
-        sendStartTx(client, chargeBox1);
+        sendStartTx(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
         sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
 
-        sendAuth(client, chargeBox2, AuthorizationStatus.CONCURRENT_TX);
+        sendAuth(client, chargeBox2, AuthorizationStatus.ACCEPTED);
+
+        sendStartTx(client, chargeBox2, AuthorizationStatus.CONCURRENT_TX);
     }
 
     private static void sendBoot(CentralSystemService client, List<String> chargeBoxIdList) {
@@ -107,7 +130,7 @@ public class Issue73Fix {
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(expected);
     }
 
-    private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
+    private void sendStartTx(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
         var start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(2)
@@ -116,8 +139,9 @@ public class Issue73Fix {
                         .withMeterStart(0),
                 chargeBoxId);
         assertThat(start).isNotNull();
+        assertThat(start.getIdTagInfo().getStatus()).isEqualTo(expected);
         assertThat(start.getTransactionId()).isGreaterThan(0);
-        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction())
+        assertThat(databasePreparer.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction())
                 .isTrue();
     }
 }

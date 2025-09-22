@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zafarkhaja.semver.Version;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
 import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -61,9 +61,9 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     private final String steveVersion;
     private final RestTemplate restTemplate;
 
-    public GithubReleaseCheckService(SteveConfiguration config) {
-        this.steveVersion = config.getSteveVersion();
-        this.restTemplate = createRestTemplate(createGitHubMapper(), "steve/" + config.getSteveVersion());
+    public GithubReleaseCheckService(SteveProperties steveProperties) {
+        this.steveVersion = steveProperties.getSteveVersion();
+        this.restTemplate = createRestTemplate(createGitHubMapper(), "steve/" + steveProperties.getSteveVersion());
     }
 
     private static RestTemplate createRestTemplate(ObjectMapper mapper, String userAgent) {

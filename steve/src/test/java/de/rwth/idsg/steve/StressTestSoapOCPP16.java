@@ -18,9 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
-import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -37,7 +35,6 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,15 +43,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.04.2018
  */
-@RequiredArgsConstructor
 public class StressTestSoapOCPP16 extends StressTest {
 
-    private final String path;
-
     public static void main(String[] args) throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getHttpPath(config);
-        new StressTestSoapOCPP16(path).attack();
+        new StressTestSoapOCPP16().attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -64,10 +56,12 @@ public class StressTestSoapOCPP16 extends StressTest {
         var runnable = new StressTester.Runnable() {
 
             private final ThreadLocal<String> threadLocalChargeBoxId = new ThreadLocal<>();
+            private final ThreadLocal<ocpp.cs._2015._10.CentralSystemService> tlClient = new ThreadLocal<>();
 
             @Override
             public void beforeRepeat() {
-                var client = getForOcpp16(path);
+                var client = getForOcpp16(soapPath);
+                tlClient.set(client);
                 var localRandom = ThreadLocalRandom.current();
 
                 threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
@@ -85,7 +79,7 @@ public class StressTestSoapOCPP16 extends StressTest {
 
             @Override
             public void toRepeat() {
-                var client = getForOcpp16(path);
+                var client = tlClient.get();
                 var localRandom = ThreadLocalRandom.current();
 
                 var chargeBoxId = threadLocalChargeBoxId.get();

@@ -18,21 +18,28 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.utils.LogFileRetriever;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import jakarta.xml.ws.WebServiceException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getSoapPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -41,37 +48,40 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @since 10.03.2018
  */
 @Slf4j
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class ApplicationTest {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
-    private static String path;
-    private static Application app;
+    @Autowired
+    private ServerProperties serverProperties;
 
-    @BeforeAll
-    public static void init() throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo("test");
-        __DatabasePreparer__.prepare(config);
+    @Autowired
+    private SteveProperties steveProperties;
 
-        path = getHttpPath(config);
+    @Autowired
+    private DSLContext dslContext;
 
-        app = new Application(config, new LogFileRetriever());
-        app.start();
+    private __DatabasePreparer__ databasePreparer;
+    private URI soapPath;
+
+    @BeforeEach
+    public void setUp() throws URISyntaxException {
+        databasePreparer = new __DatabasePreparer__(dslContext, steveProperties);
+        databasePreparer.prepare();
+        soapPath = getSoapPath(serverProperties, steveProperties);
     }
 
-    @AfterAll
-    public static void destroy() throws Exception {
-        if (app != null) {
-            app.stop();
-        }
-        __DatabasePreparer__.cleanUp();
+    @AfterEach
+    public void tearDown() {
+        databasePreparer.cleanUp();
     }
 
     @Test
     public void testOcpp12() {
-        var client = getForOcpp12(path);
+        var client = getForOcpp12(soapPath);
 
         var boot = client.bootNotification(
                 new ocpp.cs._2010._08.BootNotificationRequest()
@@ -89,7 +99,7 @@ public class ApplicationTest {
 
     @Test
     public void testOcpp15() {
-        var client = getForOcpp15(path);
+        var client = getForOcpp15(soapPath);
 
         var boot = client.bootNotification(
                 new ocpp.cs._2012._06.BootNotificationRequest()
@@ -99,7 +109,7 @@ public class ApplicationTest {
         assertThat(boot).isNotNull();
         assertThat(boot.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED);
 
-        ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
+        var auth = client.authorize(
                 new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED);
@@ -110,7 +120,7 @@ public class ApplicationTest {
      */
     @Test
     public void testOcpp16() {
-        var client = getForOcpp16(path);
+        var client = getForOcpp16(soapPath);
 
         assertThatExceptionOfType(WebServiceException.class).isThrownBy(() -> {
             var boot = client.bootNotification(

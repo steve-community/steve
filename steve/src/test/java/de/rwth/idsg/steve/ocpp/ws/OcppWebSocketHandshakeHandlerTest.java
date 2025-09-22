@@ -24,73 +24,75 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OcppWebSocketHandshakeHandlerTest {
 
+    private static final String PATH_INFIX = "/steve/websocket/CentralSystemService/";
+
     @Test
     public void testGetLastBitFromUrl_empty() {
         var in = "";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_null() {
         String in = null;
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_successFull() {
         var in = "https://www.google.com/steve/websocket/CentralSystemService/BBEI12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_noPostfix() {
         var in = "/steve/websocket/CentralSystemService/";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_successPartial() {
         var in = "/steve/websocket/CentralSystemService/BBEI12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithPercent() {
         var in = "/steve/websocket/CentralSystemService/BBE%I12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("BBE%I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithDash() {
         var in = "/steve/websocket/CentralSystemService/BBE-I12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("BBE-I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithSpace() {
         var in = "/steve/websocket/CentralSystemService/BBE I12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("BBE I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithExtraSlash() {
         var in = "/steve/websocket/CentralSystemService/889/BBEI12";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("889/BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successComplex() {
         var in = "/steve/websocket/CentralSystemService/%889 /BBEI12-";
-        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(PATH_INFIX, in);
         assertThat(out).isEqualTo("%889 /BBEI12-");
     }
 }

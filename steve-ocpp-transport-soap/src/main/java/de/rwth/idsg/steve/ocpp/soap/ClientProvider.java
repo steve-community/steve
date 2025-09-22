@@ -19,18 +19,19 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import com.oneandone.compositejks.SslContextBuilder;
-import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.stereotype.Component;
 
-import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import jakarta.xml.ws.soap.SOAPBinding;
 
 /**
@@ -43,15 +44,10 @@ public class ClientProvider {
     private final @Nullable TLSClientParameters tlsClientParams;
     private final LoggingFeature loggingFeature;
 
-    public ClientProvider(SteveConfiguration config, LoggingFeature loggingFeature) {
+    public ClientProvider(ServerProperties serverProperties, LoggingFeature loggingFeature)
+            throws GeneralSecurityException, IOException {
         this.loggingFeature = loggingFeature;
-        var jettyConfig = config.getJetty();
-        if (shouldInitSSL(jettyConfig)) {
-            tlsClientParams = new TLSClientParameters();
-            tlsClientParams.setSslContext(setupSSL(jettyConfig));
-        } else {
-            tlsClientParams = null;
-        }
+        tlsClientParams = create(serverProperties.getSsl());
     }
 
     public <T> T createClient(Class<T> clazz, String endpointAddress) {
@@ -60,8 +56,8 @@ public class ClientProvider {
         T clientObject = clazz.cast(bean.create());
 
         if (tlsClientParams != null) {
-            Client client = ClientProxy.getClient(clientObject);
-            HTTPConduit http = (HTTPConduit) client.getConduit();
+            var client = ClientProxy.getClient(clientObject);
+            var http = (HTTPConduit) client.getConduit();
             http.setTlsClientParameters(tlsClientParams);
         }
 
@@ -77,25 +73,22 @@ public class ClientProvider {
         return f;
     }
 
-    private static boolean shouldInitSSL(SteveConfiguration.Jetty jettyConfig) {
-        return jettyConfig.getKeyStorePath() != null
-                && !jettyConfig.getKeyStorePath().isBlank()
-                && jettyConfig.getKeyStorePassword() != null
-                && !jettyConfig.getKeyStorePassword().isBlank();
-    }
-
-    private static SSLContext setupSSL(SteveConfiguration.Jetty jettyConfig) {
-        try {
-            var keyStorePath = jettyConfig.getKeyStorePath();
-            var keyStorePwd = jettyConfig.getKeyStorePassword();
-            return SslContextBuilder.builder()
-                    .keyStoreFromFile(keyStorePath, keyStorePwd)
-                    .usingTLS()
-                    .usingDefaultAlgorithm()
-                    .usingKeyManagerPasswordFromKeyStore()
-                    .buildMergedWithSystem();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    private static @Nullable TLSClientParameters create(@Nullable Ssl ssl)
+            throws GeneralSecurityException, IOException {
+        if (ssl == null || !ssl.isEnabled()) {
+            return null;
         }
+        var tlsClientParams = new TLSClientParameters();
+
+        var socketFactory = SslContextBuilder.builder()
+                .keyStoreFromFile(ssl.getKeyStore(), ssl.getKeyStorePassword())
+                .usingTLS()
+                .usingDefaultAlgorithm()
+                .usingKeyManagerPasswordFromKeyStore()
+                .buildMergedWithSystem()
+                .getSocketFactory();
+        tlsClientParams.setSSLSocketFactory(socketFactory);
+
+        return tlsClientParams;
     }
 }

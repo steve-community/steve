@@ -73,17 +73,17 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 3. Configure SteVe **before** building:
 
-    The basic configuration is defined in [main.properties](src/main/resources/config/main.properties):
-      - You _may_ change [database configuration](src/main/resources/config/main.properties#L9-L13)
-      - You _may_ change [the host](src/main/resources/config/main.properties#L22) to the correct IP address of your server
-      - You _may_ change [web interface credentials](src/main/resources/config/main.properties#L17-L18)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/main.properties#L32-L35)
+    The basic configuration is defined in [application.yml](src/main/resources/application.yml):
+      - You _may_ change database configuration
+      - You _may_ change the host to the correct IP address of your server
+      - You _may_ change web interface credentials
+      - You _can_ access the application via HTTPS, by enabling it and setting the keystore properties
 
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
 
-    To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
+    To compile SteVe simply use Maven. A runnable `war` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```shell
     ./mvnw package
@@ -100,7 +100,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To start the application run (please do not run SteVe as root):
 
     ```shell
-    java -jar target/steve.jar
+    java -jar target/steve.war
     ```
 
 # Docker

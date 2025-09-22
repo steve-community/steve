@@ -18,12 +18,9 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.utils.LogFileRetriever;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -34,12 +31,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import java.util.EnumSet;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 
 /**
- * Jetty will automatically detect this class because of {@link de.rwth.idsg.steve.JettyServer#SCAN_PATTERN} and
- * use it to initialize the Spring and servlets and filters.
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.09.2025
  */
@@ -47,47 +40,26 @@ import jakarta.servlet.ServletException;
 @RequiredArgsConstructor
 public class WebConfig implements WebApplicationInitializer {
 
-    // TEMP workaround before spring boot migration
-    private static SteveConfiguration config;
-    private static LogFileRetriever logFileRetriever;
-
-    public static synchronized void initialize(SteveConfiguration cfg, LogFileRetriever retriever) {
-        if (config != null || logFileRetriever != null) {
-            throw new IllegalStateException("WebConfig already initialized");
-        }
-        config = cfg;
-        logFileRetriever = retriever;
-    }
-
-    public static void clear() {
-        config = null;
-        logFileRetriever = null;
-    }
+    private final SteveProperties steveProperties;
 
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
+    public void onStartup(ServletContext servletContext) {
         log.info("Initializing");
-
-        var context = new GenericApplicationContext();
-        context.registerBean(SteveConfiguration.class, () -> config);
-        context.registerBean(LogFileRetriever.class, () -> logFileRetriever);
-        context.refresh();
 
         // Spring root context
         var springContext = new AnnotationConfigWebApplicationContext();
-        springContext.setParent(context);
         springContext.scan("de.rwth.idsg.steve.config");
         servletContext.addListener(new ContextLoaderListener(springContext));
 
         // Spring MVC
         var web = servletContext.addServlet("spring-dispatcher", new DispatcherServlet(springContext));
         web.setLoadOnStartup(1);
-        web.addMapping(config.getPaths().getRootMapping());
+        web.addMapping(steveProperties.getPaths().getRootMapping());
 
         // Apache CXF
         var cxf = servletContext.addServlet("cxf", new CXFServlet());
         cxf.setLoadOnStartup(1);
-        cxf.addMapping(config.getPaths().getSoapMapping() + "/*");
+        cxf.addMapping(steveProperties.getPaths().getSoapMapping() + "/*");
 
         // add spring security
         servletContext
@@ -97,6 +69,6 @@ public class WebConfig implements WebApplicationInitializer {
                 .addMappingForUrlPatterns(
                         EnumSet.allOf(DispatcherType.class),
                         true,
-                        config.getPaths().getRootMapping() + "*");
+                        steveProperties.getPaths().getRootMapping() + "*");
     }
 }

@@ -25,11 +25,10 @@ import ch.qos.logback.core.FileAppender;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,6 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @since 05.11.2015
  */
 @Slf4j
+@Component
 public class LogFileRetriever {
     private final List<Path> logPathList;
 
@@ -87,15 +87,15 @@ public class LogFileRetriever {
      * by iterating over appenders.
      */
     private List<Path> getActiveLogFilePaths() {
-        Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        Iterator<Appender<ILoggingEvent>> appenderIterator = logger.iteratorForAppenders();
+        var logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        var appenderIterator = logger.iteratorForAppenders();
 
-        List<Path> fileNameList = new ArrayList<>();
-        if (appenderIterator.hasNext()) {
+        var fileNameList = new ArrayList<Path>();
+        while (appenderIterator.hasNext()) {
             var appender = appenderIterator.next();
-            String fileName = extractFileName(appender);
+            var fileName = extractFileName(appender);
             if (fileName != null) {
-                fileNameList.add(Paths.get(fileName));
+                fileNameList.add(Path.of(fileName));
             }
         }
         return fileNameList;

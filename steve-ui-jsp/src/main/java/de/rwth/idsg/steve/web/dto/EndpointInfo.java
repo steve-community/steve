@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
@@ -39,15 +39,17 @@ public class EndpointInfo {
     private final ItemsWithInfo ocppSoap;
     private final ItemsWithInfo ocppWebSocket;
 
-    public EndpointInfo(SteveConfiguration config) {
+    public EndpointInfo(SteveProperties steveProperties) {
         this.webInterface = new ItemsWithInfo(
-                "Access the web interface using", config.getPaths().getManagerMapping() + "/home");
+                "Access the web interface using", steveProperties.getPaths().getManagerMapping() + "/home");
         this.ocppSoap = new ItemsWithInfo(
                 "SOAP endpoint for OCPP",
-                config.getPaths().getSoapMapping() + config.getPaths().getRouterEndpointPath());
+                steveProperties.getPaths().getSoapMapping()
+                        + steveProperties.getPaths().getRouterEndpointPath());
         this.ocppWebSocket = new ItemsWithInfo(
                 "WebSocket/JSON endpoint for OCPP",
-                config.getPaths().getWebsocketMapping() + config.getPaths().getRouterEndpointPath() + "/(chargeBoxId)");
+                steveProperties.getPaths().getWebsocketMapping()
+                        + steveProperties.getPaths().getRouterEndpointPath() + "/(chargeBoxId)");
     }
 
     @Getter

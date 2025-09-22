@@ -21,7 +21,7 @@
       <plugin>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-codegen-plugin</artifactId>
-        <version>${plugin.cxf.version}</version>
+        <version>${cxf.version}</version>
         <configuration>
           <sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
           <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
@@ -50,12 +50,12 @@
           <dependency>
             <groupId>org.jvnet.jaxb</groupId>
             <artifactId>jaxb-plugins</artifactId>
-            <version>${jaxb.version}</version>
+            <version>${jaxb-plugins.version}</version>
           </dependency>
           <dependency>
             <groupId>org.jvnet.jaxb</groupId>
             <artifactId>jaxb-plugin-annotate</artifactId>
-            <version>${jaxb.version}</version>
+            <version>${jaxb-plugins.version}</version>
           </dependency>
         </dependencies>
         <executions>

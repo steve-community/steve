@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
@@ -56,7 +56,7 @@ public class AboutSettingsController {
     private final SettingsRepository settingsRepository;
     private final MailService mailService;
     private final ReleaseCheckService releaseCheckService;
-    private final SteveConfiguration config;
+    private final SteveProperties steveProperties;
     private final EndpointInfo info;
 
     // -------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public class AboutSettingsController {
 
     @GetMapping(value = ABOUT_PATH)
     public String getAbout(Model model) {
-        model.addAttribute("version", config.getSteveVersion());
+        model.addAttribute("version", steveProperties.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion().orElse(null));
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", Instant.now());

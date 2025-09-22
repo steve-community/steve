@@ -1,0 +1,9 @@
+server:
+  compression:
+    enabled: false
+  servlet:
+    context-path: /
+
+steve:
+  jooq:
+    executive-logging: true

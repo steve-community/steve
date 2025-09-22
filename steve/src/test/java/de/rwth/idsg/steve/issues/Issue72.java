@@ -20,10 +20,8 @@ package de.rwth.idsg.steve.issues;
 
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
-import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.MeterValue;
@@ -37,7 +35,6 @@ import ocpp.cs._2015._10.UnitOfMeasure;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,15 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.06.2018
  */
-@RequiredArgsConstructor
 public class Issue72 extends StressTest {
 
-    private final String path;
-
     public static void main(String[] args) throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getHttpPath(config);
-        new Issue72(path).attack();
+        new Issue72().attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -70,22 +62,21 @@ public class Issue72 extends StressTest {
         var meterStart = 444;
         var meterStop = 99999;
 
-        var boot = getForOcpp16(path)
-                .bootNotification(
-                        new BootNotificationRequest()
-                                .withChargePointVendor(getRandomString())
-                                .withChargePointModel(getRandomString()),
-                        chargeBoxId);
+        var client = getForOcpp16(soapPath);
+        var boot = client.bootNotification(
+                new BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString()),
+                chargeBoxId);
         assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
-        var start = getForOcpp16(path)
-                .startTransaction(
-                        new StartTransactionRequest()
-                                .withConnectorId(connectorId)
-                                .withIdTag(idTag)
-                                .withTimestamp(startDateTime)
-                                .withMeterStart(meterStart),
-                        chargeBoxId);
+        var start = client.startTransaction(
+                new StartTransactionRequest()
+                        .withConnectorId(connectorId)
+                        .withIdTag(idTag)
+                        .withTimestamp(startDateTime)
+                        .withMeterStart(meterStart),
+                chargeBoxId);
         assertThat(start).isNotNull();
 
         var transactionId = start.getTransactionId();
@@ -96,7 +87,7 @@ public class Issue72 extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                threadLocalClient.set(getForOcpp16(path));
+                threadLocalClient.set(client);
             }
 
             @Override

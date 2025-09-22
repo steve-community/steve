@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -89,9 +88,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * steps and return a "no new version" report immediately.
      */
     @Bean
-    public ReleaseCheckService releaseCheckService(SteveConfiguration config) {
-        if (InternetChecker.isInternetAvailable(config.getSteveCompositeVersion())) {
-            return new GithubReleaseCheckService(config);
+    public ReleaseCheckService releaseCheckService(SteveProperties steveProperties) {
+        if (InternetChecker.isInternetAvailable(steveProperties.getSteveVersion())) {
+            return new GithubReleaseCheckService(steveProperties);
         } else {
             return new DummyReleaseCheckService();
         }
@@ -105,7 +104,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         for (var converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter conv) {
-                ObjectMapper objectMapper = conv.getObjectMapper();
+                var objectMapper = conv.getObjectMapper();
                 objectMapper.findAndRegisterModules();
                 // if the client sends unknown props, just ignore them instead of failing
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

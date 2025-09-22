@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
-import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -50,7 +48,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
-import static de.rwth.idsg.steve.utils.Helpers.getWsPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -58,18 +55,13 @@ import static org.assertj.core.api.Assertions.fail;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.05.2018
  */
-@RequiredArgsConstructor
 public class StressTestJsonOCPP16 extends StressTest {
 
     private static final OcppVersion VERSION = OcppVersion.V_16;
     private static final ObjectMapper OCPP_MAPPER = JsonObjectMapper.createObjectMapper();
 
-    private final String path;
-
     public static void main(String[] args) throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getWsPath(config);
-        new StressTestJsonOCPP16(path).attack();
+        new StressTestJsonOCPP16().attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -85,7 +77,7 @@ public class StressTestJsonOCPP16 extends StressTest {
                 var localRandom = ThreadLocalRandom.current();
 
                 var chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(OCPP_MAPPER, VERSION, chargeBoxId, path));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(OCPP_MAPPER, VERSION, chargeBoxId, jsonPath));
 
                 var chargePoint = threadLocalChargePoint.get();
                 chargePoint.start();

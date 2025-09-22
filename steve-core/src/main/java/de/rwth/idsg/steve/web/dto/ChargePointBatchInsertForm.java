@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.util.List;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,6 +36,5 @@ import jakarta.validation.constraints.NotEmpty;
 @ToString
 public class ChargePointBatchInsertForm {
 
-    @NotEmpty @ChargeBoxId
-    private List<String> idList;
+    @NotEmpty private List<@NotNull @ChargeBoxId String> idList;
 }

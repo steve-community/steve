@@ -18,7 +18,14 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum TransactionStopEventActor {
-    STATION,
-    MANUAL
+    STATION("station"),
+    MANUAL("manual");
+
+    private final String name;
 }

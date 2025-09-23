@@ -11,10 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, ubuntu-24.04 ]
-        java: [ '21', '24' ]
+        java: [ '21', '25' ]
         db: [ 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.4.30', 'mariadb:10.5.21', 'mariadb:10.6.14' ]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     services:
       mysql:
         image: ${{ matrix.db }}

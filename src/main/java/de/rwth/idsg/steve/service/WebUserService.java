@@ -87,7 +87,7 @@ public class WebUserService implements UserDetailsManager {
 
         var headerVal = steveProperties.getAuth().getWebApiSecret();
 
-        var encodedApiPassword = StringUtils.isEmpty(headerVal)
+        var encodedApiPassword = StringUtils.isBlank(headerVal)
             ? null
             : passwordEncoder.encode(headerVal);
 

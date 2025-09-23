@@ -87,7 +87,9 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         Server targetServer = actualServers.get(schemaNamespace);
 
         // Redirect the request
-        if (targetServer != null) {
+        if (targetServer == null) {
+            log.warn("No server mapped for namespace '{}'", schemaNamespace);
+        } else {
             targetServer.getDestination().getMessageObserver().onMessage(message);
         }
 

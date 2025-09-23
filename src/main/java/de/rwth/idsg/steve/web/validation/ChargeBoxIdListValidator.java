@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -43,6 +44,9 @@ public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+        if (CollectionUtils.isEmpty(value)) {
+            return true; // null or empty is valid, because it is another constraint's responsibility
+        }
         for (String s : value) {
             if (!validator.isValid(s, context)) {
                 return false;

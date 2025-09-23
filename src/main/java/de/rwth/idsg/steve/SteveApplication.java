@@ -27,7 +27,9 @@ import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.EventListener;
 
 import java.util.TimeZone;
 
@@ -48,6 +50,10 @@ public class SteveApplication {
 
         TimeZone.setDefault(TimeZone.getTimeZone(SteveProperties.TIME_ZONE_ID));
         DateTimeZone.setDefault(DateTimeZone.forID(SteveProperties.TIME_ZONE_ID));
+    }
+
+    @EventListener(ApplicationStartedEvent.class)
+    public void logStartup() {
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveProperties.TIME_ZONE_ID, DateTime.now());
     }
 

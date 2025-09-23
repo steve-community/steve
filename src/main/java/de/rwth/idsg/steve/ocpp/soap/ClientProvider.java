@@ -75,6 +75,10 @@ public class ClientProvider {
     }
 
     private static TLSClientParameters create(Ssl ssl) throws Exception {
+        if (ssl == null || !ssl.isEnabled()) {
+            return null;
+        }
+
         String keyStorePath = ssl.getKeyStore();
         String keyStorePwd = ssl.getKeyStorePassword();
 

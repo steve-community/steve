@@ -84,7 +84,7 @@ public abstract class StressTest {
         } finally {
             try {
                 if (app != null) {
-                    app.stop();
+                    app.close();
                 }
             } finally {
                 if (databasePreparer != null) {

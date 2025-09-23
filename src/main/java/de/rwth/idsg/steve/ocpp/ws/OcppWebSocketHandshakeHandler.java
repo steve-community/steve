@@ -117,9 +117,9 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     }
 
     private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
-        for (String requestedProcotol : requestedProtocols) {
+        for (String requestedProtocol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
-                if (item.getVersion().getValue().equals(requestedProcotol)) {
+                if (item.getVersion().getValue().equals(requestedProtocol)) {
                     return item;
                 }
             }

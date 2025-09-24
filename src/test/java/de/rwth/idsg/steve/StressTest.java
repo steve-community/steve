@@ -22,11 +22,18 @@ import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
 import org.joda.time.DateTime;
+import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static de.rwth.idsg.steve.utils.Helpers.getJsonPath;
+import static de.rwth.idsg.steve.utils.Helpers.getPath;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -49,21 +56,40 @@ public abstract class StressTest {
     protected static final int CHARGE_BOX_COUNT = THREAD_COUNT;
     protected static final int CONNECTOR_COUNT_PER_CHARGE_BOX = 25;
 
+    protected String soapPath;
+    protected String jsonPath;
+
     protected void attack() throws Exception {
-        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
-        Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        System.setProperty("spring.profiles.active", "test");
 
-        __DatabasePreparer__.prepare();
+        __DatabasePreparer__ databasePreparer = null;
+        ConfigurableApplicationContext app = null;
 
-        Application app = new Application();
         try {
-            app.start();
+            app = SteveApplication.start();
+
+            ConfigurableEnvironment environment = app.getEnvironment();
+            Assertions.assertEquals(new String[]{"test"}, environment.getActiveProfiles());
+            Assertions.assertEquals("true", environment.getProperty("steve.ocpp.auto-register-unknown-stations"));
+
+            ServerProperties serverProperties = app.getBean(ServerProperties.class);
+            soapPath = getPath(serverProperties);
+            jsonPath = getJsonPath(serverProperties);
+
+            DSLContext dslContext = app.getBean(DSLContext.class);
+            databasePreparer = new __DatabasePreparer__(dslContext);
+            databasePreparer.prepare();
+
             attackInternal();
         } finally {
             try {
-                app.stop();
+                if (app != null) {
+                    app.close();
+                }
             } finally {
-                __DatabasePreparer__.cleanUp();
+                if (databasePreparer != null) {
+                    databasePreparer.cleanUp();
+                }
             }
         }
     }

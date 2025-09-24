@@ -39,7 +39,6 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
@@ -49,8 +48,6 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @since 27.06.2018
  */
 public class Issue72 extends StressTest {
-
-    private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
         new Issue72().attack();
@@ -68,14 +65,14 @@ public class Issue72 extends StressTest {
         int meterStart = 444;
         int meterStop = 99999;
 
-        BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+        BootNotificationResponse boot = getForOcpp16(soapPath).bootNotification(
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 chargeBoxId);
         Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
-        StartTransactionResponse start = getForOcpp16(path).startTransaction(
+        StartTransactionResponse start = getForOcpp16(soapPath).startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(connectorId)
                         .withIdTag(idTag)
@@ -93,7 +90,7 @@ public class Issue72 extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                threadLocalClient.set(getForOcpp16(path));
+                threadLocalClient.set(getForOcpp16(soapPath));
             }
 
             @Override

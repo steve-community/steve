@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -49,7 +48,7 @@ public final class InternetChecker {
     );
 
     static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
+        System.setProperty("http.agent", "SteVe (github)");
     }
 
     /**

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.repository.ReservationStatus;
@@ -52,15 +53,21 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.jupiter.api.AfterAll;
+import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.xml.ws.WebServiceException;
+
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
@@ -72,41 +79,40 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @since 22.03.18
  */
 @Slf4j
-public class OperationalTestSoapOCPP16 {
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment =  WebEnvironment.DEFINED_PORT)
+public class OperationalSoapOCPP16Test {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_CHARGE_BOX_ID_2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
     private static final int numConnectors = 5;
-    private static Application app;
 
-    @BeforeAll
-    public static void initClass() throws Exception {
-        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
+    @Autowired
+    private ServerProperties serverProperties;
+    @Autowired
+    private SteveProperties steveProperties;
+    @Autowired
+    private DSLContext dslContext;
 
-        app = new Application();
-        app.start();
-    }
-
-    @AfterAll
-    public static void destroyClass() throws Exception {
-        app.stop();
-    }
+    private __DatabasePreparer__ databasePreparer;
+    private String path;
 
     @BeforeEach
-    public void init() throws Exception {
-        __DatabasePreparer__.prepare();
+    public void setup() {
+        databasePreparer = new __DatabasePreparer__(dslContext);
+        databasePreparer.prepare();
+        path = getPath(serverProperties);
     }
 
     @AfterEach
-    public void destroy() throws Exception {
-        __DatabasePreparer__.cleanUp();
+    public void teardown() {
+        databasePreparer.cleanUp();
     }
 
     @Test
     public void testUnregisteredCP() {
-        Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertFalse(steveProperties.getOcpp().isAutoRegisterUnknownStations());
 
         CentralSystemService client = getForOcpp16(path);
 
@@ -127,14 +133,14 @@ public class OperationalTestSoapOCPP16 {
      *
      * In case of BootNotification, the expected behaviour is to set RegistrationStatus.REJECTED in response, as done
      * by {@link CentralSystemService16_Service#bootNotification(BootNotificationRequest, String, OcppProtocol)}.
-     * Therefore, no exception. This case is tested by {@link OperationalTestSoapOCPP16#testUnregisteredCP()} already.
+     * Therefore, no exception. This case is tested by {@link OperationalSoapOCPP16Test#testUnregisteredCP()} already.
      *
      * WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link OcppWebSocketUpgrader}.
      */
     @Test
     public void testUnregisteredCPWithInterceptor() {
         Assertions.assertThrows(WebServiceException.class, () -> {
-            Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+            Assertions.assertFalse(steveProperties.getOcpp().isAutoRegisterUnknownStations());
 
             CentralSystemService client = getForOcpp16(path);
 
@@ -150,7 +156,7 @@ public class OperationalTestSoapOCPP16 {
 
         initStationWithBootNotification(client);
 
-        ChargePoint.Details details = __DatabasePreparer__.getCBDetails(REGISTERED_CHARGE_BOX_ID);
+        ChargePoint.Details details = databasePreparer.getCBDetails(REGISTERED_CHARGE_BOX_ID);
         Assertions.assertTrue(details.getChargeBox().getOcppProtocol().contains("ocpp1.6"));
     }
 
@@ -186,26 +192,26 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(2)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(nowWithoutMillis())
                         .withMeterStart(0),
                 REGISTERED_CHARGE_BOX_ID
         );
 
         Assertions.assertNotNull(start);
         Assertions.assertTrue(start.getTransactionId() > 0);
-        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertTrue(databasePreparer.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
 
         StopTransactionResponse stop = client.stopTransaction(
                 new StopTransactionRequest()
                         .withTransactionId(start.getTransactionId())
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(nowWithoutMillis())
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withMeterStop(30),
                 REGISTERED_CHARGE_BOX_ID
         );
 
         Assertions.assertNotNull(stop);
-        Assertions.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertFalse(databasePreparer.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 
     /**
@@ -226,7 +232,7 @@ public class OperationalTestSoapOCPP16 {
                     new StartTransactionRequest()
                             .withConnectorId(2)
                             .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
+                            .withTimestamp(nowWithoutMillis())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID);
             Assertions.assertTrue(start1.getTransactionId() > 0);
@@ -248,7 +254,7 @@ public class OperationalTestSoapOCPP16 {
                     new StartTransactionRequest()
                             .withConnectorId(2)
                             .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
+                            .withTimestamp(nowWithoutMillis())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID_2);
             Assertions.assertTrue(start2.getTransactionId() > 0);
@@ -265,6 +271,13 @@ public class OperationalTestSoapOCPP16 {
     public void testStatusNotification() {
         CentralSystemService client = getForOcpp16(path);
 
+        DateTime startingTime = DateTime.parse("2020-10-01T00:00:00.000Z");
+        LinkedHashMap<DateTime, ChargePointStatus> timeStatusMap = new LinkedHashMap<>();
+        for (int i = 0; i < ChargePointStatus.values().length; i++) {
+            ChargePointStatus status = ChargePointStatus.values()[i];
+            timeStatusMap.put(startingTime.plusMinutes(i), status);
+        }
+
         // -------------------------------------------------------------------------
         // init the station and verify db connector status values
         // -------------------------------------------------------------------------
@@ -272,23 +285,23 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
 
         // test all status enum values
-        for (ChargePointStatus chargePointStatus : ChargePointStatus.values()) {
+        for (var entry : timeStatusMap.entrySet()) {
             // status for numConnectors connectors + connector 0 (main controller of CP)
             for (int i = 0; i <= numConnectors; i++) {
                 StatusNotificationResponse status = client.statusNotification(
                         new StatusNotificationRequest()
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(chargePointStatus)
+                                .withStatus(entry.getValue())
                                 .withConnectorId(i)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(entry.getKey()),
                         REGISTERED_CHARGE_BOX_ID
                 );
                 Assertions.assertNotNull(status);
             }
 
-            List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
+            List<ConnectorStatus> connectorStatusList = databasePreparer.getChargePointConnectorStatus();
             for (ConnectorStatus connectorStatus : connectorStatusList) {
-                Assertions.assertEquals(chargePointStatus.value(), connectorStatus.getStatus());
+                Assertions.assertEquals(entry.getValue().value(), connectorStatus.getStatus());
                 Assertions.assertEquals(ChargePointErrorCode.NO_ERROR.value(), connectorStatus.getErrorCode());
             }
         }
@@ -298,19 +311,19 @@ public class OperationalTestSoapOCPP16 {
         // -------------------------------------------------------------------------
 
         int faultyConnectorId = 1;
+        DateTime faultedTime = timeStatusMap.lastEntry().getKey().plusMinutes(1);
 
         StatusNotificationResponse statusConnectorError = client.statusNotification(
                 new StatusNotificationRequest()
                         .withErrorCode(ChargePointErrorCode.HIGH_TEMPERATURE)
                         .withStatus(ChargePointStatus.FAULTED)
                         .withConnectorId(faultyConnectorId)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(faultedTime),
                 REGISTERED_CHARGE_BOX_ID
         );
         Assertions.assertNotNull(statusConnectorError);
 
-
-        List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
+        List<ConnectorStatus> connectorStatusList = databasePreparer.getChargePointConnectorStatus();
         for (ConnectorStatus connectorStatus : connectorStatusList) {
             if (connectorStatus.getConnectorId() == faultyConnectorId) {
                 Assertions.assertEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
@@ -327,6 +340,7 @@ public class OperationalTestSoapOCPP16 {
         int usedConnectorID = 1;
 
         CentralSystemService client = getForOcpp16(path);
+        DateTime baseTime = nowWithoutMillis();
 
         // -------------------------------------------------------------------------
         // init the station and make reservation
@@ -335,7 +349,7 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
         initConnectorsWithStatusNotification(client);
 
-        int reservationId = __DatabasePreparer__.makeReservation(usedConnectorID);
+        int reservationId = databasePreparer.makeReservation(usedConnectorID);
 
         // -------------------------------------------------------------------------
         // startTransaction (invalid reservationId)
@@ -347,7 +361,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(baseTime.plusSeconds(1))
                         .withMeterStart(0)
                         .withReservationId(nonExistingReservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -355,13 +369,13 @@ public class OperationalTestSoapOCPP16 {
         Assertions.assertNotNull(startInvalid);
 
         // validate that the transaction is written to db, even though reservation was invalid
-        List<Transaction> transactions = __DatabasePreparer__.getTransactions();
+        List<Transaction> transactions = databasePreparer.getTransactions();
         Assertions.assertEquals(1, transactions.size());
         Assertions.assertEquals(startInvalid.getTransactionId(), transactions.get(0).getId());
 
         // make sure that this invalid reservation had no side effects
         {
-            List<Reservation> reservations = __DatabasePreparer__.getReservations();
+            List<Reservation> reservations = databasePreparer.getReservations();
             Assertions.assertEquals(1, reservations.size());
             Reservation res = reservations.get(0);
             Assertions.assertEquals(reservationId, res.getId());
@@ -376,7 +390,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(3)
                         .withIdTag(getRandomString())
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(baseTime.plusSeconds(2))
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -384,7 +398,7 @@ public class OperationalTestSoapOCPP16 {
         Assertions.assertNotNull(startWrongTag);
 
         {
-            List<Reservation> reservations = __DatabasePreparer__.getReservations();
+            List<Reservation> reservations = databasePreparer.getReservations();
             Assertions.assertEquals(1, reservations.size());
             Reservation res = reservations.get(0);
             Assertions.assertEquals(ReservationStatus.ACCEPTED.value(), res.getStatus());
@@ -399,7 +413,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(baseTime.plusSeconds(3))
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -408,7 +422,7 @@ public class OperationalTestSoapOCPP16 {
         Integer transactionIdValid = startValidId.getTransactionId();
 
         {
-            List<Reservation> reservations = __DatabasePreparer__.getReservations();
+            List<Reservation> reservations = databasePreparer.getReservations();
             Assertions.assertEquals(reservations.size(), 1);
             Reservation res = reservations.get(0);
             Assertions.assertEquals(ReservationStatus.USED.value(), res.getStatus());
@@ -423,7 +437,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(baseTime.plusSeconds(4))
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -431,7 +445,7 @@ public class OperationalTestSoapOCPP16 {
         Assertions.assertNotNull(startValidIdUsedTwice);
 
         {
-            List<Reservation> reservations = __DatabasePreparer__.getReservations();
+            List<Reservation> reservations = databasePreparer.getReservations();
             Assertions.assertEquals(reservations.size(), 1);
             Reservation res = reservations.get(0);
             Assertions.assertEquals(ReservationStatus.USED.value(), res.getStatus());
@@ -485,7 +499,7 @@ public class OperationalTestSoapOCPP16 {
 
 
         // startTransaction
-        DateTime startTimeStamp = DateTime.now();
+        DateTime startTimeStamp = nowWithoutMillis();
         StartTransactionResponse start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
@@ -498,7 +512,7 @@ public class OperationalTestSoapOCPP16 {
 
         int transactionID = start.getTransactionId();
 
-        List<TransactionRecord> allTransactions = __DatabasePreparer__.getTransactionRecords();
+        List<TransactionRecord> allTransactions = databasePreparer.getTransactionRecords();
         Assertions.assertEquals(1, allTransactions.size());
 
         {
@@ -517,7 +531,7 @@ public class OperationalTestSoapOCPP16 {
                         .withStatus(ChargePointStatus.CHARGING)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
                         .withConnectorId(0)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(nowWithoutMillis()),
                 REGISTERED_CHARGE_BOX_ID
 
         );
@@ -537,7 +551,7 @@ public class OperationalTestSoapOCPP16 {
         }
 
         // stopTransaction
-        DateTime stopTimeStamp = DateTime.now();
+        DateTime stopTimeStamp = nowWithoutMillis();
         int stopValue = 30;
         StopTransactionResponse stop = client.stopTransaction(
                 new StopTransactionRequest()
@@ -551,7 +565,7 @@ public class OperationalTestSoapOCPP16 {
 
         {
             Assertions.assertNotNull(stop);
-            List<TransactionRecord> transactionsStop = __DatabasePreparer__.getTransactionRecords();
+            List<TransactionRecord> transactionsStop = databasePreparer.getTransactionRecords();
             Assertions.assertEquals(1, transactionsStop.size());
             TransactionRecord t = transactionsStop.get(0);
             Assertions.assertEquals(stopTimeStamp, t.getStopTimestamp());
@@ -568,7 +582,7 @@ public class OperationalTestSoapOCPP16 {
                         .withStatus(ChargePointStatus.AVAILABLE)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
                         .withConnectorId(usedConnectorID)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(nowWithoutMillis()),
                 REGISTERED_CHARGE_BOX_ID
         );
         Assertions.assertNotNull(statusStop);
@@ -591,7 +605,7 @@ public class OperationalTestSoapOCPP16 {
                             .withErrorCode(ChargePointErrorCode.NO_ERROR)
                             .withStatus(ChargePointStatus.AVAILABLE)
                             .withConnectorId(i)
-                            .withTimestamp(DateTime.now()),
+                            .withTimestamp(nowWithoutMillis()),
                     REGISTERED_CHARGE_BOX_ID
             );
             Assertions.assertNotNull(statusBoot);
@@ -599,7 +613,7 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private void checkMeterValues(List<MeterValue> meterValues, int transactionPk) {
-        TransactionDetails details = __DatabasePreparer__.getDetails(transactionPk);
+        TransactionDetails details = databasePreparer.getDetails(transactionPk);
 
         // iterate over all created meter values
         for (MeterValue meterValue : meterValues) {
@@ -635,7 +649,14 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private static MeterValue createMeterValue(String val) {
-        return new MeterValue().withTimestamp(DateTime.now())
+        return new MeterValue().withTimestamp(nowWithoutMillis())
                                .withSampledValue(new SampledValue().withValue(val));
+    }
+
+    /**
+     * https://github.com/steve-community/steve/issues/1371
+     */
+    private static DateTime nowWithoutMillis() {
+        return DateTime.now().withMillisOfSecond(0);
     }
 }

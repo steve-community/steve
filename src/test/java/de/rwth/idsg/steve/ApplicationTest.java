@@ -27,10 +27,16 @@ import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
 import ocpp.cs._2010._08.RegistrationStatus;
 import ocpp.cs._2012._06.CentralSystemService;
-import org.junit.jupiter.api.AfterAll;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.xml.ws.WebServiceException;
 
@@ -45,29 +51,31 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @since 10.03.2018
  */
 @Slf4j
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment =  WebEnvironment.DEFINED_PORT)
 public class ApplicationTest {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
 
-    private static Application app;
+    @Autowired
+    private ServerProperties serverProperties;
+    @Autowired
+    private DSLContext dslContext;
 
-    @BeforeAll
-    public static void init() throws Exception {
-        Assertions.assertEquals("test", SteveConfiguration.CONFIG.getProfile());
-        __DatabasePreparer__.prepare();
+    private __DatabasePreparer__ databasePreparer;
+    private String path;
 
-        app = new Application();
-        app.start();
+    @BeforeEach
+    public void setup() {
+        databasePreparer = new __DatabasePreparer__(dslContext);
+        databasePreparer.prepare();
+        path = getPath(serverProperties);
     }
 
-    @AfterAll
-    public static void destroy() throws Exception {
-        if (app != null) {
-            app.stop();
-        }
-        __DatabasePreparer__.cleanUp();
+    @AfterEach
+    public void teardown() {
+        databasePreparer.cleanUp();
     }
 
     @Test

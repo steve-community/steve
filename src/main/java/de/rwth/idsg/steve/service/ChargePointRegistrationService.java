@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.09.2025
@@ -43,7 +42,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class ChargePointRegistrationService {
 
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
-    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+    private final SteveProperties steveProperties;
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
 
     private final ChargePointRepository chargePointRepository;
@@ -84,7 +83,7 @@ public class ChargePointRegistrationService {
         }
 
         // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
-        if (!autoRegisterUnknownStations) {
+        if (!steveProperties.getOcpp().isAutoRegisterUnknownStations()) {
             return Optional.empty();
         }
 

@@ -42,8 +42,6 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue81 extends StressTest {
 
-    private static final String path = getPath();
-
     public static void main(String[] args) throws Exception {
         new Issue81().attack();
     }
@@ -58,10 +56,10 @@ public class Issue81 extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                client.set(getForOcpp16(path));
+                client.set(getForOcpp16(soapPath));
                 chargeBoxId.set(Helpers.getRandomString());
 
-                BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+                BootNotificationResponse boot = getForOcpp16(soapPath).bootNotification(
                         new BootNotificationRequest()
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),

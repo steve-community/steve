@@ -569,5 +569,17 @@
             <artifactId>encoder-jakarta-jsp</artifactId>
             <version>1.3.1</version>
         </dependency>
+
+        <!-- Bouncy Castle for certificate signing (OCPP 1.6 Security) -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.79</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.79</version>
+        </dependency>
     </dependencies>
 </project>

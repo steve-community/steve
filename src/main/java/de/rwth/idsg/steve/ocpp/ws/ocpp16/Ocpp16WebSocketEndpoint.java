@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.ocpp.ws.data.security.*;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.DataTransferRequest;
@@ -99,8 +100,20 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
         } else if (params instanceof DataTransferRequest) {
             r = server.dataTransfer((DataTransferRequest) params, chargeBoxId);
 
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) {
+            r = server.signCertificate((de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) {
+            r = server.securityEventNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) {
+            r = server.signedFirmwareStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) {
+            r = server.logStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) params, chargeBoxId);
+
         } else {
-            throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
+            throw new IllegalArgumentException("Unexpected RequestType: " + params.getClass().getName());
         }
 
         return r;

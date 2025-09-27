@@ -60,6 +60,9 @@
                             <li><a href="${ctxPath}/manager/chargingProfiles">CHARGING PROFILES</a></li>
                             <li><a href="${ctxPath}/manager/reservations">RESERVATIONS</a></li>
                             <li><a href="${ctxPath}/manager/transactions">TRANSACTIONS</a></li>
+                            <c:if test="${gatewayEnabled}">
+                                <li><a href="${ctxPath}/manager/gateway/partners">GATEWAY PARTNERS</a></li>
+                            </c:if>
                         </ul>
                     </li>
                     <li><a>OPERATIONS &raquo;</a>
@@ -68,6 +71,22 @@
                             <li><a href="${ctxPath}/manager/operations/v1.5">OCPP v1.5</a></li>
                             <li><a href="${ctxPath}/manager/operations/v1.6">OCPP v1.6</a></li>
                             <li><a href="${ctxPath}/manager/operations/tasks">Tasks</a></li>
+                        </ul>
+                    </li>
+                    <c:if test="${gatewayEnabled}">
+                        <li><a>GATEWAY &raquo;</a>
+                            <ul>
+                                <li><a href="${ctxPath}/manager/gateway/partners">PARTNERS</a></li>
+                                <li><a href="${ctxPath}/manager/gateway/status">STATUS</a></li>
+                            </ul>
+                        </li>
+                    </c:if>
+                    <li><a>SECURITY &raquo;</a>
+                        <ul>
+                            <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/firmware">FIRMWARE UPDATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
                         </ul>
                     </li>
                     <li><a href="${ctxPath}/manager/settings">SETTINGS</a></li>

@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.data.security.*;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -132,6 +133,26 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         return service.dataTransfer(parameters, chargeBoxIdentity);
+    }
+
+    public de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateResponse signCertificate(
+            de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest parameters, String chargeBoxIdentity) {
+        return service.signCertificate(parameters, chargeBoxIdentity);
+    }
+
+    public de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationResponse securityEventNotification(
+            de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.securityEventNotification(parameters, chargeBoxIdentity);
+    }
+
+    public de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
+            de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.signedFirmwareStatusNotification(parameters, chargeBoxIdentity);
+    }
+
+    public de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationResponse logStatusNotification(
+            de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.logStatusNotification(parameters, chargeBoxIdentity);
     }
 
     // -------------------------------------------------------------------------

@@ -29,11 +29,42 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S
 * OCPP1.6J
 
-⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
-Please, don't expose a Steve instance without knowing that risk.
+#### OCPP 1.6 Security Extensions
+
+SteVe now supports the [OCPP 1.6 Security Whitepaper Edition 3](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip), providing:
+
+* **Security Profiles 0-3**: Unsecured, Basic Auth, TLS, and Mutual TLS (mTLS)
+* **Certificate Management**: PKI-based certificate signing, installation, and deletion
+* **Security Events**: Real-time security event logging and monitoring
+* **Signed Firmware Updates**: Cryptographically signed firmware with certificate validation
+* **Diagnostic Logs**: Secure log retrieval with configurable time ranges
+
+See [OCPP_SECURITY_PROFILES.md](OCPP_SECURITY_PROFILES.md) for detailed configuration guide.
+
+**Quick Configuration** (Profile 2 - TLS + Basic Auth):
+```properties
+ocpp.security.profile=2
+ocpp.security.tls.enabled=true
+ocpp.security.tls.keystore.path=/path/to/server-keystore.jks
+ocpp.security.tls.keystore.password=your-password
+```
 
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
+
+### Roaming Protocol Support
+
+SteVe includes a gateway module that enables roaming with external networks using industry-standard protocols:
+
+* **OCPI v2.2** (Open Charge Point Interface) - For interoperability with CPOs and eMSPs
+* **OICP v2.3** (Open InterCharge Protocol) - For integration with Hubject's eRoaming platform
+
+The gateway bridges OCPP charge points to OCPI/OICP networks, enabling:
+- Location and EVSE data sharing
+- Real-time availability status
+- Remote authorization for roaming users
+- Charging session data exchange
+- Charge detail records (CDRs) for billing
 
 ### System Requirements
 
@@ -77,7 +108,8 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
       - You _must_ change [the host](src/main/resources/application-prod.properties) to the correct IP address of your server
       - You _must_ change [web interface credentials](src/main/resources/application-prod.properties)
       - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties)
-     
+      - **Gateway Configuration** (optional): See [Gateway Configuration](#gateway-configuration) section below for OCPI/OICP setup
+
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
@@ -147,8 +179,132 @@ After SteVe has successfully started, you can access the web interface using the
 
 
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
- 
+
 *Have fun!*
+
+# Gateway Configuration
+
+The gateway module enables roaming integration with external networks using OCPI and OICP protocols. This feature is optional and disabled by default.
+
+## Security Requirements
+
+⚠️ **IMPORTANT**: When enabling the gateway, you **must** configure secure encryption keys to protect partner authentication tokens stored in the database.
+
+Generate secure keys using OpenSSL:
+```bash
+openssl rand -base64 32
+openssl rand -base64 16
+```
+
+## Configuration Examples
+
+### Gateway Disabled (Default)
+
+```properties
+steve.gateway.enabled = false
+```
+
+When disabled, gateway menu items are hidden and all gateway endpoints return 404.
+
+### OCPI Configuration Example
+
+Enable gateway with OCPI v2.2 for CPO (Charge Point Operator) role:
+
+```properties
+# Gateway configuration - REQUIRED
+steve.gateway.enabled = true
+steve.gateway.encryption.key = <OUTPUT_FROM_openssl_rand_-base64_32>
+steve.gateway.encryption.salt = <OUTPUT_FROM_openssl_rand_-base64_16>
+
+# OCPI v2.2 configuration
+steve.gateway.ocpi.enabled = true
+steve.gateway.ocpi.version = 2.2
+steve.gateway.ocpi.country-code = DE
+steve.gateway.ocpi.party-id = ABC
+steve.gateway.ocpi.base-url = https://your-server.com/steve
+steve.gateway.ocpi.authentication.token = your-secure-token-here
+steve.gateway.ocpi.currency = EUR
+
+# Optional: Currency conversion for cross-border transactions
+steve.gateway.ocpi.currency-conversion.enabled = false
+steve.gateway.ocpi.currency-conversion.api-key =
+steve.gateway.ocpi.currency-conversion.api-url = https://api.exchangerate-api.com/v4/latest/
+```
+
+**OCPI Endpoints** (available when enabled):
+- `POST /steve/ocpi/cpo/2.2/locations` - Publish charging locations
+- `GET /steve/ocpi/cpo/2.2/locations/{locationId}` - Get location details
+- `GET /steve/ocpi/cpo/2.2/sessions` - List charging sessions
+- `GET /steve/ocpi/2.2/credentials` - Exchange credentials with partners
+
+### OICP Configuration Example
+
+Enable gateway with OICP v2.3 for CPO role with Hubject:
+
+```properties
+# Gateway configuration - REQUIRED
+steve.gateway.enabled = true
+steve.gateway.encryption.key = <OUTPUT_FROM_openssl_rand_-base64_32>
+steve.gateway.encryption.salt = <OUTPUT_FROM_openssl_rand_-base64_16>
+
+# OICP v2.3 configuration
+steve.gateway.oicp.enabled = true
+steve.gateway.oicp.version = 2.3
+steve.gateway.oicp.provider-id = DE*ABC
+steve.gateway.oicp.base-url = https://service.hubject-qa.com
+steve.gateway.oicp.authentication.token = your-hubject-token-here
+steve.gateway.oicp.currency = EUR
+```
+
+**OICP Endpoints** (available when enabled):
+- `POST /steve/oicp/evsepull/v23/operators/{operatorId}/data-records` - Publish EVSE data
+- `POST /steve/oicp/evsepull/v23/operators/{operatorId}/status-records` - Real-time status updates
+- `POST /steve/oicp/authorization/v23/operators/{operatorId}/authorize/start` - Remote authorization
+- `POST /steve/oicp/notificationmgmt/v11/charging-notifications` - Session events
+- `POST /steve/oicp/notificationmgmt/v11/charge-detail-record` - CDRs for billing
+
+### Dual Protocol Configuration
+
+You can enable both OCPI and OICP simultaneously:
+
+```properties
+steve.gateway.enabled = true
+steve.gateway.encryption.key = <OUTPUT_FROM_openssl_rand_-base64_32>
+steve.gateway.encryption.salt = <OUTPUT_FROM_openssl_rand_-base64_16>
+
+# OCPI configuration
+steve.gateway.ocpi.enabled = true
+steve.gateway.ocpi.country-code = DE
+steve.gateway.ocpi.party-id = ABC
+# ... other OCPI settings
+
+# OICP configuration
+steve.gateway.oicp.enabled = true
+steve.gateway.oicp.provider-id = DE*ABC
+# ... other OICP settings
+```
+
+## Managing Gateway Partners
+
+After enabling the gateway, use the web interface to manage roaming partners:
+
+1. Navigate to **Data Management** > **Gateway Partners**
+2. Click **Add** to register a new partner
+3. Configure:
+   - Partner name and protocol (OCPI/OICP)
+   - Role (CPO/EMSP for OCPI, CPO for OICP)
+   - Authentication token (securely stored with AES-256-GCM encryption)
+   - Country code and party ID
+
+## API Documentation
+
+When the gateway is enabled, OpenAPI/Swagger documentation is available at:
+
+```
+http://<your-server-ip>:<port>/steve/manager/swagger-ui/index.html
+```
+
+Browse the **OCPI** and **OICP** API groups for detailed endpoint documentation.
 
 Screenshots
 -----

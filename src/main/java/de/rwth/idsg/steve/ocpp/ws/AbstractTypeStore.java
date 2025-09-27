@@ -43,8 +43,12 @@ public abstract class AbstractTypeStore implements TypeStore {
 
     public AbstractTypeStore(String packageForRequestClassMap,
                              String packageForActionResponseMap) {
-        populateRequestClassMap(packageForRequestClassMap);
-        populateActionResponseMap(packageForActionResponseMap);
+        for (String pkg : packageForRequestClassMap.split(",")) {
+            populateRequestClassMap(pkg.trim());
+        }
+        for (String pkg : packageForActionResponseMap.split(",")) {
+            populateActionResponseMap(pkg.trim());
+        }
     }
 
     @Override

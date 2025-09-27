@@ -1,0 +1,15 @@
+package de.rwth.idsg.steve.gateway.oicp.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AdditionalInfo {
+    private String language;
+    private String text;
+}

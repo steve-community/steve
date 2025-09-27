@@ -63,4 +63,7 @@ public interface ChargePointRepository {
     int addChargePoint(ChargePointForm form);
     void updateChargePoint(ChargePointForm form);
     void deleteChargePoint(int chargeBoxPk);
+
+    boolean isRegistered(String chargeBoxId);
+    boolean validatePassword(String chargeBoxId, String password);
 }

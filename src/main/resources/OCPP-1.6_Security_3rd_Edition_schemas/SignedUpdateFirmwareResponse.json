@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:SignedUpdateFirmware.conf",
+  "definitions": {
+    "UpdateFirmwareStatusEnumType": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Rejected",
+        "AcceptedCanceled",
+        "InvalidCertificate",
+        "RevokedCertificate"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "$ref": "#/definitions/UpdateFirmwareStatusEnumType"
+    }
+  },
+  "required": [
+    "status"
+  ]
+}

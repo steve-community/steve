@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:DeleteCertificate.req",
+  "definitions": {
+    "HashAlgorithmEnumType": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "SHA256",
+        "SHA384",
+        "SHA512"
+      ]
+    },
+    "CertificateHashDataType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hashAlgorithm": {
+          "$ref": "#/definitions/HashAlgorithmEnumType"
+        },
+        "issuerNameHash": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "issuerKeyHash": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "serialNumber": {
+          "type": "string",
+          "maxLength": 40
+        }
+      },
+      "required": [
+        "hashAlgorithm",
+        "issuerNameHash",
+        "issuerKeyHash",
+        "serialNumber"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "certificateHashData": {
+      "$ref": "#/definitions/CertificateHashDataType"
+    }
+  },
+  "required": [
+    "certificateHashData"
+  ]
+}

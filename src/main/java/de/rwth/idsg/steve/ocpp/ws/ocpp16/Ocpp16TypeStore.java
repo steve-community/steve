@@ -30,8 +30,10 @@ public final class Ocpp16TypeStore extends AbstractTypeStore {
 
     private Ocpp16TypeStore() {
         super(
-                ocpp.cs._2015._10.ObjectFactory.class.getPackage().getName(),
-                ocpp.cp._2015._10.ObjectFactory.class.getPackage().getName()
+                new String[]{ocpp.cs._2015._10.ObjectFactory.class.getPackage().getName(),
+                "ocpp._2020._03"},
+                new String[]{ocpp.cp._2015._10.ObjectFactory.class.getPackage().getName(),
+                "ocpp._2020._03"}
         );
     }
 }

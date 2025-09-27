@@ -23,6 +23,14 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2020._03.LogStatusNotificationRequest;
+import ocpp._2020._03.LogStatusNotificationResponse;
+import ocpp._2020._03.SecurityEventNotificationRequest;
+import ocpp._2020._03.SecurityEventNotificationResponse;
+import ocpp._2020._03.SignCertificateRequest;
+import ocpp._2020._03.SignCertificateResponse;
+import ocpp._2020._03.SignedFirmwareStatusNotificationRequest;
+import ocpp._2020._03.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -132,6 +140,26 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         return service.dataTransfer(parameters, chargeBoxIdentity);
+    }
+
+    public SignCertificateResponse signCertificate(
+            SignCertificateRequest parameters, String chargeBoxIdentity) {
+        return service.signCertificate(parameters, chargeBoxIdentity);
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(
+            SecurityEventNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.securityEventNotification(parameters, chargeBoxIdentity);
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
+            SignedFirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.signedFirmwareStatusNotification(parameters, chargeBoxIdentity);
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(
+            LogStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        return service.logStatusNotification(parameters, chargeBoxIdentity);
     }
 
     // -------------------------------------------------------------------------

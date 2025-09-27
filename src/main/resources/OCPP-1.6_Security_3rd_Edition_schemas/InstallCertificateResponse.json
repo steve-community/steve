@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:InstallCertificate.conf",
+  "definitions": {
+    "InstallCertificateStatusEnumType": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Failed",
+        "Rejected"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "$ref": "#/definitions/InstallCertificateStatusEnumType"
+    }
+  },
+  "required": [
+    "status"
+  ]
+}

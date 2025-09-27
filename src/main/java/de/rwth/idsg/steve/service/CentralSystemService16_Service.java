@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
@@ -32,6 +34,14 @@ import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2020._03.LogStatusNotificationRequest;
+import ocpp._2020._03.LogStatusNotificationResponse;
+import ocpp._2020._03.SecurityEventNotificationRequest;
+import ocpp._2020._03.SecurityEventNotificationResponse;
+import ocpp._2020._03.SignCertificateRequest;
+import ocpp._2020._03.SignCertificateResponse;
+import ocpp._2020._03.SignedFirmwareStatusNotificationRequest;
+import ocpp._2020._03.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -77,6 +87,9 @@ public class CentralSystemService16_Service {
     private final OcppTagService ocppTagService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChargePointRegistrationService chargePointRegistrationService;
+    private final SecurityRepository securityRepository;
+    private final CertificateSigningService certificateSigningService;
+    private final SecurityProfileConfiguration securityConfig;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -270,6 +283,198 @@ public class CentralSystemService16_Service {
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 
+    public SignCertificateResponse signCertificate(SignCertificateRequest parameters, String chargeBoxIdentity) {
+        log.info("Received SignCertificateRequest from '{}' with CSR length: {}", chargeBoxIdentity,
+                parameters.getCsr() != null ? parameters.getCsr().length() : 0);
+
+        var response = new SignCertificateResponse();
+
+        try {
+            var csr = parameters.getCsr();
+            if (csr == null || csr.trim().isEmpty()) {
+                log.error("Empty or null CSR received from '{}'", chargeBoxIdentity);
+                response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
+
+                securityRepository.insertSecurityEvent(
+                    chargeBoxIdentity,
+                    "SignCertificateRejected",
+                    DateTime.now(),
+                    "Empty CSR received",
+                    "MEDIUM"
+                );
+
+                return response;
+            }
+
+            if (!certificateSigningService.isInitialized()) {
+                log.error("Certificate signing service not initialized. Check TLS configuration.");
+                response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
+
+                securityRepository.insertSecurityEvent(
+                    chargeBoxIdentity,
+                    "SignCertificateUnavailable",
+                    DateTime.now(),
+                    "Certificate signing service not initialized",
+                    "HIGH"
+                );
+
+                return response;
+            }
+
+            var signedCertificatePem = certificateSigningService.signCertificateRequest(csr, chargeBoxIdentity);
+            var caCertificatePem = certificateSigningService.getCertificateChain();
+            var certificateChain = signedCertificatePem + caCertificatePem;
+
+            var certificateId = securityRepository.insertCertificate(
+                chargeBoxIdentity,
+                "ChargePointCertificate",
+                signedCertificatePem,
+                null,
+                null,
+                null,
+                DateTime.now(),
+                DateTime.now().plusYears(securityConfig.getCertificateValidityYears()),
+                "SHA256WithRSA",
+                2048
+            );
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                "SignCertificateRequest",
+                DateTime.now(),
+                "CSR signed successfully, certificate ID: " + certificateId,
+                "INFO"
+            );
+
+            response.setStatus(SignCertificateResponse.GenericStatusEnumType.ACCEPTED);
+            log.info("SignCertificateRequest from '{}' processed successfully. Certificate stored with ID: {}. "
+                      + "Send certificate to charge point using CertificateSignedTask with certificate chain: {}",
+                    chargeBoxIdentity, certificateId, certificateChain.length());
+
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid CSR from '{}': {}", chargeBoxIdentity, e.getMessage());
+            response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                "SignCertificateRejected",
+                DateTime.now(),
+                "Invalid CSR: " + e.getMessage(),
+                "HIGH"
+            );
+
+        } catch (Exception e) {
+            log.error("Error signing certificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+            response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                "SignCertificateError",
+                DateTime.now(),
+                "Error signing CSR: " + e.getMessage(),
+                "HIGH"
+            );
+        }
+
+        return response;
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotificationRequest parameters,
+                                                                       String chargeBoxIdentity) {
+        var eventType = parameters.getType();
+        var eventTimestamp = parameters.getTimestamp();
+        var techInfo = parameters.getTechInfo();
+
+        log.info("SecurityEvent from '{}': type={}, timestamp={}", chargeBoxIdentity, eventType, eventTimestamp);
+
+        try {
+            var severity = determineSeverity(eventType);
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                eventType,
+                eventTimestamp,
+                techInfo != null ? techInfo : "",
+                severity
+            );
+
+            if ("CRITICAL".equals(severity) || "HIGH".equals(severity)) {
+                log.warn("High-severity security event from '{}': {}", chargeBoxIdentity, eventType);
+            }
+
+        } catch (Exception e) {
+            log.error("Error storing security event from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SecurityEventNotificationResponse();
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
+            SignedFirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
+        var requestId = parameters.getRequestId();
+
+        log.info("FirmwareStatus from '{}': status={}, requestId={}", chargeBoxIdentity, status, requestId);
+
+        try {
+            var firmwareUpdate = securityRepository.getCurrentFirmwareUpdate(chargeBoxIdentity);
+
+            if (firmwareUpdate != null) {
+                securityRepository.updateFirmwareUpdateStatus(firmwareUpdate.getFirmwareUpdateId(), status);
+                log.info("Updated firmware status for chargeBox '{}' to '{}'", chargeBoxIdentity, status);
+            } else {
+                log.warn("No firmware update found for chargeBox '{}'", chargeBoxIdentity);
+            }
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                "FirmwareStatusNotification",
+                DateTime.now(),
+                "Firmware status: " + status + (requestId != null ? ", requestId: " + requestId : ""),
+                "INFO"
+            );
+
+        } catch (Exception e) {
+            log.error("Error processing firmware status notification from '{}': {}",
+                    chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SignedFirmwareStatusNotificationResponse();
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotificationRequest parameters, String chargeBoxIdentity) {
+        var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
+        var requestId = parameters.getRequestId();
+
+        log.info("LogStatus from '{}': status={}, requestId={}", chargeBoxIdentity, status, requestId);
+
+        try {
+            if (requestId != null) {
+                var logFile = securityRepository.getLogFile(requestId);
+
+                if (logFile != null) {
+                    securityRepository.updateLogFileStatus(requestId, status, null);
+                    log.info("Updated log file status for requestId {} to '{}'", requestId, status);
+                } else {
+                    log.warn("No log file found for requestId {}", requestId);
+                }
+            }
+
+            securityRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                "LogStatusNotification",
+                DateTime.now(),
+                "Log upload status: " + status + (requestId != null ? ", requestId: " + requestId : ""),
+                "INFO"
+            );
+
+        } catch (Exception e) {
+            log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new LogStatusNotificationResponse();
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -286,5 +491,28 @@ public class CentralSystemService16_Service {
             return null;
         }
         return transactionId;
+    }
+
+    private static String determineSeverity(String eventType) {
+        if (eventType == null) {
+            return "INFO";
+        }
+
+        var upperType = eventType.toUpperCase();
+
+        if (upperType.contains("ATTACK") || upperType.contains("BREACH") || upperType.contains("TAMPER")) {
+            return "CRITICAL";
+        }
+
+        if (upperType.contains("FAIL") || upperType.contains("ERROR") || upperType.contains("INVALID")
+            || upperType.contains("UNAUTHORIZED") || upperType.contains("REJECT")) {
+            return "HIGH";
+        }
+
+        if (upperType.contains("WARNING") || upperType.contains("EXPIR")) {
+            return "MEDIUM";
+        }
+
+        return "INFO";
     }
 }

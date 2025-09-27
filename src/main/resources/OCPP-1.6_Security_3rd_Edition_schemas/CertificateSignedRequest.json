@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:CertificateSigned.req",
+    "type": "object",
+    "properties": {
+        "certificateChain": {
+            "type": "string",
+            "maxLength": 10000
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "certificateChain"
+    ]
+}

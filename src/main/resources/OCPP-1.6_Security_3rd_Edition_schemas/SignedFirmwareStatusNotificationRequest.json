@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:SignedFirmwareStatusNotification.req",
+  "definitions": {
+    "FirmwareStatusEnumType": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Downloaded",
+        "DownloadFailed",
+        "Downloading",
+        "DownloadScheduled",
+        "DownloadPaused",
+        "Idle",
+        "InstallationFailed",
+        "Installing",
+        "Installed",
+        "InstallRebooting",
+        "InstallScheduled",
+        "InstallVerificationFailed",
+        "InvalidSignature",
+        "SignatureVerified"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "$ref": "#/definitions/FirmwareStatusEnumType"
+    },
+    "requestId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "status"
+  ]
+}

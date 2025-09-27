@@ -16,23 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.ocpp15;
+package de.rwth.idsg.steve.repository.dto;
 
-import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
+import lombok.Builder;
+import lombok.Getter;
+import org.joda.time.DateTime;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 15.03.2015
- */
-public final class Ocpp15TypeStore extends AbstractTypeStore {
-
-    public static final Ocpp15TypeStore INSTANCE = new Ocpp15TypeStore();
-
-    private Ocpp15TypeStore() {
-        super(
-                new String[]{ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName()},
-                new String[]{ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()}
-        );
-    }
-
+@Getter
+@Builder
+public class FirmwareUpdate {
+    private final int firmwareUpdateId;
+    private final String chargeBoxId;
+    private final String firmwareLocation;
+    private final String firmwareSignature;
+    private final String signingCertificate;
+    private final DateTime requestTimestamp;
+    private final DateTime retrieveDate;
+    private final DateTime installDate;
+    private final String status;
 }

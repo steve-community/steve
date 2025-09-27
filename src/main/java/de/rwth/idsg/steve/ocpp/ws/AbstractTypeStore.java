@@ -42,10 +42,14 @@ public abstract class AbstractTypeStore implements TypeStore {
     private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
     private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
 
-    public AbstractTypeStore(String packageForRequestClassMap,
-                             String packageForActionResponseMap) {
-        populateRequestClassMap(packageForRequestClassMap);
-        populateActionResponseMap(packageForActionResponseMap);
+    public AbstractTypeStore(String[] packagesForRequestClassMap,
+                             String[] packagesForActionResponseMap) {
+        for (var pkg : packagesForRequestClassMap) {
+            populateRequestClassMap(pkg.trim());
+        }
+        for (var pkg : packagesForActionResponseMap) {
+            populateActionResponseMap(pkg.trim());
+        }
     }
 
     @Override

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:SignedUpdateFirmware.req",
+  "definitions": {
+    "FirmwareType": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "location": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "retrieveDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "installDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "signingCertificate": {
+          "type": "string",
+          "maxLength": 5500
+        },
+        "signature": {
+          "type": "string",
+          "maxLength": 800
+        }
+      },
+      "required": [
+        "location",
+        "retrieveDateTime",
+        "signingCertificate",
+        "signature"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "retries": {
+      "type": "integer"
+    },
+    "retryInterval": {
+      "type": "integer"
+    },
+    "requestId": {
+      "type": "integer"
+    },
+    "firmware": {
+      "$ref": "#/definitions/FirmwareType"
+    }
+  },
+  "required": [
+    "requestId",
+    "firmware"
+  ]
+}

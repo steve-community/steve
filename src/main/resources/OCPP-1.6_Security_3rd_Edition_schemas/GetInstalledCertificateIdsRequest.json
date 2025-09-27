@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:GetInstalledCertificateIds.req",
+  "definitions": {
+    "CertificateUseEnumType": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "CentralSystemRootCertificate",
+        "ManufacturerRootCertificate"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "certificateType": {
+      "$ref": "#/definitions/CertificateUseEnumType"
+    }
+  },
+  "required": [
+    "certificateType"
+  ]
+}

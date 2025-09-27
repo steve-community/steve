@@ -16,23 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.ocpp15;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 15.03.2015
- */
-public final class Ocpp15TypeStore extends AbstractTypeStore {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-    public static final Ocpp15TypeStore INSTANCE = new Ocpp15TypeStore();
+@Setter
+@Getter
+public class ExtendedTriggerMessageParams extends MultipleChargePointSelect {
 
-    private Ocpp15TypeStore() {
-        super(
-                new String[]{ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName()},
-                new String[]{ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()}
-        );
+    @NotNull(message = "Requested message is required")
+    private MessageTriggerEnumType requestedMessage;
+
+    @Min(value = 0, message = "Connector ID must be at least {value}")
+    private Integer connectorId;
+
+    public enum MessageTriggerEnumType {
+        BootNotification,
+        LogStatusNotification,
+        FirmwareStatusNotification,
+        Heartbeat,
+        MeterValues,
+        SignChargePointCertificate,
+        StatusNotification
     }
-
 }

@@ -1,0 +1,298 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetCompositeScheduleResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ChargingRateUnitEnumType": {
+            "javaType": "ChargingRateUnitEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "W",
+                "A"
+            ]
+        },
+        "GenericStatusEnumType": {
+            "description": "The Charging Station will indicate if it was\r\nable to process the request\r\n",
+            "javaType": "GenericStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected"
+            ]
+        },
+        "OperationModeEnumType": {
+            "description": "*(2.1)* Charging operation mode to use during this time interval. When absent defaults to `ChargingOnly`.\r\n",
+            "javaType": "OperationModeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Idle",
+                "ChargingOnly",
+                "CentralSetpoint",
+                "ExternalSetpoint",
+                "ExternalLimits",
+                "CentralFrequency",
+                "LocalFrequency",
+                "LocalLoadBalancing"
+            ]
+        },
+        "ChargingSchedulePeriodType": {
+            "description": "Charging schedule period structure defines a time period in a charging schedule. It is used in: CompositeScheduleType and in ChargingScheduleType. When used in a NotifyEVChargingScheduleRequest only _startPeriod_, _limit_, _limit_L2_, _limit_L3_ are relevant.\r\n",
+            "javaType": "ChargingSchedulePeriod",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "startPeriod": {
+                    "description": "Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.\r\n",
+                    "type": "integer"
+                },
+                "limit": {
+                    "description": "Optional only when not required by the _operationMode_, as in CentralSetpoint, ExternalSetpoint, ExternalLimits, LocalFrequency,  LocalLoadBalancing. +\r\nCharging rate limit during the schedule period, in the applicable _chargingRateUnit_. \r\nThis SHOULD be a non-negative value; a negative value is only supported for backwards compatibility with older systems that use a negative value to specify a discharging limit.\r\nWhen using _chargingRateUnit_ = `W`, this field represents the sum of the power of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "limit_L2": {
+                    "description": "*(2.1)* Charging rate limit on phase L2  in the applicable _chargingRateUnit_. \r\n",
+                    "type": "number"
+                },
+                "limit_L3": {
+                    "description": "*(2.1)* Charging rate limit on phase L3  in the applicable _chargingRateUnit_. \r\n",
+                    "type": "number"
+                },
+                "numberPhases": {
+                    "description": "The number of phases that can be used for charging. +\r\nFor a DC EVSE this field should be omitted. +\r\nFor an AC EVSE a default value of _numberPhases_ = 3 will be assumed if the field is absent.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 3.0
+                },
+                "phaseToUse": {
+                    "description": "Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It\u2019s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.\r\n\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 3.0
+                },
+                "dischargeLimit": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ that the EV is allowed to discharge with. Note, these are negative values in order to be consistent with _setpoint_, which can be positive and negative.  +\r\nFor AC this field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "dischargeLimit_L2": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ on phase L2 that the EV is allowed to discharge with. \r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "dischargeLimit_L3": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ on phase L3 that the EV is allowed to discharge with. \r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "setpoint": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow as close as possible. Use negative values for discharging. +\r\nWhen a limit and/or _dischargeLimit_ are given the overshoot when following _setpoint_ must remain within these values.\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "setpoint_L2": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow on phase L2 as close as possible.\r\n",
+                    "type": "number"
+                },
+                "setpoint_L3": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow on phase L3 as close as possible. \r\n",
+                    "type": "number"
+                },
+                "setpointReactive": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow as closely as possible. Positive values for inductive, negative for capacitive reactive power or current.  +\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "setpointReactive_L2": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow on phase L2 as closely as possible. \r\n",
+                    "type": "number"
+                },
+                "setpointReactive_L3": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow on phase L3 as closely as possible. \r\n",
+                    "type": "number"
+                },
+                "preconditioningRequest": {
+                    "description": "*(2.1)* If  true, the EV should attempt to keep the BMS preconditioned for this time interval.\r\n",
+                    "type": "boolean"
+                },
+                "evseSleep": {
+                    "description": "*(2.1)* If true, the EVSE must turn off power electronics/modules associated with this transaction. Default value when absent is false.\r\n",
+                    "type": "boolean"
+                },
+                "v2xBaseline": {
+                    "description": "*(2.1)* Power value that, when present, is used as a baseline on top of which values from _v2xFreqWattCurve_ and _v2xSignalWattCurve_ are added.\r\n\r\n",
+                    "type": "number"
+                },
+                "operationMode": {
+                    "$ref": "#/definitions/OperationModeEnumType"
+                },
+                "v2xFreqWattCurve": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/V2XFreqWattPointType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                },
+                "v2xSignalWattCurve": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/V2XSignalWattPointType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "startPeriod"
+            ]
+        },
+        "CompositeScheduleType": {
+            "javaType": "CompositeSchedule",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evseId": {
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "scheduleStart": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "chargingRateUnit": {
+                    "$ref": "#/definitions/ChargingRateUnitEnumType"
+                },
+                "chargingSchedulePeriod": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/ChargingSchedulePeriodType"
+                    },
+                    "minItems": 1
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "evseId",
+                "duration",
+                "scheduleStart",
+                "chargingRateUnit",
+                "chargingSchedulePeriod"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "V2XFreqWattPointType": {
+            "description": "*(2.1)* A point of a frequency-watt curve.\r\n",
+            "javaType": "V2XFreqWattPoint",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "frequency": {
+                    "description": "Net frequency in Hz.\r\n",
+                    "type": "number"
+                },
+                "power": {
+                    "description": "Power in W to charge (positive) or discharge (negative) at specified frequency.\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "frequency",
+                "power"
+            ]
+        },
+        "V2XSignalWattPointType": {
+            "description": "*(2.1)* A point of a signal-watt curve.\r\n",
+            "javaType": "V2XSignalWattPoint",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "signal": {
+                    "description": "Signal value from an AFRRSignalRequest.\r\n",
+                    "type": "integer"
+                },
+                "power": {
+                    "description": "Power in W to charge (positive) or discharge (negative) at specified frequency.\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "signal",
+                "power"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "status": {
+            "$ref": "#/definitions/GenericStatusEnumType"
+        },
+        "statusInfo": {
+            "$ref": "#/definitions/StatusInfoType"
+        },
+        "schedule": {
+            "$ref": "#/definitions/CompositeScheduleType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "status"
+    ]
+}

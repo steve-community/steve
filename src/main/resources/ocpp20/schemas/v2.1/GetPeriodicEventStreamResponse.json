@@ -1,0 +1,84 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetPeriodicEventStreamResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ConstantStreamDataType": {
+            "javaType": "ConstantStreamData",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "description": "Uniquely identifies the stream\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "params": {
+                    "$ref": "#/definitions/PeriodicEventStreamParamsType"
+                },
+                "variableMonitoringId": {
+                    "description": "Id of monitor used to report his event. It can be a preconfigured or hardwired monitor.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "id",
+                "variableMonitoringId",
+                "params"
+            ]
+        },
+        "PeriodicEventStreamParamsType": {
+            "javaType": "PeriodicEventStreamParams",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "interval": {
+                    "description": "Time in seconds after which stream data is sent.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "values": {
+                    "description": "Number of items to be sent together in stream.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "constantStreamData": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/ConstantStreamDataType"
+            },
+            "minItems": 1
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    }
+}

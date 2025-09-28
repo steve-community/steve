@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:NotifyEventRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "EventNotificationEnumType": {
+      "description": "Specifies the event notification type of the message.\r\n\r\n",
+      "javaType": "EventNotificationEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "HardWiredNotification",
+        "HardWiredMonitor",
+        "PreconfiguredMonitor",
+        "CustomMonitor"
+      ]
+    },
+    "EventTriggerEnumType": {
+      "description": "Type of monitor that triggered this event, e.g. exceeding a threshold value.\r\n\r\n",
+      "javaType": "EventTriggerEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Alerting",
+        "Delta",
+        "Periodic"
+      ]
+    },
+    "ComponentType": {
+      "description": "A physical or logical component\r\n",
+      "javaType": "Component",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "evse": {
+          "$ref": "#/definitions/EVSEType"
+        },
+        "name": {
+          "description": "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        },
+        "instance": {
+          "description": "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "EventDataType": {
+      "description": "Class to report an event notification for a component-variable.\r\n",
+      "javaType": "EventData",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "eventId": {
+          "description": "Identifies the event. This field can be referred to as a cause by other events.\r\n\r\n",
+          "type": "integer"
+        },
+        "timestamp": {
+          "description": "Timestamp of the moment the report was generated.\r\n",
+          "type": "string",
+          "format": "date-time"
+        },
+        "trigger": {
+          "$ref": "#/definitions/EventTriggerEnumType"
+        },
+        "cause": {
+          "description": "Refers to the Id of an event that is considered to be the cause for this event.\r\n\r\n",
+          "type": "integer"
+        },
+        "actualValue": {
+          "description": "Actual value (_attributeType_ Actual) of the variable.\r\n\r\nThe Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. \r\n\r\n",
+          "type": "string",
+          "maxLength": 2500
+        },
+        "techCode": {
+          "description": "Technical (error) code as reported by component.\r\n",
+          "type": "string",
+          "maxLength": 50
+        },
+        "techInfo": {
+          "description": "Technical detail information as reported by component.\r\n",
+          "type": "string",
+          "maxLength": 500
+        },
+        "cleared": {
+          "description": "_Cleared_ is set to true to report the clearing of a monitored situation, i.e. a 'return to normal'. \r\n\r\n",
+          "type": "boolean"
+        },
+        "transactionId": {
+          "description": "If an event notification is linked to a specific transaction, this field can be used to specify its transactionId.\r\n",
+          "type": "string",
+          "maxLength": 36
+        },
+        "component": {
+          "$ref": "#/definitions/ComponentType"
+        },
+        "variableMonitoringId": {
+          "description": "Identifies the VariableMonitoring which triggered the event.\r\n",
+          "type": "integer"
+        },
+        "eventNotificationType": {
+          "$ref": "#/definitions/EventNotificationEnumType"
+        },
+        "variable": {
+          "$ref": "#/definitions/VariableType"
+        }
+      },
+      "required": [
+        "eventId",
+        "timestamp",
+        "trigger",
+        "actualValue",
+        "eventNotificationType",
+        "component",
+        "variable"
+      ]
+    },
+    "EVSEType": {
+      "description": "EVSE\r\nurn:x-oca:ocpp:uid:2:233123\r\nElectric Vehicle Supply Equipment\r\n",
+      "javaType": "EVSE",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "id": {
+          "description": "Identified_ Object. MRID. Numeric_ Identifier\r\nurn:x-enexis:ecdm:uid:1:569198\r\nEVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+          "type": "integer"
+        },
+        "connectorId": {
+          "description": "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "VariableType": {
+      "description": "Reference key to a component-variable.\r\n",
+      "javaType": "Variable",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "name": {
+          "description": "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        },
+        "instance": {
+          "description": "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "generatedAt": {
+      "description": "Timestamp of the moment this message was generated at the Charging Station.\r\n",
+      "type": "string",
+      "format": "date-time"
+    },
+    "tbc": {
+      "description": "“to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. \r\n",
+      "type": "boolean",
+      "default": false
+    },
+    "seqNo": {
+      "description": "Sequence number of this message. First message starts at 0.\r\n",
+      "type": "integer"
+    },
+    "eventData": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/EventDataType"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "generatedAt",
+    "seqNo",
+    "eventData"
+  ]
+}

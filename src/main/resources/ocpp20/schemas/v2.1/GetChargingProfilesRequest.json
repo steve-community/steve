@@ -1,0 +1,97 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetChargingProfilesRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ChargingProfilePurposeEnumType": {
+            "description": "Defines the purpose of the schedule transferred by this profile\r\n",
+            "javaType": "ChargingProfilePurposeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "ChargingStationExternalConstraints",
+                "ChargingStationMaxProfile",
+                "TxDefaultProfile",
+                "TxProfile",
+                "PriorityCharging",
+                "LocalGeneration"
+            ]
+        },
+        "ChargingProfileCriterionType": {
+            "description": "A ChargingProfileCriterionType is a filter for charging profiles to be selected by a GetChargingProfilesRequest.\r\n\r\n",
+            "javaType": "ChargingProfileCriterion",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "chargingProfilePurpose": {
+                    "$ref": "#/definitions/ChargingProfilePurposeEnumType"
+                },
+                "stackLevel": {
+                    "description": "Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "chargingProfileId": {
+                    "description": "List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;\r\n\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 1
+                },
+                "chargingLimitSource": {
+                    "description": "For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource. Values defined in Appendix as ChargingLimitSourceEnumStringType.\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "minItems": 1,
+                    "maxItems": 4
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "requestId": {
+            "description": "Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.\r\n",
+            "type": "integer"
+        },
+        "evseId": {
+            "description": "For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported. +\r\nReported charging profiles SHALL match the criteria in field _chargingProfile_.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "chargingProfile": {
+            "$ref": "#/definitions/ChargingProfileCriterionType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "requestId",
+        "chargingProfile"
+    ]
+}

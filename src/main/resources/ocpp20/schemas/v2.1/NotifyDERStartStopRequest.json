@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:NotifyDERStartStopRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "controlId": {
+            "description": "Id of the started or stopped DER control.\r\nCorresponds to the _controlId_ of the SetDERControlRequest.\r\n\r\n",
+            "type": "string",
+            "maxLength": 36
+        },
+        "started": {
+            "description": "True if DER control has started. False if it has ended.\r\n\r\n",
+            "type": "boolean"
+        },
+        "timestamp": {
+            "description": "Time of start or end of event.\r\n\r\n",
+            "type": "string",
+            "format": "date-time"
+        },
+        "supersededIds": {
+            "description": "List of controlIds that are superseded as a result of this control starting.\r\n\r\n",
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "type": "string",
+                "maxLength": 36
+            },
+            "minItems": 1,
+            "maxItems": 24
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "controlId",
+        "started",
+        "timestamp"
+    ]
+}

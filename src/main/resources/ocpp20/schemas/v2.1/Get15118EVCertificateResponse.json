@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:Get15118EVCertificateResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "Iso15118EVCertificateStatusEnumType": {
+            "description": "Indicates whether the message was processed properly.\r\n",
+            "javaType": "Iso15118EVCertificateStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Failed"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "status": {
+            "$ref": "#/definitions/Iso15118EVCertificateStatusEnumType"
+        },
+        "statusInfo": {
+            "$ref": "#/definitions/StatusInfoType"
+        },
+        "exiResponse": {
+            "description": "*(2/1)* Raw CertificateInstallationRes response for the EV, Base64 encoded. +\r\nExtended to support ISO 15118-20 certificates. The minimum supported length is 17000. If a longer _exiResponse_ is supported, then the supported length must be communicated in variable OCPPCommCtrlr.FieldLength[ \"Get15118EVCertificateResponse.exiResponse\" ].\r\n\r\n",
+            "type": "string",
+            "maxLength": 17000
+        },
+        "remainingContracts": {
+            "description": "*(2.1)* Number of contracts that can be retrieved with additional requests.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "status",
+        "exiResponse"
+    ]
+}

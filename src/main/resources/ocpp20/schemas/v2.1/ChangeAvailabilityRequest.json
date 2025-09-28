@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:ChangeAvailabilityRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "OperationalStatusEnumType": {
+            "description": "This contains the type of availability change that the Charging Station should perform.\r\n\r\n",
+            "javaType": "OperationalStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Inoperative",
+                "Operative"
+            ]
+        },
+        "EVSEType": {
+            "description": "Electric Vehicle Supply Equipment\r\n",
+            "javaType": "EVSE",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "description": "EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "connectorId": {
+                    "description": "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "evse": {
+            "$ref": "#/definitions/EVSEType"
+        },
+        "operationalStatus": {
+            "$ref": "#/definitions/OperationalStatusEnumType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "operationalStatus"
+    ]
+}

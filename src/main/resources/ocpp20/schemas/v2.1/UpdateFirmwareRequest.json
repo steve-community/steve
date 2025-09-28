@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:UpdateFirmwareRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "FirmwareType": {
+            "description": "Represents a copy of the firmware that can be loaded/updated on the Charging Station.\r\n",
+            "javaType": "Firmware",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "location": {
+                    "description": "URI defining the origin of the firmware.\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "retrieveDateTime": {
+                    "description": "Date and time at which the firmware shall be retrieved.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "installDateTime": {
+                    "description": "Date and time at which the firmware shall be installed.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "signingCertificate": {
+                    "description": "Certificate with which the firmware was signed.\r\nPEM encoded X.509 certificate.\r\n",
+                    "type": "string",
+                    "maxLength": 5500
+                },
+                "signature": {
+                    "description": "Base64 encoded firmware signature.\r\n",
+                    "type": "string",
+                    "maxLength": 800
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "location",
+                "retrieveDateTime"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "retries": {
+            "description": "This specifies how many times Charging Station must retry to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.\r\nIf the value is 0, it means: no retries.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "retryInterval": {
+            "description": "The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.\r\n",
+            "type": "integer"
+        },
+        "requestId": {
+            "description": "The Id of this request\r\n",
+            "type": "integer"
+        },
+        "firmware": {
+            "$ref": "#/definitions/FirmwareType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "requestId",
+        "firmware"
+    ]
+}

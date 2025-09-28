@@ -1,0 +1,101 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:NotifyDERAlarmRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "DERControlEnumType": {
+            "description": "Name of DER control, e.g. LFMustTrip\r\n",
+            "javaType": "DERControlEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "EnterService",
+                "FreqDroop",
+                "FreqWatt",
+                "FixedPFAbsorb",
+                "FixedPFInject",
+                "FixedVar",
+                "Gradients",
+                "HFMustTrip",
+                "HFMayTrip",
+                "HVMustTrip",
+                "HVMomCess",
+                "HVMayTrip",
+                "LimitMaxDischarge",
+                "LFMustTrip",
+                "LVMustTrip",
+                "LVMomCess",
+                "LVMayTrip",
+                "PowerMonitoringMustTrip",
+                "VoltVar",
+                "VoltWatt",
+                "WattPF",
+                "WattVar"
+            ]
+        },
+        "GridEventFaultEnumType": {
+            "description": "Type of grid event that caused this\r\n\r\n",
+            "javaType": "GridEventFaultEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "CurrentImbalance",
+                "LocalEmergency",
+                "LowInputPower",
+                "OverCurrent",
+                "OverFrequency",
+                "OverVoltage",
+                "PhaseRotation",
+                "RemoteEmergency",
+                "UnderFrequency",
+                "UnderVoltage",
+                "VoltageImbalance"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "controlType": {
+            "$ref": "#/definitions/DERControlEnumType"
+        },
+        "gridEventFault": {
+            "$ref": "#/definitions/GridEventFaultEnumType"
+        },
+        "alarmEnded": {
+            "description": "True when error condition has ended.\r\nAbsent or false when alarm has started.\r\n\r\n",
+            "type": "boolean"
+        },
+        "timestamp": {
+            "description": "Time of start or end of alarm.\r\n\r\n",
+            "type": "string",
+            "format": "date-time"
+        },
+        "extraInfo": {
+            "description": "Optional info provided by EV.\r\n\r\n",
+            "type": "string",
+            "maxLength": 200
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "controlType",
+        "timestamp"
+    ]
+}

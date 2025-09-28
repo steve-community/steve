@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:ReserveNowRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "ConnectorEnumType": {
+      "description": "This field specifies the connector type.\r\n",
+      "javaType": "ConnectorEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "cCCS1",
+        "cCCS2",
+        "cG105",
+        "cTesla",
+        "cType1",
+        "cType2",
+        "s309-1P-16A",
+        "s309-1P-32A",
+        "s309-3P-16A",
+        "s309-3P-32A",
+        "sBS1361",
+        "sCEE-7-7",
+        "sType2",
+        "sType3",
+        "Other1PhMax16A",
+        "Other1PhOver16A",
+        "Other3Ph",
+        "Pan",
+        "wInductive",
+        "wResonant",
+        "Undetermined",
+        "Unknown"
+      ]
+    },
+    "IdTokenEnumType": {
+      "description": "Enumeration of possible idToken types.\r\n",
+      "javaType": "IdTokenEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Central",
+        "eMAID",
+        "ISO14443",
+        "ISO15693",
+        "KeyCode",
+        "Local",
+        "MacAddress",
+        "NoAuthorization"
+      ]
+    },
+    "AdditionalInfoType": {
+      "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+      "javaType": "AdditionalInfo",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "additionalIdToken": {
+          "description": "This field specifies the additional IdToken.\r\n",
+          "type": "string",
+          "maxLength": 36
+        },
+        "type": {
+          "description": "This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "additionalIdToken",
+        "type"
+      ]
+    },
+    "IdTokenType": {
+      "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+      "javaType": "IdToken",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "additionalInfo": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "$ref": "#/definitions/AdditionalInfoType"
+          },
+          "minItems": 1
+        },
+        "idToken": {
+          "description": "IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+          "type": "string",
+          "maxLength": 36
+        },
+        "type": {
+          "$ref": "#/definitions/IdTokenEnumType"
+        }
+      },
+      "required": [
+        "idToken",
+        "type"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "id": {
+      "description": "Id of reservation.\r\n",
+      "type": "integer"
+    },
+    "expiryDateTime": {
+      "description": "Date and time at which the reservation expires.\r\n",
+      "type": "string",
+      "format": "date-time"
+    },
+    "connectorType": {
+      "$ref": "#/definitions/ConnectorEnumType"
+    },
+    "idToken": {
+      "$ref": "#/definitions/IdTokenType"
+    },
+    "evseId": {
+      "description": "This contains ID of the evse to be reserved.\r\n",
+      "type": "integer"
+    },
+    "groupIdToken": {
+      "$ref": "#/definitions/IdTokenType"
+    }
+  },
+  "required": [
+    "id",
+    "expiryDateTime",
+    "idToken"
+  ]
+}

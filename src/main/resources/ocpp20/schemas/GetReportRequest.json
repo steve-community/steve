@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:GetReportRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "ComponentCriterionEnumType": {
+      "javaType": "ComponentCriterionEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Active",
+        "Available",
+        "Enabled",
+        "Problem"
+      ]
+    },
+    "ComponentType": {
+      "description": "A physical or logical component\r\n",
+      "javaType": "Component",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "evse": {
+          "$ref": "#/definitions/EVSEType"
+        },
+        "name": {
+          "description": "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        },
+        "instance": {
+          "description": "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "ComponentVariableType": {
+      "description": "Class to report components, variables and variable attributes and characteristics.\r\n",
+      "javaType": "ComponentVariable",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "component": {
+          "$ref": "#/definitions/ComponentType"
+        },
+        "variable": {
+          "$ref": "#/definitions/VariableType"
+        }
+      },
+      "required": [
+        "component"
+      ]
+    },
+    "EVSEType": {
+      "description": "EVSE\r\nurn:x-oca:ocpp:uid:2:233123\r\nElectric Vehicle Supply Equipment\r\n",
+      "javaType": "EVSE",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "id": {
+          "description": "Identified_ Object. MRID. Numeric_ Identifier\r\nurn:x-enexis:ecdm:uid:1:569198\r\nEVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+          "type": "integer"
+        },
+        "connectorId": {
+          "description": "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "VariableType": {
+      "description": "Reference key to a component-variable.\r\n",
+      "javaType": "Variable",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "name": {
+          "description": "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        },
+        "instance": {
+          "description": "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "componentVariable": {
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/ComponentVariableType"
+      },
+      "minItems": 1
+    },
+    "requestId": {
+      "description": "The Id of the request.\r\n",
+      "type": "integer"
+    },
+    "componentCriteria": {
+      "description": "This field contains criteria for components for which a report is requested\r\n",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$ref": "#/definitions/ComponentCriterionEnumType"
+      },
+      "minItems": 1,
+      "maxItems": 4
+    }
+  },
+  "required": [
+    "requestId"
+  ]
+}

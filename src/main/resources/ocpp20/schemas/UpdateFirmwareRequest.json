@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:UpdateFirmwareRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "FirmwareType": {
+      "description": "Firmware\r\nurn:x-enexis:ecdm:uid:2:233291\r\nRepresents a copy of the firmware that can be loaded/updated on the Charging Station.\r\n",
+      "javaType": "Firmware",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "location": {
+          "description": "Firmware. Location. URI\r\nurn:x-enexis:ecdm:uid:1:569460\r\nURI defining the origin of the firmware.\r\n",
+          "type": "string",
+          "maxLength": 512
+        },
+        "retrieveDateTime": {
+          "description": "Firmware. Retrieve. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569461\r\nDate and time at which the firmware shall be retrieved.\r\n",
+          "type": "string",
+          "format": "date-time"
+        },
+        "installDateTime": {
+          "description": "Firmware. Install. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569462\r\nDate and time at which the firmware shall be installed.\r\n",
+          "type": "string",
+          "format": "date-time"
+        },
+        "signingCertificate": {
+          "description": "Certificate with which the firmware was signed.\r\nPEM encoded X.509 certificate.\r\n",
+          "type": "string",
+          "maxLength": 5500
+        },
+        "signature": {
+          "description": "Firmware. Signature. Signature\r\nurn:x-enexis:ecdm:uid:1:569464\r\nBase64 encoded firmware signature.\r\n",
+          "type": "string",
+          "maxLength": 800
+        }
+      },
+      "required": [
+        "location",
+        "retrieveDateTime"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "retries": {
+      "description": "This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.\r\n",
+      "type": "integer"
+    },
+    "retryInterval": {
+      "description": "The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.\r\n",
+      "type": "integer"
+    },
+    "requestId": {
+      "description": "The Id of this request\r\n",
+      "type": "integer"
+    },
+    "firmware": {
+      "$ref": "#/definitions/FirmwareType"
+    }
+  },
+  "required": [
+    "requestId",
+    "firmware"
+  ]
+}

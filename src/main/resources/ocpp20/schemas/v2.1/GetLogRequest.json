@@ -1,0 +1,92 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetLogRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "LogEnumType": {
+            "description": "This contains the type of log file that the Charging Station\r\nshould send.\r\n",
+            "javaType": "LogEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "DiagnosticsLog",
+                "SecurityLog",
+                "DataCollectorLog"
+            ]
+        },
+        "LogParametersType": {
+            "description": "Generic class for the configuration of logging entries.\r\n",
+            "javaType": "LogParameters",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "remoteLocation": {
+                    "description": "The URL of the location at the remote system where the log should be stored.\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "oldestTimestamp": {
+                    "description": "This contains the date and time of the oldest logging information to include in the diagnostics.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "latestTimestamp": {
+                    "description": "This contains the date and time of the latest logging information to include in the diagnostics.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "remoteLocation"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "log": {
+            "$ref": "#/definitions/LogParametersType"
+        },
+        "logType": {
+            "$ref": "#/definitions/LogEnumType"
+        },
+        "requestId": {
+            "description": "The Id of this request\r\n",
+            "type": "integer"
+        },
+        "retries": {
+            "description": "This specifies how many times the Charging Station must retry to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry. If the value is 0, it means: no retries.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "retryInterval": {
+            "description": "The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.\r\n",
+            "type": "integer"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "logType",
+        "requestId",
+        "log"
+    ]
+}

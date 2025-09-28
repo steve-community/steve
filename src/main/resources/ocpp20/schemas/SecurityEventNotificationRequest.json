@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:SecurityEventNotificationRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "type": {
+      "description": "Type of the security event. This value should be taken from the Security events list.\r\n",
+      "type": "string",
+      "maxLength": 50
+    },
+    "timestamp": {
+      "description": "Date and time at which the event occurred.\r\n",
+      "type": "string",
+      "format": "date-time"
+    },
+    "techInfo": {
+      "description": "Additional information about the occurred security event.\r\n",
+      "type": "string",
+      "maxLength": 255
+    }
+  },
+  "required": [
+    "type",
+    "timestamp"
+  ]
+}

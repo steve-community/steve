@@ -1,0 +1,137 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetTariffsResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "TariffGetStatusEnumType": {
+            "description": "Status of operation\r\n",
+            "javaType": "TariffGetStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected",
+                "NoTariff"
+            ]
+        },
+        "TariffKindEnumType": {
+            "description": "Kind of tariff (driver/default)\r\n",
+            "javaType": "TariffKindEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "DefaultTariff",
+                "DriverTariff"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "TariffAssignmentType": {
+            "description": "Shows assignment of tariffs to EVSE or IdToken.\r\n",
+            "javaType": "TariffAssignment",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tariffId": {
+                    "description": "Tariff id.\r\n",
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "tariffKind": {
+                    "$ref": "#/definitions/TariffKindEnumType"
+                },
+                "validFrom": {
+                    "description": "Date/time when this tariff become active.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "evseIds": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0.0
+                    },
+                    "minItems": 1
+                },
+                "idTokens": {
+                    "description": "IdTokens related to tariff\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "minItems": 1
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "tariffId",
+                "tariffKind"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "status": {
+            "$ref": "#/definitions/TariffGetStatusEnumType"
+        },
+        "statusInfo": {
+            "$ref": "#/definitions/StatusInfoType"
+        },
+        "tariffAssignments": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/TariffAssignmentType"
+            },
+            "minItems": 1
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "status"
+    ]
+}

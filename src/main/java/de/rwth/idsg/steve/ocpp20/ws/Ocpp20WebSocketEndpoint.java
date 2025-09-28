@@ -23,6 +23,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.rwth.idsg.steve.ocpp20.config.Ocpp20Configuration;
 import de.rwth.idsg.steve.ocpp20.model.*;
 import de.rwth.idsg.steve.ocpp20.service.CentralSystemService20;
+import de.rwth.idsg.steve.ocpp20.service.Ocpp20MessageDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,6 +45,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
 
     private final CentralSystemService20 centralSystemService;
     private final Ocpp20Configuration ocpp20Config;
+    private final Ocpp20MessageDispatcher messageDispatcher;
     private final ObjectMapper objectMapper = createObjectMapper();
     private final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
@@ -64,6 +66,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
         }
 
         sessionMap.put(chargeBoxId, session);
+        messageDispatcher.registerSession(chargeBoxId, session);
         log.info("OCPP 2.0 WebSocket connection established for '{}'", chargeBoxId);
     }
 
@@ -88,9 +91,13 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
             if (messageTypeId == 2) {
                 handleCallMessage(session, chargeBoxId, messageId, jsonArray);
             } else if (messageTypeId == 3) {
-                log.debug("CallResult from '{}' for messageId '{}'", chargeBoxId, messageId);
+                Object responsePayload = jsonArray.get(2);
+                messageDispatcher.handleCallResult(messageId, responsePayload);
             } else if (messageTypeId == 4) {
-                log.warn("CallError from '{}' for messageId '{}'", chargeBoxId, messageId);
+                String errorCode = (String) jsonArray.get(2);
+                String errorDescription = (String) jsonArray.get(3);
+                Object errorDetails = jsonArray.size() > 4 ? jsonArray.get(4) : null;
+                messageDispatcher.handleCallError(messageId, errorCode, errorDescription, errorDetails);
             } else {
                 sendError(session, messageId, "MessageTypeNotSupported", "Unknown message type: " + messageTypeId);
             }
@@ -227,6 +234,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         String chargeBoxId = extractChargeBoxId(session);
         sessionMap.remove(chargeBoxId);
+        messageDispatcher.unregisterSession(chargeBoxId);
         log.info("OCPP 2.0 WebSocket connection closed for '{}': {}", chargeBoxId, status);
     }
 

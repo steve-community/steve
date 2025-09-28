@@ -1,0 +1,254 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:SetNetworkProfileRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "APNAuthenticationEnumType": {
+            "description": "Authentication method.\r\n",
+            "javaType": "APNAuthenticationEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "PAP",
+                "CHAP",
+                "NONE",
+                "AUTO"
+            ]
+        },
+        "OCPPInterfaceEnumType": {
+            "description": "Applicable Network Interface. Charging Station is allowed to use a different network interface to connect if the given one does not work.\r\n",
+            "javaType": "OCPPInterfaceEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Wired0",
+                "Wired1",
+                "Wired2",
+                "Wired3",
+                "Wireless0",
+                "Wireless1",
+                "Wireless2",
+                "Wireless3",
+                "Any"
+            ]
+        },
+        "OCPPTransportEnumType": {
+            "description": "Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.x, but is supported by earlier versions of OCPP.\r\n",
+            "javaType": "OCPPTransportEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "SOAP",
+                "JSON"
+            ]
+        },
+        "OCPPVersionEnumType": {
+            "description": "*(2.1)* This field is ignored, since the OCPP version to use is determined during the websocket handshake. The field is only kept for backwards compatibility with the OCPP 2.0.1 JSON schema.\r\n",
+            "javaType": "OCPPVersionEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "OCPP12",
+                "OCPP15",
+                "OCPP16",
+                "OCPP20",
+                "OCPP201",
+                "OCPP21"
+            ]
+        },
+        "VPNEnumType": {
+            "description": "Type of VPN\r\n",
+            "javaType": "VPNEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "IKEv2",
+                "IPSec",
+                "L2TP",
+                "PPTP"
+            ]
+        },
+        "APNType": {
+            "description": "Collection of configuration data needed to make a data-connection over a cellular network.\r\n\r\nNOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.\r\n",
+            "javaType": "APN",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "apn": {
+                    "description": "The Access Point Name as an URL.\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "apnUserName": {
+                    "description": "APN username.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "apnPassword": {
+                    "description": "*(2.1)* APN Password.\r\n",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "simPin": {
+                    "description": "SIM card pin code.\r\n",
+                    "type": "integer"
+                },
+                "preferredNetwork": {
+                    "description": "Preferred network, written as MCC and MNC concatenated. See note.\r\n",
+                    "type": "string",
+                    "maxLength": 6
+                },
+                "useOnlyPreferredNetwork": {
+                    "description": "Default: false. Use only the preferred Network, do\r\nnot dial in when not available. See Note.\r\n",
+                    "type": "boolean",
+                    "default": false
+                },
+                "apnAuthentication": {
+                    "$ref": "#/definitions/APNAuthenticationEnumType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "apn",
+                "apnAuthentication"
+            ]
+        },
+        "NetworkConnectionProfileType": {
+            "description": "The NetworkConnectionProfile defines the functional and technical parameters of a communication link.\r\n",
+            "javaType": "NetworkConnectionProfile",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "apn": {
+                    "$ref": "#/definitions/APNType"
+                },
+                "ocppVersion": {
+                    "$ref": "#/definitions/OCPPVersionEnumType"
+                },
+                "ocppInterface": {
+                    "$ref": "#/definitions/OCPPInterfaceEnumType"
+                },
+                "ocppTransport": {
+                    "$ref": "#/definitions/OCPPTransportEnumType"
+                },
+                "messageTimeout": {
+                    "description": "Duration in seconds before a message send by the Charging Station via this network connection times-out.\r\nThe best setting depends on the underlying network and response times of the CSMS.\r\nIf you are looking for a some guideline: use 30 seconds as a starting point.\r\n",
+                    "type": "integer"
+                },
+                "ocppCsmsUrl": {
+                    "description": "URL of the CSMS(s) that this Charging Station communicates with, without the Charging Station identity part. +\r\nThe SecurityCtrlr.Identity field is appended to _ocppCsmsUrl_ to provide the full websocket URL.\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "securityProfile": {
+                    "description": "This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "identity": {
+                    "description": "*(2.1)* Charging Station identity to be used as the basic authentication username.\r\n",
+                    "type": "string",
+                    "maxLength": 48
+                },
+                "basicAuthPassword": {
+                    "description": "*(2.1)* BasicAuthPassword to use for security profile 1 or 2.\r\n",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "vpn": {
+                    "$ref": "#/definitions/VPNType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "ocppInterface",
+                "ocppTransport",
+                "messageTimeout",
+                "ocppCsmsUrl",
+                "securityProfile"
+            ]
+        },
+        "VPNType": {
+            "description": "VPN Configuration settings\r\n",
+            "javaType": "VPN",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "server": {
+                    "description": "VPN Server Address\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "user": {
+                    "description": "VPN User\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "group": {
+                    "description": "VPN group.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "password": {
+                    "description": "*(2.1)* VPN Password.\r\n",
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "key": {
+                    "description": "VPN shared secret.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "$ref": "#/definitions/VPNEnumType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "server",
+                "user",
+                "password",
+                "key",
+                "type"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "configurationSlot": {
+            "description": "Slot in which the configuration should be stored.\r\n",
+            "type": "integer"
+        },
+        "connectionData": {
+            "$ref": "#/definitions/NetworkConnectionProfileType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "configurationSlot",
+        "connectionData"
+    ]
+}

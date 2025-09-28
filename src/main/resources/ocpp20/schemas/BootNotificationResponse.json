@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:BootNotificationResponse",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "RegistrationStatusEnumType": {
+      "description": "This contains whether the Charging Station has been registered\r\nwithin the CSMS.\r\n",
+      "javaType": "RegistrationStatusEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Pending",
+        "Rejected"
+      ]
+    },
+    "StatusInfoType": {
+      "description": "Element providing more information about the status.\r\n",
+      "javaType": "StatusInfo",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "reasonCode": {
+          "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+          "type": "string",
+          "maxLength": 20
+        },
+        "additionalInfo": {
+          "description": "Additional text to provide detailed information.\r\n",
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "reasonCode"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "currentTime": {
+      "description": "This contains the CSMS’s current time.\r\n",
+      "type": "string",
+      "format": "date-time"
+    },
+    "interval": {
+      "description": "When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.\r\n",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/definitions/RegistrationStatusEnumType"
+    },
+    "statusInfo": {
+      "$ref": "#/definitions/StatusInfoType"
+    }
+  },
+  "required": [
+    "currentTime",
+    "interval",
+    "status"
+  ]
+}

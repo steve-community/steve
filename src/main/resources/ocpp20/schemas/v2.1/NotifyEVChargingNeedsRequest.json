@@ -1,0 +1,740 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:NotifyEVChargingNeedsRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ControlModeEnumType": {
+            "description": "*(2.1)* Indicates whether EV wants to operate in Dynamic or Scheduled mode. When absent, Scheduled mode is assumed for backwards compatibility. +\r\n*ISO 15118-20:* +\r\nServiceSelectionReq(SelectedEnergyTransferService)\r\n",
+            "javaType": "ControlModeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "ScheduledControl",
+                "DynamicControl"
+            ]
+        },
+        "DERControlEnumType": {
+            "javaType": "DERControlEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "EnterService",
+                "FreqDroop",
+                "FreqWatt",
+                "FixedPFAbsorb",
+                "FixedPFInject",
+                "FixedVar",
+                "Gradients",
+                "HFMustTrip",
+                "HFMayTrip",
+                "HVMustTrip",
+                "HVMomCess",
+                "HVMayTrip",
+                "LimitMaxDischarge",
+                "LFMustTrip",
+                "LVMustTrip",
+                "LVMomCess",
+                "LVMayTrip",
+                "PowerMonitoringMustTrip",
+                "VoltVar",
+                "VoltWatt",
+                "WattPF",
+                "WattVar"
+            ]
+        },
+        "EnergyTransferModeEnumType": {
+            "description": "Mode of energy transfer requested by the EV.\r\n",
+            "javaType": "EnergyTransferModeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "AC_single_phase",
+                "AC_two_phase",
+                "AC_three_phase",
+                "DC",
+                "AC_BPT",
+                "AC_BPT_DER",
+                "AC_DER",
+                "DC_BPT",
+                "DC_ACDP",
+                "DC_ACDP_BPT",
+                "WPT"
+            ]
+        },
+        "IslandingDetectionEnumType": {
+            "javaType": "IslandingDetectionEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "NoAntiIslandingSupport",
+                "RoCoF",
+                "UVP_OVP",
+                "UFP_OFP",
+                "VoltageVectorShift",
+                "ZeroCrossingDetection",
+                "OtherPassive",
+                "ImpedanceMeasurement",
+                "ImpedanceAtFrequency",
+                "SlipModeFrequencyShift",
+                "SandiaFrequencyShift",
+                "SandiaVoltageShift",
+                "FrequencyJump",
+                "RCLQFactor",
+                "OtherActive"
+            ]
+        },
+        "MobilityNeedsModeEnumType": {
+            "description": "*(2.1)* Value of EVCC indicates that EV determines min/target SOC and departure time. +\r\nA value of EVCC_SECC indicates that charging station or CSMS may also update min/target SOC and departure time. +\r\n*ISO 15118-20:* +\r\nServiceSelectionReq(SelectedEnergyTransferService)\r\n",
+            "javaType": "MobilityNeedsModeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "EVCC",
+                "EVCC_SECC"
+            ]
+        },
+        "ACChargingParametersType": {
+            "description": "EV AC charging parameters for ISO 15118-2\r\n\r\n",
+            "javaType": "ACChargingParameters",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "energyAmount": {
+                    "description": "Amount of energy requested (in Wh). This includes energy required for preconditioning.\r\nRelates to: +\r\n*ISO 15118-2*: AC_EVChargeParameterType: EAmount +\r\n*ISO 15118-20*: Dynamic/Scheduled_SEReqControlModeType: EVTargetEnergyRequest\r\n\r\n",
+                    "type": "number"
+                },
+                "evMinCurrent": {
+                    "description": "Minimum current (amps) supported by the electric vehicle (per phase).\r\nRelates to: +\r\n*ISO 15118-2*: AC_EVChargeParameterType: EVMinCurrent\r\n\r\n",
+                    "type": "number"
+                },
+                "evMaxCurrent": {
+                    "description": "Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.\r\nRelates to: +\r\n*ISO 15118-2*: AC_EVChargeParameterType: EVMaxCurrent\r\n\r\n",
+                    "type": "number"
+                },
+                "evMaxVoltage": {
+                    "description": "Maximum voltage supported by the electric vehicle.\r\nRelates to: +\r\n*ISO 15118-2*: AC_EVChargeParameterType: EVMaxVoltage\r\n\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "energyAmount",
+                "evMinCurrent",
+                "evMaxCurrent",
+                "evMaxVoltage"
+            ]
+        },
+        "ChargingNeedsType": {
+            "javaType": "ChargingNeeds",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "acChargingParameters": {
+                    "$ref": "#/definitions/ACChargingParametersType"
+                },
+                "derChargingParameters": {
+                    "$ref": "#/definitions/DERChargingParametersType"
+                },
+                "evEnergyOffer": {
+                    "$ref": "#/definitions/EVEnergyOfferType"
+                },
+                "requestedEnergyTransfer": {
+                    "$ref": "#/definitions/EnergyTransferModeEnumType"
+                },
+                "dcChargingParameters": {
+                    "$ref": "#/definitions/DCChargingParametersType"
+                },
+                "v2xChargingParameters": {
+                    "$ref": "#/definitions/V2XChargingParametersType"
+                },
+                "availableEnergyTransfer": {
+                    "description": "*(2.1)* Modes of energy transfer that are marked as available by EV.\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/EnergyTransferModeEnumType"
+                    },
+                    "minItems": 1
+                },
+                "controlMode": {
+                    "$ref": "#/definitions/ControlModeEnumType"
+                },
+                "mobilityNeedsMode": {
+                    "$ref": "#/definitions/MobilityNeedsModeEnumType"
+                },
+                "departureTime": {
+                    "description": "Estimated departure time of the EV. +\r\n*ISO 15118-2:* AC/DC_EVChargeParameterType: DepartureTime +\r\n*ISO 15118-20:* Dynamic/Scheduled_SEReqControlModeType: DepartureTIme\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "requestedEnergyTransfer"
+            ]
+        },
+        "DCChargingParametersType": {
+            "description": "EV DC charging parameters for ISO 15118-2\r\n",
+            "javaType": "DCChargingParameters",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evMaxCurrent": {
+                    "description": "Maximum current (in A) supported by the electric vehicle. Includes cable capacity.\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType:EVMaximumCurrentLimit\r\n",
+                    "type": "number"
+                },
+                "evMaxVoltage": {
+                    "description": "Maximum voltage supported by the electric vehicle.\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: EVMaximumVoltageLimit\r\n\r\n",
+                    "type": "number"
+                },
+                "evMaxPower": {
+                    "description": "Maximum power (in W) supported by the electric vehicle. Required for DC charging.\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: EVMaximumPowerLimit\r\n\r\n",
+                    "type": "number"
+                },
+                "evEnergyCapacity": {
+                    "description": "Capacity of the electric vehicle battery (in Wh).\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: EVEnergyCapacity\r\n\r\n",
+                    "type": "number"
+                },
+                "energyAmount": {
+                    "description": "Amount of energy requested (in Wh). This inludes energy required for preconditioning.\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: EVEnergyRequest\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "stateOfCharge": {
+                    "description": "Energy available in the battery (in percent of the battery capacity)\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: DC_EVStatus: EVRESSSOC\r\n\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "fullSoC": {
+                    "description": "Percentage of SoC at which the EV considers the battery fully charged. (possible values: 0 - 100)\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: FullSOC\r\n\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "bulkSoC": {
+                    "description": "Percentage of SoC at which the EV considers a fast charging process to end. (possible values: 0 - 100)\r\nRelates to: +\r\n*ISO 15118-2*: DC_EVChargeParameterType: BulkSOC\r\n\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "evMaxCurrent",
+                "evMaxVoltage"
+            ]
+        },
+        "DERChargingParametersType": {
+            "description": "*(2.1)* DERChargingParametersType is used in ChargingNeedsType during an ISO 15118-20 session for AC_BPT_DER to report the inverter settings related to DER control that were agreed between EVSE and EV.\r\n\r\nFields starting with \"ev\" contain values from the EV.\r\nOther fields contain a value that is supported by both EV and EVSE.\r\n\r\nDERChargingParametersType type is only relevant in case of an ISO 15118-20 AC_BPT_DER/AC_DER charging session.\r\n\r\nNOTE: All these fields have values greater or equal to zero (i.e. are non-negative)\r\n\r\n",
+            "javaType": "DERChargingParameters",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evSupportedDERControl": {
+                    "description": "DER control functions supported by EV. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType:DERControlFunctions (bitmap)\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/DERControlEnumType"
+                    },
+                    "minItems": 1
+                },
+                "evOverExcitedMaxDischargePower": {
+                    "description": "Rated maximum injected active power by EV, at specified over-excited power factor (overExcitedPowerFactor). +\r\nIt can also be defined as the rated maximum discharge power at the rated minimum injected reactive power value. This means that if the EV is providing reactive power support, and it is requested to discharge at max power (e.g. to satisfy an EMS request), the EV may override the request and discharge up to overExcitedMaximumDischargePower to meet the minimum reactive power requirements. +\r\nCorresponds to the WOvPF attribute in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVOverExcitedMaximumDischargePower\r\n",
+                    "type": "number"
+                },
+                "evOverExcitedPowerFactor": {
+                    "description": "EV power factor when injecting (over excited) the minimum reactive power. +\r\nCorresponds to the OvPF attribute in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVOverExcitedPowerFactor\r\n",
+                    "type": "number"
+                },
+                "evUnderExcitedMaxDischargePower": {
+                    "description": "Rated maximum injected active power by EV supported at specified under-excited power factor (EVUnderExcitedPowerFactor). +\r\nIt can also be defined as the rated maximum dischargePower at the rated minimum absorbed reactive power value.\r\nThis means that if the EV is providing reactive power support, and it is requested to discharge at max power (e.g. to satisfy an EMS request), the EV may override the request and discharge up to underExcitedMaximumDischargePower to meet the minimum reactive power requirements. +\r\nThis corresponds to the WUnPF attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVUnderExcitedMaximumDischargePower\r\n",
+                    "type": "number"
+                },
+                "evUnderExcitedPowerFactor": {
+                    "description": "EV power factor when injecting (under excited) the minimum reactive power. +\r\nCorresponds to the OvPF attribute in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVUnderExcitedPowerFactor\r\n",
+                    "type": "number"
+                },
+                "maxApparentPower": {
+                    "description": "Rated maximum total apparent power, defined by min(EV, EVSE) in va.\r\nCorresponds to the VAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumApparentPower\r\n",
+                    "type": "number"
+                },
+                "maxChargeApparentPower": {
+                    "description": "Rated maximum absorbed apparent power, defined by min(EV, EVSE) in va. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\n    Corresponds to the ChaVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeApparentPower\r\n",
+                    "type": "number"
+                },
+                "maxChargeApparentPower_L2": {
+                    "description": "Rated maximum absorbed apparent power on phase L2, defined by min(EV, EVSE) in va.\r\nCorresponds to the ChaVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeApparentPower_L2\r\n",
+                    "type": "number"
+                },
+                "maxChargeApparentPower_L3": {
+                    "description": "Rated maximum absorbed apparent power on phase L3, defined by min(EV, EVSE) in va.\r\nCorresponds to the ChaVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeApparentPower_L3\r\n",
+                    "type": "number"
+                },
+                "maxDischargeApparentPower": {
+                    "description": "Rated maximum injected apparent power, defined by min(EV, EVSE) in va. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\n    Corresponds to the DisVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeApparentPower\r\n",
+                    "type": "number"
+                },
+                "maxDischargeApparentPower_L2": {
+                    "description": "Rated maximum injected apparent power on phase L2, defined by min(EV, EVSE) in va. +\r\n    Corresponds to the DisVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeApparentPower_L2\r\n",
+                    "type": "number"
+                },
+                "maxDischargeApparentPower_L3": {
+                    "description": "Rated maximum injected apparent power on phase L3, defined by min(EV, EVSE) in va. +\r\n    Corresponds to the DisVAMaxRtg in IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeApparentPower_L3\r\n",
+                    "type": "number"
+                },
+                "maxChargeReactivePower": {
+                    "description": "Rated maximum absorbed reactive power, defined by min(EV, EVSE), in vars. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\nCorresponds to the AvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeReactivePower\r\n",
+                    "type": "number"
+                },
+                "maxChargeReactivePower_L2": {
+                    "description": "Rated maximum absorbed reactive power, defined by min(EV, EVSE), in vars on phase L2. +\r\nCorresponds to the AvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeReactivePower_L2\r\n",
+                    "type": "number"
+                },
+                "maxChargeReactivePower_L3": {
+                    "description": "Rated maximum absorbed reactive power, defined by min(EV, EVSE), in vars on phase L3. +\r\nCorresponds to the AvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumChargeReactivePower_L3\r\n",
+                    "type": "number"
+                },
+                "minChargeReactivePower": {
+                    "description": "Rated minimum absorbed reactive power, defined by max(EV, EVSE), in vars. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumChargeReactivePower\r\n",
+                    "type": "number"
+                },
+                "minChargeReactivePower_L2": {
+                    "description": "Rated minimum absorbed reactive power, defined by max(EV, EVSE), in vars on phase L2. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumChargeReactivePower_L2\r\n",
+                    "type": "number"
+                },
+                "minChargeReactivePower_L3": {
+                    "description": "Rated minimum absorbed reactive power, defined by max(EV, EVSE), in vars on phase L3. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumChargeReactivePower_L3\r\n",
+                    "type": "number"
+                },
+                "maxDischargeReactivePower": {
+                    "description": "Rated maximum injected reactive power, defined by min(EV, EVSE), in vars. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\nCorresponds to the IvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeReactivePower\r\n",
+                    "type": "number"
+                },
+                "maxDischargeReactivePower_L2": {
+                    "description": "Rated maximum injected reactive power, defined by min(EV, EVSE), in vars on phase L2. +\r\nCorresponds to the IvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeReactivePower_L2\r\n",
+                    "type": "number"
+                },
+                "maxDischargeReactivePower_L3": {
+                    "description": "Rated maximum injected reactive power, defined by min(EV, EVSE), in vars on phase L3. +\r\nCorresponds to the IvarMax attribute in the IEC 61850. +\r\n    *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumDischargeReactivePower_L3\r\n",
+                    "type": "number"
+                },
+                "minDischargeReactivePower": {
+                    "description": "Rated minimum injected reactive power, defined by max(EV, EVSE), in vars. +\r\n    This field represents the sum of all phases, unless values are provided for L2 and L3,\r\n    in which case this field represents phase L1. +\r\n        *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumDischargeReactivePower\r\n",
+                    "type": "number"
+                },
+                "minDischargeReactivePower_L2": {
+                    "description": "Rated minimum injected reactive power, defined by max(EV, EVSE), in var on phase L2. +\r\n        *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumDischargeReactivePower_L2\r\n",
+                    "type": "number"
+                },
+                "minDischargeReactivePower_L3": {
+                    "description": "Rated minimum injected reactive power, defined by max(EV, EVSE), in var on phase L3. +\r\n        *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumDischargeReactivePower_L3\r\n",
+                    "type": "number"
+                },
+                "nominalVoltage": {
+                    "description": "Line voltage supported by EVSE and EV.\r\n        *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVNominalVoltage\r\n",
+                    "type": "number"
+                },
+                "nominalVoltageOffset": {
+                    "description": "The nominal AC voltage (rms) offset between the Charging Station's electrical connection point and the utility\u2019s point of common coupling. +\r\n        *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVNominalVoltageOffset\r\n",
+                    "type": "number"
+                },
+                "maxNominalVoltage": {
+                    "description": "Maximum AC rms voltage, as defined by min(EV, EVSE)  to operate with. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumNominalVoltage\r\n",
+                    "type": "number"
+                },
+                "minNominalVoltage": {
+                    "description": "Minimum AC rms voltage, as defined by max(EV, EVSE)  to operate with. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMinimumNominalVoltage\r\n",
+                    "type": "number"
+                },
+                "evInverterManufacturer": {
+                    "description": "Manufacturer of the EV inverter. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVInverterManufacturer\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "evInverterModel": {
+                    "description": "Model name of the EV inverter. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVInverterModel\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "evInverterSerialNumber": {
+                    "description": "Serial number of the EV inverter. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVInverterSerialNumber\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "evInverterSwVersion": {
+                    "description": "Software version of EV inverter. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVInverterSwVersion\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "evInverterHwVersion": {
+                    "description": "Hardware version of EV inverter. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVInverterHwVersion\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "evIslandingDetectionMethod": {
+                    "description": "Type of islanding detection method. Only mandatory when islanding detection is required at the site, as set in the ISO 15118 Service Details configuration. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVIslandingDetectionMethod\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/IslandingDetectionEnumType"
+                    },
+                    "minItems": 1
+                },
+                "evIslandingTripTime": {
+                    "description": "Time after which EV will trip if an island has been detected. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVIslandingTripTime\r\n",
+                    "type": "number"
+                },
+                "evMaximumLevel1DCInjection": {
+                    "description": "Maximum injected DC current allowed at level 1 charging. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumLevel1DCInjection\r\n",
+                    "type": "number"
+                },
+                "evDurationLevel1DCInjection": {
+                    "description": "Maximum allowed duration of DC injection at level 1 charging. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVDurationLevel1DCInjection\r\n",
+                    "type": "number"
+                },
+                "evMaximumLevel2DCInjection": {
+                    "description": "Maximum injected DC current allowed at level 2 charging. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVMaximumLevel2DCInjection\r\n",
+                    "type": "number"
+                },
+                "evDurationLevel2DCInjection": {
+                    "description": "Maximum allowed duration of DC injection at level 2 charging. +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVDurationLevel2DCInjection\r\n",
+                    "type": "number"
+                },
+                "evReactiveSusceptance": {
+                    "description": "\tMeasure of the susceptibility of the circuit to reactance, in Siemens (S). +\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVReactiveSusceptance\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "evSessionTotalDischargeEnergyAvailable": {
+                    "description": "Total energy value, in Wh, that EV is allowed to provide during the entire V2G session. The value is independent of the V2X Cycling area. Once this value reaches the value of 0, the EV may block any attempt to discharge in order to protect the battery health.\r\n       *ISO 15118-20*: DER_BPT_AC_CPDReqEnergyTransferModeType: EVSessionTotalDischargeEnergyAvailable\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "EVAbsolutePriceScheduleEntryType": {
+            "description": "*(2.1)* An entry in price schedule over time for which EV is willing to discharge.\r\n",
+            "javaType": "EVAbsolutePriceScheduleEntry",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "duration": {
+                    "description": "The amount of seconds of this entry.\r\n",
+                    "type": "integer"
+                },
+                "evPriceRule": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/EVPriceRuleType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 8
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "duration",
+                "evPriceRule"
+            ]
+        },
+        "EVAbsolutePriceScheduleType": {
+            "description": "*(2.1)* Price schedule of EV energy offer.\r\n",
+            "javaType": "EVAbsolutePriceSchedule",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "timeAnchor": {
+                    "description": "Starting point in time of the EVEnergyOffer.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "currency": {
+                    "description": "Currency code according to ISO 4217.\r\n",
+                    "type": "string",
+                    "maxLength": 3
+                },
+                "evAbsolutePriceScheduleEntries": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/EVAbsolutePriceScheduleEntryType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1024
+                },
+                "priceAlgorithm": {
+                    "description": "ISO 15118-20 URN of price algorithm: Power, PeakPower, StackedEnergy.\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "timeAnchor",
+                "currency",
+                "priceAlgorithm",
+                "evAbsolutePriceScheduleEntries"
+            ]
+        },
+        "EVEnergyOfferType": {
+            "description": "*(2.1)* A schedule of the energy amount over time that EV is willing to discharge. A negative value indicates the willingness to discharge under specific conditions, a positive value indicates that the EV currently is not able to offer energy to discharge. \r\n",
+            "javaType": "EVEnergyOffer",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evAbsolutePriceSchedule": {
+                    "$ref": "#/definitions/EVAbsolutePriceScheduleType"
+                },
+                "evPowerSchedule": {
+                    "$ref": "#/definitions/EVPowerScheduleType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "evPowerSchedule"
+            ]
+        },
+        "EVPowerScheduleEntryType": {
+            "description": "*(2.1)* An entry in schedule of the energy amount over time that EV is willing to discharge. A negative value indicates the willingness to discharge under specific conditions, a positive value indicates that the EV currently is not able to offer energy to discharge.\r\n",
+            "javaType": "EVPowerScheduleEntry",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "duration": {
+                    "description": "The duration of this entry.\r\n",
+                    "type": "integer"
+                },
+                "power": {
+                    "description": "Defines maximum amount of power for the duration of this EVPowerScheduleEntry to be discharged from the EV battery through EVSE power outlet. Negative values are used for discharging.\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "duration",
+                "power"
+            ]
+        },
+        "EVPowerScheduleType": {
+            "description": "*(2.1)* Schedule of EV energy offer.\r\n",
+            "javaType": "EVPowerSchedule",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evPowerScheduleEntries": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/EVPowerScheduleEntryType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1024
+                },
+                "timeAnchor": {
+                    "description": "The time that defines the starting point for the EVEnergyOffer.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "timeAnchor",
+                "evPowerScheduleEntries"
+            ]
+        },
+        "EVPriceRuleType": {
+            "description": "*(2.1)* An entry in price schedule over time for which EV is willing to discharge.\r\n",
+            "javaType": "EVPriceRule",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "energyFee": {
+                    "description": "Cost per kWh.\r\n",
+                    "type": "number"
+                },
+                "powerRangeStart": {
+                    "description": "The EnergyFee applies between this value and the value of the PowerRangeStart of the subsequent EVPriceRule. If the power is below this value, the EnergyFee of the previous EVPriceRule applies. Negative values are used for discharging.\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "energyFee",
+                "powerRangeStart"
+            ]
+        },
+        "V2XChargingParametersType": {
+            "description": "Charging parameters for ISO 15118-20, also supporting V2X charging/discharging.+\r\nAll values are greater or equal to zero, with the exception of EVMinEnergyRequest, EVMaxEnergyRequest, EVTargetEnergyRequest, EVMinV2XEnergyRequest and EVMaxV2XEnergyRequest.\r\n",
+            "javaType": "V2XChargingParameters",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "minChargePower": {
+                    "description": "Minimum charge power in W, defined by max(EV, EVSE).\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumChargePower\r\n",
+                    "type": "number"
+                },
+                "minChargePower_L2": {
+                    "description": "Minimum charge power on phase L2 in W, defined by max(EV, EVSE).\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumChargePower_L2\r\n",
+                    "type": "number"
+                },
+                "minChargePower_L3": {
+                    "description": "Minimum charge power on phase L3 in W, defined by max(EV, EVSE).\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumChargePower_L3\r\n",
+                    "type": "number"
+                },
+                "maxChargePower": {
+                    "description": "Maximum charge (absorbed) power in W, defined by min(EV, EVSE) at unity power factor. +\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\nIt corresponds to the ChaWMax attribute in the IEC 61850.\r\nIt is usually equivalent to the rated apparent power of the EV when discharging (ChaVAMax) in IEC 61850. +\r\n\r\nRelates to: \r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumChargePower\r\n\r\n",
+                    "type": "number"
+                },
+                "maxChargePower_L2": {
+                    "description": "Maximum charge power on phase L2 in W, defined by min(EV, EVSE)\r\nRelates to: \r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumChargePower_L2\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "maxChargePower_L3": {
+                    "description": "Maximum charge power on phase L3 in W, defined by min(EV, EVSE)\r\nRelates to: \r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumChargePower_L3\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "minDischargePower": {
+                    "description": "Minimum discharge (injected) power in W, defined by max(EV, EVSE) at unity power factor. Value &gt;= 0. +\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1. +\r\nIt corresponds to the WMax attribute in the IEC 61850.\r\nIt is usually equivalent to the rated apparent power of the EV when discharging (VAMax attribute in the IEC 61850).\r\n\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumDischargePower\r\n\r\n",
+                    "type": "number"
+                },
+                "minDischargePower_L2": {
+                    "description": "Minimum discharge power on phase L2 in W, defined by max(EV, EVSE).  Value &gt;= 0.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumDischargePower_L2\r\n\r\n",
+                    "type": "number"
+                },
+                "minDischargePower_L3": {
+                    "description": "Minimum discharge power on phase L3 in W, defined by max(EV, EVSE).  Value &gt;= 0.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMinimumDischargePower_L3\r\n\r\n",
+                    "type": "number"
+                },
+                "maxDischargePower": {
+                    "description": "Maximum discharge (injected) power in W, defined by min(EV, EVSE) at unity power factor.  Value &gt;= 0.\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumDischargePower\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "maxDischargePower_L2": {
+                    "description": "Maximum discharge power on phase L2 in W, defined by min(EV, EVSE).  Value &gt;= 0.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumDischargePowe_L2\r\n\r\n",
+                    "type": "number"
+                },
+                "maxDischargePower_L3": {
+                    "description": "Maximum discharge power on phase L3 in W, defined by min(EV, EVSE).  Value &gt;= 0.\r\nRelates to:\r\n*ISO 15118-20*: BPT_AC/DC_CPDReqEnergyTransferModeType: EVMaximumDischargePower_L3\r\n\r\n",
+                    "type": "number"
+                },
+                "minChargeCurrent": {
+                    "description": "Minimum charge current in A, defined by max(EV, EVSE)\r\nRelates to: \r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMinimumChargeCurrent\r\n\r\n",
+                    "type": "number"
+                },
+                "maxChargeCurrent": {
+                    "description": "Maximum charge current in A, defined by min(EV, EVSE)\r\nRelates to: \r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMaximumChargeCurrent\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "minDischargeCurrent": {
+                    "description": "Minimum discharge current in A, defined by max(EV, EVSE).  Value &gt;= 0.\r\nRelates to: \r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMinimumDischargeCurrent\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "maxDischargeCurrent": {
+                    "description": "Maximum discharge current in A, defined by min(EV, EVSE).  Value &gt;= 0.\r\nRelates to: \r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMaximumDischargeCurrent\r\n\r\n",
+                    "type": "number"
+                },
+                "minVoltage": {
+                    "description": "Minimum voltage in V, defined by max(EV, EVSE)\r\nRelates to:\r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMinimumVoltage\r\n\r\n",
+                    "type": "number"
+                },
+                "maxVoltage": {
+                    "description": "Maximum voltage in V, defined by min(EV, EVSE)\r\nRelates to:\r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: EVMaximumVoltage\r\n\r\n",
+                    "type": "number"
+                },
+                "evTargetEnergyRequest": {
+                    "description": "Energy to requested state of charge in Wh\r\nRelates to:\r\n*ISO 15118-20*: Dynamic/Scheduled_SEReqControlModeType: EVTargetEnergyRequest\r\n\r\n",
+                    "type": "number"
+                },
+                "evMinEnergyRequest": {
+                    "description": "Energy to minimum allowed state of charge in Wh\r\nRelates to:\r\n*ISO 15118-20*: Dynamic/Scheduled_SEReqControlModeType: EVMinimumEnergyRequest\r\n\r\n",
+                    "type": "number"
+                },
+                "evMaxEnergyRequest": {
+                    "description": "Energy to maximum state of charge in Wh\r\nRelates to:\r\n*ISO 15118-20*: Dynamic/Scheduled_SEReqControlModeType: EVMaximumEnergyRequest\r\n\r\n",
+                    "type": "number"
+                },
+                "evMinV2XEnergyRequest": {
+                    "description": "Energy (in Wh) to minimum state of charge for cycling (V2X) activity. \r\nPositive value means that current state of charge is below V2X range.\r\nRelates to:\r\n*ISO 15118-20*: Dynamic_SEReqControlModeType: EVMinimumV2XEnergyRequest\r\n\r\n",
+                    "type": "number"
+                },
+                "evMaxV2XEnergyRequest": {
+                    "description": "Energy (in Wh) to maximum state of charge for cycling (V2X) activity.\r\nNegative value indicates that current state of charge is above V2X range.\r\nRelates to:\r\n*ISO 15118-20*: Dynamic_SEReqControlModeType: EVMaximumV2XEnergyRequest\r\n\r\n\r\n",
+                    "type": "number"
+                },
+                "targetSoC": {
+                    "description": "Target state of charge at departure as percentage.\r\nRelates to:\r\n*ISO 15118-20*: BPT_DC_CPDReqEnergyTransferModeType: TargetSOC\r\n\r\n",
+                    "type": "integer",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "evseId": {
+            "description": "Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.\r\n",
+            "type": "integer",
+            "minimum": 1.0
+        },
+        "maxScheduleTuples": {
+            "description": "Contains the maximum elements the EV supports for: +\r\n- ISO 15118-2: schedule tuples in SASchedule (both Pmax and Tariff). +\r\n- ISO 15118-20: PowerScheduleEntry, PriceRule and PriceLevelScheduleEntries.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "chargingNeeds": {
+            "$ref": "#/definitions/ChargingNeedsType"
+        },
+        "timestamp": {
+            "description": "*(2.1)* Time when EV charging needs were received. +\r\nField can be added when charging station was offline when charging needs were received.\r\n\r\n",
+            "type": "string",
+            "format": "date-time"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "evseId",
+        "chargingNeeds"
+    ]
+}

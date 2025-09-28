@@ -1,0 +1,72 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:Get15118EVCertificateRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "CertificateActionEnumType": {
+            "description": "Defines whether certificate needs to be installed or updated.\r\n",
+            "javaType": "CertificateActionEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Install",
+                "Update"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "iso15118SchemaVersion": {
+            "description": "Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.\r\n\r\n",
+            "type": "string",
+            "maxLength": 50
+        },
+        "action": {
+            "$ref": "#/definitions/CertificateActionEnumType"
+        },
+        "exiRequest": {
+            "description": "*(2.1)* Raw CertificateInstallationReq request from EV, Base64 encoded. +\r\nExtended to support ISO 15118-20 certificates. The minimum supported length is 11000. If a longer _exiRequest_ is supported, then the supported length must be communicated in variable OCPPCommCtrlr.FieldLength[ \"Get15118EVCertificateRequest.exiRequest\" ].\r\n",
+            "type": "string",
+            "maxLength": 11000
+        },
+        "maximumContractCertificateChains": {
+            "description": "*(2.1)* Absent during ISO 15118-2 session. Required during ISO 15118-20 session. +\r\nMaximum number of contracts that EV wants to install.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "prioritizedEMAIDs": {
+            "description": "*(2.1)*  Absent during ISO 15118-2 session. Optional during ISO 15118-20 session. List of EMAIDs for which contract certificates must be requested first, in case there are more certificates than allowed by _maximumContractCertificateChains_.\r\n",
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "type": "string",
+                "maxLength": 255
+            },
+            "minItems": 1,
+            "maxItems": 8
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "iso15118SchemaVersion",
+        "action",
+        "exiRequest"
+    ]
+}

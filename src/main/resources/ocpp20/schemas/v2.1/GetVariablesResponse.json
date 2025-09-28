@@ -1,0 +1,198 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:GetVariablesResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "AttributeEnumType": {
+            "javaType": "AttributeEnum",
+            "type": "string",
+            "default": "Actual",
+            "additionalProperties": false,
+            "enum": [
+                "Actual",
+                "Target",
+                "MinSet",
+                "MaxSet"
+            ]
+        },
+        "GetVariableStatusEnumType": {
+            "javaType": "GetVariableStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected",
+                "UnknownComponent",
+                "UnknownVariable",
+                "NotSupportedAttributeType"
+            ]
+        },
+        "ComponentType": {
+            "description": "A physical or logical component\r\n",
+            "javaType": "Component",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evse": {
+                    "$ref": "#/definitions/EVSEType"
+                },
+                "name": {
+                    "description": "Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "instance": {
+                    "description": "Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "EVSEType": {
+            "description": "Electric Vehicle Supply Equipment\r\n",
+            "javaType": "EVSE",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "description": "EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "connectorId": {
+                    "description": "An id to designate a specific connector (on an EVSE) by connector index number.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "GetVariableResultType": {
+            "description": "Class to hold results of GetVariables request.\r\n",
+            "javaType": "GetVariableResult",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "attributeStatus": {
+                    "$ref": "#/definitions/GetVariableStatusEnumType"
+                },
+                "attributeStatusInfo": {
+                    "$ref": "#/definitions/StatusInfoType"
+                },
+                "attributeType": {
+                    "$ref": "#/definitions/AttributeEnumType"
+                },
+                "attributeValue": {
+                    "description": "Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.\r\n\r\nThe Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. \r\n\r\n",
+                    "type": "string",
+                    "maxLength": 2500
+                },
+                "component": {
+                    "$ref": "#/definitions/ComponentType"
+                },
+                "variable": {
+                    "$ref": "#/definitions/VariableType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "attributeStatus",
+                "component",
+                "variable"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "VariableType": {
+            "description": "Reference key to a component-variable.\r\n",
+            "javaType": "Variable",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "description": "Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "instance": {
+                    "description": "Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "getVariableResult": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/GetVariableResultType"
+            },
+            "minItems": 1
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "getVariableResult"
+    ]
+}

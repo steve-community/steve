@@ -1,0 +1,158 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:AuthorizeRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "HashAlgorithmEnumType": {
+            "description": "Used algorithms for the hashes provided.\r\n",
+            "javaType": "HashAlgorithmEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "SHA256",
+                "SHA384",
+                "SHA512"
+            ]
+        },
+        "AdditionalInfoType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "AdditionalInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalIdToken": {
+                    "description": "*(2.1)* This field specifies the additional IdToken.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "_additionalInfo_ can be used to send extra information to CSMS in addition to the regular authorization with _IdToken_. _AdditionalInfo_ contains one or more custom _types_, which need to be agreed upon by all parties involved. When the _type_ is not supported, the CSMS/Charging Station MAY ignore the _additionalInfo_.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "additionalIdToken",
+                "type"
+            ]
+        },
+        "IdTokenType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "IdToken",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalInfo": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/AdditionalInfoType"
+                    },
+                    "minItems": 1
+                },
+                "idToken": {
+                    "description": "*(2.1)* IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "*(2.1)* Enumeration of possible idToken types. Values defined in Appendix as IdTokenEnumStringType.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "idToken",
+                "type"
+            ]
+        },
+        "OCSPRequestDataType": {
+            "description": "Information about a certificate for an OCSP check.\r\n",
+            "javaType": "OCSPRequestData",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "hashAlgorithm": {
+                    "$ref": "#/definitions/HashAlgorithmEnumType"
+                },
+                "issuerNameHash": {
+                    "description": "The hash of the issuer\u2019s distinguished\r\nname (DN), that must be calculated over the DER\r\nencoding of the issuer\u2019s name field in the certificate\r\nbeing checked.\r\n",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "issuerKeyHash": {
+                    "description": "The hash of the DER encoded public key:\r\nthe value (excluding tag and length) of the subject\r\npublic key field in the issuer\u2019s certificate.\r\n",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "serialNumber": {
+                    "description": "The string representation of the\r\nhexadecimal value of the serial number without the\r\nprefix \"0x\" and without leading zeroes.\r\n",
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "responderURL": {
+                    "description": "This contains the responder URL (Case insensitive). \r\n\r\n",
+                    "type": "string",
+                    "maxLength": 2000
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "hashAlgorithm",
+                "issuerNameHash",
+                "issuerKeyHash",
+                "serialNumber",
+                "responderURL"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "idToken": {
+            "$ref": "#/definitions/IdTokenType"
+        },
+        "certificate": {
+            "description": "*(2.1)* The X.509 certificate chain presented by EV and encoded in PEM format. Order of certificates in chain is from leaf up to (but excluding) root certificate. +\r\nOnly needed in case of central contract validation when Charging Station cannot validate the contract certificate.\r\n\r\n",
+            "type": "string",
+            "maxLength": 10000
+        },
+        "iso15118CertificateHashData": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/OCSPRequestDataType"
+            },
+            "minItems": 1,
+            "maxItems": 4
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "idToken"
+    ]
+}

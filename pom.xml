@@ -383,6 +383,60 @@
                     </generator>
                 </configuration>
             </plugin>
+
+            <!-- JSON Schema to POJO for OCPP 2.0 message generation -->
+            <plugin>
+                <groupId>org.jsonschema2pojo</groupId>
+                <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/resources/ocpp20/schemas</sourceDirectory>
+                    <targetPackage>de.rwth.idsg.steve.ocpp20.model</targetPackage>
+                    <outputDirectory>${project.build.directory}/generated-sources/ocpp20</outputDirectory>
+
+                    <!-- Generate Java classes from JSON Schema -->
+                    <sourceType>jsonschema</sourceType>
+
+                    <!-- Use Jackson for JSON serialization -->
+                    <annotationStyle>jackson2</annotationStyle>
+
+                    <!-- Generate builder methods for fluent API -->
+                    <generateBuilders>true</generateBuilders>
+
+                    <!-- Use Lombok to reduce boilerplate -->
+                    <includeAdditionalProperties>false</includeAdditionalProperties>
+                    <includeDynamicAccessors>false</includeDynamicAccessors>
+
+                    <!-- Generate toString, equals, hashCode -->
+                    <includeToString>true</includeToString>
+                    <includeHashcodeAndEquals>true</includeHashcodeAndEquals>
+
+                    <!-- Use java.time instead of Joda for OCPP 2.0 -->
+                    <dateTimeType>java.time.OffsetDateTime</dateTimeType>
+                    <dateType>java.time.LocalDate</dateType>
+                    <timeType>java.time.OffsetTime</timeType>
+
+                    <!-- Generate constructors -->
+                    <includeConstructors>true</includeConstructors>
+                    <constructorsRequiredPropertiesOnly>false</constructorsRequiredPropertiesOnly>
+
+                    <!-- JSR-303 validation annotations (Jakarta for Spring Boot 3+) -->
+                    <includeJsr303Annotations>true</includeJsr303Annotations>
+                    <useJakartaValidation>true</useJakartaValidation>
+
+                    <!-- Make generated classes serializable -->
+                    <serializable>true</serializable>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-ocpp20-models</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

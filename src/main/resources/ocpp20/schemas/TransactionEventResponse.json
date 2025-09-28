@@ -1,0 +1,223 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:TransactionEventResponse",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "AuthorizationStatusEnumType": {
+      "description": "ID_ Token. Status. Authorization_ Status\r\nurn:x-oca:ocpp:uid:1:569372\r\nCurrent status of the ID Token.\r\n",
+      "javaType": "AuthorizationStatusEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Blocked",
+        "ConcurrentTx",
+        "Expired",
+        "Invalid",
+        "NoCredit",
+        "NotAllowedTypeEVSE",
+        "NotAtThisLocation",
+        "NotAtThisTime",
+        "Unknown"
+      ]
+    },
+    "IdTokenEnumType": {
+      "description": "Enumeration of possible idToken types.\r\n",
+      "javaType": "IdTokenEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Central",
+        "eMAID",
+        "ISO14443",
+        "ISO15693",
+        "KeyCode",
+        "Local",
+        "MacAddress",
+        "NoAuthorization"
+      ]
+    },
+    "MessageFormatEnumType": {
+      "description": "Message_ Content. Format. Message_ Format_ Code\r\nurn:x-enexis:ecdm:uid:1:570848\r\nFormat of the message.\r\n",
+      "javaType": "MessageFormatEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "ASCII",
+        "HTML",
+        "URI",
+        "UTF8"
+      ]
+    },
+    "AdditionalInfoType": {
+      "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+      "javaType": "AdditionalInfo",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "additionalIdToken": {
+          "description": "This field specifies the additional IdToken.\r\n",
+          "type": "string",
+          "maxLength": 36
+        },
+        "type": {
+          "description": "This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.\r\n",
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "additionalIdToken",
+        "type"
+      ]
+    },
+    "IdTokenInfoType": {
+      "description": "ID_ Token\r\nurn:x-oca:ocpp:uid:2:233247\r\nContains status information about an identifier.\r\nIt is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.\r\n",
+      "javaType": "IdTokenInfo",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "status": {
+          "$ref": "#/definitions/AuthorizationStatusEnumType"
+        },
+        "cacheExpiryDateTime": {
+          "description": "ID_ Token. Expiry. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569373\r\nDate and Time after which the token must be considered invalid.\r\n",
+          "type": "string",
+          "format": "date-time"
+        },
+        "chargingPriority": {
+          "description": "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. \r\n",
+          "type": "integer"
+        },
+        "language1": {
+          "description": "ID_ Token. Language1. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569374\r\nPreferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n\r\n",
+          "type": "string",
+          "maxLength": 8
+        },
+        "evseId": {
+          "description": "Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.\r\n\r\n",
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1
+        },
+        "groupIdToken": {
+          "$ref": "#/definitions/IdTokenType"
+        },
+        "language2": {
+          "description": "ID_ Token. Language2. Language_ Code\r\nurn:x-oca:ocpp:uid:1:569375\r\nSecond preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+          "type": "string",
+          "maxLength": 8
+        },
+        "personalMessage": {
+          "$ref": "#/definitions/MessageContentType"
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "IdTokenType": {
+      "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+      "javaType": "IdToken",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "additionalInfo": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "$ref": "#/definitions/AdditionalInfoType"
+          },
+          "minItems": 1
+        },
+        "idToken": {
+          "description": "IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+          "type": "string",
+          "maxLength": 36
+        },
+        "type": {
+          "$ref": "#/definitions/IdTokenEnumType"
+        }
+      },
+      "required": [
+        "idToken",
+        "type"
+      ]
+    },
+    "MessageContentType": {
+      "description": "Message_ Content\r\nurn:x-enexis:ecdm:uid:2:234490\r\nContains message details, for a message to be displayed on a Charging Station.\r\n\r\n",
+      "javaType": "MessageContent",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "format": {
+          "$ref": "#/definitions/MessageFormatEnumType"
+        },
+        "language": {
+          "description": "Message_ Content. Language. Language_ Code\r\nurn:x-enexis:ecdm:uid:1:570849\r\nMessage language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+          "type": "string",
+          "maxLength": 8
+        },
+        "content": {
+          "description": "Message_ Content. Content. Message\r\nurn:x-enexis:ecdm:uid:1:570852\r\nMessage contents.\r\n\r\n",
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "format",
+        "content"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "totalCost": {
+      "description": "SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.\r\n\r\n",
+      "type": "number"
+    },
+    "chargingPriority": {
+      "description": "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  \r\n",
+      "type": "integer"
+    },
+    "idTokenInfo": {
+      "$ref": "#/definitions/IdTokenInfoType"
+    },
+    "updatedPersonalMessage": {
+      "$ref": "#/definitions/MessageContentType"
+    }
+  }
+}

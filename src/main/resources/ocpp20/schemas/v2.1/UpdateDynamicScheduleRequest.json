@@ -1,0 +1,102 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:UpdateDynamicScheduleRequest",
+    "description": "Id of dynamic charging profile to update.\r\n",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ChargingScheduleUpdateType": {
+            "description": "Updates to a ChargingSchedulePeriodType for dynamic charging profiles.\r\n\r\n",
+            "javaType": "ChargingScheduleUpdate",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "limit": {
+                    "description": "Optional only when not required by the _operationMode_, as in CentralSetpoint, ExternalSetpoint, ExternalLimits, LocalFrequency,  LocalLoadBalancing. +\r\nCharging rate limit during the schedule period, in the applicable _chargingRateUnit_. \r\nThis SHOULD be a non-negative value; a negative value is only supported for backwards compatibility with older systems that use a negative value to specify a discharging limit.\r\nFor AC this field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "limit_L2": {
+                    "description": "*(2.1)* Charging rate limit on phase L2  in the applicable _chargingRateUnit_. \r\n",
+                    "type": "number"
+                },
+                "limit_L3": {
+                    "description": "*(2.1)* Charging rate limit on phase L3  in the applicable _chargingRateUnit_. \r\n",
+                    "type": "number"
+                },
+                "dischargeLimit": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ that the EV is allowed to discharge with. Note, these are negative values in order to be consistent with _setpoint_, which can be positive and negative.  +\r\nFor AC this field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "dischargeLimit_L2": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ on phase L2 that the EV is allowed to discharge with. \r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "dischargeLimit_L3": {
+                    "description": "*(2.1)* Limit in _chargingRateUnit_ on phase L3 that the EV is allowed to discharge with. \r\n",
+                    "type": "number",
+                    "maximum": 0.0
+                },
+                "setpoint": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow as close as possible. Use negative values for discharging. +\r\nWhen a limit and/or _dischargeLimit_ are given the overshoot when following _setpoint_ must remain within these values.\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "setpoint_L2": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow on phase L2 as close as possible.\r\n",
+                    "type": "number"
+                },
+                "setpoint_L3": {
+                    "description": "*(2.1)* Setpoint in _chargingRateUnit_ that the EV should follow on phase L3 as close as possible. \r\n",
+                    "type": "number"
+                },
+                "setpointReactive": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow as closely as possible. Positive values for inductive, negative for capacitive reactive power or current.  +\r\nThis field represents the sum of all phases, unless values are provided for L2 and L3, in which case this field represents phase L1.\r\n",
+                    "type": "number"
+                },
+                "setpointReactive_L2": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow on phase L2 as closely as possible. \r\n",
+                    "type": "number"
+                },
+                "setpointReactive_L3": {
+                    "description": "*(2.1)* Setpoint for reactive power (or current) in _chargingRateUnit_ that the EV should follow on phase L3 as closely as possible. \r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "chargingProfileId": {
+            "description": "Id of charging profile to update.\r\n",
+            "type": "integer"
+        },
+        "scheduleUpdate": {
+            "$ref": "#/definitions/ChargingScheduleUpdateType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "chargingProfileId",
+        "scheduleUpdate"
+    ]
+}

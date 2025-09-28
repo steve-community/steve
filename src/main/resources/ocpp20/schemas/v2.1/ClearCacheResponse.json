@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:ClearCacheResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "ClearCacheStatusEnumType": {
+            "description": "Accepted if the Charging Station has executed the request, otherwise rejected.\r\n",
+            "javaType": "ClearCacheStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "status": {
+            "$ref": "#/definitions/ClearCacheStatusEnumType"
+        },
+        "statusInfo": {
+            "$ref": "#/definitions/StatusInfoType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "status"
+    ]
+}

@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:NotifyPeriodicEventStream",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "StreamDataElementType": {
+            "javaType": "StreamDataElement",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "t": {
+                    "description": "Offset relative to _basetime_ of this message. _basetime_ + _t_ is timestamp of recorded value.\r\n",
+                    "type": "number"
+                },
+                "v": {
+                    "type": "string",
+                    "maxLength": 2500
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "t",
+                "v"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "data": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/StreamDataElementType"
+            },
+            "minItems": 1
+        },
+        "id": {
+            "description": "Id of stream.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "pending": {
+            "description": "Number of data elements still pending to be sent.\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "basetime": {
+            "description": "Base timestamp to add to time offset of values.\r\n",
+            "type": "string",
+            "format": "date-time"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "id",
+        "pending",
+        "basetime",
+        "data"
+    ]
+}

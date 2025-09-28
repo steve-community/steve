@@ -1,0 +1,688 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:AuthorizeResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "AuthorizationStatusEnumType": {
+            "description": "Current status of the ID Token.\r\n",
+            "javaType": "AuthorizationStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Blocked",
+                "ConcurrentTx",
+                "Expired",
+                "Invalid",
+                "NoCredit",
+                "NotAllowedTypeEVSE",
+                "NotAtThisLocation",
+                "NotAtThisTime",
+                "Unknown"
+            ]
+        },
+        "AuthorizeCertificateStatusEnumType": {
+            "description": "Certificate status information. \r\n- if all certificates are valid: return 'Accepted'.\r\n- if one of the certificates was revoked, return 'CertificateRevoked'.\r\n",
+            "javaType": "AuthorizeCertificateStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "SignatureError",
+                "CertificateExpired",
+                "CertificateRevoked",
+                "NoCertificateAvailable",
+                "CertChainError",
+                "ContractCancelled"
+            ]
+        },
+        "DayOfWeekEnumType": {
+            "javaType": "DayOfWeekEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ]
+        },
+        "EnergyTransferModeEnumType": {
+            "javaType": "EnergyTransferModeEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "AC_single_phase",
+                "AC_two_phase",
+                "AC_three_phase",
+                "DC",
+                "AC_BPT",
+                "AC_BPT_DER",
+                "AC_DER",
+                "DC_BPT",
+                "DC_ACDP",
+                "DC_ACDP_BPT",
+                "WPT"
+            ]
+        },
+        "EvseKindEnumType": {
+            "description": "Type of EVSE (AC, DC) this tariff applies to.\r\n",
+            "javaType": "EvseKindEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "AC",
+                "DC"
+            ]
+        },
+        "MessageFormatEnumType": {
+            "description": "Format of the message.\r\n",
+            "javaType": "MessageFormatEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "ASCII",
+                "HTML",
+                "URI",
+                "UTF8",
+                "QRCODE"
+            ]
+        },
+        "AdditionalInfoType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "AdditionalInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalIdToken": {
+                    "description": "*(2.1)* This field specifies the additional IdToken.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "_additionalInfo_ can be used to send extra information to CSMS in addition to the regular authorization with _IdToken_. _AdditionalInfo_ contains one or more custom _types_, which need to be agreed upon by all parties involved. When the _type_ is not supported, the CSMS/Charging Station MAY ignore the _additionalInfo_.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "additionalIdToken",
+                "type"
+            ]
+        },
+        "IdTokenInfoType": {
+            "description": "Contains status information about an identifier.\r\nIt is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.\r\n",
+            "javaType": "IdTokenInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/AuthorizationStatusEnumType"
+                },
+                "cacheExpiryDateTime": {
+                    "description": "Date and Time after which the token must be considered invalid.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "chargingPriority": {
+                    "description": "Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. \r\n",
+                    "type": "integer"
+                },
+                "groupIdToken": {
+                    "$ref": "#/definitions/IdTokenType"
+                },
+                "language1": {
+                    "description": "Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 8
+                },
+                "language2": {
+                    "description": "Second preferred user interface language of identifier user. Don\u2019t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+                    "type": "string",
+                    "maxLength": 8
+                },
+                "evseId": {
+                    "description": "Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.\r\n\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "type": "integer",
+                        "minimum": 0.0
+                    },
+                    "minItems": 1
+                },
+                "personalMessage": {
+                    "$ref": "#/definitions/MessageContentType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "status"
+            ]
+        },
+        "IdTokenType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "IdToken",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalInfo": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/AdditionalInfoType"
+                    },
+                    "minItems": 1
+                },
+                "idToken": {
+                    "description": "*(2.1)* IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "*(2.1)* Enumeration of possible idToken types. Values defined in Appendix as IdTokenEnumStringType.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "idToken",
+                "type"
+            ]
+        },
+        "MessageContentType": {
+            "description": "Contains message details, for a message to be displayed on a Charging Station.\r\n\r\n",
+            "javaType": "MessageContent",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "format": {
+                    "$ref": "#/definitions/MessageFormatEnumType"
+                },
+                "language": {
+                    "description": "Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.\r\n",
+                    "type": "string",
+                    "maxLength": 8
+                },
+                "content": {
+                    "description": "*(2.1)* Required. Message contents. +\r\nMaximum length supported by Charging Station is given in OCPPCommCtrlr.FieldLength[\"MessageContentType.content\"].\r\n    Maximum length defaults to 1024.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "format",
+                "content"
+            ]
+        },
+        "PriceType": {
+            "description": "Price with and without tax. At least one of _exclTax_, _inclTax_ must be present.\r\n",
+            "javaType": "Price",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "exclTax": {
+                    "description": "Price/cost excluding tax. Can be absent if _inclTax_ is present.\r\n",
+                    "type": "number"
+                },
+                "inclTax": {
+                    "description": "Price/cost including tax. Can be absent if _exclTax_ is present.\r\n",
+                    "type": "number"
+                },
+                "taxRates": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TaxRateType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "TariffConditionsFixedType": {
+            "description": "These conditions describe if a FixedPrice applies at start of the transaction.\r\n\r\nWhen more than one restriction is set, they are to be treated as a logical AND. All need to be valid before this price is active.\r\n\r\nNOTE: _startTimeOfDay_ and _endTimeOfDay_ are in local time, because it is the time in the tariff as it is shown to the EV driver at the Charging Station.\r\nA Charging Station will convert this to the internal time zone that it uses (which is recommended to be UTC, see section Generic chapter 3.1) when performing cost calculation.\r\n\r\n",
+            "javaType": "TariffConditionsFixed",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "startTimeOfDay": {
+                    "description": "Start time of day in local time. +\r\nFormat as per RFC 3339: time-hour \":\" time-minute  +\r\nMust be in 24h format with leading zeros. Hour/Minute separator: \":\"\r\nRegex: ([0-1][0-9]\\|2[0-3]):[0-5][0-9]\r\n",
+                    "type": "string"
+                },
+                "endTimeOfDay": {
+                    "description": "End time of day in local time. Same syntax as _startTimeOfDay_. +\r\n    If end time &lt; start time then the period wraps around to the next day. +\r\n    To stop at end of the day use: 00:00.\r\n",
+                    "type": "string"
+                },
+                "dayOfWeek": {
+                    "description": "Day(s) of the week this is tariff applies.\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/DayOfWeekEnumType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 7
+                },
+                "validFromDate": {
+                    "description": "Start date in local time, for example: 2015-12-24.\r\nValid from this day (inclusive). +\r\nFormat as per RFC 3339: full-date  + \r\n\r\nRegex: ([12][0-9]{3})-(0[1-9]\\|1[0-2])-(0[1-9]\\|[12][0-9]\\|3[01])\r\n",
+                    "type": "string"
+                },
+                "validToDate": {
+                    "description": "End date in local time, for example: 2015-12-27.\r\n    Valid until this day (exclusive). Same syntax as _validFromDate_.\r\n",
+                    "type": "string"
+                },
+                "evseKind": {
+                    "$ref": "#/definitions/EvseKindEnumType"
+                },
+                "paymentBrand": {
+                    "description": "For which payment brand this (adhoc) tariff applies. Can be used to add a surcharge for certain payment brands.\r\n    Based on value of _additionalIdToken_ from _idToken.additionalInfo.type_ = \"PaymentBrand\".\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "paymentRecognition": {
+                    "description": "Type of adhoc payment, e.g. CC, Debit.\r\n    Based on value of _additionalIdToken_ from _idToken.additionalInfo.type_ = \"PaymentRecognition\".\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "TariffConditionsType": {
+            "description": "These conditions describe if and when a TariffEnergyType or TariffTimeType applies during a transaction.\r\n\r\nWhen more than one restriction is set, they are to be treated as a logical AND. All need to be valid before this price is active.\r\n\r\nFor reverse energy flow (discharging) negative values of energy, power and current are used.\r\n\r\nNOTE: _minXXX_ (where XXX = Kwh/A/Kw) must be read as \"closest to zero\", and _maxXXX_ as \"furthest from zero\". For example, a *charging* power range from 10 kW to 50 kWh is given by _minPower_ = 10000 and _maxPower_ = 50000, and a *discharging* power range from -10 kW to -50 kW is given by _minPower_ = -10 and _maxPower_ = -50.\r\n\r\nNOTE: _startTimeOfDay_ and _endTimeOfDay_ are in local time, because it is the time in the tariff as it is shown to the EV driver at the Charging Station.\r\nA Charging Station will convert this to the internal time zone that it uses (which is recommended to be UTC, see section Generic chapter 3.1) when performing cost calculation.\r\n\r\n",
+            "javaType": "TariffConditions",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "startTimeOfDay": {
+                    "description": "Start time of day in local time. +\r\nFormat as per RFC 3339: time-hour \":\" time-minute  +\r\nMust be in 24h format with leading zeros. Hour/Minute separator: \":\"\r\nRegex: ([0-1][0-9]\\|2[0-3]):[0-5][0-9]\r\n",
+                    "type": "string"
+                },
+                "endTimeOfDay": {
+                    "description": "End time of day in local time. Same syntax as _startTimeOfDay_. +\r\n    If end time &lt; start time then the period wraps around to the next day. +\r\n    To stop at end of the day use: 00:00.\r\n",
+                    "type": "string"
+                },
+                "dayOfWeek": {
+                    "description": "Day(s) of the week this is tariff applies.\r\n",
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/DayOfWeekEnumType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 7
+                },
+                "validFromDate": {
+                    "description": "Start date in local time, for example: 2015-12-24.\r\nValid from this day (inclusive). +\r\nFormat as per RFC 3339: full-date  + \r\n\r\nRegex: ([12][0-9]{3})-(0[1-9]\\|1[0-2])-(0[1-9]\\|[12][0-9]\\|3[01])\r\n",
+                    "type": "string"
+                },
+                "validToDate": {
+                    "description": "End date in local time, for example: 2015-12-27.\r\n    Valid until this day (exclusive). Same syntax as _validFromDate_.\r\n",
+                    "type": "string"
+                },
+                "evseKind": {
+                    "$ref": "#/definitions/EvseKindEnumType"
+                },
+                "minEnergy": {
+                    "description": "Minimum consumed energy in Wh, for example 20000 Wh.\r\n    Valid from this amount of energy (inclusive) being used.\r\n",
+                    "type": "number"
+                },
+                "maxEnergy": {
+                    "description": "Maximum consumed energy in Wh, for example 50000 Wh.\r\n    Valid until this amount of energy (exclusive) being used.\r\n",
+                    "type": "number"
+                },
+                "minCurrent": {
+                    "description": "Sum of the minimum current (in Amperes) over all phases, for example 5 A.\r\n    When the EV is charging with more than, or equal to, the defined amount of current, this price is/becomes active. If the charging current is or becomes lower, this price is not or no longer valid and becomes inactive. +\r\n    This is NOT about the minimum current over the entire transaction.\r\n",
+                    "type": "number"
+                },
+                "maxCurrent": {
+                    "description": "Sum of the maximum current (in Amperes) over all phases, for example 20 A.\r\n      When the EV is charging with less than the defined amount of current, this price becomes/is active. If the charging current is or becomes higher, this price is not or no longer valid and becomes inactive.\r\n      This is NOT about the maximum current over the entire transaction.\r\n",
+                    "type": "number"
+                },
+                "minPower": {
+                    "description": "Minimum power in W, for example 5000 W.\r\n      When the EV is charging with more than, or equal to, the defined amount of power, this price is/becomes active.\r\n      If the charging power is or becomes lower, this price is not or no longer valid and becomes inactive.\r\n      This is NOT about the minimum power over the entire transaction.\r\n",
+                    "type": "number"
+                },
+                "maxPower": {
+                    "description": "Maximum power in W, for example 20000 W.\r\n      When the EV is charging with less than the defined amount of power, this price becomes/is active.\r\n      If the charging power is or becomes higher, this price is not or no longer valid and becomes inactive.\r\n      This is NOT about the maximum power over the entire transaction.\r\n",
+                    "type": "number"
+                },
+                "minTime": {
+                    "description": "Minimum duration in seconds the transaction (charging &amp; idle) MUST last (inclusive).\r\n      When the duration of a transaction is longer than the defined value, this price is or becomes active.\r\n      Before that moment, this price is not yet active.\r\n",
+                    "type": "integer"
+                },
+                "maxTime": {
+                    "description": "Maximum duration in seconds the transaction (charging &amp; idle) MUST last (exclusive).\r\n      When the duration of a transaction is shorter than the defined value, this price is or becomes active.\r\n      After that moment, this price is no longer active.\r\n",
+                    "type": "integer"
+                },
+                "minChargingTime": {
+                    "description": "Minimum duration in seconds the charging MUST last (inclusive).\r\n      When the duration of a charging is longer than the defined value, this price is or becomes active.\r\n      Before that moment, this price is not yet active.\r\n",
+                    "type": "integer"
+                },
+                "maxChargingTime": {
+                    "description": "Maximum duration in seconds the charging MUST last (exclusive).\r\n      When the duration of a charging is shorter than the defined value, this price is or becomes active.\r\n      After that moment, this price is no longer active.\r\n",
+                    "type": "integer"
+                },
+                "minIdleTime": {
+                    "description": "Minimum duration in seconds the idle period (i.e. not charging) MUST last (inclusive).\r\n      When the duration of the idle time is longer than the defined value, this price is or becomes active.\r\n      Before that moment, this price is not yet active.\r\n",
+                    "type": "integer"
+                },
+                "maxIdleTime": {
+                    "description": "Maximum duration in seconds the idle period (i.e. not charging) MUST last (exclusive).\r\n      When the duration of idle time is shorter than the defined value, this price is or becomes active.\r\n      After that moment, this price is no longer active.\r\n",
+                    "type": "integer"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "TariffEnergyPriceType": {
+            "description": "Tariff with optional conditions for an energy price.\r\n",
+            "javaType": "TariffEnergyPrice",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "priceKwh": {
+                    "description": "Price per kWh (excl. tax) for this element.\r\n",
+                    "type": "number"
+                },
+                "conditions": {
+                    "$ref": "#/definitions/TariffConditionsType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "priceKwh"
+            ]
+        },
+        "TariffEnergyType": {
+            "description": "Price elements and tax for energy\r\n",
+            "javaType": "TariffEnergy",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "prices": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TariffEnergyPriceType"
+                    },
+                    "minItems": 1
+                },
+                "taxRates": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TaxRateType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "prices"
+            ]
+        },
+        "TariffFixedPriceType": {
+            "description": "Tariff with optional conditions for a fixed price.\r\n",
+            "javaType": "TariffFixedPrice",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "conditions": {
+                    "$ref": "#/definitions/TariffConditionsFixedType"
+                },
+                "priceFixed": {
+                    "description": "Fixed price  for this element e.g. a start fee.\r\n",
+                    "type": "number"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "priceFixed"
+            ]
+        },
+        "TariffFixedType": {
+            "javaType": "TariffFixed",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "prices": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TariffFixedPriceType"
+                    },
+                    "minItems": 1
+                },
+                "taxRates": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TaxRateType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "prices"
+            ]
+        },
+        "TariffTimePriceType": {
+            "description": "Tariff with optional conditions for a time duration price.\r\n",
+            "javaType": "TariffTimePrice",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "priceMinute": {
+                    "description": "Price per minute (excl. tax) for this element.\r\n",
+                    "type": "number"
+                },
+                "conditions": {
+                    "$ref": "#/definitions/TariffConditionsType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "priceMinute"
+            ]
+        },
+        "TariffTimeType": {
+            "description": "Price elements and tax for time\r\n\r\n",
+            "javaType": "TariffTime",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "prices": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TariffTimePriceType"
+                    },
+                    "minItems": 1
+                },
+                "taxRates": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/TaxRateType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "prices"
+            ]
+        },
+        "TariffType": {
+            "description": "A tariff is described by fields with prices for:\r\nenergy,\r\ncharging time,\r\nidle time,\r\nfixed fee,\r\nreservation time,\r\nreservation fixed fee. +\r\nEach of these fields may have (optional) conditions that specify when a price is applicable. +\r\nThe _description_ contains a human-readable explanation of the tariff to be shown to the user. +\r\nThe other fields are parameters that define the tariff. These are used by the charging station to calculate the price.\r\n",
+            "javaType": "Tariff",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "tariffId": {
+                    "description": "Unique id of tariff\r\n",
+                    "type": "string",
+                    "maxLength": 60
+                },
+                "description": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/MessageContentType"
+                    },
+                    "minItems": 1,
+                    "maxItems": 10
+                },
+                "currency": {
+                    "description": "Currency code according to ISO 4217\r\n",
+                    "type": "string",
+                    "maxLength": 3
+                },
+                "energy": {
+                    "$ref": "#/definitions/TariffEnergyType"
+                },
+                "validFrom": {
+                    "description": "Time when this tariff becomes active. When absent, it is immediately active.\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "chargingTime": {
+                    "$ref": "#/definitions/TariffTimeType"
+                },
+                "idleTime": {
+                    "$ref": "#/definitions/TariffTimeType"
+                },
+                "fixedFee": {
+                    "$ref": "#/definitions/TariffFixedType"
+                },
+                "reservationTime": {
+                    "$ref": "#/definitions/TariffTimeType"
+                },
+                "reservationFixed": {
+                    "$ref": "#/definitions/TariffFixedType"
+                },
+                "minCost": {
+                    "$ref": "#/definitions/PriceType"
+                },
+                "maxCost": {
+                    "$ref": "#/definitions/PriceType"
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "tariffId",
+                "currency"
+            ]
+        },
+        "TaxRateType": {
+            "description": "Tax percentage\r\n",
+            "javaType": "TaxRate",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "type": {
+                    "description": "Type of this tax, e.g.  \"Federal \",  \"State\", for information on receipt.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "tax": {
+                    "description": "Tax percentage\r\n",
+                    "type": "number"
+                },
+                "stack": {
+                    "description": "Stack level for this type of tax. Default value, when absent, is 0. +\r\n_stack_ = 0: tax on net price; +\r\n_stack_ = 1: tax added on top of _stack_ 0; +\r\n_stack_ = 2: tax added on top of _stack_ 1, etc. \r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "type",
+                "tax"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "idTokenInfo": {
+            "$ref": "#/definitions/IdTokenInfoType"
+        },
+        "certificateStatus": {
+            "$ref": "#/definitions/AuthorizeCertificateStatusEnumType"
+        },
+        "allowedEnergyTransfer": {
+            "description": "*(2.1)* List of allowed energy transfer modes the EV can choose from. If omitted this defaults to charging only.\r\n\r\n\r\n",
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/EnergyTransferModeEnumType"
+            },
+            "minItems": 1
+        },
+        "tariff": {
+            "$ref": "#/definitions/TariffType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "idTokenInfo"
+    ]
+}

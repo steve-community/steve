@@ -67,6 +67,7 @@ public class SecurityConfiguration {
                         "/static/**",
                         SteveProperties.CXF_MAPPING + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",
+                        "/ocpp/v20/**", // OCPP 2.0 WebSocket endpoint
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")

@@ -156,14 +156,56 @@ public class CertificateSigningService {
             );
         }
 
+        RDN[] orgRdns = subject.getRDNs(BCStyle.O);
+        if (orgRdns.length == 0 && securityConfig.isRequireOrganization()) {
+            throw new IllegalArgumentException("CSR subject must contain Organization (O) field");
+        }
+        if (orgRdns.length > 0) {
+            String organization = IETFUtils.valueToString(orgRdns[0].getFirst().getValue());
+            if (securityConfig.getAllowedOrganizations() != null &&
+                !securityConfig.getAllowedOrganizations().isEmpty() &&
+                !securityConfig.getAllowedOrganizations().contains(organization)) {
+                throw new IllegalArgumentException(
+                    String.format("Organization '%s' is not in the allowed list", organization)
+                );
+            }
+        }
+
+        RDN[] countryRdns = subject.getRDNs(BCStyle.C);
+        if (countryRdns.length == 0 && securityConfig.isRequireCountry()) {
+            throw new IllegalArgumentException("CSR subject must contain Country (C) field");
+        }
+        if (countryRdns.length > 0 && securityConfig.getExpectedCountry() != null) {
+            String country = IETFUtils.valueToString(countryRdns[0].getFirst().getValue());
+            if (!country.equals(securityConfig.getExpectedCountry())) {
+                throw new IllegalArgumentException(
+                    String.format("Country '%s' does not match expected country '%s'",
+                        country, securityConfig.getExpectedCountry())
+                );
+            }
+        }
+
+        String signatureAlgorithm = csr.getSignatureAlgorithm().getAlgorithm().getId();
+        if (signatureAlgorithm.contains("SHA1") || signatureAlgorithm.contains("sha1")) {
+            throw new IllegalArgumentException("CSR uses weak SHA1 signature algorithm. Use SHA256 or higher.");
+        }
+
         log.info("CSR validated for charge point '{}'. Subject: {}",
                 chargePointId, csr.getSubject().toString());
+    }
+
+    private BigInteger generateSerialNumber() {
+        BigInteger serial = new BigInteger(128, secureRandom);
+        if (serial.compareTo(BigInteger.ZERO) <= 0) {
+            serial = generateSerialNumber();
+        }
+        return serial;
     }
 
     private X509Certificate signCertificate(PKCS10CertificationRequest csr) throws Exception {
         X500Name issuer = new X500Name(caCertificate.getSubjectX500Principal().getName());
         X500Name subject = csr.getSubject();
-        BigInteger serial = new BigInteger(64, secureRandom);
+        BigInteger serial = generateSerialNumber();
         Date notBefore = DateTime.now().toDate();
         int validityYears = securityConfig.getCertificateValidityYears();
         Date notAfter = DateTime.now().plusYears(validityYears).toDate();

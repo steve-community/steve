@@ -236,4 +236,66 @@ public class CentralSystemService20 {
                 chargeBoxId, request.getStatus());
         return new PublishFirmwareStatusNotificationResponse();
     }
+
+    public DataTransferResponse handleDataTransfer(DataTransferRequest request, String chargeBoxId) {
+        log.info("OCPP 2.0 DataTransfer from '{}': vendorId={}, messageId={}",
+                chargeBoxId, request.getVendorId(), request.getMessageId());
+
+        DataTransferResponse response = new DataTransferResponse();
+        response.setStatus(DataTransferStatusEnum.ACCEPTED);
+
+        if (request.getData() != null) {
+            response.setData(request.getData());
+        }
+
+        return response;
+    }
+
+    public RequestStartTransactionResponse handleRequestStartTransaction(RequestStartTransactionRequest request, String chargeBoxId) {
+        log.info("OCPP 2.0 RequestStartTransaction from '{}': remoteStartId={}, evseId={}",
+                chargeBoxId, request.getRemoteStartId(), request.getEvseId());
+
+        RequestStartTransactionResponse response = new RequestStartTransactionResponse();
+        response.setStatus(RequestStartStopStatusEnum.ACCEPTED);
+
+        String transactionId = "TRX-" + System.currentTimeMillis();
+        response.setTransactionId(transactionId);
+
+        return response;
+    }
+
+    public RequestStopTransactionResponse handleRequestStopTransaction(RequestStopTransactionRequest request, String chargeBoxId) {
+        log.info("OCPP 2.0 RequestStopTransaction from '{}': transactionId={}",
+                chargeBoxId, request.getTransactionId());
+
+        RequestStopTransactionResponse response = new RequestStopTransactionResponse();
+        response.setStatus(RequestStartStopStatusEnum.ACCEPTED);
+
+        return response;
+    }
+
+    public Get15118EVCertificateResponse handleGet15118EVCertificate(Get15118EVCertificateRequest request, String chargeBoxId) {
+        log.info("OCPP 2.0 Get15118EVCertificate from '{}': iso15118SchemaVersion={}",
+                chargeBoxId, request.getIso15118SchemaVersion());
+
+        Get15118EVCertificateResponse response = new Get15118EVCertificateResponse();
+        response.setStatus(Iso15118EVCertificateStatusEnum.ACCEPTED);
+        response.setExiResponse("BASE64_ENCODED_EXI_RESPONSE");
+
+        return response;
+    }
+
+    public GetCertificateStatusResponse handleGetCertificateStatus(GetCertificateStatusRequest request, String chargeBoxId) {
+        log.info("OCPP 2.0 GetCertificateStatus from '{}'",
+                chargeBoxId);
+
+        GetCertificateStatusResponse response = new GetCertificateStatusResponse();
+        response.setStatus(GetCertificateStatusEnum.ACCEPTED);
+
+        if (request.getOcspRequestData() != null) {
+            response.setOcspResult("BASE64_ENCODED_OCSP_RESPONSE");
+        }
+
+        return response;
+    }
 }

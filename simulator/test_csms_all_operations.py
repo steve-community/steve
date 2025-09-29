@@ -257,6 +257,22 @@ class CSMSOperationsDemo:
             print(f"  Authorization List: {len(auth_list)} entries")
             return {"status": "Accepted"}
 
+        elif action == "GetLocalListVersion":
+            print(f"\n{Colors.BOLD}📋 Get Local List Version Request{Colors.ENDC}")
+            return {"versionNumber": 42}
+
+        elif action == "GetTransactionStatus":
+            print(f"\n{Colors.BOLD}💳 Get Transaction Status Request{Colors.ENDC}")
+            transaction_id = payload.get('transactionId')
+            if transaction_id:
+                print(f"  Transaction ID: {transaction_id}")
+            else:
+                print(f"  Getting status for all ongoing transactions")
+            return {
+                "messagesInQueue": False,
+                "ongoingIndicator": True
+            }
+
         elif action == "SetChargingProfile":
             print(f"\n{Colors.BOLD}⚡ Set Charging Profile{Colors.ENDC}")
             charging_profile = payload.get('chargingProfile', {})

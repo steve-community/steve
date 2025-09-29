@@ -46,6 +46,8 @@ import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -71,6 +73,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     private final DSLContext ctx;
     private final AddressRepository addressRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {
@@ -377,5 +380,42 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         ctx.delete(CHARGE_BOX)
            .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
            .execute();
+    }
+
+    @Override
+    public boolean isRegistered(String chargeBoxId) {
+        return ctx.fetchExists(
+            ctx.selectFrom(CHARGE_BOX)
+               .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+        );
+    }
+
+    @Override
+    public boolean validatePassword(String chargeBoxId, String password) {
+        if (password == null || password.isEmpty()) {
+            log.warn("Empty password provided for charge point '{}'", chargeBoxId);
+            return false;
+        }
+
+        String storedHashedPassword = ctx.select(CHARGE_BOX.AUTH_PASSWORD)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+            .fetchOne(CHARGE_BOX.AUTH_PASSWORD);
+
+        if (storedHashedPassword == null || storedHashedPassword.isEmpty()) {
+            log.warn("No password configured for charge point '{}' - authentication disabled", chargeBoxId);
+            return true;
+        }
+
+        try {
+            boolean matches = passwordEncoder.matches(password, storedHashedPassword);
+            if (!matches) {
+                log.warn("Invalid password attempt for charge point '{}'", chargeBoxId);
+            }
+            return matches;
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid BCrypt hash stored for charge point '{}'. Hash might be corrupted.", chargeBoxId, e);
+            return false;
+        }
     }
 }

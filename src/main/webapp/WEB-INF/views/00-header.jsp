@@ -70,6 +70,9 @@
                             <li><a href="${ctxPath}/manager/operations/v1.2">OCPP v1.2</a></li>
                             <li><a href="${ctxPath}/manager/operations/v1.5">OCPP v1.5</a></li>
                             <li><a href="${ctxPath}/manager/operations/v1.6">OCPP v1.6</a></li>
+                            <c:if test="${ocpp20Enabled}">
+                                <li><a href="${ctxPath}/manager/operations/v2.0/Reset">OCPP v2.0</a></li>
+                            </c:if>
                             <li><a href="${ctxPath}/manager/operations/tasks">Tasks</a></li>
                         </ul>
                     </li>

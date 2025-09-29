@@ -150,6 +150,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
             case V_12 -> getOcpp12Handler(chargeBoxId);
             case V_15 -> getOcpp15Handler(chargeBoxId);
             case V_16 -> getOcpp16Handler(chargeBoxId);
+            case V_20 -> throw new UnsupportedOperationException("OCPP 2.0 uses JSON/WebSocket, not SOAP");
         };
     }
 

@@ -38,6 +38,8 @@ public abstract class Ocpp20Task<REQUEST, RESPONSE> {
     protected final ObjectMapper objectMapper = createObjectMapper();
     protected final String operationName;
     protected final List<String> chargeBoxIds;
+    private final String taskId;
+    private final String action;
 
     private final Map<String, TaskResult> resultMap = new ConcurrentHashMap<>();
     private final Map<String, CompletableFuture<RESPONSE>> pendingRequests = new ConcurrentHashMap<>();
@@ -46,7 +48,9 @@ public abstract class Ocpp20Task<REQUEST, RESPONSE> {
     private DateTime endTimestamp;
 
     protected Ocpp20Task(String operationName, List<String> chargeBoxIds) {
+        this.taskId = UUID.randomUUID().toString();
         this.operationName = operationName;
+        this.action = operationName;
         this.chargeBoxIds = chargeBoxIds;
 
         for (String chargeBoxId : chargeBoxIds) {

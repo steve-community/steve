@@ -289,6 +289,12 @@ ul.navigation ul li a {
 	padding: 0 0 0 12px;
 	border-left: 1px solid #CCC;
 }
+.op20-content {
+	min-height: 650px;
+	margin: 0 0 0 230px;
+	padding: 0 0 0 12px;
+	border-left: 1px solid #CCC;
+}
 .main { height: auto; min-height: 100%; }
 .main-wrapper {
 	height: auto; 

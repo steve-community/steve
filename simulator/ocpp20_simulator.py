@@ -122,12 +122,67 @@ async def test_ocpp20():
             assert tx_end_response[0] == 3, "Expected CallResult"
             print(f"✓ TransactionEvent Ended")
 
+            # Test 6: GetBaseReport (New command)
+            print("\n--- Test 6: GetBaseReport ---")
+            response = await websocket.recv()
+            message = json.loads(response)
+            if message[0] == 2 and message[2] == "GetBaseReport":
+                print(f"✓ Received GetBaseReport request")
+                print(f"  Request ID: {message[3].get('requestId')}")
+                print(f"  Report Base: {message[3].get('reportBase')}")
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await websocket.send(json.dumps(response_msg))
+                print(f"✓ GetBaseReport response sent")
+
+            # Test 7: GetReport (New command)
+            print("\n--- Test 7: GetReport ---")
+            response = await websocket.recv()
+            message = json.loads(response)
+            if message[0] == 2 and message[2] == "GetReport":
+                print(f"✓ Received GetReport request")
+                print(f"  Request ID: {message[3].get('requestId')}")
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await websocket.send(json.dumps(response_msg))
+                print(f"✓ GetReport response sent")
+
+            # Test 8: SetNetworkProfile (New command)
+            print("\n--- Test 8: SetNetworkProfile ---")
+            response = await websocket.recv()
+            message = json.loads(response)
+            if message[0] == 2 and message[2] == "SetNetworkProfile":
+                print(f"✓ Received SetNetworkProfile request")
+                print(f"  Configuration Slot: {message[3].get('configurationSlot')}")
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await websocket.send(json.dumps(response_msg))
+                print(f"✓ SetNetworkProfile response sent")
+
+            # Test 9: SetChargingProfile (New command)
+            print("\n--- Test 9: SetChargingProfile ---")
+            response = await websocket.recv()
+            message = json.loads(response)
+            if message[0] == 2 and message[2] == "SetChargingProfile":
+                print(f"✓ Received SetChargingProfile request")
+                profile = message[3].get('chargingProfile', {})
+                print(f"  Profile ID: {profile.get('id')}")
+                print(f"  Stack Level: {profile.get('stackLevel')}")
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await websocket.send(json.dumps(response_msg))
+                print(f"✓ SetChargingProfile response sent")
+
             print("\n=== ALL TESTS PASSED ===")
             print(f"✓ BootNotification: OK")
             print(f"✓ Authorize: OK")
             print(f"✓ TransactionEvent (Started): OK")
             print(f"✓ Heartbeat: OK")
             print(f"✓ TransactionEvent (Ended): OK")
+            print(f"✓ GetBaseReport: OK")
+            print(f"✓ GetReport: OK")
+            print(f"✓ SetNetworkProfile: OK")
+            print(f"✓ SetChargingProfile: OK")
 
     except websockets.exceptions.InvalidStatusCode as e:
         print(f"[ERROR] Connection rejected: {e}")

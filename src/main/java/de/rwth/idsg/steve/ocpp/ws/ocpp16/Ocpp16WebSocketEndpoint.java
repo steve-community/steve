@@ -68,54 +68,22 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @Override
     public ResponseType dispatch(RequestType params, String chargeBoxId) {
-        ResponseType r;
-
-        if (params instanceof BootNotificationRequest) {
-            r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
-
-        } else if (params instanceof FirmwareStatusNotificationRequest) {
-            r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
-
-        } else if (params instanceof StatusNotificationRequest) {
-            r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
-
-        } else if (params instanceof MeterValuesRequest) {
-            r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
-
-        } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-            r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
-
-        } else if (params instanceof StartTransactionRequest) {
-            r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
-
-        } else if (params instanceof StopTransactionRequest) {
-            r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
-
-        } else if (params instanceof HeartbeatRequest) {
-            r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
-
-        } else if (params instanceof AuthorizeRequest) {
-            r = server.authorize((AuthorizeRequest) params, chargeBoxId);
-
-        } else if (params instanceof DataTransferRequest) {
-            r = server.dataTransfer((DataTransferRequest) params, chargeBoxId);
-
-        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) {
-            r = server.signCertificate((de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) params, chargeBoxId);
-
-        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) {
-            r = server.securityEventNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) params, chargeBoxId);
-
-        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) {
-            r = server.signedFirmwareStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) params, chargeBoxId);
-
-        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) {
-            r = server.logStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) params, chargeBoxId);
-
-        } else {
-            throw new IllegalArgumentException("Unexpected RequestType: " + params.getClass().getName());
-        }
-
-        return r;
+        return switch (params) {
+            case BootNotificationRequest p -> server.bootNotificationWithTransport(p, chargeBoxId, OcppProtocol.V_16_JSON);
+            case FirmwareStatusNotificationRequest p -> server.firmwareStatusNotification(p, chargeBoxId);
+            case StatusNotificationRequest p -> server.statusNotification(p, chargeBoxId);
+            case MeterValuesRequest p -> server.meterValues(p, chargeBoxId);
+            case DiagnosticsStatusNotificationRequest p -> server.diagnosticsStatusNotification(p, chargeBoxId);
+            case StartTransactionRequest p -> server.startTransaction(p, chargeBoxId);
+            case StopTransactionRequest p -> server.stopTransaction(p, chargeBoxId);
+            case HeartbeatRequest p -> server.heartbeat(p, chargeBoxId);
+            case AuthorizeRequest p -> server.authorize(p, chargeBoxId);
+            case DataTransferRequest p -> server.dataTransfer(p, chargeBoxId);
+            case de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest p -> server.signCertificate(p, chargeBoxId);
+            case de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest p -> server.securityEventNotification(p, chargeBoxId);
+            case de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest p -> server.signedFirmwareStatusNotification(p, chargeBoxId);
+            case de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest p -> server.logStatusNotification(p, chargeBoxId);
+            default -> throw new IllegalArgumentException("Unexpected RequestType: " + params.getClass().getName());
+        };
     }
 }

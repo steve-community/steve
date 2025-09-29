@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp20.service.Ocpp20MessageDispatcher;
 import de.rwth.idsg.steve.ocpp20.validation.Ocpp20JsonSchemaValidator;
 import de.rwth.idsg.steve.ocpp20.ws.handler.Ocpp20MessageHandlerRegistry;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.ocpp20.security.Ocpp20AuthenticationConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.net.InetSocketAddress;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 
 @Slf4j
 @Component
@@ -55,6 +60,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
     private final Ocpp20MessageHandlerRegistry handlerRegistry;
     private final Ocpp20JsonSchemaValidator schemaValidator;
     private final ObjectMapper objectMapper;
+    private final Ocpp20AuthenticationConfig authConfig;
     private final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     public Ocpp20WebSocketEndpoint(
@@ -65,6 +71,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
             Ocpp20RateLimiter rateLimiter,
             Ocpp20MessageHandlerRegistry handlerRegistry,
             Ocpp20JsonSchemaValidator schemaValidator,
+            Ocpp20AuthenticationConfig authConfig,
             @Qualifier("ocpp20ObjectMapper") ObjectMapper objectMapper) {
         this.centralSystemService = centralSystemService;
         this.ocpp20Config = ocpp20Config;
@@ -73,6 +80,7 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
         this.rateLimiter = rateLimiter;
         this.handlerRegistry = handlerRegistry;
         this.schemaValidator = schemaValidator;
+        this.authConfig = authConfig;
 
         SimpleModule ocppModule = new SimpleModule();
         ocppModule.addDeserializer(Ocpp20Message.class, new Ocpp20MessageDeserializer());
@@ -83,9 +91,28 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String chargeBoxId = extractChargeBoxId(session);
+        String remoteIP = extractRemoteIP(session);
 
-        if (!authenticateChargePoint(session, chargeBoxId)) {
-            log.warn("Authentication failed for charge point '{}'", chargeBoxId);
+        // Check IP blacklist first
+        if (authConfig.isBlacklisted(remoteIP)) {
+            log.warn("Connection from blacklisted IP '{}' for charge point '{}'", remoteIP, chargeBoxId);
+            session.close(CloseStatus.POLICY_VIOLATION.withReason("IP address blacklisted"));
+            return;
+        }
+
+        // Check IP whitelist
+        if (!authConfig.isWhitelisted(remoteIP)) {
+            log.warn("Connection from non-whitelisted IP '{}' for charge point '{}'", remoteIP, chargeBoxId);
+            session.close(CloseStatus.POLICY_VIOLATION.withReason("IP address not whitelisted"));
+            return;
+        }
+
+        // Skip authentication for trusted networks if configured
+        boolean isTrustedNetwork = authConfig.isTrustedNetwork(remoteIP);
+        if (isTrustedNetwork) {
+            log.info("Connection from trusted network '{}' for charge point '{}', skipping authentication", remoteIP, chargeBoxId);
+        } else if (!authenticateChargePoint(session, chargeBoxId)) {
+            log.warn("Authentication failed for charge point '{}' from IP '{}'", chargeBoxId, remoteIP);
             session.close(CloseStatus.POLICY_VIOLATION.withReason("Authentication failed"));
             return;
         }
@@ -186,67 +213,82 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
     }
 
     private Object dispatchLegacy(String action, String payloadJson, String chargeBoxId) throws Exception {
-        switch (action) {
-            case "TransactionEvent":
-                TransactionEventRequest txReq = objectMapper.readValue(payloadJson, TransactionEventRequest.class);
-                return centralSystemService.handleTransactionEvent(txReq, chargeBoxId);
-            case "StatusNotification":
-                StatusNotificationRequest statusReq = objectMapper.readValue(payloadJson, StatusNotificationRequest.class);
-                return centralSystemService.handleStatusNotification(statusReq, chargeBoxId);
-            case "MeterValues":
-                MeterValuesRequest meterReq = objectMapper.readValue(payloadJson, MeterValuesRequest.class);
-                return centralSystemService.handleMeterValues(meterReq, chargeBoxId);
-            case "SignCertificate":
-                SignCertificateRequest signCertReq = objectMapper.readValue(payloadJson, SignCertificateRequest.class);
-                return centralSystemService.handleSignCertificate(signCertReq, chargeBoxId);
-            case "SecurityEventNotification":
-                SecurityEventNotificationRequest secEventReq = objectMapper.readValue(payloadJson, SecurityEventNotificationRequest.class);
-                return centralSystemService.handleSecurityEventNotification(secEventReq, chargeBoxId);
-            case "NotifyReport":
-                NotifyReportRequest notifyReportReq = objectMapper.readValue(payloadJson, NotifyReportRequest.class);
-                return centralSystemService.handleNotifyReport(notifyReportReq, chargeBoxId);
-            case "NotifyEvent":
-                NotifyEventRequest notifyEventReq = objectMapper.readValue(payloadJson, NotifyEventRequest.class);
-                return centralSystemService.handleNotifyEvent(notifyEventReq, chargeBoxId);
-            case "FirmwareStatusNotification":
-                FirmwareStatusNotificationRequest fwStatusReq = objectMapper.readValue(payloadJson, FirmwareStatusNotificationRequest.class);
-                return centralSystemService.handleFirmwareStatusNotification(fwStatusReq, chargeBoxId);
-            case "LogStatusNotification":
-                LogStatusNotificationRequest logStatusReq = objectMapper.readValue(payloadJson, LogStatusNotificationRequest.class);
-                return centralSystemService.handleLogStatusNotification(logStatusReq, chargeBoxId);
-            case "NotifyEVChargingNeeds":
-                NotifyEVChargingNeedsRequest evNeedsReq = objectMapper.readValue(payloadJson, NotifyEVChargingNeedsRequest.class);
-                return centralSystemService.handleNotifyEVChargingNeeds(evNeedsReq, chargeBoxId);
-            case "ReportChargingProfiles":
-                ReportChargingProfilesRequest reportProfilesReq = objectMapper.readValue(payloadJson, ReportChargingProfilesRequest.class);
-                return centralSystemService.handleReportChargingProfiles(reportProfilesReq, chargeBoxId);
-            case "ReservationStatusUpdate":
-                ReservationStatusUpdateRequest resStatusReq = objectMapper.readValue(payloadJson, ReservationStatusUpdateRequest.class);
-                return centralSystemService.handleReservationStatusUpdate(resStatusReq, chargeBoxId);
-            case "ClearedChargingLimit":
-                ClearedChargingLimitRequest clearedLimitReq = objectMapper.readValue(payloadJson, ClearedChargingLimitRequest.class);
-                return centralSystemService.handleClearedChargingLimit(clearedLimitReq, chargeBoxId);
-            case "NotifyChargingLimit":
-                NotifyChargingLimitRequest notifyLimitReq = objectMapper.readValue(payloadJson, NotifyChargingLimitRequest.class);
-                return centralSystemService.handleNotifyChargingLimit(notifyLimitReq, chargeBoxId);
-            case "NotifyCustomerInformation":
-                NotifyCustomerInformationRequest custInfoReq = objectMapper.readValue(payloadJson, NotifyCustomerInformationRequest.class);
-                return centralSystemService.handleNotifyCustomerInformation(custInfoReq, chargeBoxId);
-            case "NotifyDisplayMessages":
-                NotifyDisplayMessagesRequest displayMsgReq = objectMapper.readValue(payloadJson, NotifyDisplayMessagesRequest.class);
-                return centralSystemService.handleNotifyDisplayMessages(displayMsgReq, chargeBoxId);
-            case "NotifyEVChargingSchedule":
-                NotifyEVChargingScheduleRequest evScheduleReq = objectMapper.readValue(payloadJson, NotifyEVChargingScheduleRequest.class);
-                return centralSystemService.handleNotifyEVChargingSchedule(evScheduleReq, chargeBoxId);
-            case "NotifyMonitoringReport":
-                NotifyMonitoringReportRequest monitoringReq = objectMapper.readValue(payloadJson, NotifyMonitoringReportRequest.class);
-                return centralSystemService.handleNotifyMonitoringReport(monitoringReq, chargeBoxId);
-            case "PublishFirmwareStatusNotification":
-                PublishFirmwareStatusNotificationRequest pubFwReq = objectMapper.readValue(payloadJson, PublishFirmwareStatusNotificationRequest.class);
-                return centralSystemService.handlePublishFirmwareStatusNotification(pubFwReq, chargeBoxId);
-            default:
+        return switch (action) {
+            case "TransactionEvent" ->
+                centralSystemService.handleTransactionEvent(
+                    objectMapper.readValue(payloadJson, TransactionEventRequest.class), chargeBoxId);
+            case "StatusNotification" ->
+                centralSystemService.handleStatusNotification(
+                    objectMapper.readValue(payloadJson, StatusNotificationRequest.class), chargeBoxId);
+            case "MeterValues" ->
+                centralSystemService.handleMeterValues(
+                    objectMapper.readValue(payloadJson, MeterValuesRequest.class), chargeBoxId);
+            case "SignCertificate" ->
+                centralSystemService.handleSignCertificate(
+                    objectMapper.readValue(payloadJson, SignCertificateRequest.class), chargeBoxId);
+            case "SecurityEventNotification" ->
+                centralSystemService.handleSecurityEventNotification(
+                    objectMapper.readValue(payloadJson, SecurityEventNotificationRequest.class), chargeBoxId);
+            case "NotifyReport" ->
+                centralSystemService.handleNotifyReport(
+                    objectMapper.readValue(payloadJson, NotifyReportRequest.class), chargeBoxId);
+            case "NotifyEvent" ->
+                centralSystemService.handleNotifyEvent(
+                    objectMapper.readValue(payloadJson, NotifyEventRequest.class), chargeBoxId);
+            case "FirmwareStatusNotification" ->
+                centralSystemService.handleFirmwareStatusNotification(
+                    objectMapper.readValue(payloadJson, FirmwareStatusNotificationRequest.class), chargeBoxId);
+            case "LogStatusNotification" ->
+                centralSystemService.handleLogStatusNotification(
+                    objectMapper.readValue(payloadJson, LogStatusNotificationRequest.class), chargeBoxId);
+            case "NotifyEVChargingNeeds" ->
+                centralSystemService.handleNotifyEVChargingNeeds(
+                    objectMapper.readValue(payloadJson, NotifyEVChargingNeedsRequest.class), chargeBoxId);
+            case "ReportChargingProfiles" ->
+                centralSystemService.handleReportChargingProfiles(
+                    objectMapper.readValue(payloadJson, ReportChargingProfilesRequest.class), chargeBoxId);
+            case "ReservationStatusUpdate" ->
+                centralSystemService.handleReservationStatusUpdate(
+                    objectMapper.readValue(payloadJson, ReservationStatusUpdateRequest.class), chargeBoxId);
+            case "ClearedChargingLimit" ->
+                centralSystemService.handleClearedChargingLimit(
+                    objectMapper.readValue(payloadJson, ClearedChargingLimitRequest.class), chargeBoxId);
+            case "NotifyChargingLimit" ->
+                centralSystemService.handleNotifyChargingLimit(
+                    objectMapper.readValue(payloadJson, NotifyChargingLimitRequest.class), chargeBoxId);
+            case "NotifyCustomerInformation" ->
+                centralSystemService.handleNotifyCustomerInformation(
+                    objectMapper.readValue(payloadJson, NotifyCustomerInformationRequest.class), chargeBoxId);
+            case "NotifyDisplayMessages" ->
+                centralSystemService.handleNotifyDisplayMessages(
+                    objectMapper.readValue(payloadJson, NotifyDisplayMessagesRequest.class), chargeBoxId);
+            case "NotifyEVChargingSchedule" ->
+                centralSystemService.handleNotifyEVChargingSchedule(
+                    objectMapper.readValue(payloadJson, NotifyEVChargingScheduleRequest.class), chargeBoxId);
+            case "NotifyMonitoringReport" ->
+                centralSystemService.handleNotifyMonitoringReport(
+                    objectMapper.readValue(payloadJson, NotifyMonitoringReportRequest.class), chargeBoxId);
+            case "PublishFirmwareStatusNotification" ->
+                centralSystemService.handlePublishFirmwareStatusNotification(
+                    objectMapper.readValue(payloadJson, PublishFirmwareStatusNotificationRequest.class), chargeBoxId);
+            case "DataTransfer" ->
+                centralSystemService.handleDataTransfer(
+                    objectMapper.readValue(payloadJson, DataTransferRequest.class), chargeBoxId);
+            case "RequestStartTransaction" ->
+                centralSystemService.handleRequestStartTransaction(
+                    objectMapper.readValue(payloadJson, RequestStartTransactionRequest.class), chargeBoxId);
+            case "RequestStopTransaction" ->
+                centralSystemService.handleRequestStopTransaction(
+                    objectMapper.readValue(payloadJson, RequestStopTransactionRequest.class), chargeBoxId);
+            case "Get15118EVCertificate" ->
+                centralSystemService.handleGet15118EVCertificate(
+                    objectMapper.readValue(payloadJson, Get15118EVCertificateRequest.class), chargeBoxId);
+            case "GetCertificateStatus" ->
+                centralSystemService.handleGetCertificateStatus(
+                    objectMapper.readValue(payloadJson, GetCertificateStatusRequest.class), chargeBoxId);
+            default ->
                 throw new IllegalArgumentException("Unsupported action: " + action);
-        }
+        };
     }
 
     private void sendCallResult(WebSocketSession session, String messageId, Object response) {
@@ -323,12 +365,122 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
                 return false;
             }
 
+            // Check client certificate authentication if enabled
+            if (authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.CERTIFICATE ||
+                authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.COMBINED) {
+                if (!authenticateWithCertificate(session, chargeBoxId)) {
+                    if (authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.CERTIFICATE) {
+                        log.warn("Certificate authentication failed for '{}'", chargeBoxId);
+                        return false;
+                    }
+                    // For COMBINED mode, fall back to basic auth
+                }
+            }
+
+            // Check basic authentication if enabled
+            if (authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.BASIC ||
+                authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.COMBINED) {
+                return authenticateWithBasicAuth(session, chargeBoxId);
+            }
+
+            // NONE mode or allow no auth
+            if (authConfig.getMode() == Ocpp20AuthenticationConfig.AuthMode.NONE ||
+                authConfig.isAllowNoAuth()) {
+                log.debug("No authentication required for '{}'", chargeBoxId);
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            log.error("Authentication error for charge point '{}'", chargeBoxId, e);
+            return false;
+        }
+    }
+
+    private boolean authenticateWithCertificate(WebSocketSession session, String chargeBoxId) {
+        try {
+            // Get SSL session from WebSocket session attributes
+            Object sslSessionObj = session.getAttributes().get("SSL_SESSION");
+            if (!(sslSessionObj instanceof SSLSession)) {
+                log.debug("No SSL session available for '{}'", chargeBoxId);
+                return false;
+            }
+
+            SSLSession sslSession = (SSLSession) sslSessionObj;
+
+            // Get peer certificates
+            X509Certificate[] peerCerts;
+            try {
+                peerCerts = (X509Certificate[]) sslSession.getPeerCertificates();
+            } catch (SSLPeerUnverifiedException e) {
+                log.debug("No client certificate provided by '{}'", chargeBoxId);
+                return false;
+            }
+
+            if (peerCerts == null || peerCerts.length == 0) {
+                log.debug("No client certificates found for '{}'", chargeBoxId);
+                return false;
+            }
+
+            X509Certificate clientCert = peerCerts[0];
+            String subjectDN = clientCert.getSubjectDN().getName();
+
+            // Validate certificate
+            try {
+                clientCert.checkValidity();
+            } catch (Exception e) {
+                log.warn("Client certificate expired or not yet valid for '{}': {}", chargeBoxId, subjectDN);
+                return false;
+            }
+
+            // Check if certificate DN is trusted
+            if (!authConfig.getTrustedCertificateDNs().isEmpty()) {
+                if (!authConfig.getTrustedCertificateDNs().contains(subjectDN)) {
+                    log.warn("Client certificate DN not trusted for '{}': {}", chargeBoxId, subjectDN);
+                    return false;
+                }
+            }
+
+            // Check if CN matches charge box ID
+            String cn = extractCN(subjectDN);
+            if (cn != null && !cn.equals(chargeBoxId)) {
+                log.warn("Certificate CN '{}' does not match charge box ID '{}'", cn, chargeBoxId);
+                return false;
+            }
+
+            log.info("Client certificate authentication successful for '{}' with DN: {}", chargeBoxId, subjectDN);
+            return true;
+
+        } catch (Exception e) {
+            log.error("Certificate authentication error for '{}'", chargeBoxId, e);
+            return false;
+        }
+    }
+
+    private String extractCN(String dn) {
+        String[] parts = dn.split(",");
+        for (String part : parts) {
+            String trimmed = part.trim();
+            if (trimmed.startsWith("CN=")) {
+                return trimmed.substring(3);
+            }
+        }
+        return null;
+    }
+
+    private boolean authenticateWithBasicAuth(WebSocketSession session, String chargeBoxId) {
+        try {
             HttpHeaders headers = session.getHandshakeHeaders();
             List<String> authHeaders = headers.get(HttpHeaders.AUTHORIZATION);
 
             if (authHeaders == null || authHeaders.isEmpty()) {
-                log.debug("No Authorization header from '{}', allowing (backward compatibility)", chargeBoxId);
-                return true;
+                if (authConfig.isAllowNoAuth()) {
+                    log.debug("No Authorization header from '{}', allowing (no auth allowed)", chargeBoxId);
+                    return true;
+                }
+                log.debug("No Authorization header from '{}'", chargeBoxId);
+                return false;
             }
 
             String authHeader = authHeaders.get(0);
@@ -361,8 +513,35 @@ public class Ocpp20WebSocketEndpoint extends TextWebSocketHandler {
             return authenticated;
 
         } catch (Exception e) {
-            log.error("Authentication error for charge point '{}'", chargeBoxId, e);
+            log.error("Basic authentication error for charge point '{}'", chargeBoxId, e);
             return false;
         }
+    }
+
+    private String extractRemoteIP(WebSocketSession session) {
+        try {
+            InetSocketAddress remoteAddress = session.getRemoteAddress();
+            if (remoteAddress != null) {
+                String ip = remoteAddress.getAddress().getHostAddress();
+
+                // Check for X-Forwarded-For header (proxy/load balancer)
+                HttpHeaders headers = session.getHandshakeHeaders();
+                List<String> xForwardedFor = headers.get("X-Forwarded-For");
+                if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+                    String forwarded = xForwardedFor.get(0);
+                    if (forwarded.contains(",")) {
+                        // Take the first IP in the chain
+                        ip = forwarded.split(",")[0].trim();
+                    } else {
+                        ip = forwarded.trim();
+                    }
+                }
+
+                return ip;
+            }
+        } catch (Exception e) {
+            log.error("Failed to extract remote IP", e);
+        }
+        return "unknown";
     }
 }

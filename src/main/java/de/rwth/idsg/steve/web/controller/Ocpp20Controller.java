@@ -39,8 +39,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -458,6 +460,32 @@ public class Ocpp20Controller {
     private static final String CANCEL_RESERVATION_PATH = "/CancelReservation";
     private static final String RESERVE_NOW_PATH = "/ReserveNow";
     private static final String SEND_LOCAL_LIST_PATH = "/SendLocalList";
+    private static final String GET_LOCAL_LIST_VERSION_PATH = "/GetLocalListVersion";
+    private static final String GET_TRANSACTION_STATUS_PATH = "/GetTransactionStatus";
+
+    // Certificate Management Operations
+    private static final String INSTALL_CERTIFICATE_PATH = "/InstallCertificate";
+    private static final String GET_INSTALLED_CERTIFICATE_IDS_PATH = "/GetInstalledCertificateIds";
+    private static final String DELETE_CERTIFICATE_PATH = "/DeleteCertificate";
+    private static final String CERTIFICATE_SIGNED_PATH = "/CertificateSigned";
+    private static final String GET_CERTIFICATE_STATUS_PATH = "/GetCertificateStatus";
+    private static final String GET_15118_EV_CERTIFICATE_PATH = "/Get15118EVCertificate";
+
+    // Customer and Display Operations
+    private static final String CUSTOMER_INFORMATION_PATH = "/CustomerInformation";
+    private static final String GET_DISPLAY_MESSAGES_PATH = "/GetDisplayMessages";
+    private static final String SET_DISPLAY_MESSAGE_PATH = "/SetDisplayMessage";
+    private static final String CLEAR_DISPLAY_MESSAGE_PATH = "/ClearDisplayMessage";
+
+    // Monitoring Operations
+    private static final String SET_MONITORING_BASE_PATH = "/SetMonitoringBase";
+    private static final String SET_MONITORING_LEVEL_PATH = "/SetMonitoringLevel";
+    private static final String SET_VARIABLE_MONITORING_PATH = "/SetVariableMonitoring";
+    private static final String CLEAR_VARIABLE_MONITORING_PATH = "/ClearVariableMonitoring";
+
+    // Firmware Operations
+    private static final String PUBLISH_FIRMWARE_PATH = "/PublishFirmware";
+    private static final String UNPUBLISH_FIRMWARE_PATH = "/UnpublishFirmware";
 
     @RequestMapping(value = SET_CHARGING_PROFILE_PATH, method = RequestMethod.GET)
     public String setChargingProfileGet(Model model) {
@@ -758,4 +786,383 @@ public class Ocpp20Controller {
         model.addAttribute("taskId", task.getTaskId());
         return "redirect:/manager/operations/v2.0" + SEND_LOCAL_LIST_PATH;
     }
+
+    // -------------------------------------------------------------------------
+    // GetLocalListVersion
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = GET_LOCAL_LIST_VERSION_PATH, method = RequestMethod.GET)
+    public String getLocalListVersionGet(Model model) {
+        model.addAttribute("params", new GetLocalListVersionParams());
+        return "op20/GetLocalListVersion";
+    }
+
+    @RequestMapping(value = GET_LOCAL_LIST_VERSION_PATH, method = RequestMethod.POST)
+    public String getLocalListVersionPost(@Valid @ModelAttribute("params") GetLocalListVersionParams params,
+                                          BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/GetLocalListVersion";
+        }
+
+        GetLocalListVersionTask task = new GetLocalListVersionTask(
+            params.getChargePointSelectList()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_LOCAL_LIST_VERSION_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // GetTransactionStatus
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = GET_TRANSACTION_STATUS_PATH, method = RequestMethod.GET)
+    public String getTransactionStatusGet(Model model) {
+        model.addAttribute("params", new GetTransactionStatusParams());
+        return "op20/GetTransactionStatus";
+    }
+
+    @RequestMapping(value = GET_TRANSACTION_STATUS_PATH, method = RequestMethod.POST)
+    public String getTransactionStatusPost(@Valid @ModelAttribute("params") GetTransactionStatusParams params,
+                                           BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/GetTransactionStatus";
+        }
+
+        GetTransactionStatusTask task = new GetTransactionStatusTask(
+            params.getChargePointSelectList(),
+            params.getTransactionId()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_TRANSACTION_STATUS_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // Certificate Management Methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.GET)
+    public String getInstallCertificate(Model model) {
+        model.addAttribute("params", new InstallCertificateParams());
+        return "op20/InstallCertificate";
+    }
+
+    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.POST)
+    public String postInstallCertificate(@Valid @ModelAttribute("params") InstallCertificateParams params,
+                                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/InstallCertificate";
+        }
+
+        InstallCertificateTask task = new InstallCertificateTask(
+            params.getChargePointSelectList(),
+            InstallCertificateUseEnum.fromValue(params.getCertificateType()),
+            params.getCertificate()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + INSTALL_CERTIFICATE_PATH;
+    }
+
+    @RequestMapping(value = GET_INSTALLED_CERTIFICATE_IDS_PATH, method = RequestMethod.GET)
+    public String getGetInstalledCertificateIds(Model model) {
+        model.addAttribute("params", new GetInstalledCertificateIdsParams());
+        return "op20/GetInstalledCertificateIds";
+    }
+
+    @RequestMapping(value = GET_INSTALLED_CERTIFICATE_IDS_PATH, method = RequestMethod.POST)
+    public String postGetInstalledCertificateIds(@Valid @ModelAttribute("params") GetInstalledCertificateIdsParams params,
+                                                 BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/GetInstalledCertificateIds";
+        }
+
+        GetCertificateIdUseEnum certType = params.getCertificateType() != null && !params.getCertificateType().isEmpty()
+            ? GetCertificateIdUseEnum.fromValue(params.getCertificateType())
+            : null;
+
+        GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(
+            params.getChargePointSelectList(),
+            certType
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_INSTALLED_CERTIFICATE_IDS_PATH;
+    }
+
+    @RequestMapping(value = DELETE_CERTIFICATE_PATH, method = RequestMethod.GET)
+    public String getDeleteCertificate(Model model) {
+        model.addAttribute("params", new DeleteCertificateParams());
+        
+        return "op20/DeleteCertificate";
+    }
+
+    @RequestMapping(value = DELETE_CERTIFICATE_PATH, method = RequestMethod.POST)
+    public String postDeleteCertificate(@Valid @ModelAttribute("params") DeleteCertificateParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/DeleteCertificate";
+        }
+
+        DeleteCertificateTask task = new DeleteCertificateTask(
+            params.getChargePointSelectList(),
+            params.getIssuerNameHash(),
+            params.getIssuerKeyHash(),
+            params.getSerialNumber()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + DELETE_CERTIFICATE_PATH;
+    }
+
+    @RequestMapping(value = CERTIFICATE_SIGNED_PATH, method = RequestMethod.GET)
+    public String getCertificateSigned(Model model) {
+        model.addAttribute("params", new CertificateSignedParams());
+        
+        return "op20/CertificateSigned";
+    }
+
+    @RequestMapping(value = CERTIFICATE_SIGNED_PATH, method = RequestMethod.POST)
+    public String postCertificateSigned(@Valid @ModelAttribute("params") CertificateSignedParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/CertificateSigned";
+        }
+
+        CertificateSignedTask task = new CertificateSignedTask(
+            params.getChargePointSelectList(),
+            params.getCertificateChain()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + CERTIFICATE_SIGNED_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // Customer and Display Management Methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = CUSTOMER_INFORMATION_PATH, method = RequestMethod.GET)
+    public String getCustomerInformation(Model model) {
+        model.addAttribute("params", new CustomerInformationParams());
+        
+        return "op20/CustomerInformation";
+    }
+
+    @RequestMapping(value = CUSTOMER_INFORMATION_PATH, method = RequestMethod.POST)
+    public String postCustomerInformation(@Valid @ModelAttribute("params") CustomerInformationParams params,
+                                          BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/CustomerInformation";
+        }
+
+        CustomerInformationTask task = new CustomerInformationTask(
+            params.getChargePointSelectList(),
+            params.getRequestId(),
+            params.getReport(),
+            params.getClear(),
+            params.getCustomerIdentifier()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + CUSTOMER_INFORMATION_PATH;
+    }
+
+    @RequestMapping(value = GET_DISPLAY_MESSAGES_PATH, method = RequestMethod.GET)
+    public String getGetDisplayMessages(Model model) {
+        model.addAttribute("params", new GetDisplayMessagesParams());
+        
+        return "op20/GetDisplayMessages";
+    }
+
+    @RequestMapping(value = GET_DISPLAY_MESSAGES_PATH, method = RequestMethod.POST)
+    public String postGetDisplayMessages(@Valid @ModelAttribute("params") GetDisplayMessagesParams params,
+                                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/GetDisplayMessages";
+        }
+
+        List<Integer> messageIds = null;
+        if (params.getMessageIds() != null && !params.getMessageIds().isEmpty()) {
+            messageIds = Arrays.stream(params.getMessageIds().split(","))
+                .map(String::trim)
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        }
+
+        MessagePriorityEnum priority = params.getPriority() != null && !params.getPriority().isEmpty()
+            ? MessagePriorityEnum.fromValue(params.getPriority())
+            : null;
+
+        MessageStateEnum state = params.getState() != null && !params.getState().isEmpty()
+            ? MessageStateEnum.fromValue(params.getState())
+            : null;
+
+        GetDisplayMessagesTask task = new GetDisplayMessagesTask(
+            params.getChargePointSelectList(),
+            params.getRequestId(),
+            messageIds,
+            priority,
+            state
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_DISPLAY_MESSAGES_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // Monitoring Methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = SET_MONITORING_BASE_PATH, method = RequestMethod.GET)
+    public String getSetMonitoringBase(Model model) {
+        model.addAttribute("params", new SetMonitoringBaseParams());
+        
+        return "op20/SetMonitoringBase";
+    }
+
+    @RequestMapping(value = SET_MONITORING_BASE_PATH, method = RequestMethod.POST)
+    public String postSetMonitoringBase(@Valid @ModelAttribute("params") SetMonitoringBaseParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/SetMonitoringBase";
+        }
+
+        SetMonitoringBaseTask task = new SetMonitoringBaseTask(
+            params.getChargePointSelectList(),
+            MonitoringBaseEnum.ALL // Default to ALL, could be made configurable
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + SET_MONITORING_BASE_PATH;
+    }
+
+    @RequestMapping(value = SET_MONITORING_LEVEL_PATH, method = RequestMethod.GET)
+    public String getSetMonitoringLevel(Model model) {
+        model.addAttribute("params", new SetMonitoringLevelParams());
+        
+        return "op20/SetMonitoringLevel";
+    }
+
+    @RequestMapping(value = SET_MONITORING_LEVEL_PATH, method = RequestMethod.POST)
+    public String postSetMonitoringLevel(@Valid @ModelAttribute("params") SetMonitoringLevelParams params,
+                                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/SetMonitoringLevel";
+        }
+
+        SetMonitoringLevelTask task = new SetMonitoringLevelTask(
+            params.getChargePointSelectList(),
+            params.getSeverity()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + SET_MONITORING_LEVEL_PATH;
+    }
+
+    @RequestMapping(value = CLEAR_VARIABLE_MONITORING_PATH, method = RequestMethod.GET)
+    public String getClearVariableMonitoring(Model model) {
+        model.addAttribute("params", new ClearVariableMonitoringParams());
+        
+        return "op20/ClearVariableMonitoring";
+    }
+
+    @RequestMapping(value = CLEAR_VARIABLE_MONITORING_PATH, method = RequestMethod.POST)
+    public String postClearVariableMonitoring(@Valid @ModelAttribute("params") ClearVariableMonitoringParams params,
+                                              BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/ClearVariableMonitoring";
+        }
+
+        List<Integer> monitoringIds = Arrays.stream(params.getMonitoringIds().split(","))
+            .map(String::trim)
+            .map(Integer::parseInt)
+            .collect(Collectors.toList());
+
+        ClearVariableMonitoringTask task = new ClearVariableMonitoringTask(
+            params.getChargePointSelectList(),
+            monitoringIds
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + CLEAR_VARIABLE_MONITORING_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // Firmware Methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = PUBLISH_FIRMWARE_PATH, method = RequestMethod.GET)
+    public String getPublishFirmware(Model model) {
+        model.addAttribute("params", new PublishFirmwareParams());
+        
+        return "op20/PublishFirmware";
+    }
+
+    @RequestMapping(value = PUBLISH_FIRMWARE_PATH, method = RequestMethod.POST)
+    public String postPublishFirmware(@Valid @ModelAttribute("params") PublishFirmwareParams params,
+                                      BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/PublishFirmware";
+        }
+
+        PublishFirmwareTask task = new PublishFirmwareTask(
+            params.getChargePointSelectList(),
+            params.getLocation(),
+            params.getRetries(),
+            params.getRetryInterval(),
+            params.getChecksum(),
+            params.getRequestId()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + PUBLISH_FIRMWARE_PATH;
+    }
+
+    @RequestMapping(value = UNPUBLISH_FIRMWARE_PATH, method = RequestMethod.GET)
+    public String getUnpublishFirmware(Model model) {
+        model.addAttribute("params", new UnpublishFirmwareParams());
+        
+        return "op20/UnpublishFirmware";
+    }
+
+    @RequestMapping(value = UNPUBLISH_FIRMWARE_PATH, method = RequestMethod.POST)
+    public String postUnpublishFirmware(@Valid @ModelAttribute("params") UnpublishFirmwareParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            
+            return "op20/UnpublishFirmware";
+        }
+
+        UnpublishFirmwareTask task = new UnpublishFirmwareTask(
+            params.getChargePointSelectList(),
+            params.getChecksum()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + UNPUBLISH_FIRMWARE_PATH;
+    }
+
 }

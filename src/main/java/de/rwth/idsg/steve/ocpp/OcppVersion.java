@@ -32,7 +32,8 @@ import lombok.RequiredArgsConstructor;
 public enum OcppVersion {
     V_12("ocpp1.2"),
     V_15("ocpp1.5"),
-    V_16("ocpp1.6");
+    V_16("ocpp1.6"),
+    V_20("ocpp2.0");
 
     private final String value;
 

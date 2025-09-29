@@ -118,6 +118,60 @@ class OCPP20CSMSTest:
                 "getVariableResult": []
             }
 
+        elif action == "GetBaseReport":
+            print(f"\n{Colors.BOLD}📊 Get Base Report Request{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            print(f"  Report Base: {payload.get('reportBase')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Base report generation started"
+                }
+            }
+
+        elif action == "GetReport":
+            print(f"\n{Colors.BOLD}📈 Get Report Request{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Report generation started"
+                }
+            }
+
+        elif action == "SetNetworkProfile":
+            print(f"\n{Colors.BOLD}🌐 Set Network Profile Request{Colors.ENDC}")
+            print(f"  Configuration Slot: {payload.get('configurationSlot')}")
+            connection_data = payload.get('connectionData', {})
+            if connection_data:
+                print(f"  OCPP Version: {connection_data.get('ocppVersion')}")
+                print(f"  OCPP CSMS URL: {connection_data.get('ocppCsmsUrl')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Network profile configured"
+                }
+            }
+
+        elif action == "SetChargingProfile":
+            print(f"\n{Colors.BOLD}⚡ Set Charging Profile Request{Colors.ENDC}")
+            print(f"  EVSE ID: {payload.get('evseId')}")
+            charging_profile = payload.get('chargingProfile', {})
+            if charging_profile:
+                print(f"  Profile ID: {charging_profile.get('id')}")
+                print(f"  Stack Level: {charging_profile.get('stackLevel')}")
+                print(f"  Purpose: {charging_profile.get('chargingProfilePurpose')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Charging profile set successfully"
+                }
+            }
+
         else:
             print(f"\n{Colors.WARNING}⚠ Unsupported action: {action}{Colors.ENDC}")
             return {}

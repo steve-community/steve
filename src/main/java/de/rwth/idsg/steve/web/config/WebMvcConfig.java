@@ -28,9 +28,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final GatewayMenuInterceptor gatewayMenuInterceptor;
+    private final Ocpp20MenuInterceptor ocpp20MenuInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(gatewayMenuInterceptor);
+        registry.addInterceptor(ocpp20MenuInterceptor);
     }
 }

@@ -77,18 +77,21 @@ public class ChargePointServiceJsonInvoker {
             case V_12 -> ocpp12WebSocketEndpoint;
             case V_15 -> ocpp15WebSocketEndpoint;
             case V_16 -> ocpp16WebSocketEndpoint;
+            case V_20 -> throw new UnsupportedOperationException("OCPP 2.0 uses Ocpp20TaskExecutor");
         };
 
         var typeStore = switch (cps.getOcppProtocol().getVersion()) {
             case V_12 -> Ocpp12TypeStore.INSTANCE;
             case V_15 -> Ocpp15TypeStore.INSTANCE;
             case V_16 -> Ocpp16TypeStore.INSTANCE;
+            case V_20 -> throw new UnsupportedOperationException("OCPP 2.0 uses Ocpp20TaskExecutor");
         };
 
         RequestType request = switch (cps.getOcppProtocol().getVersion()) {
             case V_12 -> task.getOcpp12Request();
             case V_15 -> task.getOcpp15Request();
             case V_16 -> task.getOcpp16Request();
+            case V_20 -> throw new UnsupportedOperationException("OCPP 2.0 uses Ocpp20TaskExecutor");
         };
 
         ActionResponsePair pair = typeStore.findActionResponse(request);

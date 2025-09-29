@@ -262,6 +262,109 @@ class OCPP20CertificationTests:
 
         return False
 
+    async def test_08_get_base_report(self):
+        print(f"\n{Colors.HEADER}Test 8: GetBaseReport (CSMS Command){Colors.ENDC}")
+
+        # This test waits for a GetBaseReport from CSMS
+        print("Waiting for GetBaseReport command from CSMS...")
+        try:
+            with_timeout = asyncio.wait_for(self.websocket.recv(), timeout=5.0)
+            response = await with_timeout
+            message = json.loads(response)
+
+            if message[0] == 2 and message[2] == "GetBaseReport":
+                print(f"✓ Received GetBaseReport request")
+                print(f"  Request ID: {message[3].get('requestId')}")
+                print(f"  Report Base: {message[3].get('reportBase')}")
+
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await self.websocket.send(json.dumps(response_msg))
+
+                self.log_test("GetBaseReport", "PASS", "GetBaseReport handled")
+                return True
+        except asyncio.TimeoutError:
+            print("Note: No GetBaseReport received (this is optional)")
+
+        return True  # Optional test
+
+    async def test_09_get_report(self):
+        print(f"\n{Colors.HEADER}Test 9: GetReport (CSMS Command){Colors.ENDC}")
+
+        # This test waits for a GetReport from CSMS
+        print("Waiting for GetReport command from CSMS...")
+        try:
+            with_timeout = asyncio.wait_for(self.websocket.recv(), timeout=5.0)
+            response = await with_timeout
+            message = json.loads(response)
+
+            if message[0] == 2 and message[2] == "GetReport":
+                print(f"✓ Received GetReport request")
+                print(f"  Request ID: {message[3].get('requestId')}")
+
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await self.websocket.send(json.dumps(response_msg))
+
+                self.log_test("GetReport", "PASS", "GetReport handled")
+                return True
+        except asyncio.TimeoutError:
+            print("Note: No GetReport received (this is optional)")
+
+        return True  # Optional test
+
+    async def test_10_set_network_profile(self):
+        print(f"\n{Colors.HEADER}Test 10: SetNetworkProfile (CSMS Command){Colors.ENDC}")
+
+        # This test waits for a SetNetworkProfile from CSMS
+        print("Waiting for SetNetworkProfile command from CSMS...")
+        try:
+            with_timeout = asyncio.wait_for(self.websocket.recv(), timeout=5.0)
+            response = await with_timeout
+            message = json.loads(response)
+
+            if message[0] == 2 and message[2] == "SetNetworkProfile":
+                print(f"✓ Received SetNetworkProfile request")
+                print(f"  Configuration Slot: {message[3].get('configurationSlot')}")
+
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await self.websocket.send(json.dumps(response_msg))
+
+                self.log_test("SetNetworkProfile", "PASS", "SetNetworkProfile handled")
+                return True
+        except asyncio.TimeoutError:
+            print("Note: No SetNetworkProfile received (this is optional)")
+
+        return True  # Optional test
+
+    async def test_11_set_charging_profile(self):
+        print(f"\n{Colors.HEADER}Test 11: SetChargingProfile (CSMS Command){Colors.ENDC}")
+
+        # This test waits for a SetChargingProfile from CSMS
+        print("Waiting for SetChargingProfile command from CSMS...")
+        try:
+            with_timeout = asyncio.wait_for(self.websocket.recv(), timeout=5.0)
+            response = await with_timeout
+            message = json.loads(response)
+
+            if message[0] == 2 and message[2] == "SetChargingProfile":
+                print(f"✓ Received SetChargingProfile request")
+                profile = message[3].get('chargingProfile', {})
+                print(f"  Profile ID: {profile.get('id')}")
+                print(f"  Stack Level: {profile.get('stackLevel')}")
+
+                # Send response
+                response_msg = [3, message[1], {"status": "Accepted"}]
+                await self.websocket.send(json.dumps(response_msg))
+
+                self.log_test("SetChargingProfile", "PASS", "SetChargingProfile handled")
+                return True
+        except asyncio.TimeoutError:
+            print("Note: No SetChargingProfile received (this is optional)")
+
+        return True  # Optional test
+
     async def run_all_tests(self):
         print(f"\n{Colors.BOLD}{'='*60}{Colors.ENDC}")
         print(f"{Colors.BOLD}OCPP 2.0.1 Certification Tests for SteVe{Colors.ENDC}")
@@ -285,6 +388,11 @@ class OCPP20CertificationTests:
                 await self.test_05_transaction_event_started()
                 await self.test_06_meter_values()
                 await self.test_07_transaction_event_ended()
+                # Optional CSMS command tests
+                await self.test_08_get_base_report()
+                await self.test_09_get_report()
+                await self.test_10_set_network_profile()
+                await self.test_11_set_charging_profile()
 
         except Exception as e:
             print(f"\n{Colors.FAIL}Connection error: {e}{Colors.ENDC}")

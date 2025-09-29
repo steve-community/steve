@@ -35,7 +35,9 @@ public enum OcppProtocol {
     V_15_JSON(OcppVersion.V_15, OcppTransport.JSON),
 
     V_16_SOAP(OcppVersion.V_16, OcppTransport.SOAP),
-    V_16_JSON(OcppVersion.V_16, OcppTransport.JSON);
+    V_16_JSON(OcppVersion.V_16, OcppTransport.JSON),
+
+    V_20_JSON(OcppVersion.V_20, OcppTransport.JSON);
 
     private final OcppVersion version;
     private final OcppTransport transport;

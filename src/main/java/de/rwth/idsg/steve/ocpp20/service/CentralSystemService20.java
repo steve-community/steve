@@ -143,9 +143,11 @@ public class CentralSystemService20 {
                 String variableName = reportData.getVariable() != null ? reportData.getVariable().getName() : "Unknown";
 
                 if (reportData.getVariableAttribute() != null && !reportData.getVariableAttribute().isEmpty()) {
-                    String value = reportData.getVariableAttribute().get(0).getValue();
-                    if (value != null) {
-                        ocpp20Repository.upsertVariable(chargeBoxId, componentName, variableName, value);
+                    for (VariableAttribute attr : reportData.getVariableAttribute()) {
+                        String value = attr.getValue();
+                        if (value != null) {
+                            ocpp20Repository.upsertVariable(chargeBoxId, componentName, variableName, value);
+                        }
                     }
                 }
             }

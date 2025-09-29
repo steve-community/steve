@@ -85,6 +85,37 @@ class CSMSOperationsDemo:
                 }
             }
 
+        elif action == "DataTransfer":
+            print(f"\n{Colors.BOLD}📦 Data Transfer{Colors.ENDC}")
+            return {
+                "status": "Accepted",
+                "data": "Response data from charge point",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Data transfer processed"
+                }
+            }
+
+        elif action == "ClearCache":
+            print(f"\n{Colors.BOLD}🗑️  Clear Cache{Colors.ENDC}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Authorization cache cleared"
+                }
+            }
+
+        elif action == "ChangeAvailability":
+            print(f"\n{Colors.BOLD}🔧 Change Availability{Colors.ENDC}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": f"Availability changed to {payload.get('operationalStatus')}"
+                }
+            }
+
         elif action == "UnlockConnector":
             print(f"\n{Colors.BOLD}🔓 Unlock Connector{Colors.ENDC}")
             return {
@@ -92,6 +123,152 @@ class CSMSOperationsDemo:
                 "statusInfo": {
                     "reasonCode": "Unlocked",
                     "additionalInfo": "Connector unlocked"
+                }
+            }
+
+        elif action == "GetBaseReport":
+            print(f"\n{Colors.BOLD}📊 Get Base Report{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            print(f"  Report Base: {payload.get('reportBase')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Base report generation started"
+                }
+            }
+
+        elif action == "GetReport":
+            print(f"\n{Colors.BOLD}📈 Get Report{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Report generation started"
+                }
+            }
+
+        elif action == "SetNetworkProfile":
+            print(f"\n{Colors.BOLD}🌐 Set Network Profile{Colors.ENDC}")
+            print(f"  Configuration Slot: {payload.get('configurationSlot')}")
+            connection_data = payload.get('connectionData', {})
+            if connection_data:
+                print(f"  OCPP CSMS URL: {connection_data.get('ocppCsmsUrl')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Network profile configured"
+                }
+            }
+
+        elif action == "GetChargingProfiles":
+            print(f"\n{Colors.BOLD}📊 Get Charging Profiles Request{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            print(f"  EVSE ID: {payload.get('evseId')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Charging profiles will be reported"
+                }
+            }
+
+        elif action == "ClearChargingProfile":
+            print(f"\n{Colors.BOLD}🗑️  Clear Charging Profile Request{Colors.ENDC}")
+            print(f"  Profile ID: {payload.get('chargingProfileId')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Charging profile cleared"
+                }
+            }
+
+        elif action == "GetCompositeSchedule":
+            print(f"\n{Colors.BOLD}📅 Get Composite Schedule Request{Colors.ENDC}")
+            print(f"  Duration: {payload.get('duration')}")
+            print(f"  EVSE ID: {payload.get('evseId')}")
+            return {
+                "status": "Accepted",
+                "chargingSchedule": {
+                    "evseId": payload.get('evseId'),
+                    "duration": payload.get('duration'),
+                    "chargingRateUnit": "A",
+                    "chargingSchedulePeriod": []
+                },
+                "statusInfo": {
+                    "reasonCode": "Accepted"
+                }
+            }
+
+        elif action == "UpdateFirmware":
+            print(f"\n{Colors.BOLD}⬆️  Update Firmware Request{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            firmware = payload.get('firmware', {})
+            if firmware:
+                print(f"  Location: {firmware.get('location')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Firmware update will be performed"
+                }
+            }
+
+        elif action == "GetLog":
+            print(f"\n{Colors.BOLD}📜 Get Log Request{Colors.ENDC}")
+            print(f"  Request ID: {payload.get('requestId')}")
+            print(f"  Log Type: {payload.get('logType')}")
+            log_params = payload.get('log', {})
+            if log_params:
+                print(f"  Remote Location: {log_params.get('remoteLocation')}")
+            return {
+                "status": "Accepted",
+                "filename": f"log_{payload.get('requestId')}.log",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Log upload will start"
+                }
+            }
+
+        elif action == "CancelReservation":
+            print(f"\n{Colors.BOLD}🚫 Cancel Reservation Request{Colors.ENDC}")
+            print(f"  Reservation ID: {payload.get('reservationId')}")
+            return {"status": "Accepted"}
+
+        elif action == "ReserveNow":
+            print(f"\n{Colors.BOLD}📅 Reserve Now Request{Colors.ENDC}")
+            print(f"  ID: {payload.get('id')}")
+            print(f"  Expiry DateTime: {payload.get('expiryDateTime')}")
+            id_token = payload.get('idToken', {})
+            if id_token:
+                print(f"  ID Token: {id_token.get('idToken')} ({id_token.get('type')})")
+            if payload.get('evseId'):
+                print(f"  EVSE ID: {payload.get('evseId')}")
+            return {"status": "Accepted"}
+
+        elif action == "SendLocalList":
+            print(f"\n{Colors.BOLD}📋 Send Local List Request{Colors.ENDC}")
+            print(f"  Version Number: {payload.get('versionNumber')}")
+            print(f"  Update Type: {payload.get('updateType')}")
+            auth_list = payload.get('localAuthorizationList', [])
+            print(f"  Authorization List: {len(auth_list)} entries")
+            return {"status": "Accepted"}
+
+        elif action == "SetChargingProfile":
+            print(f"\n{Colors.BOLD}⚡ Set Charging Profile{Colors.ENDC}")
+            charging_profile = payload.get('chargingProfile', {})
+            if charging_profile:
+                print(f"  Profile ID: {charging_profile.get('id')}")
+                print(f"  Stack Level: {charging_profile.get('stackLevel')}")
+                print(f"  Purpose: {charging_profile.get('chargingProfilePurpose')}")
+            return {
+                "status": "Accepted",
+                "statusInfo": {
+                    "reasonCode": "Accepted",
+                    "additionalInfo": "Charging profile set"
                 }
             }
 
@@ -144,6 +321,10 @@ class CSMSOperationsDemo:
                 print(f"  2. {Colors.BOLD}RequestStopTransaction{Colors.ENDC} - Stop a charging session")
                 print(f"  3. {Colors.BOLD}Reset{Colors.ENDC} - Reset the charge point")
                 print(f"  4. {Colors.BOLD}UnlockConnector{Colors.ENDC} - Unlock a stuck connector")
+                print(f"  5. {Colors.BOLD}GetBaseReport{Colors.ENDC} - Request base report from charge point")
+                print(f"  6. {Colors.BOLD}GetReport{Colors.ENDC} - Request custom report from charge point")
+                print(f"  7. {Colors.BOLD}SetNetworkProfile{Colors.ENDC} - Configure network profile")
+                print(f"  8. {Colors.BOLD}SetChargingProfile{Colors.ENDC} - Set charging profile")
 
                 print(f"\n{Colors.CYAN}How to test:{Colors.ENDC}")
                 print(f"  • Use Ocpp20TaskService in Java code")

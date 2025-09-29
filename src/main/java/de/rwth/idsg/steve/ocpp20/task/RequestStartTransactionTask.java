@@ -34,12 +34,12 @@ public class RequestStartTransactionTask extends Ocpp20Task<RequestStartTransact
     private final String idTokenType;
     private final Integer remoteStartId;
 
-    public RequestStartTransactionTask(List<String> chargeBoxIds, Integer evseId, String idToken, String idTokenType) {
+    public RequestStartTransactionTask(List<String> chargeBoxIds, String idToken, Integer remoteStartId, Integer evseId) {
         super("RequestStartTransaction", chargeBoxIds);
-        this.evseId = evseId;
         this.idToken = idToken;
-        this.idTokenType = idTokenType;
-        this.remoteStartId = (int) (System.currentTimeMillis() / 1000);
+        this.idTokenType = "ISO14443";
+        this.remoteStartId = remoteStartId;
+        this.evseId = evseId;
     }
 
     @Override

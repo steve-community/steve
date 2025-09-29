@@ -19,8 +19,9 @@
 package de.rwth.idsg.steve.ocpp20.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -35,20 +36,16 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "ocpp.v20.enabled", havingValue = "true")
 public class Ocpp20MessageDispatcher {
 
-    private final ObjectMapper objectMapper = createObjectMapper();
+    @Qualifier("ocpp20ObjectMapper")
+    private final ObjectMapper objectMapper;
     private final Map<String, PendingRequest<?>> pendingRequests = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     private static final long DEFAULT_TIMEOUT_SECONDS = 30;
-
-    private ObjectMapper createObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        return mapper;
-    }
 
     public void registerSession(String chargeBoxId, WebSocketSession session) {
         sessionMap.put(chargeBoxId, session);
@@ -117,10 +114,10 @@ public class Ocpp20MessageDispatcher {
 
     @SuppressWarnings("unchecked")
     public void handleCallResult(String messageId, Object payload) {
-        PendingRequest<?> pendingRequest = pendingRequests.remove(messageId);
+        PendingRequest<?> pendingRequest = pendingRequests.get(messageId);
 
         if (pendingRequest == null) {
-            log.warn("Received CallResult for unknown messageId: {}", messageId);
+            log.warn("Received CallResult for unknown or timed-out messageId: {}", messageId);
             return;
         }
 
@@ -130,19 +127,25 @@ public class Ocpp20MessageDispatcher {
                 pendingRequest.chargeBoxId, pendingRequest.action, messageId);
             log.debug("CallResult payload: {}", payload);
 
-            ((CompletableFuture<Object>) pendingRequest.future).complete(response);
+            if (((CompletableFuture<Object>) pendingRequest.future).complete(response)) {
+                pendingRequests.remove(messageId);
+            } else {
+                log.debug("CallResult arrived after timeout for messageId: {}", messageId);
+                pendingRequests.remove(messageId);
+            }
 
         } catch (Exception e) {
             log.error("Error processing CallResult for messageId '{}'", messageId, e);
             pendingRequest.future.completeExceptionally(e);
+            pendingRequests.remove(messageId);
         }
     }
 
     public void handleCallError(String messageId, String errorCode, String errorDescription, Object errorDetails) {
-        PendingRequest<?> pendingRequest = pendingRequests.remove(messageId);
+        PendingRequest<?> pendingRequest = pendingRequests.get(messageId);
 
         if (pendingRequest == null) {
-            log.warn("Received CallError for unknown messageId: {}", messageId);
+            log.warn("Received CallError for unknown or timed-out messageId: {}", messageId);
             return;
         }
 
@@ -150,7 +153,12 @@ public class Ocpp20MessageDispatcher {
             pendingRequest.chargeBoxId, pendingRequest.action, messageId, errorCode, errorDescription);
 
         String errorMessage = String.format("[%s] %s", errorCode, errorDescription);
-        pendingRequest.future.completeExceptionally(new RuntimeException(errorMessage));
+        if (pendingRequest.future.completeExceptionally(new RuntimeException(errorMessage))) {
+            pendingRequests.remove(messageId);
+        } else {
+            log.debug("CallError arrived after timeout for messageId: {}", messageId);
+            pendingRequests.remove(messageId);
+        }
     }
 
     public boolean hasActiveSession(String chargeBoxId) {

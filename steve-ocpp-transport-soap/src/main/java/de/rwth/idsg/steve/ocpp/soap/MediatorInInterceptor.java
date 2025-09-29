@@ -18,18 +18,14 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -41,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
@@ -51,29 +46,29 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
 
     private final Map<String, Server> actualServers;
 
-    public MediatorInInterceptor(Bus bus, SteveConfiguration config) {
+    public MediatorInInterceptor(List<EndpointImpl> endpoints) {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
-        actualServers = initServerLookupMap(bus, config);
+        actualServers = initServerLookupMap(endpoints);
     }
 
     public final void handleMessage(SoapMessage message) {
-        String schemaNamespace = "";
+        var schemaNamespace = "";
 
         // Scan the incoming message for its schema namespace
         try {
             // Create a buffered stream so that we get back the original stream after scanning
-            InputStream is = message.getContent(InputStream.class);
-            BufferedInputStream bis = new BufferedInputStream(is);
+            var is = message.getContent(InputStream.class);
+            var bis = new BufferedInputStream(is);
             bis.mark(bis.available());
             message.setContent(InputStream.class, bis);
 
-            String encoding = (String) message.get(Message.ENCODING);
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(bis, encoding);
-            DepthXMLStreamReader xmlReader = new DepthXMLStreamReader(reader);
+            var encoding = (String) message.get(Message.ENCODING);
+            var reader = StaxUtils.createXMLStreamReader(bis, encoding);
+            var xmlReader = new DepthXMLStreamReader(reader);
 
             if (xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {
-                SoapVersion soapVersion = message.getVersion();
+                var soapVersion = message.getVersion();
                 // Advance just past header
                 StaxUtils.toNextTag(xmlReader, soapVersion.getBody());
                 // Past body
@@ -87,12 +82,14 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         }
 
         // We redirect the message to the actual OCPP service
-        Server targetServer = actualServers.get(schemaNamespace);
+        var targetServer = actualServers.get(schemaNamespace);
 
         // Redirect the request
-        if (targetServer != null) {
-            targetServer.getDestination().getMessageObserver().onMessage(message);
+        if (targetServer == null) {
+            log.warn("No server mapped for namespace '{}'", schemaNamespace);
+            return;
         }
+        targetServer.getDestination().getMessageObserver().onMessage(message);
 
         // Now the response has been put in the message, abort the chain
         message.getInterceptorChain().abort();
@@ -104,30 +101,12 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
      * redirect to the version-specific implementation according to the namespace
      * of the incoming message.
      */
-    private static Map<String, Server> initServerLookupMap(Bus bus, SteveConfiguration config) {
-        String exceptionMsg = "The services are not created and/or registered to the bus yet.";
-
-        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
-        if (serverRegistry == null) {
-            throw new RuntimeException(exceptionMsg);
-        }
-
-        List<Server> temp = serverRegistry.getServers();
-        if (temp.isEmpty()) {
-            throw new RuntimeException(exceptionMsg);
-        }
-
-        Map<String, Server> actualServers = new HashMap<>(temp.size() - 1);
-        for (Server server : temp) {
-            EndpointInfo info = server.getEndpoint().getEndpointInfo();
-            String address = info.getAddress();
-
-            // exclude the 'dummy' routing server
-            if (config.getPaths().getRouterEndpointPath().equals(address)) {
-                continue;
-            }
-
-            String serverNamespace = info.getName().getNamespaceURI();
+    private static Map<String, Server> initServerLookupMap(List<EndpointImpl> endpoints) {
+        var actualServers = new HashMap<String, Server>();
+        for (var endpoint : endpoints) {
+            var server = endpoint.getServer();
+            var serverNamespace =
+                    server.getEndpoint().getEndpointInfo().getName().getNamespaceURI();
             actualServers.put(serverNamespace, server);
         }
         return actualServers;

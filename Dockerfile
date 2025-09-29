@@ -52,7 +52,6 @@ RUN --mount=type=cache,target=/root/.m2 \
       -Ddb.schema="${DB_DATABASE}" \
       -Ddb.user="${DB_USER}" \
       -Ddb.password="${DB_PASSWORD}" \
-      -Dprofile=prod \
       -Dappender=CONSOLE
 
 FROM eclipse-temurin:21-jre
@@ -75,11 +74,11 @@ RUN apt-get update \
 HEALTHCHECK --interval=10s --timeout=3s --retries=20 \
   CMD curl -fsS "http://127.0.0.1:${PORT}/" || exit 1
 
-ENV JAVA_TOOL_OPTIONS="-Dserver.host=0.0.0.0 -Dhttp.port=${PORT} -Ddb.jdbc.url='jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslMode=PREFERRED&serverTimezone=UTC' -Ddb.schema=${DB_DATABASE} -Ddb.user=${DB_USER} -Ddb.password=${DB_PASSWORD} -Djdk.tls.client.protocols='TLSv1,TLSv1.1,TLSv1.2' -Dserver.gzip.enabled=false"
+ENV JAVA_TOOL_OPTIONS="-Dserver.address=0.0.0.0 -Dserver.port=${PORT} -Ddb.jdbc.url='jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslMode=PREFERRED&serverTimezone=UTC' -Ddb.schema=${DB_DATABASE} -Ddb.user=${DB_USER} -Ddb.password=${DB_PASSWORD} -Djdk.tls.client.protocols='TLSv1,TLSv1.1,TLSv1.2' -Dserver.gzip.enabled=false"
 
 RUN addgroup --system app && adduser --system --ingroup app app
 
-COPY --from=builder --chown=app:app /code/steve/target/steve.jar /app/
+COPY --from=builder --chown=app:app /code/steve/target/steve.war /app/
 COPY --from=builder --chown=app:app /code/steve/target/libs/ /app/libs/
 
 USER app
@@ -87,4 +86,4 @@ USER app
 EXPOSE ${PORT}
 EXPOSE 8443
 
-CMD ["sh", "-c", "exec java -XX:MaxRAMPercentage=85 -jar /app/steve.jar"]
+CMD ["sh", "-c", "exec java -XX:MaxRAMPercentage=85 -jar /app/steve.war"]

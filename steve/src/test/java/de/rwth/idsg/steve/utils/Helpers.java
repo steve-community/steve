@@ -18,10 +18,13 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,76 +41,69 @@ public class Helpers {
     }
 
     public static List<String> getRandomStrings(int size) {
-        List<String> list = new ArrayList<>(size);
+        var list = new ArrayList<String>(size);
         for (int i = 0; i < size; i++) {
             list.add(getRandomString());
         }
         return list;
     }
 
-    public static String getHttpPath(SteveConfiguration config) {
-        String prefix;
-        int port;
-
-        if (config.getJetty().isHttpEnabled()) {
-            prefix = "http://";
-            port = config.getJetty().getHttpPort();
-        } else if (config.getJetty().isHttpsEnabled()) {
-            prefix = "https://";
-            port = config.getJetty().getHttpsPort();
-        } else {
-            throw new RuntimeException();
+    public static URI getSoapPath(ServerProperties serverProperties, SteveProperties steveProperties)
+            throws URISyntaxException {
+        var scheme = "http";
+        if (serverProperties.getSsl().isEnabled()) {
+            scheme = "https";
         }
 
-        return prefix + config.getJetty().getServerHost() + ":" + port
-                + config.getPaths().getContextPath()
-                + config.getPaths().getSoapMapping()
-                + config.getPaths().getRouterEndpointPath();
+        return new URI(
+                scheme,
+                null,
+                serverProperties.getAddress().getHostName(),
+                serverProperties.getPort(),
+                serverProperties.getServlet().getContextPath()
+                        + steveProperties.getPaths().getSoapMapping()
+                        + steveProperties.getPaths().getRouterEndpointPath() + "/",
+                null,
+                null);
     }
 
-    public static String getWsPath(SteveConfiguration config) {
-        String prefix;
-        int port;
-
-        if (config.getJetty().isHttpEnabled()) {
-            prefix = "ws://";
-            port = config.getJetty().getHttpPort();
-        } else if (config.getJetty().isHttpsEnabled()) {
-            prefix = "wss://";
-            port = config.getJetty().getHttpsPort();
-        } else {
-            throw new RuntimeException();
+    public static URI getWsPath(ServerProperties serverProperties, SteveProperties steveProperties)
+            throws URISyntaxException {
+        var scheme = "ws";
+        if (serverProperties.getSsl().isEnabled()) {
+            scheme = "wss";
         }
 
-        return prefix + config.getJetty().getServerHost() + ":" + port
-                + config.getPaths().getContextPath()
-                + config.getPaths().getWebsocketMapping()
-                + config.getPaths().getRouterEndpointPath() + "/";
+        return new URI(
+                scheme,
+                null,
+                serverProperties.getAddress().getHostName(),
+                serverProperties.getPort(),
+                serverProperties.getServlet().getContextPath()
+                        + steveProperties.getPaths().getWebsocketMapping()
+                        + steveProperties.getPaths().getRouterEndpointPath() + "/",
+                null,
+                null);
     }
 
-    public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2015._10.CentralSystemService.class);
-        return (ocpp.cs._2015._10.CentralSystemService) f.create();
+    public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(URI path) {
+        return createBean(path, ocpp.cs._2015._10.CentralSystemService.class);
     }
 
-    public static ocpp.cs._2012._06.CentralSystemService getForOcpp15(String path) {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2012._06.CentralSystemService.class);
-        return (ocpp.cs._2012._06.CentralSystemService) f.create();
+    public static ocpp.cs._2012._06.CentralSystemService getForOcpp15(URI path) {
+        return createBean(path, ocpp.cs._2012._06.CentralSystemService.class);
     }
 
-    public static ocpp.cs._2010._08.CentralSystemService getForOcpp12(String path) {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2010._08.CentralSystemService.class);
-        return (ocpp.cs._2010._08.CentralSystemService) f.create();
+    public static ocpp.cs._2010._08.CentralSystemService getForOcpp12(URI path) {
+        return createBean(path, ocpp.cs._2010._08.CentralSystemService.class);
     }
 
-    private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
-        JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
+    private static <T> T createBean(URI endpointAddress, Class<T> serviceClass) {
+        var f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(new WSAddressingFeature());
-        f.setAddress(endpointAddress);
-        return f;
+        f.setAddress(endpointAddress.toString());
+        f.setServiceClass(serviceClass);
+        return (T) f.create();
     }
 }

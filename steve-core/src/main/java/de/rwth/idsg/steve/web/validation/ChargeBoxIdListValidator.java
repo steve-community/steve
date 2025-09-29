@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import jakarta.validation.ConstraintValidator;
@@ -31,14 +31,10 @@ import jakarta.validation.ConstraintValidatorContext;
  * @since 21.01.2016
  */
 @Component
-// Default constructor for Hibernate Validator
-// Spring will inject the value from properties
-// And then HV will call `initialize`
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
 
-    @Autowired
-    private ChargeBoxIdValidator validator;
+    private final ChargeBoxIdValidator validator;
 
     @Override
     public void initialize(ChargeBoxId constraintAnnotation) {
@@ -47,7 +43,10 @@ public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
-        for (String s : value) {
+        if (CollectionUtils.isEmpty(value)) {
+            return true; // null or empty is valid, because it is another constraint's responsibility
+        }
+        for (var s : value) {
             if (!validator.isValid(s, context)) {
                 return false;
             }

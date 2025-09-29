@@ -86,11 +86,11 @@ public class OcppJsonChargePoint {
     private CountDownLatch receivedMessagesSignal;
     private Session session;
 
-    public OcppJsonChargePoint(ObjectMapper ocppMapper, OcppVersion version, String chargeBoxId, String pathPrefix) {
+    public OcppJsonChargePoint(ObjectMapper ocppMapper, OcppVersion version, String chargeBoxId, URI pathPrefix) {
         this(ocppMapper, version.getValue(), chargeBoxId, pathPrefix);
     }
 
-    public OcppJsonChargePoint(ObjectMapper ocppMapper, String ocppVersion, String chargeBoxId, String pathPrefix) {
+    public OcppJsonChargePoint(ObjectMapper ocppMapper, String ocppVersion, String chargeBoxId, URI pathPrefix) {
         this.ocppMapper = ocppMapper;
         this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;

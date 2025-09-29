@@ -251,9 +251,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
 
-        var connectorPk = getConnectorPkFromConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
-
         if (p.isSetReservationId()) {
+            var connectorPk = getConnectorPkFromConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
             reservationRepository.used(connectorPk, p.getIdTag(), p.getReservationId(), transactionId);
         }
 
@@ -262,7 +261,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            insertConnectorStatus(ctx, connectorPk, toLocalDateTime(p.getStartTimestamp()), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStartTimestamp()), p.getStatusUpdate());
         }
 
         return transactionId;
@@ -296,13 +295,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            var connectorPk = DSL.select(TRANSACTION_START.CONNECTOR_PK)
+            var connectorPkQuery = DSL.select(TRANSACTION_START.CONNECTOR_PK)
                     .from(TRANSACTION_START)
-                    .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()))
-                    .fetchOne()
-                    .value1();
+                    .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
-            insertConnectorStatus(ctx, connectorPk, toLocalDateTime(p.getStopTimestamp()), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStopTimestamp()), p.getStatusUpdate());
         }
     }
 
@@ -369,10 +366,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * and we have a "more recent" status, it will still be the current status.
      */
     private void insertConnectorStatus(
-            DSLContext ctx, int connectorPk, LocalDateTime timestamp, TransactionStatusUpdate statusUpdate) {
+            DSLContext ctx,
+            SelectConditionStep<Record1<Integer>> connectorPkQuery,
+            LocalDateTime timestamp,
+            TransactionStatusUpdate statusUpdate) {
         try {
             ctx.insertInto(CONNECTOR_STATUS)
-                    .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPk)
+                    .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
                     .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
                     .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
                     .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
@@ -487,6 +487,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         if (actor == null) {
             return null;
         }
-        return TransactionStopEventActor.valueOf(actor.name());
+        return TransactionStopEventActor.lookupLiteral(actor.getName());
     }
 }

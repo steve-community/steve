@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.OcppWebSocketConfiguration;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +50,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointRegistrationService chargePointRegistrationService;
+    private final String pathInfix;
 
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
@@ -73,7 +73,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // 1. Check the chargeBoxId
         // -------------------------------------------------------------------------
 
-        var chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+        var chargeBoxId = getLastBitFromUrl(pathInfix, request.getURI().getRawPath());
         var isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
@@ -123,9 +123,9 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     }
 
     private @Nullable AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols) {
-        for (var requestedProcotol : requestedProtocols) {
+        for (var requestedProtocol : requestedProtocols) {
             for (var item : endpoints) {
-                if (item.getVersion().getValue().equals(requestedProcotol)) {
+                if (item.getVersion().getValue().equals(requestedProtocol)) {
                     return item;
                 }
             }
@@ -133,17 +133,15 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         return null;
     }
 
-    public static String getLastBitFromUrl(final String input) {
+    public static String getLastBitFromUrl(String pathInfix, String input) {
         if (Strings.isNullOrEmpty(input)) {
             return "";
         }
 
-        var substring = OcppWebSocketConfiguration.PATH_INFIX;
-
-        var index = input.indexOf(substring);
+        var index = input.indexOf(pathInfix);
         if (index == -1) {
             return "";
         }
-        return input.substring(index + substring.length());
+        return input.substring(index + pathInfix.length());
     }
 }

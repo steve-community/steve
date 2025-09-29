@@ -19,11 +19,11 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -43,17 +43,16 @@ public class ChargePointRegistrationService {
     private final ChargePointRepository chargePointRepository;
 
     public ChargePointRegistrationService(
-            ChargePointRepository chargePointRepository,
-            @Value("${auto.register.unknown.stations}") Boolean autoRegisterUnknownStations) {
+            ChargePointRepository chargePointRepository, SteveProperties steveProperties) {
         this.chargePointRepository = chargePointRepository;
-        this.autoRegisterUnknownStations = autoRegisterUnknownStations;
+        this.autoRegisterUnknownStations = steveProperties.getOcpp().isAutoRegisterUnknownStations();
     }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
-        Lock l = isRegisteredLocks.get(chargeBoxId);
+        var l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
         try {
-            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
+            var status = getRegistrationStatusInternal(chargeBoxId);
             if (status.isEmpty()) {
                 unknownChargePointService.processNewUnidentified(chargeBoxId);
             }
@@ -65,7 +64,7 @@ public class ChargePointRegistrationService {
 
     private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        var status = chargePointRepository.getRegistrationStatus(chargeBoxId);
         if (status.isPresent()) {
             try {
                 return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));

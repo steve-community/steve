@@ -18,17 +18,23 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.utils.LogFileRetriever;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
+import org.jooq.DSLContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.Helpers.getSoapPath;
+import static de.rwth.idsg.steve.utils.Helpers.getWsPath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -52,22 +58,43 @@ public abstract class StressTest {
     protected static final int CHARGE_BOX_COUNT = THREAD_COUNT;
     protected static final int CONNECTOR_COUNT_PER_CHARGE_BOX = 25;
 
+    protected URI soapPath;
+    protected URI jsonPath;
+
     protected void attack() throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo("test");
-        assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
+        var spring = new SpringApplication(SteveApplication.class);
+        spring.setAdditionalProfiles("test");
 
-        __DatabasePreparer__.prepare(config);
+        __DatabasePreparer__ databasePreparer = null;
+        ConfigurableApplicationContext app = null;
 
-        var app = new Application(config, new LogFileRetriever());
         try {
-            app.start();
+            app = spring.run();
+
+            var environment = app.getEnvironment();
+            assertThat(environment.getActiveProfiles()).hasSize(1).contains("test");
+            assertThat(environment.getProperty("steve.ocpp.auto-register-unknown-stations"))
+                    .isEqualTo("true");
+
+            var serverProperties = app.getBean(ServerProperties.class);
+            var steveProperties = app.getBean(SteveProperties.class);
+            soapPath = getSoapPath(serverProperties, steveProperties);
+            jsonPath = getWsPath(serverProperties, steveProperties);
+
+            var dslContext = app.getBean(DSLContext.class);
+            databasePreparer = new __DatabasePreparer__(dslContext, steveProperties);
+            databasePreparer.prepare();
+
             attackInternal();
         } finally {
             try {
-                app.stop();
+                if (app != null) {
+                    app.close();
+                }
             } finally {
-                __DatabasePreparer__.cleanUp();
+                if (databasePreparer != null) {
+                    databasePreparer.cleanUp();
+                }
             }
         }
     }

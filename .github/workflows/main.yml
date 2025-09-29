@@ -43,22 +43,20 @@ jobs:
       - name: Build with Maven
         run: |
           ./mvnw -B -V \
-            -Pdev,useRealDatabase \
             -DskipTests=false \
             -Dmaven.javadoc.skip=true \
-            -Ddb.jdbc.url="jdbc:mysql://127.0.0.1:3306/${DB_SCHEMA}?sslMode=PREFERRED&serverTimezone=UTC" \
-            -Ddb.schema="${DB_SCHEMA}" \
+            -PuseRealDatabase \
+            -Dspring.profiles.active=test,dev \
             -Ddb.user="${DB_USER}" \
             -Ddb.password="${DB_PASSWORD}" \
-            -Ddb.sql.logging=true \
-            -Dprofile=test \
-            -Dappender=CONSOLE \
-            clean package --file pom.xml
+            -Ddb.schema="${DB_SCHEMA}" \
+            -Ddb.jdbc.url="jdbc:mysql://127.0.0.1:3306/${DB_SCHEMA}?sslMode=PREFERRED&serverTimezone=UTC" \
+            clean package
 
       - name: Start the app and visit signin web page
         run: |
           sudo apt-get install -y elinks
-          java -Djava.net.preferIPv4Stack=true -jar steve/target/steve.jar &
+          java -Djava.net.preferIPv4Stack=true -jar steve/target/steve.war &
           sleep 30
           elinks -dump -no-references http://localhost:8080/manager/signin
           killall java

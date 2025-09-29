@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/stevedb_test_2aa6a783d47d
+    username: steve
+    password: changeme

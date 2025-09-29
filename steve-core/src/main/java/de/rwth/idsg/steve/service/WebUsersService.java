@@ -22,8 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.repository.dto.WebUser;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
@@ -73,11 +73,11 @@ public class WebUsersService implements UserDetailsManager {
     // Because Guava's cache does not accept a null value
     private static final UserDetails DUMMY_USER = new User("#", "#", Collections.emptyList());
 
-    private final SteveConfiguration config;
+    private final SteveProperties steveProperties;
+    private final PasswordEncoder passwordEncoder;
     private final ObjectMapper mapper;
     private final WebUserRepository webUserRepository;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
-    private final PasswordEncoder encoder;
 
     private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
@@ -90,9 +90,13 @@ public class WebUsersService implements UserDetailsManager {
             return;
         }
 
+        var headerVal = steveProperties.getWebApi().getHeaderValue();
+        var encodedApiPassword = (headerVal == null || headerVal.isBlank()) ? null : passwordEncoder.encode(headerVal);
+
         var user = WebUser.builder()
-                .login(config.getAuth().getUserName())
-                .password(config.getAuth().getEncodedPassword())
+                .login(steveProperties.getAuth().getUsername())
+                .password(passwordEncoder.encode(steveProperties.getAuth().getPassword()))
+                .apiPassword(encodedApiPassword)
                 .enabled(true)
                 .authorities(EnumSet.of(WebUserAuthority.ADMIN))
                 .build();
@@ -136,7 +140,7 @@ public class WebUsersService implements UserDetailsManager {
         }
 
         var username = currentUser.getName();
-        webUserRepository.changePassword(username, encoder.encode(newPassword));
+        webUserRepository.changePassword(username, passwordEncoder.encode(newPassword));
 
         var authentication = createNewAuthentication(currentUser);
         var context = this.securityContextHolderStrategy.createEmptyContext();
@@ -217,13 +221,13 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public void updatePassword(WebUserForm form) {
-        webUserRepository.changePassword(form.getWebUserPk(), encoder.encode(form.getPassword()));
+        webUserRepository.changePassword(form.getWebUserPk(), passwordEncoder.encode(form.getPassword()));
     }
 
     public void updateApiPassword(WebUserForm form) {
         String newPassword = null;
         if (form.getApiPassword() != null && !form.getApiPassword().isEmpty()) {
-            newPassword = encoder.encode(form.getApiPassword());
+            newPassword = passwordEncoder.encode(form.getApiPassword());
         }
         webUserRepository.changeApiPassword(form.getWebUserPk(), newPassword);
     }
@@ -309,7 +313,7 @@ public class WebUsersService implements UserDetailsManager {
         var encPw = "";
         if (rawPassword != null) {
             Assert.hasText(rawPassword, "Password may not be empty");
-            encPw = encoder.encode(rawPassword);
+            encPw = passwordEncoder.encode(rawPassword);
         }
         return User.withUsername(form.getWebUsername())
                 .password(encPw)

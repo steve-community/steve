@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="LOG_DIR" source="logging.file.path" defaultValue="${USER_HOME:-${HOME:-.}}/logs"/>
+    <springProperty scope="context" name="APPENDER" source="logging.appender" defaultValue="CONSOLE"/>
+    <property name="LOG_PATTERN" value="[%-5level] %d %c \(%thread\) - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/steve.log</file>
+
+        <!-- daily rollover -->
+        <!-- keep 30 days' worth of history capped at 3GB total size -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/steve-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <springProperty scope="context" name="ROOT_LEVEL" source="logging.level.root" defaultValue="INFO"/>
+
+    <springProfile name="default,prod">
+        <root level="${ROOT_LEVEL}">
+            <appender-ref ref="${APPENDER}"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev,test">
+        <root level="${ROOT_LEVEL}">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="org.apache.cxf" level="INFO"/>
+        <logger name="org.eclipse.jetty" level="INFO"/>
+        <logger name="com.zaxxer.hikari" level="INFO"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.springframework.security" level="INFO"/>
+        <logger name="org.springframework.web.servlet" level="INFO"/>
+    </springProfile>
+
+    <logger name="org.springframework.security" level="TRACE"/>
+    <logger name="org.springframework.web" level="DEBUG"/>
+
+    <logger name="org.apache.jasper" level="WARN"/>
+    <logger name="org.apache.tomcat.util" level="WARN"/>
+    <logger name="jndi" level="WARN"/>
+</configuration>

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
@@ -28,10 +29,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,14 +56,32 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(MockitoExtension.class)
 public class ChargePointsRestControllerTest extends AbstractControllerTest {
 
+    @Configuration
+    static class ValidationConfig {
+        @Bean
+        public LocalValidatorFactoryBean validator(ApplicationContext applicationContext) {
+            var factory = new LocalValidatorFactoryBean();
+            factory.setApplicationContext(applicationContext);
+            return factory;
+        }
+    }
+
     @Mock
     private ChargePointsService chargePointsService;
 
     private MockMvcTester mockMvc;
 
     @BeforeEach
-    public void setup() {
-        mockMvc = buildMockMvc(MockMvcBuilders.standaloneSetup(new ChargePointsRestController(chargePointsService)));
+    public void setUp() {
+        var ctx = new AnnotationConfigApplicationContext();
+        ctx.register(ValidationConfig.class);
+        ctx.register(SteveProperties.class);
+        ctx.refresh();
+
+        var validator = ctx.getBean(Validator.class);
+
+        mockMvc = buildMockMvc(MockMvcBuilders.standaloneSetup(new ChargePointsRestController(chargePointsService))
+                .setValidator(validator));
     }
 
     @Test
@@ -96,7 +121,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("GET one: One entity found, expected 200")
     public void testGetOne_found() {
-        ChargePoint.Details result = createDetails(1, null);
+        var result = createDetails(1, null);
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
         assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1")))
@@ -116,12 +141,12 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("POST: Entity created, expected 201")
     public void testPost() throws Exception {
-        ChargePointForm form = new ChargePointForm();
+        var form = new ChargePointForm();
         form.setChargeBoxId("test-cb");
         form.setRegistrationStatus("updated");
         form.setInsertConnectorStatusAfterTransactionMsg(true);
 
-        ChargePoint.Details result = createDetails(1, "test-cb");
+        var result = createDetails(1, "test-cb");
 
         when(chargePointsService.addChargePoint(any(ChargePointForm.class))).thenReturn(1);
         when(chargePointsService.getDetails(1)).thenReturn(result);
@@ -140,12 +165,12 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("PUT: Entity updated, expected 200")
     public void testPut() throws Exception {
-        ChargePointForm form = new ChargePointForm();
+        var form = new ChargePointForm();
         form.setChargeBoxId("test-cb-updated");
         form.setRegistrationStatus("updated");
         form.setInsertConnectorStatusAfterTransactionMsg(true);
 
-        ChargePoint.Details result = createDetails(1, "test-cb-updated");
+        var result = createDetails(1, "test-cb-updated");
 
         when(chargePointsService.getDetails(1)).thenReturn(result);
 

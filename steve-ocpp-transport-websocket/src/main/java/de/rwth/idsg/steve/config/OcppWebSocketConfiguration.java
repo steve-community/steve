@@ -46,7 +46,6 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class OcppWebSocketConfiguration implements WebSocketConfigurer {
 
-    public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
     public static final Duration IDLE_TIMEOUT = Duration.ofHours(2);
     public static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
@@ -57,28 +56,33 @@ public class OcppWebSocketConfiguration implements WebSocketConfigurer {
     private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final SteveProperties steveProperties;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
+        var pathInfix = steveProperties.getPaths().getWebsocketMapping()
+                + steveProperties.getPaths().getRouterEndpointPath() + "/";
+
+        var handshakeHandler = new OcppWebSocketHandshakeHandler(
                 chargeBoxIdValidator,
                 createHandshakeHandler(),
                 Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-                chargePointRegistrationService);
+                chargePointRegistrationService,
+                pathInfix);
 
-        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
+        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), pathInfix + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
     }
 
     /**
+     * See Spring docs:
      * https://docs.spring.io/spring-framework/reference/web/websocket/server.html#websocket-server-runtime-configurationCheck failure[checkstyle] src/main/java/de/rwth/idsg/steve/config/WebSocketConfiguration.java#L73 <com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck>Check failure: [checkstyle] src/main/java/de/rwth/idsg/steve/config/WebSocketConfiguration.java#L73 <com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck>Line is longer than 120 characters (found 121).build and run tests / checkstyleView detailsCode has alerts. Press enter to view.
-     *
      * Otherwise, defaults come from {@link WebSocketConstants}
      */
     private static DefaultHandshakeHandler createHandshakeHandler() {
-        JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
+        var strategy = new JettyRequestUpgradeStrategy();
 
         strategy.addWebSocketConfigurer(configurable -> {
             configurable.setMaxTextMessageSize(MAX_MSG_SIZE);

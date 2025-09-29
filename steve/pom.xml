@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>steve</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <licenses>
     <license>
@@ -27,17 +27,10 @@
   </developers>
 
   <properties>
-    <server.host>127.0.0.1</server.host>
-    <http.port>8080</http.port>
-    <db.ip>localhost</db.ip>
-    <db.port>3306</db.port>
-    <db.schema>stevedb</db.schema>
     <db.user>steve</db.user>
     <db.password>changeme</db.password>
-    <auth.user>admin</auth.user>
-    <auth.password>1234</auth.password>
-    <webapi.key>STEVE-API-KEY</webapi.key>
-    <webapi.value />
+    <db.schema>stevedb</db.schema>
+    <db.jdbc.url>jdbc:mysql://localhost:3306/${db.schema}</db.jdbc.url>
   </properties>
 
   <dependencies>
@@ -62,9 +55,36 @@
       <artifactId>steve-api</artifactId>
     </dependency>
 
+    <!-- Spring -->
     <dependency>
-      <groupId>jakarta.mail</groupId>
-      <artifactId>jakarta.mail-api</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-websocket</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
     </dependency>
 
     <dependency>
@@ -72,39 +92,8 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
-      <version>5.5</version>
-    </dependency>
-
-    <!-- Spring -->
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-config</artifactId>
-    </dependency>
-
-    <!-- Logging -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${slf4j.version}</version>
     </dependency>
 
     <!-- Jetty related dependencies -->
@@ -113,46 +102,34 @@
       <artifactId>jetty-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-webapp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-annotations</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-rewrite</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10.websocket</groupId>
-      <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
-    </dependency>
-    <dependency>
+    <!-- Since jetty 12.1.0 but 12.0.27 in boot 3.5.6 -->
+    <!--dependency>
       <groupId>org.eclipse.jetty.compression</groupId>
       <artifactId>jetty-compression-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.compression</groupId>
       <artifactId>jetty-compression-gzip</artifactId>
-    </dependency>
+    </dependency-->
 
     <!-- DB -->
     <dependency>
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
-      <version>${mysql.jdbc.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>7.0.2</version>
     </dependency>
 
     <!-- Test -->
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -161,8 +138,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-hc</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -171,24 +148,28 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>net.bytebuddy</groupId>
       <artifactId>byte-buddy</artifactId>
-      <version>1.17.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.jayway.jsonpath</groupId>
-      <artifactId>json-path</artifactId>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mysql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mariadb</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -204,89 +185,51 @@
     <finalName>${project.artifactId}</finalName>
     <resources>
       <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>application.yml</exclude>
+        </excludes>
+      </resource>
+      <resource>
         <filtering>true</filtering>
-        <directory>src/main/resources/config</directory>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>application.yml</include>
+        </includes>
       </resource>
     </resources>
 
     <plugins>
       <plugin>
-        <groupId>io.github.git-commit-id</groupId>
-        <artifactId>git-commit-id-maven-plugin</artifactId>
-        <version>9.0.2</version>
-        <configuration>
-          <failOnNoGitDirectory>false</failOnNoGitDirectory>
-          <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>revision</goal>
-            </goals>
-            <phase>initialize</phase>
-          </execution>
-        </executions>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.8.1</version>
         <executions>
           <execution>
-            <id>copy-dependencies</id>
+            <id>unpack-steve-ui-jsp-webapp</id>
             <goals>
-              <goal>copy-dependencies</goal>
+              <goal>unpack</goal>
             </goals>
-            <phase>prepare-package</phase>
+            <phase>process-resources</phase>
             <configuration>
-              <outputDirectory>${project.build.directory}/libs</outputDirectory>
-              <includeScope>runtime</includeScope>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>de.rwth.idsg</groupId>
+                  <artifactId>steve-ui-jsp</artifactId>
+                  <version>${project.version}</version>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+                  <includes>WEB-INF/**,static/**</includes>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>de.rwth.idsg.steve.Application</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>prod</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <skipTests>true</skipTests>
-        <context.path>steve</context.path>
-        <db.sql.logging>false</db.sql.logging>
-        <server.gzip.enabled>true</server.gzip.enabled>
-        <appender>FILE</appender>
-        <profile>prod</profile>
-      </properties>
-    </profile>
-    <profile>
-      <id>dev</id>
-      <properties>
-        <skipTests>true</skipTests>
-        <context.path />
-        <db.sql.logging>true</db.sql.logging>
-        <server.gzip.enabled>false</server.gzip.enabled>
-        <appender>CONSOLE</appender>
-        <profile>dev</profile>
-      </properties>
-    </profile>
-  </profiles>
 </project>

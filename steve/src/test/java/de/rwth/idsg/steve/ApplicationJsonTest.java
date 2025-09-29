@@ -19,11 +19,10 @@
 package de.rwth.idsg.steve;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
-import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -34,10 +33,19 @@ import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.HeartbeatResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.core.exception.UpgradeException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getWsPath;
@@ -51,6 +59,8 @@ import static org.assertj.core.api.BDDAssertions.then;
  * @since 21.03.2018
  */
 @Slf4j
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 public class ApplicationJsonTest {
 
     private static final ObjectMapper OCPP_MAPPER = JsonObjectMapper.createObjectMapper();
@@ -58,32 +68,33 @@ public class ApplicationJsonTest {
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
-    private static String path;
-    private static Application app;
+    @Autowired
+    private ServerProperties serverProperties;
 
-    @BeforeAll
-    public static void init() throws Exception {
-        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        assertThat(config.getProfile()).isEqualTo("test");
-        __DatabasePreparer__.prepare(config);
+    @Autowired
+    private SteveProperties steveProperties;
 
-        path = getWsPath(config);
+    @Autowired
+    private DSLContext dslContext;
 
-        app = new Application(config, new LogFileRetriever());
-        app.start();
+    private URI jsonPath;
+    private __DatabasePreparer__ databasePreparer;
+
+    @BeforeEach
+    public void setUp() throws URISyntaxException {
+        databasePreparer = new __DatabasePreparer__(dslContext, steveProperties);
+        databasePreparer.prepare();
+        jsonPath = getWsPath(serverProperties, steveProperties);
     }
 
-    @AfterAll
-    public static void destroy() throws Exception {
-        if (app != null) {
-            app.stop();
-        }
-        __DatabasePreparer__.cleanUp();
+    @AfterEach
+    public void tearDown() {
+        databasePreparer.cleanUp();
     }
 
     @Test
     public void testOcpp12() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, jsonPath);
         chargePoint.start();
 
         var boot = new ocpp.cs._2010._08.BootNotificationRequest()
@@ -111,7 +122,7 @@ public class ApplicationJsonTest {
 
     @Test
     public void testOcpp15() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, jsonPath);
         chargePoint.start();
 
         var boot = new ocpp.cs._2012._06.BootNotificationRequest()
@@ -139,7 +150,7 @@ public class ApplicationJsonTest {
 
     @Test
     public void testOcpp16() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, jsonPath);
         chargePoint.start();
 
         var boot = new BootNotificationRequest()
@@ -166,14 +177,13 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithMissingVersion() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, (String) null, REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, (String) null, REGISTERED_CHARGE_BOX_ID, jsonPath);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
                 .rootCause()
                 .satisfies(c -> {
-                    ;
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 });
@@ -181,7 +191,7 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithWrongVersion() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, "ocpp1234", REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, "ocpp1234", REGISTERED_CHARGE_BOX_ID, jsonPath);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
@@ -195,7 +205,7 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithUnauthorizedStation() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, "unauth1234", path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, "unauth1234", jsonPath);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
@@ -212,7 +222,7 @@ public class ApplicationJsonTest {
      */
     @Test
     public void testWithNullPayload() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, path);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, jsonPath);
         chargePoint.start();
 
         chargePoint.prepare(

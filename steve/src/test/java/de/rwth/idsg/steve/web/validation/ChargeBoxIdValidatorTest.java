@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ChargeBoxIdValidatorTest {
 
-    private final ChargeBoxIdValidator validator = new ChargeBoxIdValidator();
+    private final ChargeBoxIdValidator validator = new ChargeBoxIdValidator((String) null);
 
     @Test
     public void testNull() {

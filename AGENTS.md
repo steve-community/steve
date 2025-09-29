@@ -68,7 +68,7 @@ FLUSH PRIVILEGES;
 Note: On MySQL 8.0+, you cannot grant privileges on `INFORMATION_SCHEMA`; metadata read access is implicit. The grants above are sufficient for Flyway and jOOQ code generation.
 
 **2. Application Properties:**
-The default configuration is in `steve/src/main/resources/config/main.properties`. You can either edit this file or provide the configuration as command-line arguments during the build.
+The default configuration is in `steve/src/main/resources/application.yml`. You can either edit this file or provide the configuration as command-line arguments during the build.
 
 ### Maven Profiles and Properties
 
@@ -97,18 +97,18 @@ Example with overridden properties:
 ./mvnw package -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
 ```
 
-A runnable JAR file will be created at `steve/target/steve.jar`.
+A runnable JAR file will be created at `steve/target/steve.war`.
 
 ## Running the Application
 
 After building, you can run the application with the following command:
 ```bash
-java -jar steve/target/steve.jar
+java -jar steve/target/steve.war
 ```
 
 Example with overridden properties:
 ```bash
-java -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password> -jar steve/target/steve.jar
+java -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password> -jar steve/target/steve.war
 ```
 
 ## Running Tests

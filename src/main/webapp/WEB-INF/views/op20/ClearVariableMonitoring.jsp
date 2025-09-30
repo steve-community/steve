@@ -31,7 +31,7 @@ Paths:
     <table class="userInput">
         <tr>
             <td>Charge Point Selection:</td>
-            <td><%@ include file="../snippets/chargePointSelectList.jsp" %></td>
+            <td><%@ include file="../00-cp-multiple.jsp" %></td>
         </tr>
         <tr>
             <td>Monitoring IDs (comma-separated):</td>

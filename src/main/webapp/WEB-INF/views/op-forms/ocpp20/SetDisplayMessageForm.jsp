@@ -4,40 +4,31 @@
     <section><span>Parameters</span></section>
     <table class="userInput">
         <tr>
+            <td>Message (required):</td>
+            <td><form:textarea path="message" placeholder="Display message content (JSON object)" rows="4"/></td>
+        </tr>
+        <tr>
             <td>Message ID:</td>
-            <td><form:input path="message.id" placeholder="Enter message ID"/></td>
+            <td><form:input path="messageId" placeholder="Unique identifier for this message"/></td>
         </tr>
         <tr>
-            <td>Priority:</td>
-            <td><form:input path="message.priority" placeholder="AlwaysFront|InFront|NormalCycle"/></td>
+            <td>Message Priority:</td>
+            <td><form:select path="messagePriority">
+                <form:option value="">- Please choose a priority -</form:option>
+                <form:option value="AlwaysFront">Always Front</form:option>
+                <form:option value="InFront">In Front</form:option>
+                <form:option value="NormalCycle">Normal Cycle</form:option>
+            </form:select></td>
         </tr>
         <tr>
-            <td>Message Text:</td>
-            <td><form:textarea path="message.message.content" rows="3" cols="60" placeholder="Enter message text"/></td>
-        </tr>
-        <tr>
-            <td>Message Format (optional):</td>
-            <td><form:input path="message.message.format" placeholder="ASCII|HTML|URI|UTF8"/></td>
-        </tr>
-        <tr>
-            <td>Language (optional):</td>
-            <td><form:input path="message.message.language" placeholder="en|de|fr|es"/></td>
-        </tr>
-        <tr>
-            <td>State (optional):</td>
-            <td><form:input path="message.state" placeholder="Charging|Faulted|Idle|Unavailable"/></td>
-        </tr>
-        <tr>
-            <td>Start Date/Time (optional):</td>
-            <td><form:input path="message.startDateTime" cssClass="dateTimePicker" placeholder="Select start date/time"/></td>
-        </tr>
-        <tr>
-            <td>End Date/Time (optional):</td>
-            <td><form:input path="message.endDateTime" cssClass="dateTimePicker" placeholder="Select end date/time"/></td>
-        </tr>
-        <tr>
-            <td>Transaction ID (optional):</td>
-            <td><form:input path="message.transactionId" placeholder="Enter transaction ID"/></td>
+            <td>Message State:</td>
+            <td><form:select path="messageState">
+                <form:option value="">- Please choose a state -</form:option>
+                <form:option value="Charging">Charging</form:option>
+                <form:option value="Faulted">Faulted</form:option>
+                <form:option value="Idle">Idle</form:option>
+                <form:option value="Unavailable">Unavailable</form:option>
+            </form:select></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

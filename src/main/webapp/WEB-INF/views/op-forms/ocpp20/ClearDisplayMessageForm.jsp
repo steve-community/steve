@@ -4,8 +4,8 @@
     <section><span>Parameters</span></section>
     <table class="userInput">
         <tr>
-            <td>Display Message ID:</td>
-            <td><form:input path="id" placeholder="Enter display message ID to clear"/></td>
+            <td>Display Message ID (required):</td>
+            <td><form:input path="id" placeholder="ID of the message to be removed"/></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

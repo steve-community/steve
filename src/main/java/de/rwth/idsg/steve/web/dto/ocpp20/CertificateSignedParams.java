@@ -9,4 +9,6 @@ import jakarta.validation.constraints.*;
 public class CertificateSignedParams extends BaseParams {
     @NotBlank(message = "Certificate chain is required")
     private String certificateChain;
+
+    private String certificateType;
 }

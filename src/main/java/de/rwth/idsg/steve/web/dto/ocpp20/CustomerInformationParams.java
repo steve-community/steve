@@ -13,4 +13,7 @@ public class CustomerInformationParams extends BaseParams {
     private Boolean report = true;
     private Boolean clear = false;
     private String customerIdentifier;
+
+    private String idToken;
+    private String idTokenType;
 }

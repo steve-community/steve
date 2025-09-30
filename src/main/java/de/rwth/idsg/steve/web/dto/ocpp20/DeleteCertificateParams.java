@@ -7,12 +7,6 @@ import jakarta.validation.constraints.*;
 @Getter
 @Setter
 public class DeleteCertificateParams extends BaseParams {
-    @NotBlank(message = "Issuer Name Hash is required")
-    private String issuerNameHash;
-
-    @NotBlank(message = "Issuer Key Hash is required")
-    private String issuerKeyHash;
-
-    @NotBlank(message = "Serial Number is required")
-    private String serialNumber;
+    @NotNull(message = "Certificate hash data is required")
+    private CertificateHashData certificateHashData = new CertificateHashData();
 }

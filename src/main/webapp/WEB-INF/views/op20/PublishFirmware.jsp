@@ -17,71 +17,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 --%>
 <%@ include file="../00-header.jsp" %>
-<script type="text/javascript">
-    $(document).ready(function() {
-        <%@ include file="../snippets/getChargepointList.js" %>
-    });
-</script>
+<%@ include file="../00-op-bind-errors.jsp" %>
+
 <div class="content">
-    <div class="left-menu">
-        <ul>
-            <li><a href="${ctxPath}/manager/operations/v2.0">OCPP 2.0</a></li>
-        </ul>
-    </div>
-    <div class="main">
-        <div class="container">
-            <form:form action="${ctxPath}/manager/operations/v2.0/PublishFirmware" modelAttribute="params">
-                <section><span>Charge Points</span></section>
-                <table class="userInput">
-                    <tr>
-                        <td>Charge Point:</td>
-                        <td>
-                            <form:select path="chargePointSelectList" id="cp" multiple="false" size="1" cssClass="select-one">
-                                <option value="" selected>-- Choose --</option>
-                                <form:options items="${cpList}" itemLabel="chargeBoxId" itemValue="chargeBoxPk"/>
-                            </form:select>
-                        </td>
-                    </tr>
-                </table>
-                <section><span>Parameters</span></section>
-                <table class="userInput">
-                    <tr>
-                        <td>Location (URL)*:</td>
-                        <td><form:input path="location" placeholder="https://example.com/firmware.bin"/></td>
-                    </tr>
-                    <tr>
-                        <td>Checksum (MD5)*:</td>
-                        <td><form:input path="checksum" placeholder="32 character MD5 hash"/></td>
-                    </tr>
-                    <tr>
-                        <td>Request ID:</td>
-                        <td><form:input path="requestId" placeholder="Optional request identifier"/></td>
-                    </tr>
-                    <tr>
-                        <td>Retries:</td>
-                        <td><form:input path="retries" placeholder="Number of retries (optional)"/></td>
-                    </tr>
-                    <tr>
-                        <td>Retry Interval (seconds):</td>
-                        <td><form:input path="retryInterval" placeholder="Seconds between retries (optional)"/></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <div class="info">* Required fields</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <div class="submit-button">
-                                <input type="submit" value="Perform"/>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </form:form>
-        </div>
-    </div>
-</div>
+<jsp:include page="00-menu.jsp">
+    <jsp:param name="menuItem" value="PublishFirmware"/>
+</jsp:include>
+<div class="op20-content">
+<%@ include file="../op-forms/ocpp20/PublishFirmwareForm.jsp" %>
+</div></div>
 <%@ include file="../00-footer.jsp" %>

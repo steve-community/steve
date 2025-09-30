@@ -4,36 +4,31 @@
     <section><span>Parameters</span></section>
     <table class="userInput">
         <tr>
-            <td>Component Name:</td>
-            <td><form:input path="setMonitoringData[0].component.name" placeholder="e.g., ChargingStation"/></td>
-        </tr>
-        <tr>
-            <td>Component Instance (optional):</td>
-            <td><form:input path="setMonitoringData[0].component.instance" placeholder="e.g., 1"/></td>
-        </tr>
-        <tr>
-            <td>EVSE ID (optional):</td>
-            <td><form:input path="setMonitoringData[0].component.evse.id" placeholder="e.g., 1"/></td>
-        </tr>
-        <tr>
-            <td>Variable Name:</td>
-            <td><form:input path="setMonitoringData[0].variable.name" placeholder="e.g., Available"/></td>
-        </tr>
-        <tr>
-            <td>Variable Instance (optional):</td>
-            <td><form:input path="setMonitoringData[0].variable.instance" placeholder="e.g., 1"/></td>
+            <td>Set Monitoring Data (required):</td>
+            <td><form:textarea path="setMonitoringData" placeholder="Set monitoring data configuration (JSON array)" rows="6"/></td>
         </tr>
         <tr>
             <td>Monitor Type:</td>
-            <td><form:input path="setMonitoringData[0].type" placeholder="UpperThreshold|LowerThreshold|Delta|Periodic|PeriodicClockAligned"/></td>
+            <td><form:select path="monitorType">
+                <form:option value="">- Please choose a monitor type -</form:option>
+                <form:option value="UpperThreshold">Upper Threshold</form:option>
+                <form:option value="LowerThreshold">Lower Threshold</form:option>
+                <form:option value="Delta">Delta</form:option>
+                <form:option value="Periodic">Periodic</form:option>
+                <form:option value="PeriodicClockAligned">Periodic Clock Aligned</form:option>
+            </form:select></td>
         </tr>
         <tr>
-            <td>Value:</td>
-            <td><form:input path="setMonitoringData[0].value" placeholder="Monitor value"/></td>
+            <td>Monitor Value:</td>
+            <td><form:input path="monitorValue" type="number" step="0.01" placeholder="Threshold or interval value"/></td>
         </tr>
         <tr>
-            <td>Severity:</td>
-            <td><form:input path="setMonitoringData[0].severity" placeholder="0-9"/></td>
+            <td>Component:</td>
+            <td><form:input path="component" placeholder="Component name"/></td>
+        </tr>
+        <tr>
+            <td>Variable:</td>
+            <td><form:input path="variable" placeholder="Variable name"/></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

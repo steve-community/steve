@@ -65,6 +65,8 @@ public class Ocpp20Controller {
     private static final String CHANGE_AVAILABILITY_PATH = "/ChangeAvailability";
     private static final String CLEAR_CACHE_PATH = "/ClearCache";
     private static final String DATA_TRANSFER_PATH = "/DataTransfer";
+    private static final String COST_UPDATED_PATH = "/CostUpdated";
+    private static final String GET_MONITORING_REPORT_PATH = "/GetMonitoringReport";
 
     @ModelAttribute("ocppVersion")
     public OcppVersion getOcppVersion() {
@@ -912,9 +914,9 @@ public class Ocpp20Controller {
 
         DeleteCertificateTask task = new DeleteCertificateTask(
             params.getChargePointSelectList(),
-            params.getIssuerNameHash(),
-            params.getIssuerKeyHash(),
-            params.getSerialNumber()
+            params.getCertificateHashData().getIssuerNameHash(),
+            params.getCertificateHashData().getIssuerKeyHash(),
+            params.getCertificateHashData().getSerialNumber()
         );
 
         taskExecutor.execute(task);
@@ -1163,6 +1165,184 @@ public class Ocpp20Controller {
         taskExecutor.execute(task);
         model.addAttribute("taskId", task.getTaskId());
         return "redirect:/manager/operations/v2.0" + UNPUBLISH_FIRMWARE_PATH;
+    }
+
+    // ClearDisplayMessage
+    @RequestMapping(value = CLEAR_DISPLAY_MESSAGE_PATH, method = RequestMethod.GET)
+    public String clearDisplayMessageGet(Model model) {
+        model.addAttribute("params", new ClearDisplayMessageParams());
+        return "op20/ClearDisplayMessage";
+    }
+
+    @RequestMapping(value = CLEAR_DISPLAY_MESSAGE_PATH, method = RequestMethod.POST)
+    public String clearDisplayMessagePost(@Valid @ModelAttribute("params") ClearDisplayMessageParams params,
+                                          BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/ClearDisplayMessage";
+        }
+
+        ClearDisplayMessageTask task = new ClearDisplayMessageTask(
+            params.getChargePointSelectList(),
+            params.getId()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + CLEAR_DISPLAY_MESSAGE_PATH;
+    }
+
+    // CostUpdated - TODO: Fix CostUpdatedTask implementation
+    /*
+    @RequestMapping(value = COST_UPDATED_PATH, method = RequestMethod.GET)
+    public String costUpdatedGet(Model model) {
+        model.addAttribute("params", new CostUpdatedParams());
+        return "op20/CostUpdated";
+    }
+
+    @RequestMapping(value = COST_UPDATED_PATH, method = RequestMethod.POST)
+    public String costUpdatedPost(@Valid @ModelAttribute("params") CostUpdatedParams params,
+                                  BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/CostUpdated";
+        }
+
+        // TODO: Fix CostUpdatedTask implementation
+        // CostUpdatedTask task = new CostUpdatedTask(
+        //     params.getChargePointSelectList(),
+        //     params.getTotalCost(),
+        //     params.getTransactionId()
+        // );
+
+        // taskExecutor.execute(task);
+        // model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + COST_UPDATED_PATH;
+    }
+    */
+
+    // Get15118EVCertificate
+    @RequestMapping(value = GET_15118_EV_CERTIFICATE_PATH, method = RequestMethod.GET)
+    public String get15118EVCertificateGet(Model model) {
+        model.addAttribute("params", new Get15118EVCertificateParams());
+        return "op20/Get15118EVCertificate";
+    }
+
+    @RequestMapping(value = GET_15118_EV_CERTIFICATE_PATH, method = RequestMethod.POST)
+    public String get15118EVCertificatePost(@Valid @ModelAttribute("params") Get15118EVCertificateParams params,
+                                            BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/Get15118EVCertificate";
+        }
+
+        Get15118EVCertificateTask task = new Get15118EVCertificateTask(
+            params.getChargePointSelectList(),
+            params.getIso15118SchemaVersion(),
+            params.getExiRequest()
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_15118_EV_CERTIFICATE_PATH;
+    }
+
+    // GetCertificateStatus
+    @RequestMapping(value = GET_CERTIFICATE_STATUS_PATH, method = RequestMethod.GET)
+    public String getCertificateStatusGet(Model model) {
+        model.addAttribute("params", new GetCertificateStatusParams());
+        return "op20/GetCertificateStatus";
+    }
+
+    @RequestMapping(value = GET_CERTIFICATE_STATUS_PATH, method = RequestMethod.POST)
+    public String getCertificateStatusPost(@Valid @ModelAttribute("params") GetCertificateStatusParams params,
+                                           BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/GetCertificateStatus";
+        }
+
+        GetCertificateStatusTask task = new GetCertificateStatusTask(
+            params.getChargePointSelectList(),
+            null // TODO: Convert DTO to OCPP model
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_CERTIFICATE_STATUS_PATH;
+    }
+
+    // GetMonitoringReport - TODO: Fix type conversions
+    /*
+    @RequestMapping(value = GET_MONITORING_REPORT_PATH, method = RequestMethod.GET)
+    public String getMonitoringReportGet(Model model) {
+        model.addAttribute("params", new GetMonitoringReportParams());
+        return "op20/GetMonitoringReport";
+    }
+
+    @RequestMapping(value = GET_MONITORING_REPORT_PATH, method = RequestMethod.POST)
+    public String getMonitoringReportPost(@Valid @ModelAttribute("params") GetMonitoringReportParams params,
+                                          BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/GetMonitoringReport";
+        }
+
+        // TODO: Fix GetMonitoringReportTask constructor - needs proper type conversion
+        // GetMonitoringReportTask task = new GetMonitoringReportTask(
+        //     params.getChargePointSelectList(),
+        //     params.getRequestId(),
+        //     params.getMonitoringCriteria(), // Convert monitoring criteria
+        //     params.getComponentVariable()  // Convert component variables
+        // );
+
+        // taskExecutor.execute(task);
+        // model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + GET_MONITORING_REPORT_PATH;
+    }
+    */
+
+    // SetDisplayMessage
+    @RequestMapping(value = SET_DISPLAY_MESSAGE_PATH, method = RequestMethod.GET)
+    public String setDisplayMessageGet(Model model) {
+        model.addAttribute("params", new SetDisplayMessageParams());
+        return "op20/SetDisplayMessage";
+    }
+
+    @RequestMapping(value = SET_DISPLAY_MESSAGE_PATH, method = RequestMethod.POST)
+    public String setDisplayMessagePost(@Valid @ModelAttribute("params") SetDisplayMessageParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/SetDisplayMessage";
+        }
+
+        SetDisplayMessageTask task = new SetDisplayMessageTask(
+            params.getChargePointSelectList(),
+            null // TODO: Convert message info
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + SET_DISPLAY_MESSAGE_PATH;
+    }
+
+    // SetVariableMonitoring
+    @RequestMapping(value = SET_VARIABLE_MONITORING_PATH, method = RequestMethod.GET)
+    public String setVariableMonitoringGet(Model model) {
+        model.addAttribute("params", new SetVariableMonitoringParams());
+        return "op20/SetVariableMonitoring";
+    }
+
+    @RequestMapping(value = SET_VARIABLE_MONITORING_PATH, method = RequestMethod.POST)
+    public String setVariableMonitoringPost(@Valid @ModelAttribute("params") SetVariableMonitoringParams params,
+                                            BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "op20/SetVariableMonitoring";
+        }
+
+        SetVariableMonitoringTask task = new SetVariableMonitoringTask(
+            params.getChargePointSelectList(),
+            null // TODO: Convert monitoring data
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
+        return "redirect:/manager/operations/v2.0" + SET_VARIABLE_MONITORING_PATH;
     }
 
 }

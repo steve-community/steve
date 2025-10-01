@@ -28,7 +28,6 @@ import org.springframework.core.type.filter.RegexPatternTypeFilter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -97,11 +96,11 @@ public abstract class AbstractTypeStore implements TypeStore {
             String packageName, Class<INTERFACE> interfaceClass) {
         try {
             // create scanner and disable default filters (that is the 'false' argument)
-            final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+            var provider = new ClassPathScanningCandidateComponentProvider(false);
             // add include filters which matches all the classes (or use your own)
             provider.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile(".*")));
             // get matching classes defined in the package
-            final Set<BeanDefinition> classes = provider.findCandidateComponents(packageName);
+            var classes = provider.findCandidateComponents(packageName);
 
             Map<String, Class<IMPL>> map = new HashMap<>();
 

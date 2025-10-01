@@ -68,23 +68,54 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @Override
     public ResponseType dispatch(RequestType params, String chargeBoxId) {
-        return switch (params) {
-            case BootNotificationRequest request -> server.bootNotificationWithTransport(request, chargeBoxId, OcppProtocol.V_16_JSON);
-            case FirmwareStatusNotificationRequest request -> server.firmwareStatusNotification(request, chargeBoxId);
-            case StatusNotificationRequest request -> server.statusNotification(request, chargeBoxId);
-            case MeterValuesRequest request -> server.meterValues(request, chargeBoxId);
-            case DiagnosticsStatusNotificationRequest request -> server.diagnosticsStatusNotification(request, chargeBoxId);
-            case StartTransactionRequest request -> server.startTransaction(request, chargeBoxId);
-            case StopTransactionRequest request -> server.stopTransaction(request, chargeBoxId);
-            case HeartbeatRequest request -> server.heartbeat(request, chargeBoxId);
-            case AuthorizeRequest request -> server.authorize(request, chargeBoxId);
-            case DataTransferRequest request -> server.dataTransfer(request, chargeBoxId);
-            case de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest request -> server.signCertificate(request, chargeBoxId);
-            case de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest request -> server.securityEventNotification(request, chargeBoxId);
-            case de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest request -> server.signedFirmwareStatusNotification(request, chargeBoxId);
-            case de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest request -> server.logStatusNotification(request, chargeBoxId);
-            case null, default ->
-                throw new IllegalArgumentException("Unexpected RequestType: " + params.getClass().getName());
-        };
+        ResponseType r;
+
+        if (params instanceof BootNotificationRequest) {
+            r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
+
+        } else if (params instanceof FirmwareStatusNotificationRequest) {
+            r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof StatusNotificationRequest) {
+            r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof MeterValuesRequest) {
+            r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
+
+        } else if (params instanceof DiagnosticsStatusNotificationRequest) {
+            r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof StartTransactionRequest) {
+            r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
+
+        } else if (params instanceof StopTransactionRequest) {
+            r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
+
+        } else if (params instanceof HeartbeatRequest) {
+            r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
+
+        } else if (params instanceof AuthorizeRequest) {
+            r = server.authorize((AuthorizeRequest) params, chargeBoxId);
+
+        } else if (params instanceof DataTransferRequest) {
+            r = server.dataTransfer((DataTransferRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) {
+            r = server.signCertificate((de.rwth.idsg.steve.ocpp.ws.data.security.SignCertificateRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) {
+            r = server.securityEventNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SecurityEventNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) {
+            r = server.signedFirmwareStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.SignedFirmwareStatusNotificationRequest) params, chargeBoxId);
+
+        } else if (params instanceof de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) {
+            r = server.logStatusNotification((de.rwth.idsg.steve.ocpp.ws.data.security.LogStatusNotificationRequest) params, chargeBoxId);
+
+        } else {
+            throw new IllegalArgumentException("Unexpected RequestType: " + params.getClass().getName());
+        }
+
+        return r;
     }
 }

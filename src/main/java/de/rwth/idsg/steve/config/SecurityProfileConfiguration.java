@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @Getter
@@ -68,26 +66,8 @@ public class SecurityProfileConfiguration {
     @Value("${ocpp.security.certificate.validity.years:1}")
     private int certificateValidityYears;
 
-    @Value("${ocpp.security.certificate.csr.require.organization:false}")
-    private boolean requireOrganization;
-
-    @Value("${ocpp.security.certificate.csr.allowed.organizations:}")
-    private String allowedOrganizationsString;
-
-    @Value("${ocpp.security.certificate.csr.require.country:false}")
-    private boolean requireCountry;
-
-    @Value("${ocpp.security.certificate.csr.expected.country:}")
-    private String expectedCountry;
-
-    private List<String> allowedOrganizations;
-
     @PostConstruct
     public void init() {
-        if (allowedOrganizationsString != null && !allowedOrganizationsString.isEmpty()) {
-            allowedOrganizations = Arrays.asList(allowedOrganizationsString.split(","));
-        }
-
         log.info("OCPP Security Profile Configuration:");
         log.info("  Security Profile: {}", securityProfile);
         log.info("  TLS Enabled: {}", tlsEnabled);
@@ -102,15 +82,6 @@ public class SecurityProfileConfiguration {
 
             if (tlsCipherSuites != null && tlsCipherSuites.length > 0) {
                 log.info("  Cipher Suites: {}", String.join(", ", tlsCipherSuites));
-            }
-            log.info("  Certificate Validity (years): {}", certificateValidityYears);
-            log.info("  CSR Require Organization: {}", requireOrganization);
-            if (allowedOrganizations != null && !allowedOrganizations.isEmpty()) {
-                log.info("  Allowed Organizations: {}", String.join(", ", allowedOrganizations));
-            }
-            log.info("  CSR Require Country: {}", requireCountry);
-            if (expectedCountry != null && !expectedCountry.isEmpty()) {
-                log.info("  Expected Country: {}", expectedCountry);
             }
 
             validateConfiguration();

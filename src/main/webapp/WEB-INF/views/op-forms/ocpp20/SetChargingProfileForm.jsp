@@ -3,7 +3,7 @@
     Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 --%>
-<form:form modelAttribute="params">
+<form:form action="${ctxPath}/manager/operations/v2.0/SetChargingProfile" modelAttribute="params">
     <section><span>Charge Points</span></section>
     <table class="userInput">
         <tr>
@@ -106,4 +106,3 @@
         </tr>
     </table>
 </form:form>
-<%@ include file="../../00-cp-multiple.jsp" %>

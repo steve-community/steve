@@ -25,10 +25,6 @@
             <td>ID Token Type (optional):</td>
             <td><form:input path="idTokenType" placeholder="Central|eMAID|ISO14443|ISO15693|KeyCode|Local|MacAddress|NoAuthorization"/></td>
         </tr>
-        <tr>
-            <td>Certificate Hash Data (optional):</td>
-            <td><form:textarea path="customerCertificate" placeholder="Certificate hash data (JSON format)"/></td>
-        </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

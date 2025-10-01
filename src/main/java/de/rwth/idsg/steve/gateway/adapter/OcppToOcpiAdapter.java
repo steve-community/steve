@@ -123,23 +123,47 @@ public class OcppToOcpiAdapter {
     public Location getLocation(String locationId) {
         log.debug("Getting location for id: {}", locationId);
 
-        // TODO: Implement location lookup by ID
-        // This would typically involve finding a charge point by some identifier
-        return null;
+        // Find charge point by chargeBoxId
+        ChargePointQueryForm form = new ChargePointQueryForm();
+        form.setChargeBoxId(locationId);
+        List<ChargePoint.Overview> chargePoints = chargePointRepository.getOverview(form);
+
+        if (chargePoints.isEmpty()) {
+            log.warn("Charge point not found for location ID: {}", locationId);
+            return null;
+        }
+
+        return convertChargePointToLocation(chargePoints.get(0));
     }
 
     public EVSE getEvse(String locationId, String evseUid) {
         log.debug("Getting EVSE for location: {}, evse: {}", locationId, evseUid);
 
-        // TODO: Implement EVSE lookup
-        return null;
+        Location location = getLocation(locationId);
+        if (location == null) {
+            log.warn("Location not found for EVSE lookup: {}", locationId);
+            return null;
+        }
+
+        return location.getEvses().stream()
+            .filter(evse -> evse.getUid().equals(evseUid))
+            .findFirst()
+            .orElse(null);
     }
 
     public Connector getConnector(String locationId, String evseUid, String connectorId) {
         log.debug("Getting connector for location: {}, evse: {}, connector: {}", locationId, evseUid, connectorId);
 
-        // TODO: Implement connector lookup
-        return null;
+        EVSE evse = getEvse(locationId, evseUid);
+        if (evse == null) {
+            log.warn("EVSE not found for connector lookup: {}", evseUid);
+            return null;
+        }
+
+        return evse.getConnectors().stream()
+            .filter(connector -> connector.getId().equals(connectorId))
+            .findFirst()
+            .orElse(null);
     }
 
     // Session related methods
@@ -243,8 +267,14 @@ public class OcppToOcpiAdapter {
     public AuthorizationInfo authorizeToken(LocationReferences locationReferences) {
         log.debug("Authorizing token: {}", locationReferences);
 
-        // TODO: Implement token authorization logic
-        // This would involve checking if the token is valid for the specified location
+        // Simplified authorization - in production, this should check:
+        // 1. Token validity and expiration
+        // 2. Token whitelist/blocklist status
+        // 3. Location-specific authorization rules
+        // 4. Parent ID token validity
+        // For now, we accept all tokens as this is a gateway adapter
+        log.warn("Using simplified token authorization - all tokens accepted. Implement proper validation for production.");
+
         return AuthorizationInfo.builder()
             .allowed("Accepted")
             .build();

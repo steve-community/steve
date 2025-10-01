@@ -1,8 +1,9 @@
 package de.rwth.idsg.steve.web.dto.ocpp20;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.*;
 
 @Getter
 @Setter
@@ -23,7 +24,9 @@ public class MessageInfo {
     private String transactionId;
 
     @NotNull(message = "Message content is required")
+    @Valid
     private MessageContent message = new MessageContent();
 
+    @Valid
     private Display display;
 }

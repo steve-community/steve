@@ -42,12 +42,17 @@ public class PingTask implements Runnable {
 
     @Override
     public void run() {
+        if (!session.isOpen()) {
+            log.debug("Session for chargeBox '{}' is not open. Skipping ping.", chargeBoxId);
+            return;
+        }
+
         WebSocketLogger.sendingPing(chargeBoxId, session);
         try {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
             WebSocketLogger.pingError(chargeBoxId, session, e);
-            // TODO: Do something about this
+            log.error("Failed to send ping to chargeBox '{}'. Session may be stale and will be closed on next interaction.", chargeBoxId);
         }
     }
 }

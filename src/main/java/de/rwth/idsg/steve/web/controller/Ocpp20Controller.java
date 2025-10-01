@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp20.model.*;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.web.converter.Ocpp20DtoMapper;
 import de.rwth.idsg.steve.web.dto.ocpp20.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -520,7 +524,11 @@ public class Ocpp20Controller {
         schedule.setChargingRateUnit(ChargingRateUnitEnum.fromValue(params.getChargingRateUnit()));
 
         if (params.getStartSchedule() != null && !params.getStartSchedule().isEmpty()) {
-            // TODO: Parse datetime string to OffsetDateTime
+            try {
+                schedule.setStartSchedule(OffsetDateTime.parse(params.getStartSchedule()));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid start schedule format. Expected ISO 8601 format (e.g., 2025-10-01T10:00:00Z)", e);
+            }
         }
 
         if (params.getMinChargingRate() != null) {
@@ -1191,8 +1199,6 @@ public class Ocpp20Controller {
         return "redirect:/manager/operations/v2.0" + CLEAR_DISPLAY_MESSAGE_PATH;
     }
 
-    // CostUpdated - TODO: Fix CostUpdatedTask implementation
-    /*
     @RequestMapping(value = COST_UPDATED_PATH, method = RequestMethod.GET)
     public String costUpdatedGet(Model model) {
         model.addAttribute("params", new CostUpdatedParams());
@@ -1206,18 +1212,16 @@ public class Ocpp20Controller {
             return "op20/CostUpdated";
         }
 
-        // TODO: Fix CostUpdatedTask implementation
-        // CostUpdatedTask task = new CostUpdatedTask(
-        //     params.getChargePointSelectList(),
-        //     params.getTotalCost(),
-        //     params.getTransactionId()
-        // );
+        CostUpdatedTask task = new CostUpdatedTask(
+            params.getChargePointSelectList(),
+            params.getTotalCost().doubleValue(),
+            params.getTransactionId()
+        );
 
-        // taskExecutor.execute(task);
-        // model.addAttribute("taskId", task.getTaskId());
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
         return "redirect:/manager/operations/v2.0" + COST_UPDATED_PATH;
     }
-    */
 
     // Get15118EVCertificate
     @RequestMapping(value = GET_15118_EV_CERTIFICATE_PATH, method = RequestMethod.GET)
@@ -1258,9 +1262,17 @@ public class Ocpp20Controller {
             return "op20/GetCertificateStatus";
         }
 
+        de.rwth.idsg.steve.ocpp20.model.OCSPRequestData requestData;
+        try {
+            requestData = Ocpp20DtoMapper.toOcspRequestData(params.getOcspRequestData());
+        } catch (IllegalArgumentException ex) {
+            result.rejectValue("ocspRequestData", "conversionError", ex.getMessage());
+            return "op20/GetCertificateStatus";
+        }
+
         GetCertificateStatusTask task = new GetCertificateStatusTask(
             params.getChargePointSelectList(),
-            null // TODO: Convert DTO to OCPP model
+            requestData
         );
 
         taskExecutor.execute(task);
@@ -1268,8 +1280,6 @@ public class Ocpp20Controller {
         return "redirect:/manager/operations/v2.0" + GET_CERTIFICATE_STATUS_PATH;
     }
 
-    // GetMonitoringReport - TODO: Fix type conversions
-    /*
     @RequestMapping(value = GET_MONITORING_REPORT_PATH, method = RequestMethod.GET)
     public String getMonitoringReportGet(Model model) {
         model.addAttribute("params", new GetMonitoringReportParams());
@@ -1283,19 +1293,32 @@ public class Ocpp20Controller {
             return "op20/GetMonitoringReport";
         }
 
-        // TODO: Fix GetMonitoringReportTask constructor - needs proper type conversion
-        // GetMonitoringReportTask task = new GetMonitoringReportTask(
-        //     params.getChargePointSelectList(),
-        //     params.getRequestId(),
-        //     params.getMonitoringCriteria(), // Convert monitoring criteria
-        //     params.getComponentVariable()  // Convert component variables
-        // );
+        List<MonitoringCriterionEnum> criteria;
+        List<ComponentVariable> componentVariables;
+        try {
+            criteria = Ocpp20DtoMapper.toMonitoringCriteria(params.getMonitoringCriteria());
+            componentVariables = Ocpp20DtoMapper.toComponentVariables(params.getComponentVariable());
+        } catch (IllegalArgumentException ex) {
+            result.reject("conversionError", ex.getMessage());
+            return "op20/GetMonitoringReport";
+        }
 
-        // taskExecutor.execute(task);
-        // model.addAttribute("taskId", task.getTaskId());
+        if ((criteria == null || criteria.isEmpty()) && (componentVariables == null || componentVariables.isEmpty())) {
+            result.reject("conversionError", "Please provide at least one monitoring criterion or component variable.");
+            return "op20/GetMonitoringReport";
+        }
+
+        GetMonitoringReportTask task = new GetMonitoringReportTask(
+            params.getChargePointSelectList(),
+            params.getRequestId(),
+            criteria,
+            componentVariables
+        );
+
+        taskExecutor.execute(task);
+        model.addAttribute("taskId", task.getTaskId());
         return "redirect:/manager/operations/v2.0" + GET_MONITORING_REPORT_PATH;
     }
-    */
 
     // SetDisplayMessage
     @RequestMapping(value = SET_DISPLAY_MESSAGE_PATH, method = RequestMethod.GET)
@@ -1311,9 +1334,17 @@ public class Ocpp20Controller {
             return "op20/SetDisplayMessage";
         }
 
+        de.rwth.idsg.steve.ocpp20.model.MessageInfo messageInfo;
+        try {
+            messageInfo = Ocpp20DtoMapper.toMessageInfo(params.getMessage());
+        } catch (IllegalArgumentException ex) {
+            result.rejectValue("message", "conversionError", ex.getMessage());
+            return "op20/SetDisplayMessage";
+        }
+
         SetDisplayMessageTask task = new SetDisplayMessageTask(
             params.getChargePointSelectList(),
-            null // TODO: Convert message info
+            messageInfo
         );
 
         taskExecutor.execute(task);
@@ -1335,9 +1366,22 @@ public class Ocpp20Controller {
             return "op20/SetVariableMonitoring";
         }
 
+        List<de.rwth.idsg.steve.ocpp20.model.SetMonitoringData> monitoringData;
+        try {
+            monitoringData = Ocpp20DtoMapper.toSetMonitoringData(params.getSetMonitoringData());
+        } catch (IllegalArgumentException ex) {
+            result.rejectValue("setMonitoringData", "conversionError", ex.getMessage());
+            return "op20/SetVariableMonitoring";
+        }
+
+        if (monitoringData.isEmpty()) {
+            result.rejectValue("setMonitoringData", "conversionError", "Please provide at least one monitoring entry.");
+            return "op20/SetVariableMonitoring";
+        }
+
         SetVariableMonitoringTask task = new SetVariableMonitoringTask(
             params.getChargePointSelectList(),
-            null // TODO: Convert monitoring data
+            monitoringData
         );
 
         taskExecutor.execute(task);

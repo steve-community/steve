@@ -13,7 +13,7 @@
         </tr>
         <tr>
             <td>Local Authorization List:</td>
-            <td><form:textarea path="localAuthorizationList" placeholder="Enter authorization list data (optional)"/></td>
+            <td><form:textarea path="authorizationList" placeholder="Enter authorization list data (optional)"/></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

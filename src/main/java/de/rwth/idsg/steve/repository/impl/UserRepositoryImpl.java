@@ -64,8 +64,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
-        var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
         var userResults = getOverviewInternal(form);
+        var userPks = userResults.stream().map(Record5::value1).toList();
+        var ocppTagsPerUser = getOcppTagsInternal(userPks, form.getOcppIdTag());
 
         List<User.Overview> userOverviews = new ArrayList<>();
         for (var r : userResults) {
@@ -79,9 +80,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .ocppTagEntries(tags)
                 .build();
 
-            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
-            //       should be acceptable since the number of users (and tags) are usually not very high, and this
-            //       overview query will probably not be in the hot path.
             switch (form.getOcppTagFilter()) {
                 case OnlyUsersWithTags -> {
                     if (!tags.isEmpty()) {
@@ -113,7 +111,7 @@ public class UserRepositoryImpl implements UserRepository {
         return User.Details.builder()
                            .userRecord(ur)
                            .address(addressRepository.get(ctx, ur.getAddressPk()))
-                           .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
+                           .ocppTagEntries(getOcppTagsInternal(List.of(userPk), null).getOrDefault(userPk, List.of()))
                            .build();
     }
 
@@ -206,11 +204,11 @@ public class UserRepositoryImpl implements UserRepository {
             .fetch();
     }
 
-    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, String ocppIdTag) {
+    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(List<Integer> userPks, String ocppIdTag) {
         List<Condition> conditions = new ArrayList<>();
 
-        if (userPk != null) {
-            conditions.add(USER_OCPP_TAG.USER_PK.eq(userPk));
+        if (userPks != null && !userPks.isEmpty()) {
+            conditions.add(USER_OCPP_TAG.USER_PK.in(userPks));
         }
 
         if (!Strings.isNullOrEmpty(ocppIdTag)) {

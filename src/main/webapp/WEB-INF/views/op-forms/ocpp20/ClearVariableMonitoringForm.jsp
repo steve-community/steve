@@ -5,7 +5,7 @@
     <table class="userInput">
         <tr>
             <td>Monitoring IDs (comma-separated):</td>
-            <td><form:input path="id" placeholder="1,2,3"/></td>
+            <td><form:input path="monitoringIds" placeholder="1,2,3"/></td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

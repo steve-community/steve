@@ -5,10 +5,89 @@ Tests all OCPP 2.0 operations (both CP->CSMS and CSMS->CP) for accessibility
 Author: Claude Code
 """
 
-import requests
 import sys
-from urllib.parse import urljoin
 import time
+from urllib.parse import urljoin
+
+try:
+    import requests  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - optional runtime dependency
+    # Provide a tiny fallback so the test suite can run without external deps
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+    from http.cookiejar import CookieJar
+
+    class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+
+    class _SimpleResponse:
+        def __init__(self, status_code, headers, url, content):
+            self.status_code = status_code
+            self.headers = dict(headers.items()) if headers else {}
+            self.url = url
+            self._content = content or b""
+
+        @property
+        def text(self):
+            return self._content.decode("utf-8", errors="replace")
+
+    class _SimpleSession:
+        def __init__(self):
+            self.headers = {}
+            self._cookie_jar = CookieJar()
+            self._opener = urllib.request.build_opener(
+                urllib.request.HTTPCookieProcessor(self._cookie_jar)
+            )
+
+        def _make_request(self, url, method, data=None, allow_redirects=True, timeout=None):
+            request_headers = dict(self.headers)
+            request_data = data
+
+            if isinstance(data, dict):
+                request_data = urllib.parse.urlencode(data).encode()
+                request_headers.setdefault("Content-Type", "application/x-www-form-urlencoded")
+            elif isinstance(data, str):
+                request_data = data.encode()
+
+            req = urllib.request.Request(url, data=request_data, headers=request_headers, method=method)
+
+            opener = self._opener
+            if not allow_redirects:
+                opener = urllib.request.build_opener(
+                    urllib.request.HTTPCookieProcessor(self._cookie_jar),
+                    _NoRedirectHandler(),
+                )
+
+            try:
+                response = opener.open(req, timeout=timeout)
+                content = response.read()
+                return _SimpleResponse(response.getcode(), response.headers, response.geturl(), content)
+            except urllib.error.HTTPError as exc:
+                content = exc.read()
+                return _SimpleResponse(exc.code, exc.headers, exc.geturl(), content)
+            except urllib.error.URLError as exc:  # bubble up a familiar error message
+                raise ConnectionError(str(exc)) from exc
+
+        def get(self, url, allow_redirects=True, timeout=None):
+            return self._make_request(url, "GET", allow_redirects=allow_redirects, timeout=timeout)
+
+        def post(self, url, data=None, allow_redirects=True, timeout=None):
+            return self._make_request(url, "POST", data=data, allow_redirects=allow_redirects, timeout=timeout)
+
+    class _RequestsModule:
+        Session = _SimpleSession
+
+        @staticmethod
+        def get(url, **kwargs):
+            return _SimpleSession().get(url, **kwargs)
+
+        @staticmethod
+        def post(url, **kwargs):
+            return _SimpleSession().post(url, **kwargs)
+
+    requests = _RequestsModule()  # type: ignore
 
 # Configuration
 BASE_URL = "http://localhost:8080/steve/"  # Add trailing slash for proper urljoin behavior

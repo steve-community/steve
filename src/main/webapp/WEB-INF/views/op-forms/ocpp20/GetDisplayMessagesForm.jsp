@@ -9,7 +9,7 @@
         </tr>
         <tr>
             <td>Message IDs (optional, comma-separated):</td>
-            <td><form:input path="id" placeholder="1,2,3 (leave empty for all)"/></td>
+            <td><form:input path="messageIds" placeholder="1,2,3 (leave empty for all)"/></td>
         </tr>
         <tr>
             <td>Priority (optional):</td>

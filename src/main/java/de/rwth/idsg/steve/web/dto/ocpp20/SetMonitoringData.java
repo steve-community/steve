@@ -1,8 +1,9 @@
 package de.rwth.idsg.steve.web.dto.ocpp20;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.*;
 
 @Getter
 @Setter
@@ -23,8 +24,10 @@ public class SetMonitoringData {
     private Integer severity;
 
     @NotNull(message = "Component is required")
+    @Valid
     private ComponentDto component = new ComponentDto();
 
     @NotNull(message = "Variable is required")
+    @Valid
     private VariableDto variable = new VariableDto();
 }

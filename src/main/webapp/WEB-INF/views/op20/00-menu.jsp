@@ -44,6 +44,7 @@
 	<li><a ${param.menuItem == 'Get15118EVCertificate' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/Get15118EVCertificate">Get ISO 15118 EV Certificate</a></li>
 	<hr>
 	<li><a ${param.menuItem == 'CustomerInformation' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/CustomerInformation">Customer Information</a></li>
+	<li><a ${param.menuItem == 'CostUpdated' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/CostUpdated">Cost Updated</a></li>
 	<li><a ${param.menuItem == 'GetDisplayMessages' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/GetDisplayMessages">Get Display Messages</a></li>
 	<li><a ${param.menuItem == 'SetDisplayMessage' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/SetDisplayMessage">Set Display Message</a></li>
 	<li><a ${param.menuItem == 'ClearDisplayMessage' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/v2.0/ClearDisplayMessage">Clear Display Message</a></li>

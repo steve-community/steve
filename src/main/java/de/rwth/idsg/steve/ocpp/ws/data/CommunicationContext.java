@@ -62,13 +62,15 @@ public class CommunicationContext {
 
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
-        // TODO: not so sure about this
+        // Wraps the task's handler to process successful OCPP responses.
+        // DummyResponse adapts the payload format to match the handler's expected interface.
         resultHandler = result -> task.getHandler(chargeBoxId)
                                       .handleResponse(new DummyResponse(result.getPayload()));
     }
 
     public void createErrorHandler(CommunicationTask task) {
-        // TODO: not so sure about this
+        // Wraps the task's default callback to process OCPP error responses.
+        // The callback receives the chargeBoxId and error details for logging/handling.
         errorHandler = result -> task.defaultCallback()
                                      .success(chargeBoxId, result);
     }

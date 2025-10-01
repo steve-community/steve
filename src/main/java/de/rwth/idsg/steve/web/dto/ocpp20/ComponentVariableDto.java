@@ -1,14 +1,16 @@
 package de.rwth.idsg.steve.web.dto.ocpp20;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.*;
 
 @Getter
 @Setter
 public class ComponentVariableDto {
-    @NotNull(message = "Component is required")
+    @Valid
     private ComponentDto component = new ComponentDto();
 
+    @Valid
     private VariableDto variable = new VariableDto();
 }

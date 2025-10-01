@@ -104,6 +104,9 @@ public abstract class AbstractTypeStore implements TypeStore {
                     map.put(clazz.getSimpleName(), (Class<IMPL>) clazz);
                 }
             }
+            if (map.isEmpty()) {
+                throw new IllegalStateException("No classes with interface " + interfaceClass.getSimpleName() + " found in package " + packageName);
+            }
             return map;
         } catch (IOException e) {
             throw new RuntimeException(e);

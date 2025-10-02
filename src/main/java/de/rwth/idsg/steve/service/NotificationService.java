@@ -64,7 +64,7 @@ import static java.lang.String.format;
 public class NotificationService {
 
     private final MailService mailService;
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
     private final UserRepository userRepository;
     private final DelegatingTaskExecutor asyncTaskExecutor;
 
@@ -136,7 +136,7 @@ public class NotificationService {
 
     private void userNotificationOcppStationStatusFailure(OcppStationStatusFailure notification, String subject) {
 
-         Transaction transaction = transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
+         Transaction transaction = transactionService.getActiveTransaction(notification.getChargeBoxId(),
                 notification.getConnectorId());
         if (transaction == null) {
             return;
@@ -267,7 +267,7 @@ public class NotificationService {
 
     private void userNotificationActionSuspendedEV(OcppStationStatusSuspendedEV notification, String subject) {
 
-        Transaction transaction = transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
+        Transaction transaction = transactionService.getActiveTransaction(notification.getChargeBoxId(),
                 notification.getConnectorId());
         if (transaction == null) {
             return;
@@ -338,7 +338,7 @@ public class NotificationService {
         String eMailAddress = null;
         UserRecord userRecord = new UserRecord();
 
-        Transaction transActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
+        Transaction transActParams = transactionService.getTransaction(notification.getParams().getTransactionId());
 
         // if the Transactionstop is received within the first Minute don't send an E-Mail
         if (!transActParams.getStopTimestamp().isAfter(transActParams.getStartTimestamp().plusMinutes(1))) {

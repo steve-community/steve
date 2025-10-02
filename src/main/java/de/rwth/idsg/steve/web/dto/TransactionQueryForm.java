@@ -41,7 +41,7 @@ public class TransactionQueryForm extends QueryForm {
     private Integer transactionPk;
     
     @Schema(description = "ID of the connector")
-    Integer connectorId;
+    private Integer connectorId;
 
     @Schema(description = "Disabled for the Web APIs. Do not use and set", hidden = true)
     private boolean returnCSV = false;
@@ -64,7 +64,7 @@ public class TransactionQueryForm extends QueryForm {
     }
     
     @Schema(hidden = true)
-    public boolean isConnectorId() {
+    public boolean isConnectorIdSet() {
         return connectorId != null;
     }
 

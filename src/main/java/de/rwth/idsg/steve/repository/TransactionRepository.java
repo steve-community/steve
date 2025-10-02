@@ -30,10 +30,6 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface TransactionRepository {
-    Transaction getTransaction(int transactionPk);
-
-    Transaction getActiveTransaction(String chargeBoxId, Integer connectorId);
-
     List<Transaction> getTransactions(TransactionQueryForm form);
 
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);

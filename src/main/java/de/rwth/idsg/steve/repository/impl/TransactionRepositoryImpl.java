@@ -64,34 +64,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private final DSLContext ctx;
 
     @Override
-    public Transaction getTransaction(int transactionPk) {
-        TransactionQueryForm form = new TransactionQueryForm();
-        form.setTransactionPk(transactionPk);
-        form.setReturnCSV(false);
-        form.setType(TransactionQueryForm.QueryType.ALL);
-        return getInternal(form).fetch()
-                                .map(new TransactionMapper()).get(0);
-    }
-
-    @Override
-    public Transaction getActiveTransaction(String chargeBoxId, Integer connectorId) {
-        Transaction retVal = null;
-        TransactionQueryForm form = new TransactionQueryForm();
-        form.setChargeBoxId(chargeBoxId);
-        form.setConnectorId(connectorId);
-        form.setReturnCSV(false);
-        form.setType(TransactionQueryForm.QueryType.ACTIVE);
-        Record12<Integer, String, Integer, String, DateTime, String,
-                DateTime, String, String, Integer, Integer, TransactionStopEventActor>
-                transactionRecord = getInternal(form).fetchAny();
-        if (transactionRecord != null) {
-            TransactionMapper mapper = new TransactionMapper();
-            retVal = mapper.map(transactionRecord);
-        }
-        return retVal;
-    }
-
-    @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper());
@@ -309,7 +281,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        if (form.isConnectorId()) {
+        if (form.isConnectorIdSet()) {
             selectQuery.addConditions(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
         }
 

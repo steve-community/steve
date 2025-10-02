@@ -67,6 +67,10 @@ public class OcppTagService {
         return ocppTagRepository.getIdTags();
     }
 
+    public List<String> getIdTagsWithoutUser() {
+        return ocppTagRepository.getIdTagsWithoutUser();
+    }
+
     public List<String> getActiveIdTags() {
         return ocppTagRepository.getActiveIdTags();
     }

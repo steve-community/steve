@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -26,16 +25,8 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springdoc.core.configuration.SpringDocConfiguration;
-import org.springdoc.core.properties.SwaggerUiConfigProperties;
-import org.springdoc.core.properties.SwaggerUiOAuthProperties;
-import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
-import org.springdoc.webmvc.ui.SwaggerConfig;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -46,13 +37,6 @@ import java.util.List;
  * @since 15.09.2022
  */
 @Configuration
-@ComponentScan(basePackages = {"org.springdoc"})
-@Import({SpringDocConfiguration.class,
-    SpringDocWebMvcConfiguration.class,
-    SwaggerConfig.class,
-    SwaggerUiConfigProperties.class,
-    SwaggerUiOAuthProperties.class,
-    JacksonAutoConfiguration.class})
 public class ApiDocsConfiguration {
 
     static {
@@ -67,10 +51,12 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
         // Sort endpoints (within a controller) alphabetically by their path
         System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
+        // Sort schemas/DTOs alphabetically
+        System.setProperty("springdoc.writer-with-order-by-keys", "true");
     }
 
     @Bean
-    public OpenAPI apiDocs() {
+    public OpenAPI apiDocs(SteveProperties steveProperties) {
         String title = "SteVe REST API Documentation";
 
         String securityName = "basicAuth";
@@ -88,7 +74,7 @@ public class ApiDocsConfiguration {
                     .name("GPL-3.0")
                     .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
                 )
-                .version(SteveConfiguration.CONFIG.getSteveVersion())
+                .version(steveProperties.getVersion())
             )
             // https://stackoverflow.com/a/68185254
             .servers(List.of(new Server().url("/").description("Default Server URL")))

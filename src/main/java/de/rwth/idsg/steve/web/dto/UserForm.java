@@ -28,6 +28,9 @@ import org.joda.time.LocalDate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
@@ -40,7 +43,7 @@ public class UserForm {
     // Internal database id
     private Integer userPk;
 
-    private String ocppIdTag;
+    private List<String> idTagList = Collections.emptyList();
 
     private String firstName;
     private String lastName;

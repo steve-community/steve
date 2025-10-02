@@ -26,13 +26,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -53,19 +52,20 @@ public class SecurityConfiguration {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return CONFIG.getAuth().getPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String prefix = CONFIG.getSpringManagerMapping();
+        final String prefix = SteveProperties.SPRING_MANAGER_MAPPING;
 
         return http
             .authorizeHttpRequests(
                 req -> req
                     .requestMatchers(
+                        "/", // we have RootRedirectController to redirect "/" to "/manager"
                         "/static/**",
-                        CONFIG.getCxfMapping() + "/**",
+                        SteveProperties.CXF_MAPPING + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
@@ -74,23 +74,17 @@ public class SecurityConfiguration {
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
             // we need to disable CSRF for SOAP paths explicitly.
-            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
-            .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
-            .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
-            .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
+            .csrf(c -> c.ignoringRequestMatchers(SteveProperties.CXF_MAPPING + "/**"))
+            .sessionManagement(req -> req.invalidSessionUrl(prefix + "/signin"))
+            .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
+            .logout(req -> req.logoutUrl(prefix + "/signout"))
             .build();
     }
 
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ApiAuthenticationManager apiAuthenticationManager) throws Exception {
-        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+        return http.securityMatcher(SteveProperties.API_MAPPING + "/**")
             .csrf(k -> k.disable())
             .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))

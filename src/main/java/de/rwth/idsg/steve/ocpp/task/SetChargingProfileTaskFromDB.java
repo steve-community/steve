@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
 import ocpp.cp._2015._10.ChargingProfileKindType;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     private final int connectorId;
+    private final Integer transactionId;
     private final ChargingProfile.Details details;
     private final ChargingProfileRepository chargingProfileRepository;
 
@@ -49,6 +51,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                                         ChargingProfileRepository chargingProfileRepository) {
         super(params);
         this.connectorId = params.getConnectorId();
+        this.transactionId = params.getTransactionId();
         this.details = details;
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -58,9 +61,10 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
         return new DefaultOcppCallback<String>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
+                ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue) && ChargingProfilePurposeType.TX_PROFILE != purpose) {
                     int chargingProfilePk = details.getProfile().getChargingProfilePk();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
@@ -70,36 +74,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
-        ChargingProfileRecord profile = details.getProfile();
-
-        List<ChargingSchedulePeriod> schedulePeriods =
-            details.getPeriods()
-                       .stream()
-                       .map(k -> {
-                           ChargingSchedulePeriod p = new ChargingSchedulePeriod();
-                           p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimit());
-                           p.setNumberPhases(k.getNumberPhases());
-                           return p;
-                       })
-                       .collect(Collectors.toList());
-
-        ChargingSchedule schedule = new ChargingSchedule()
-                .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(profile.getStartSchedule())
-                .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
-                .withMinChargingRate(profile.getMinChargingRate())
-                .withChargingSchedulePeriod(schedulePeriods);
-
-        ocpp.cp._2015._10.ChargingProfile ocppProfile = new ocpp.cp._2015._10.ChargingProfile()
-                .withChargingProfileId(profile.getChargingProfilePk())
-                .withStackLevel(profile.getStackLevel())
-                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
-                .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
-                .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(profile.getValidFrom())
-                .withValidTo(profile.getValidTo())
-                .withChargingSchedule(schedule);
+        ocpp.cp._2015._10.ChargingProfile ocppProfile = ChargingProfileDetailsMapper.mapToOcpp(details, transactionId);
 
         var request = new SetChargingProfileRequest()
                 .withConnectorId(connectorId)

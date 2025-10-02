@@ -65,5 +65,15 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<Multiple
             && request.getConnectorId() < 1) {
             throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
         }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+            && request.getCsChargingProfiles().getTransactionId() == null) {
+            throw new SteveException("transaction id is required for TxProfile");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE != purpose
+            && request.getCsChargingProfiles().getTransactionId() != null) {
+            throw new SteveException("transaction id should only be set for TxProfile");
+        }
     }
 }

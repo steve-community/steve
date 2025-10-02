@@ -45,6 +45,9 @@ public class OcppTagQueryForm {
     @Schema(description = "The parent OCPP tag of this OCPP tag")
     private String parentIdTag;
 
+    @Schema(description = "The User ID")
+    private Integer userId;
+
     @Schema(description = "Return expired, not expired, or all Ocpp tags? Defaults to ALL")
     private BooleanType expired = BooleanType.FALSE;
 
@@ -56,6 +59,9 @@ public class OcppTagQueryForm {
 
     @Schema(description = "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.")
     private String note;
+
+    @Schema(description = "Filter by whether the OCPP tag is associated with a user or not. Defaults to All")
+    private UserFilter userFilter = UserFilter.All;
 
     @Schema(hidden = true)
     public boolean isOcppTagPkSet() {
@@ -75,6 +81,11 @@ public class OcppTagQueryForm {
     @Schema(hidden = true)
     public boolean isNoteSet() {
         return !Strings.isNullOrEmpty(note);
+    }
+
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
     }
 
     public BooleanType getExpired() {
@@ -113,6 +124,12 @@ public class OcppTagQueryForm {
             }
             throw new IllegalArgumentException(v);
         }
+    }
+
+    public enum UserFilter {
+        All,
+        OnlyTagsWithUser,
+        OnlyTagsWithoutUser
     }
 
     @ToString(callSuper = true)

@@ -26,14 +26,12 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import jakarta.annotation.PostConstruct;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import jakarta.xml.ws.soap.SOAPBinding;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -42,15 +40,14 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Component
 public class ClientProvider {
 
-    @Nullable private TLSClientParameters tlsClientParams;
+    @Nullable private final TLSClientParameters tlsClientParams;
 
-    @PostConstruct
-    private void init() {
-        if (shouldInitSSL()) {
-            tlsClientParams = new TLSClientParameters();
-            tlsClientParams.setSSLSocketFactory(setupSSL());
-        } else {
-            tlsClientParams = null;
+    public ClientProvider(ServerProperties serverProperties) {
+        Ssl ssl = serverProperties.getSsl();
+        try {
+            tlsClientParams = create(ssl);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -77,24 +74,29 @@ public class ClientProvider {
         return f;
     }
 
-    private static boolean shouldInitSSL() {
-        return CONFIG.getJetty().getKeyStorePath() != null && CONFIG.getJetty().getKeyStorePassword() != null;
-    }
-
-    private static SSLSocketFactory setupSSL() {
-        SSLContext ssl;
-        try {
-            String keyStorePath = CONFIG.getJetty().getKeyStorePath();
-            String keyStorePwd = CONFIG.getJetty().getKeyStorePassword();
-            ssl = SslContextBuilder.builder()
-                                   .keyStoreFromFile(keyStorePath, keyStorePwd)
-                                   .usingTLS()
-                                   .usingDefaultAlgorithm()
-                                   .usingKeyManagerPasswordFromKeyStore()
-                                   .buildMergedWithSystem();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    private static TLSClientParameters create(Ssl ssl) throws Exception {
+        if (ssl == null || !ssl.isEnabled()) {
+            return null;
         }
-        return ssl.getSocketFactory();
+
+        String keyStorePath = ssl.getKeyStore();
+        String keyStorePwd = ssl.getKeyStorePassword();
+
+        boolean shouldInit = StringUtils.hasLength(keyStorePath) && StringUtils.hasLength(keyStorePwd);
+        if (!shouldInit) {
+            return null;
+        }
+
+        var socketFactory = SslContextBuilder.builder()
+            .keyStoreFromFile(keyStorePath, keyStorePwd)
+            .usingTLS()
+            .usingDefaultAlgorithm()
+            .usingKeyManagerPasswordFromKeyStore()
+            .buildMergedWithSystem()
+            .getSocketFactory();
+
+        var tlsClientParams = new TLSClientParameters();
+        tlsClientParams.setSSLSocketFactory(socketFactory);
+        return tlsClientParams;
     }
 }

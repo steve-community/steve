@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -36,11 +37,11 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -52,14 +53,10 @@ import static jooq.steve.db.tables.Reservation.RESERVATION;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final DSLContext ctx;
-
-    @Autowired
-    public ReservationRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -89,6 +86,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getOcppIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
+            selectQuery.addConditions(RESERVATION.ID_TAG.in(query));
         }
 
         if (form.isStatusSet()) {
@@ -222,8 +224,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom().toDateTime()),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo().toDateTime())
+                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom()),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo())
                 );
                 break;
 

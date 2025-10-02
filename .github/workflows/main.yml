@@ -6,8 +6,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-20.04, ubuntu-22.04 ]
-        java: [ '17', '21' ]
+        os: [ ubuntu-latest ]
+        java: [ '21', '23' ]
         db: [ 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.4.30', 'mariadb:10.5.21', 'mariadb:10.6.14' ]
     runs-on: ${{ matrix.os }}
     services:
@@ -21,9 +21,9 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Java ${{ matrix.Java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -42,7 +42,7 @@ jobs:
       - name: Start the app and visit signin web page
         run: |
           sudo apt-get install -y elinks
-          java -Djava.net.preferIPv4Stack=true -jar target/steve.jar &
+          java -Djava.net.preferIPv4Stack=true -jar target/steve.war &
           sleep 30
           elinks -dump -no-references http://localhost:8080/steve/manager/signin
           killall java

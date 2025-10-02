@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+
 import java.io.IOException;
 
 /**
@@ -46,14 +47,15 @@ import java.io.IOException;
  * @since 15.08.2014
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class TransactionsReservationsController {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private TransactionStopService transactionStopService;
+    private final TransactionRepository transactionRepository;
+    private final ReservationRepository reservationRepository;
+    private final ChargePointRepository chargePointRepository;
+    private final OcppTagService ocppTagService;
+    private final TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
 

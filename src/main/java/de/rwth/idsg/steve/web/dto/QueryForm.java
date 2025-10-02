@@ -19,12 +19,13 @@
 package de.rwth.idsg.steve.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
+
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -42,11 +43,14 @@ public abstract class QueryForm {
     @Schema(description = "The OCPP tag")
     private String ocppIdTag;
 
-    @Schema(description = "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
-    private LocalDateTime from;
+    @Schema(description = "The User ID")
+    private Integer userId;
 
-    @Schema(description = "Show results that happened before this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T12:00:00`")
-    private LocalDateTime to;
+    @Schema(description = "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime from;
+
+    @Schema(description = "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime to;
 
     @Schema(hidden = true)
     @AssertTrue(message = "'To' must be after 'From'")
@@ -67,5 +71,10 @@ public abstract class QueryForm {
     @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
         return ocppIdTag != null;
+    }
+
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
     }
 }

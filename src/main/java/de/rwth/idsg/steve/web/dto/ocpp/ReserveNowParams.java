@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -42,7 +42,7 @@ public class ReserveNowParams extends SingleChargePointSelect {
 
     @NotNull(message = "Expiry Date/Time is required")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiry;
+    private DateTime expiry;
 
     @NotBlank(message = "User ID Tag is required.")
     @IdTag

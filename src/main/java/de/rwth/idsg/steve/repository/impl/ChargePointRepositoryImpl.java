@@ -31,6 +31,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
@@ -45,7 +46,6 @@ import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -66,16 +66,11 @@ import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     private final DSLContext ctx;
     private final AddressRepository addressRepository;
-
-    @Autowired
-    public ChargePointRepositoryImpl(DSLContext ctx, AddressRepository addressRepository) {
-        this.ctx = ctx;
-        this.addressRepository = addressRepository;
-    }
 
     @Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {

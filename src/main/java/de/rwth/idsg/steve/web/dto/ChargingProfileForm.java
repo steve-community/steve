@@ -25,17 +25,22 @@ import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -65,24 +70,22 @@ public class ChargingProfileForm {
 
     private RecurrencyKindType recurrencyKind;
 
-    private LocalDateTime validFrom;
+    private DateTime validFrom;
 
     @Future(message = "Valid To must be in future")
-    private LocalDateTime validTo;
+    private DateTime validTo;
 
     @Positive(message = "Duration has to be a positive number")
     private Integer durationInSeconds;
 
-    private LocalDateTime startSchedule;
+    private DateTime startSchedule;
 
     @NotNull(message = "Charging Rate Unit has to be set")
     private ChargingRateUnitType chargingRateUnit;
 
     private BigDecimal minChargingRate;
 
-    @NotEmpty(message = "Schedule Periods cannot be empty")
-    @Valid
-    private Map<String, SchedulePeriod> schedulePeriodMap;
+    private List<@Valid SchedulePeriod> schedulePeriods;
 
     @AssertTrue(message = "Valid To must be after Valid From")
     public boolean isFromToValid() {
@@ -117,27 +120,58 @@ public class ChargingProfileForm {
         return true;
     }
 
+    @AssertTrue(message = "Schedule Periods cannot be empty")
+    public boolean isSchedulePeriodsValid() {
+        if (CollectionUtils.isEmpty(schedulePeriods)) {
+            return false;
+        }
+
+        return schedulePeriods.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(SchedulePeriod::isNonEmpty);
+    }
+
     @Getter
     @Setter
     @ToString
     public static class SchedulePeriod {
 
-        private static final int defaultNumberPhases = 3;
-
-        @NotNull(message = "Schedule period: Start Period has to be set")
+        @Min(value = 0, message = "Start Period has to be a positive number or 0")
         private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull(message = "Schedule period: Power Limit has to be set")
+        /**
+         * According to spec: "Accepts at most one digit fraction (e.g. 8.1)"
+         */
+        @DecimalMin(value = "0.0", message = "Power Limit has to be a positive number or 0")
+        @Digits(integer = 6, fraction = 1, message = "Power Limit must be a number with at most 6 digits and 1 fractional digit")
         private BigDecimal powerLimit;
 
+        @Min(value = 1, message = "Number of Phases has to be at least 1")
+        @Max(value = 3, message = "Number of Phases has to be at most 3")
         private Integer numberPhases;
 
-        public Integer getNumberPhases() {
-            return Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        @AssertTrue(message = "Schedule period: Power Limit has to be set")
+        public boolean isPowerLimitSet() {
+            if (isEmpty()) {
+                return true; // All fields are null, so validation is ignored
+            }
+            return powerLimit != null;
         }
 
-        public void setNumberPhases(Integer numberPhases) {
-            this.numberPhases = Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        @AssertTrue(message = "Schedule period: Start Period has to be set")
+        public boolean isStartPeriodInSecondsSet() {
+            if (isEmpty()) {
+                return true; // All fields are null, so validation is ignored
+            }
+            return startPeriodInSeconds != null;
+        }
+
+        public boolean isNonEmpty() {
+            return !isEmpty();
+        }
+
+        private boolean isEmpty() {
+            return (startPeriodInSeconds == null) && (powerLimit == null) && (numberPhases == null);
         }
     }
 }

@@ -20,8 +20,8 @@ package de.rwth.idsg.steve.web;
 
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -46,7 +46,7 @@ public class GlobalControllerAdvice {
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forMvc());
+        binder.registerCustomEditor(DateTime.class, DateTimeEditor.forMvc());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);

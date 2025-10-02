@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.github.zafarkhaja.semver.Version;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
 import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -55,15 +54,15 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
 
     private static final String API_URL = "https://api.github.com/repos/steve-community/steve/releases/latest";
-
     private static final String TAG_NAME_PREFIX = "steve-";
-
     private static final String FILE_SEPARATOR = File.separator;
 
-    private RestTemplate restTemplate;
+    private final SteveProperties steveProperties;
+    private final RestTemplate restTemplate;
 
-    @PostConstruct
-    private void init() {
+    public GithubReleaseCheckService(SteveProperties steveProperties) {
+        this.steveProperties = steveProperties;
+
         var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
 
         var connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout).build();
@@ -102,10 +101,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static ReleaseReport getReport(ReleaseResponse response) {
+    private ReleaseReport getReport(ReleaseResponse response) {
         String githubVersion = extractVersion(response);
 
-        Version build = Version.valueOf(SteveConfiguration.CONFIG.getSteveVersion());
+        Version build = Version.valueOf(steveProperties.getVersion());
         Version github = Version.valueOf(githubVersion);
 
         boolean isGithubMoreRecent = github.greaterThan(build);

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,12 +39,14 @@ public class UserQueryForm {
     private String name;
     private String email;
 
+    private OcppTagFilter ocppTagFilter = OcppTagFilter.All;
+
     public boolean isSetUserPk() {
         return userPk != null;
     }
 
     public boolean isSetOcppIdTag() {
-        return ocppIdTag != null;
+        return !Strings.isNullOrEmpty(ocppIdTag);
     }
 
     public boolean isSetName() {
@@ -53,4 +56,11 @@ public class UserQueryForm {
     public boolean isSetEmail() {
         return email != null;
     }
+
+    public enum OcppTagFilter {
+        All,
+        OnlyUsersWithTags,
+        OnlyUsersWithoutTags
+    }
+
 }

@@ -23,32 +23,36 @@ import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
+import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.jetty.websocket.core.WebSocketConstants;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 11.03.2015
  */
+@RequiredArgsConstructor
 @EnableWebSocket
 @Configuration
 @Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
-    @Autowired private ChargePointHelperService chargePointHelperService;
-
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final ChargePointRegistrationService chargePointRegistrationService;
+    private final ChargeBoxIdValidator chargeBoxIdValidator;
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
@@ -57,15 +61,32 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
-            new DefaultHandshakeHandler(),
+            chargeBoxIdValidator,
+            handshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointHelperService
+            chargePointRegistrationService
         );
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
+    }
+
+    /**
+     * https://docs.spring.io/spring-framework/reference/web/websocket/server.html#websocket-server-runtime-configuration
+     *
+     * Otherwise, defaults come from {@link WebSocketConstants}
+     */
+    @Bean
+    public DefaultHandshakeHandler handshakeHandler() {
+        JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
+
+        strategy.addWebSocketConfigurer(configurable -> {
+            configurable.setMaxTextMessageSize(MAX_MSG_SIZE);
+            configurable.setIdleTimeout(IDLE_TIMEOUT);
+        });
+
+        return new DefaultHandshakeHandler(strategy);
     }
 }

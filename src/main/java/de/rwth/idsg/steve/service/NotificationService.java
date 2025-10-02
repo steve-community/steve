@@ -20,38 +20,39 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
-import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import de.rwth.idsg.steve.service.notification.OccpStationBooted;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
-import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
-import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
-import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
-import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
-import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
-
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusSuspendedEV;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
-import static java.lang.String.format;
-import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
-import java.util.List;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 import jooq.steve.db.tables.records.UserRecord;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusSuspendedEV;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+import static java.lang.String.format;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -59,12 +60,13 @@ import jooq.steve.db.tables.records.UserRecord;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired private MailService mailService;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    private final MailService mailService;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final DelegatingTaskExecutor asyncTaskExecutor;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
@@ -429,7 +431,7 @@ public class NotificationService {
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();
 
-        boolean isEnabled = settings.isEnabled()
+        boolean isEnabled = Boolean.TRUE.equals(settings.getEnabled())
                 && settings.getEnabledFeatures().contains(f)
                 && !settings.getRecipients().isEmpty();
 

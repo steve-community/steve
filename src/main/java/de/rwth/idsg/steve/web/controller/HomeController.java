@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,11 +39,12 @@ import java.util.List;
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class HomeController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final ChargePointRepository chargePointRepository;
+    private final ChargePointHelperService chargePointHelperService;
 
     private static final String PARAMS = "params";
 

@@ -20,29 +20,19 @@ package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
+import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.spring.SpringBus;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.logging.Slf4jLogger;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import jakarta.annotation.PostConstruct;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 
 /**
  * Configuration and beans related to OCPP.
@@ -50,51 +40,59 @@ import static java.util.Collections.singletonList;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.11.2014
  */
+@RequiredArgsConstructor
 @Configuration
 public class OcppConfiguration {
 
-    static {
-        LogUtils.setLoggerClass(Slf4jLogger.class);
+    private final Bus bus;
+    private final ocpp.cs._2010._08.CentralSystemService ocpp12Server;
+    private final ocpp.cs._2012._06.CentralSystemService ocpp15Server;
+    private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
+    private final MessageHeaderInterceptor messageHeaderInterceptor;
+
+    private final MessageIdInterceptor messageIdInterceptor = new MessageIdInterceptor();
+
+    @Bean
+    public EndpointImpl ocpp12Endpoint() {
+        return createDefaultEndpoint(ocpp12Server, "/CentralSystemServiceOCPP12");
     }
 
-    @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
-    @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
-    @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
-
-    @Autowired
-    @Qualifier("MessageHeaderInterceptor")
-    private PhaseInterceptor<Message> messageHeaderInterceptor;
-
-    @PostConstruct
-    public void init() {
-        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
-        List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
-
-        createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
-        createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
-        createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors, logging);
-
-        // Just a dummy service to route incoming messages to the appropriate service version. This should be the last
-        // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
-        //
-        List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus()));
-        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+    @Bean
+    public EndpointImpl ocpp15Endpoint() {
+        return createDefaultEndpoint(ocpp15Server, "/CentralSystemServiceOCPP15");
     }
 
-    @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
-    public SpringBus springBus() {
-        return new SpringBus();
+    @Bean
+    public EndpointImpl ocpp16Endpoint() {
+        return createDefaultEndpoint(ocpp16Server, "/CentralSystemServiceOCPP16");
     }
 
-    private void createOcppService(Object serviceBean, String address,
-                                   List<Interceptor<? extends Message>> interceptors,
-                                   Collection<? extends Feature> features) {
-        JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
-        f.setBus(springBus());
-        f.setServiceBean(serviceBean);
-        f.setAddress(address);
-        f.getFeatures().addAll(features);
-        f.getInInterceptors().addAll(interceptors);
-        f.create();
+    /**
+     * Just a dummy service to route incoming messages to the appropriate service version.
+     */
+    @Bean
+    public EndpointImpl routerEndpoint(EndpointImpl ocpp12Endpoint,
+                                       EndpointImpl ocpp15Endpoint,
+                                       EndpointImpl ocpp16Endpoint) {
+        var mediator = new MediatorInInterceptor(List.of(ocpp12Endpoint, ocpp15Endpoint, ocpp16Endpoint));
+        return createEndpoint(
+            ocpp12Server, SteveProperties.ROUTER_ENDPOINT_PATH, List.of(mediator), Collections.emptyList()
+        );
+    }
+
+    private EndpointImpl createDefaultEndpoint(Object serviceBean, String address) {
+        return createEndpoint(
+            serviceBean, address, List.of(messageIdInterceptor, messageHeaderInterceptor), List.of(LoggingFeatureProxy.INSTANCE.get())
+        );
+    }
+
+    private EndpointImpl createEndpoint(Object serviceBean, String address,
+                                        List<Interceptor<? extends Message>> interceptors,
+                                        List<? extends Feature> features) {
+        EndpointImpl endpoint = new EndpointImpl(bus, serviceBean);
+        endpoint.getInInterceptors().addAll(interceptors);
+        endpoint.getFeatures().addAll(features);
+        endpoint.publish(address);
+        return endpoint;
     }
 }

@@ -17,13 +17,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package de.rwth.idsg.steve.repository.dto;
-import java.util.List;
+
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -34,8 +35,9 @@ public class User {
     @Getter
     @Builder
     public static final class Overview {
-        private final Integer userPk, ocppTagPk;
-        private final String ocppIdTag, name, phone, email;
+        private final Integer userPk;
+        private final String name, phone, email;
+        private final List<OcppTagEntry> ocppTagEntries;
         private final List<UserNotificationFeature> enabledFeatures;
     }
 
@@ -44,6 +46,14 @@ public class User {
     public static final class Details {
         private final UserRecord userRecord;
         private final AddressRecord address;
-        private final Optional<String> ocppIdTag;
+        private final List<OcppTagEntry> ocppTagEntries;
     }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class OcppTagEntry {
+        private final Integer ocppTagPk;
+        private final String idTag;
+    }
+
 }

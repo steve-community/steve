@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,10 +35,10 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -70,12 +70,11 @@ public class TransactionsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "")
-    @ResponseBody
     public List<Transaction> get(@Valid @ParameterObject TransactionQueryForm.TransactionQueryFormForApi params) {
         log.debug("Read request for query: {}", params);
 
         if (params.isReturnCSV()) {
-            throw new BadRequestException("returnCSV=true is not supported for API calls");
+            throw new SteveException.BadRequest("returnCSV=true is not supported for API calls");
         }
 
         var response = transactionRepository.getTransactions(params);

@@ -93,7 +93,7 @@ public enum LogFileRetriever {
         Iterator<Appender<ILoggingEvent>> appenderIterator = logger.iteratorForAppenders();
 
         List<Path> fileNameList = new ArrayList<>();
-        if (appenderIterator.hasNext()) {
+        while (appenderIterator.hasNext()) {
             var appender = appenderIterator.next();
             String fileName = extractFileName(appender);
             if (fileName != null) {

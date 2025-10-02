@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
@@ -38,12 +39,12 @@ import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -57,14 +58,10 @@ import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
  * @since 14.08.2014
  */
 @Repository
+@RequiredArgsConstructor
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     private final DSLContext ctx;
-
-    @Autowired
-    public TransactionRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     public Transaction getTransaction(int transactionPk) {
@@ -320,6 +317,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }
 
+        if (form.isUserIdSet()) {
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
+            selectQuery.addConditions(TRANSACTION.ID_TAG.in(query));
+        }
+
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
             selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNull());
 
@@ -359,8 +361,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 break;
 
             case FROM_TO:
-                DateTime from = form.getFrom().toDateTime();
-                DateTime to = form.getTo().toDateTime();
+                DateTime from = form.getFrom();
+                DateTime to = form.getTo();
 
                 if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
                     selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));

@@ -18,8 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,11 +48,10 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
-    private static final ChargeBoxIdValidator CHARGE_BOX_ID_VALIDATOR = new ChargeBoxIdValidator();
-
+    private final ChargeBoxIdValidator chargeBoxIdValidator;
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final ChargePointHelperService chargePointHelperService;
+    private final ChargePointRegistrationService chargePointRegistrationService;
 
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
@@ -73,14 +71,14 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId);
+        boolean isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+        Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
@@ -119,9 +117,9 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     }
 
     private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
-        for (String requestedProcotol : requestedProtocols) {
+        for (String requestedProtocol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
-                if (item.getVersion().getValue().equals(requestedProcotol)) {
+                if (item.getVersion().getValue().equals(requestedProtocol)) {
                     return item;
                 }
             }

@@ -19,6 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointServiceClient;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
@@ -47,6 +50,12 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 @Controller
 @RequestMapping(value = "/manager/operations/v1.5")
 public class Ocpp15Controller extends Ocpp12Controller {
+
+    public Ocpp15Controller(OcppTagService ocppTagService,
+                            ChargePointHelperService chargePointHelperService,
+                            ChargePointServiceClient chargePointServiceClient) {
+        super(ocppTagService, chargePointHelperService, chargePointServiceClient);
+    }
 
     // -------------------------------------------------------------------------
     // Paths

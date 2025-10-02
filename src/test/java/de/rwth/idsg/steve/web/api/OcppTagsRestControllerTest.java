@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -242,7 +241,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         // given
         OcppTagForm form = new OcppTagForm();
         form.setIdTag("id-123");
-        form.setExpiryDate(LocalDateTime.parse("1990-10-01T00:00"));
+        form.setExpiryDate(DateTime.parse("1990-10-01T00:00Z"));
 
         // when and then
         mockMvc.perform(

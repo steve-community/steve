@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -47,22 +46,6 @@ public final class DateTimeUtils {
             .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
             .appendSeconds().appendSuffix(" second", " seconds")
             .toFormatter();
-
-    public static DateTime toDateTime(LocalDateTime ldt) {
-        if (ldt == null) {
-            return null;
-        } else {
-            return ldt.toDateTime();
-        }
-    }
-
-    public static LocalDateTime toLocalDateTime(DateTime dt) {
-        if (dt == null) {
-            return null;
-        } else {
-            return dt.toLocalDateTime();
-        }
-    }
 
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.

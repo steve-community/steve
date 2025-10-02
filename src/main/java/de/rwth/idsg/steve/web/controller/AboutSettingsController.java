@@ -19,25 +19,27 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * One controller for about and settings pages
@@ -45,14 +47,16 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
-    @Autowired private GenericRepository genericRepository;
-    @Autowired private LogController logController;
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private MailService mailService;
-    @Autowired private ReleaseCheckService releaseCheckService;
+    private final GenericRepository genericRepository;
+    private final LogController logController;
+    private final SettingsRepository settingsRepository;
+    private final MailService mailService;
+    private final ReleaseCheckService releaseCheckService;
+    private final SteveProperties steveProperties;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -66,14 +70,16 @@ public class AboutSettingsController {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
-    public String getAbout(Model model) {
-        model.addAttribute("version", CONFIG.getSteveVersion());
+    public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
+        String scheme = request.getScheme();
+
+        model.addAttribute("version", steveProperties.getVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host));
         return "about";
     }
 

@@ -41,8 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.01.2016
@@ -107,11 +105,7 @@ public class MailServiceDefault implements MailService {
         }
 
         for (String rep : eMailAddresses) {
-            if (isValidAddress(rep)) {
-                mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
-            } else {
-                log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
-            }
+            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
 
         try (Transport transport = session.getTransport()) {

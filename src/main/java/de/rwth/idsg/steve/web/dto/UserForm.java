@@ -18,8 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
-import java.util.List;
+import de.rwth.idsg.steve.NotificationFeature;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -57,7 +56,7 @@ public class UserForm {
     @Email(message = "Not a valid e-mail address")
     private String eMail;
 
-    private List<UserNotificationFeature> enabledFeatures;
+    private List<NotificationFeature> enabledFeatures;
 
     private Address address;
 

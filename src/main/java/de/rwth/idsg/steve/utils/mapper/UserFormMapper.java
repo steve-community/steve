@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve.utils.mapper;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserSex;
 import jooq.steve.db.tables.records.UserRecord;
@@ -44,7 +44,7 @@ public final class UserFormMapper {
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
         form.setEMail(userRecord.getEMail());
-        form.setEnabledFeatures(UserNotificationFeature.splitFeatures(userRecord.getUserNotificationFeatures()));
+        form.setEnabledFeatures(NotificationFeature.splitFeatures(userRecord.getUserNotificationFeatures()));
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
         form.setIdTagList(details.getOcppTagEntries().stream().map(User.OcppTagEntry::getIdTag).toList());

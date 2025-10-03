@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
@@ -38,7 +39,7 @@ public class User {
         private final Integer userPk;
         private final String name, phone, email;
         private final List<OcppTagEntry> ocppTagEntries;
-        private final List<UserNotificationFeature> enabledFeatures;
+        private final List<NotificationFeature> enabledFeatures;
     }
 
     @Getter

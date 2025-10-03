@@ -19,11 +19,11 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
@@ -78,7 +78,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .phone(r.value4())
                 .email(r.value5())
                 .ocppTagEntries(tags)
-                .enabledFeatures(UserNotificationFeature.splitFeatures(r.value6()))
+                .enabledFeatures(NotificationFeature.splitFeatures(r.value6()))
                 .build();
 
             // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
@@ -260,7 +260,7 @@ public class UserRepositoryImpl implements UserRepository {
                       .set(USER.E_MAIL, form.getEMail())
                       .set(USER.NOTE, form.getNote())
                       .set(USER.ADDRESS_PK, addressPk)
-                      .set(USER.USER_NOTIFICATION_FEATURES, UserNotificationFeature.joinFeatures(form.getEnabledFeatures()))
+                      .set(USER.USER_NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getEnabledFeatures()))
                       .returning(USER.USER_PK)
                       .fetchOne()
                       .getUserPk();
@@ -279,7 +279,7 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.E_MAIL, form.getEMail())
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
-           .set(USER.USER_NOTIFICATION_FEATURES, UserNotificationFeature.joinFeatures(form.getEnabledFeatures()))
+           .set(USER.USER_NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getEnabledFeatures()))
            .where(USER.USER_PK.eq(form.getUserPk()))
            .execute();
     }

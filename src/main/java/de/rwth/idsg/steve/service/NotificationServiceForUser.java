@@ -19,10 +19,10 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
@@ -65,7 +65,7 @@ public class NotificationServiceForUser {
             return;
         }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), UserNotificationFeature.OcppStationStatusFailure);
+        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusFailure);
         if (user == null) {
             return;
         }
@@ -90,7 +90,7 @@ public class NotificationServiceForUser {
                 event.getParams().getConnectorId()
         );
 
-        var user = getUserForMail(event.getParams().getIdTag(), UserNotificationFeature.OcppTransactionStarted);
+        var user = getUserForMail(event.getParams().getIdTag(), NotificationFeature.OcppTransactionStarted);
         if (user == null) {
             return;
         }
@@ -124,7 +124,7 @@ public class NotificationServiceForUser {
             return;
         }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), UserNotificationFeature.OcppStationStatusSuspendedEV);
+        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
         if (user == null) {
             return;
         }
@@ -154,7 +154,7 @@ public class NotificationServiceForUser {
             return;
         }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), UserNotificationFeature.OcppTransactionEnded);
+        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
         if (user == null) {
             return;
         }
@@ -166,7 +166,7 @@ public class NotificationServiceForUser {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private User.Overview getUserForMail(String ocppIdTag, UserNotificationFeature feature) {
+    private User.Overview getUserForMail(String ocppIdTag, NotificationFeature feature) {
         UserQueryForm form = new UserQueryForm();
         form.setOcppIdTag(ocppIdTag);
 

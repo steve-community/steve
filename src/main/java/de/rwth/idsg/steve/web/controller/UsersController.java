@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
@@ -84,7 +84,7 @@ public class UsersController {
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("userList", userRepository.getOverview(params));
-        model.addAttribute("features", UserNotificationFeature.values());
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -93,7 +93,7 @@ public class UsersController {
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
-        model.addAttribute("features", UserNotificationFeature.values());
+        model.addAttribute("features", NotificationFeature.getUserValues());
         setTags(model, form.getIdTagList());
         return "data-man/userDetails";
     }
@@ -102,7 +102,7 @@ public class UsersController {
     public String addGet(Model model) {
         setTags(model, List.of());
         model.addAttribute("userForm", new UserForm());
-        model.addAttribute("features", UserNotificationFeature.values());
+        model.addAttribute("features", NotificationFeature.getUserValues());
         return "data-man/userAdd";
     }
 

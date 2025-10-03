@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 
+import jakarta.mail.MessagingException;
+
 import java.util.List;
 
 /**
@@ -34,5 +36,7 @@ public interface MailService {
 
     void sendAsync(String subject, String body);
 
-    void sendAsync(String subject, String body, List<String> eMailAddresses);
+    void send(String subject, String body) throws MessagingException;
+
+    void send(String subject, String body, List<String> eMailAddresses);
 }

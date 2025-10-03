@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
@@ -117,30 +116,6 @@ public class UserRepositoryImpl implements UserRepository {
                            .userRecord(ur)
                            .address(addressRepository.get(ctx, ur.getAddressPk()))
                            .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
-                           .build();
-    }
-
-    @Override
-    public User.Details getDetails(String ocppIdTag) {
-        Map<Integer, List<User.OcppTagEntry>> ocppTagEntries = getOcppTagsInternal(null, ocppIdTag);
-        if (CollectionUtils.isEmpty(ocppTagEntries)) {
-            throw new SteveException("There is no user with OcppTag '%s'", ocppIdTag);
-        }
-
-        Integer userPk = ocppTagEntries.keySet().iterator().next();
-
-        UserRecord ur = ctx.selectFrom(USER)
-                           .where(USER.USER_PK.equal(userPk))
-                           .fetchOne();
-
-        if (ur == null) {
-            throw new SteveException("There is no user with id '%s'", userPk);
-        }
-
-        return User.Details.builder()
-                           .userRecord(ur)
-                           .address(addressRepository.get(ctx, ur.getAddressPk()))
-                           .ocppTagEntries(ocppTagEntries.getOrDefault(userPk, List.of()))
                            .build();
     }
 

@@ -35,12 +35,12 @@ public class EndpointInfo {
     private final String ocppSoap;
     private final String ocppWebSocket;
 
-    public static EndpointInfo fromRequest(String httpScheme, String host) {
+    public static EndpointInfo fromRequest(String httpScheme, String host, String contextPath) {
         String webSocketScheme = httpScheme.equals("https") ? "wss" : "ws";
 
         return EndpointInfo.builder()
-            .ocppSoap(httpScheme + "://" + host + "/services/CentralSystemService")
-            .ocppWebSocket(webSocketScheme + "://" + host + "/websocket/CentralSystemService/(chargeBoxId)")
+            .ocppSoap(httpScheme + "://" + host + contextPath + "/services/CentralSystemService")
+            .ocppWebSocket(webSocketScheme + "://" + host + contextPath + "/websocket/CentralSystemService/(chargeBoxId)")
             .build();
     }
 }

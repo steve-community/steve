@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -209,18 +210,8 @@ public class NotificationServiceForUser {
     }
 
     private static String createContent(Transaction params, User.Overview user) {
-        Double meterValueDiff;
-        Integer meterValueStop;
-        Integer meterValueStart;
-        String strMeterValueDiff = "-";
-        try {
-            meterValueStop = Integer.valueOf(params.getStopValue());
-            meterValueStart = Integer.valueOf(params.getStartValue());
-            meterValueDiff = (meterValueStop - meterValueStart) / 1000.0; // --> kWh
-            strMeterValueDiff = meterValueDiff.toString() + " kWh";
-        } catch (NumberFormatException e) {
-            log.error("Failed to calculate charged energy! ", e);
-        }
+        Double consumption = TransactionStopServiceHelper.calculateEnergyConsumptionInKWh(params);
+        String strMeterValueDiff = (consumption == null) ? "- kWh" : consumption + " kWh";
 
         return new StringBuilder("User: ")
             .append(user.getName())

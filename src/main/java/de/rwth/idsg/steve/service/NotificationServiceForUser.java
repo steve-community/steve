@@ -226,7 +226,7 @@ public class NotificationServiceForUser {
             .append("- stopTimestamp (UTC): ").append(params.getStopTimestamp()).append(System.lineSeparator())
             .append("- stopMeterValue: ").append(params.getStopValue()).append(System.lineSeparator())
             .append("- stopReason: ").append(params.getStopReason()).append(System.lineSeparator())
-            .append("- charged energy: ").append(strMeterValueDiff).append(System.lineSeparator())
+            .append("- charged energy: ").append(strMeterValueDiff)
             .toString();
     }
 

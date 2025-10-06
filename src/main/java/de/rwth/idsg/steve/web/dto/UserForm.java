@@ -56,7 +56,7 @@ public class UserForm {
     @Email(message = "Not a valid e-mail address")
     private String eMail;
 
-    private List<NotificationFeature> enabledFeatures;
+    private List<NotificationFeature> notificationFeatures;
 
     private Address address;
 

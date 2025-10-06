@@ -88,7 +88,7 @@
                 <td>${cr.name}</td>
                 <td>${cr.phone}</td>
                 <td>${cr.email}</td>
-                <td><c:forEach items="${cr.enabledFeatures}" var="eF">
+                <td><c:forEach items="${cr.notificationFeatures}" var="eF">
                         ${eF}<br/>
                     </c:forEach>
                 </td>

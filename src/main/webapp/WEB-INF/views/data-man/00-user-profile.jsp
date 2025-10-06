@@ -35,7 +35,7 @@
 	<tr><td>E-mail:</td><td><form:input path="eMail"/></td></tr>
         <tr>
             <td>Notify when... </td>
-            <td><form:checkboxes items="${features}" path="enabledFeatures"
+            <td><form:checkboxes items="${features}" path="notificationFeatures"
                                  itemLabel="text" delimiter="<br/>"/>
             </td>
         </tr> 

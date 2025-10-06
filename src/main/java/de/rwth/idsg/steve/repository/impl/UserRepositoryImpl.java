@@ -78,7 +78,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .phone(r.value4())
                 .email(r.value5())
                 .ocppTagEntries(tags)
-                .enabledFeatures(NotificationFeature.splitFeatures(r.value6()))
+                .notificationFeatures(NotificationFeature.splitFeatures(r.value6()))
                 .build();
 
             // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
@@ -203,7 +203,7 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.LAST_NAME,
                 USER.PHONE,
                 USER.E_MAIL,
-                USER.USER_NOTIFICATION_FEATURES)
+                USER.NOTIFICATION_FEATURES)
             .from(USER)
             .where(conditions)
             .fetch();
@@ -260,7 +260,7 @@ public class UserRepositoryImpl implements UserRepository {
                       .set(USER.E_MAIL, form.getEMail())
                       .set(USER.NOTE, form.getNote())
                       .set(USER.ADDRESS_PK, addressPk)
-                      .set(USER.USER_NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getEnabledFeatures()))
+                      .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))
                       .returning(USER.USER_PK)
                       .fetchOne()
                       .getUserPk();
@@ -279,7 +279,7 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.E_MAIL, form.getEMail())
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
-           .set(USER.USER_NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getEnabledFeatures()))
+           .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))
            .where(USER.USER_PK.eq(form.getUserPk()))
            .execute();
     }

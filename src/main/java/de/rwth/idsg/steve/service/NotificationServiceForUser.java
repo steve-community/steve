@@ -188,7 +188,7 @@ public class NotificationServiceForUser {
             return null;
         }
 
-        if (!user.getEnabledFeatures().contains(feature)) {
+        if (!user.getNotificationFeatures().contains(feature)) {
             return null;
         }
 

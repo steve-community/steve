@@ -44,7 +44,7 @@ public final class UserFormMapper {
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
         form.setEMail(userRecord.getEMail());
-        form.setEnabledFeatures(NotificationFeature.splitFeatures(userRecord.getUserNotificationFeatures()));
+        form.setNotificationFeatures(NotificationFeature.splitFeatures(userRecord.getNotificationFeatures()));
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
         form.setIdTagList(details.getOcppTagEntries().stream().map(User.OcppTagEntry::getIdTag).toList());

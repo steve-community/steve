@@ -39,7 +39,7 @@ public class User {
         private final Integer userPk;
         private final String name, phone, email;
         private final List<OcppTagEntry> ocppTagEntries;
-        private final List<NotificationFeature> enabledFeatures;
+        private final List<NotificationFeature> notificationFeatures;
     }
 
     @Getter

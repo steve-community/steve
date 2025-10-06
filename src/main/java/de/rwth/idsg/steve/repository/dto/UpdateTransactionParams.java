@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.dto;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
@@ -29,6 +30,7 @@ import org.joda.time.DateTime;
  */
 @Getter
 @Builder
+@ToString
 public class UpdateTransactionParams {
     private final String chargeBoxId;
     private final int transactionId;

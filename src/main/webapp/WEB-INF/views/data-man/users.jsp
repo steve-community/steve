@@ -69,6 +69,7 @@
                 <th data-sort="string">Name</th>
                 <th data-sort="string">Phone</th>
                 <th data-sort="string">E-Mail</th>
+                <th data-sort="string">Notifications</th>
                 <th>
                     <form:form action="${ctxPath}/manager/users/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New">
@@ -87,8 +88,11 @@
                 <td>${cr.name}</td>
                 <td>${cr.phone}</td>
                 <td>${cr.email}</td>
-                <td>
-                    <form:form action="${ctxPath}/manager/users/delete/${cr.userPk}">
+                <td><c:forEach items="${cr.notificationFeatures}" var="eF">
+                        ${eF}<br/>
+                    </c:forEach>
+                </td>
+                <td><form:form action="${ctxPath}/manager/users/delete/${cr.userPk}">
                         <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>

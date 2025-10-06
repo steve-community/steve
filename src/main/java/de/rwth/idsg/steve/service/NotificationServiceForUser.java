@@ -56,6 +56,8 @@ public class NotificationServiceForUser {
     @Async
     @EventListener
     public void ocppStationStatusFailure(OcppStationStatusFailure event) {
+        log.debug("Processing: {}", event);
+
         String subject = format("Connector '%s' of charging station '%s' is FAULTED",
                 event.getConnectorId(),
                 event.getChargeBoxId()
@@ -85,6 +87,8 @@ public class NotificationServiceForUser {
     @Async
     @EventListener
     public void ocppTransactionStarted(OcppTransactionStarted event) {
+        log.debug("Processing: {}", event);
+
         String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'",
                 event.getTransactionId(),
                 event.getParams().getChargeBoxId(),
@@ -110,6 +114,8 @@ public class NotificationServiceForUser {
     @Async
     @EventListener
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV event) {
+        log.debug("Processing: {}", event);
+
         String subject = format("EV stopped charging at charging station %s, Connector %d",
                     event.getChargeBoxId(),
                     event.getConnectorId()
@@ -138,6 +144,8 @@ public class NotificationServiceForUser {
     @Async
     @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded event) {
+        log.debug("Processing: {}", event);
+
         String subject = format("Transaction '%s' has ended on charging station '%s'",
                 event.getParams().getTransactionId(),
                 event.getParams().getChargeBoxId()

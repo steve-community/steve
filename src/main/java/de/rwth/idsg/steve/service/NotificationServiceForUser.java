@@ -120,11 +120,6 @@ public class NotificationServiceForUser {
             return;
         }
 
-        // No mail directly after the start of the transaction,
-        if (!event.getTimestamp().isAfter(transaction.getStartTimestamp().plusMinutes(1))) {
-            return;
-        }
-
         var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
         if (user == null) {
             return;
@@ -149,11 +144,6 @@ public class NotificationServiceForUser {
         );
 
         var transaction = transactionService.getTransaction(event.getParams().getTransactionId());
-
-        // if the TransactionStop is received within the first Minute don't send an E-Mail
-        if (!transaction.getStopTimestamp().isAfter(transaction.getStartTimestamp().plusMinutes(1))) {
-            return;
-        }
 
         var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
         if (user == null) {

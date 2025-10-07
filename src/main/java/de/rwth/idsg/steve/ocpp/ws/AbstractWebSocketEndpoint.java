@@ -22,6 +22,8 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
@@ -137,6 +139,18 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
+        if (isHeartbeatMessage(incomingString)) {
+            ChargerConnectionHeartbeatRequest heartbeatReq = ChargerConnectionHeartbeatRequest.builder()
+                    .chargerBoxId(chargeBoxId)
+                    .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                    .build();
+
+            analyticsClient.updateLastSeen(heartbeatReq)
+                    .doOnSuccess(resp -> log.info("Heartbeat sent to analytics: {}", resp))
+                    .doOnError(err -> log.error("Failed to send heartbeat to analytics", err))
+                    .subscribe();
+        }
+
         CommunicationContext context = new CommunicationContext(session, clusteredInvokerClient, chargeBoxId, null);
         context.setIncomingString(incomingString);
 
@@ -146,6 +160,20 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
         chargePointService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
+    }
+
+    private boolean isHeartbeatMessage(String payload) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode array = mapper.readTree(payload);
+            if (array.isArray() && array.size() >= 3) {
+                String action = array.get(2).asText();
+                return "Heartbeat".equalsIgnoreCase(action);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to parse incoming WebSocket message: {}", payload, e);
+        }
+        return false;
     }
 
     @Override

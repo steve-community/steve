@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.analytics.dto.ChargerConnectionRequest;
-import net.parkl.ocpp.analytics.AnalyticsClient;
+import net.parkl.ocpp.service.analytics.AnalyticsClient;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,9 +84,9 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
         if (podIp == null) {
             podIp = "unknown";
         }
-
+        String chargeBoxId = (String) session.getAttributes().get(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY);
         ChargerConnectionRequest req = ChargerConnectionRequest.builder()
-                .chargerBoxId((String) session.getAttributes().get("chargeBoxId"))
+                .chargerBoxId(chargeBoxId)
                 .connectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
                 .podIp(podIp)
                 .serverType("JAVA")

@@ -25,8 +25,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.analytics.dto.ChargerConnectionRequest;
-import net.parkl.ocpp.analytics.AnalyticsClient;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,8 +35,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;

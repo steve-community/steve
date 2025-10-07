@@ -57,8 +57,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     @Autowired
     protected AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
-    @Autowired
-    protected AnalyticsClient analyticsClient;
+
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(600);
 
@@ -80,22 +79,6 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
                 .put("org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS", IDLE_TIMEOUT_IN_MS);
         nativeSession.getUserProperties()
                 .put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT", IDLE_TIMEOUT_IN_MS);
-        String podIp = System.getenv("POD_IP");
-        if (podIp == null) {
-            podIp = "unknown";
-        }
-        String chargeBoxId = (String) session.getAttributes().get(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY);
-        ChargerConnectionRequest req = ChargerConnectionRequest.builder()
-                .chargerBoxId(chargeBoxId)
-                .connectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
-                .podIp(podIp)
-                .serverType("JAVA")
-                .build();
-
-        analyticsClient.createConnection(req)
-                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
-                .doOnError(error -> log.error("Failed to create connection in analytics", error))
-                .subscribe();
 
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }

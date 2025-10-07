@@ -34,8 +34,11 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
-import de.rwth.idsg.steve.repository.TaskStore;
-import net.parkl.ocpp.entities.OcppChargeBox;
+import lombok.extern.slf4j.Slf4j;
+import net.parkl.analytics.dto.ChargerConnectionDisconnectRequest;
+import net.parkl.analytics.dto.ChargerConnectionHeartbeatRequest;
+import net.parkl.analytics.dto.ChargerConnectionRequest;
+import net.parkl.ocpp.analytics.AnalyticsClient;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.*;
 
 import jakarta.annotation.PostConstruct;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -57,11 +63,14 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
+@Slf4j
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    protected AnalyticsClient analyticsClient;
 
     @Autowired private ChargePointService chargePointService;
     @Autowired private ClusteredInvokerClient clusteredInvokerClient;
@@ -136,6 +145,17 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
+        String chargeBoxId = (String) session.getAttributes().get(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY);
+        ChargerConnectionHeartbeatRequest req = ChargerConnectionHeartbeatRequest.builder()
+                .chargerBoxId(chargeBoxId)
+                .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+
+                .build();
+
+        analyticsClient.updateLastSeen(req)
+                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
+                .doOnError(error -> log.error("Failed to create connection in analytics", error))
+                .subscribe();
         chargePointService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
@@ -145,6 +165,22 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.connected(chargeBoxId, session);
         chargePointService.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
+
+        String podIp = System.getenv("POD_IP");
+        if (podIp == null) {
+            podIp = "unknown";
+        }
+        ChargerConnectionRequest req = ChargerConnectionRequest.builder()
+                .chargerBoxId(chargeBoxId)
+                .connectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .podIp(podIp)
+                .serverType("JAVA")
+                .build();
+
+        analyticsClient.createConnection(req)
+                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
+                .doOnError(error -> log.error("Failed to create connection in analytics", error))
+                .subscribe();
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
@@ -173,6 +209,15 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Override
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
+        ChargerConnectionDisconnectRequest req = ChargerConnectionDisconnectRequest.builder()
+                .chargerBoxId(chargeBoxId)
+                .disConnectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .build();
+
+        analyticsClient.updateConnection(req)
+                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
+                .doOnError(error -> log.error("Failed to create connection in analytics", error))
+                .subscribe();
 
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 

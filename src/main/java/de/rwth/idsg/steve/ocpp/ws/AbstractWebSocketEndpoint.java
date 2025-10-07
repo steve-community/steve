@@ -145,17 +145,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-        String chargeBoxId = (String) session.getAttributes().get(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY);
-        ChargerConnectionHeartbeatRequest req = ChargerConnectionHeartbeatRequest.builder()
-                .chargerBoxId(chargeBoxId)
-                .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
-
-                .build();
-
-        analyticsClient.updateLastSeen(req)
-                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
-                .doOnError(error -> log.error("Failed to create connection in analytics", error))
-                .subscribe();
         chargePointService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 

@@ -32,6 +32,8 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.analytics.dto.ChargerConnectionHeartbeatRequest;
+import net.parkl.ocpp.analytics.AnalyticsClient;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
@@ -47,6 +49,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
@@ -73,6 +77,8 @@ public class CentralSystemService16_Service {
     private OcppTagService ocppTagService;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    protected AnalyticsClient analyticsClient;
 
     @Autowired
     private ChargePointHelperService chargePointHelperService;
@@ -313,6 +319,16 @@ public class CentralSystemService16_Service {
         log.debug("Heartbeat from charge box: {}", chargeBoxIdentity);
         DateTime now = DateTime.now();
         chargePointService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
+
+        ChargerConnectionHeartbeatRequest req = ChargerConnectionHeartbeatRequest.builder()
+                .chargerBoxId(chargeBoxIdentity)
+                .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .build();
+
+        analyticsClient.updateLastSeen(req)
+                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
+                .doOnError(error -> log.error("Failed to create connection in analytics", error))
+                .subscribe();
         return new HeartbeatResponse().withCurrentTime(now);
     }
 

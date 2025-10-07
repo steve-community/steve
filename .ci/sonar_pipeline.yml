@@ -10,7 +10,7 @@ pr:
   - master
 
 pool:
-  vmImage: 'ubuntu-20.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
   major: 4
@@ -18,7 +18,7 @@ variables:
   minorDev: 0
   minorFeature: 0
   master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
-  
+
 
 stages:
   - stage:
@@ -32,7 +32,7 @@ stages:
           - bash: |
                 echo "##vso[build.updatebuildnumber]$(major).$(minor).$(patch)"
             name: SetBuildName
-     
+
       - job: Build_Version_Number_Branch
         condition: eq(variables.master, false)
         variables:

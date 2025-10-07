@@ -12,7 +12,7 @@ trigger:
       - '*'
 
 pool:
-  vmImage: 'ubuntu-20.04'
+  vmImage: 'ubuntu-latest'
 
 stages:
   - stage:

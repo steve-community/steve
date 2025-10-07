@@ -25,6 +25,8 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.analytics.client.AnalyticsClientReactive;
+import net.parkl.analytics.dto.ChargerConnectionRequest;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,10 +34,11 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.adapter.NativeWebSocketSession;
 import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -54,6 +57,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     @Autowired
     protected AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
+    @Autowired
+    protected AnalyticsClientReactive analyticsClient;
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(600);
 
@@ -75,6 +80,22 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
                 .put("org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS", IDLE_TIMEOUT_IN_MS);
         nativeSession.getUserProperties()
                 .put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT", IDLE_TIMEOUT_IN_MS);
+        String podIp = System.getenv("POD_IP");
+        if (podIp == null) {
+            podIp = "unknown";
+        }
+
+        ChargerConnectionRequest req = ChargerConnectionRequest.builder()
+                .chargerBoxId((String) session.getAttributes().get("chargeBoxId"))
+                .connectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .podIp(podIp)
+                .serverType("JAVA")
+                .build();
+
+        analyticsClient.createConnection(req)
+                .doOnNext(connection -> log.info("Created connection in analytics: {}", connection))
+                .doOnError(error -> log.error("Failed to create connection in analytics", error))
+                .subscribe();
 
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }

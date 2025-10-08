@@ -22,7 +22,7 @@ public class WebSocketClusterSessionService {
 
     public void addSession(String id, String chargeBoxId, String podIp) {
         Optional<WebSocketClusterSession> existingSessionOpt =
-                clusterSessionRepository.findFirstByChargeBoxIdOrderByCreateDateDesc();
+                clusterSessionRepository.findFirstByChargeBoxIdOrderByCreateDateDesc(chargeBoxId);
 
         WebSocketClusterSession session;
         if (existingSessionOpt.isPresent()) {

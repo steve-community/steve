@@ -44,7 +44,7 @@
 
         <jakarta.ee.web.api.version>10.0.0</jakarta.ee.web.api.version>
         <jakarta.xml.ws.api.version>4.0.0</jakarta.xml.ws.api.version>
-        <parkl.backend.api.version>1.7.62-Par-9094-analytics</parkl.backend.api.version>
+        <parkl.backend.api.version>1.7.63</parkl.backend.api.version>
 
         <mysql.jdbc.version>8.4.0</mysql.jdbc.version>
 

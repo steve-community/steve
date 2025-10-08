@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,21 @@ public class WebSocketClusterSessionService {
     }
 
     public void addSession(String id, String chargeBoxId, String podIp) {
-        WebSocketClusterSession session = new WebSocketClusterSession();
-        session.setSessionId(id);
-        session.setChargeBoxId(chargeBoxId);
-        session.setPodIp(podIp);
+        Optional<WebSocketClusterSession> existingSessionOpt =
+                clusterSessionRepository.findFirstByChargeBoxIdOrderByCreateDateDesc();
+
+        WebSocketClusterSession session;
+        if (existingSessionOpt.isPresent()) {
+            session = existingSessionOpt.get();
+            session.setSessionId(id);
+            session.setPodIp(podIp);
+        } else {
+            session = new WebSocketClusterSession();
+            session.setSessionId(id);
+            session.setChargeBoxId(chargeBoxId);
+            session.setPodIp(podIp);
+        }
+
         clusterSessionRepository.save(session);
     }
 

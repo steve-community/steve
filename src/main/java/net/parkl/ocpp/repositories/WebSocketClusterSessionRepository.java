@@ -33,4 +33,6 @@ public interface WebSocketClusterSessionRepository extends CrudRepository<WebSoc
 
     @Query("SELECT s.podIp FROM WebSocketClusterSession s WHERE s.chargeBoxId=?1 ORDER BY s.createDate DESC")
     List<String> findPodIpByChargeBoxId(String chargeBoxId, Pageable pageable);
+
+    Optional<WebSocketClusterSession> findFirstByChargeBoxIdOrderByCreateDateDesc();
 }

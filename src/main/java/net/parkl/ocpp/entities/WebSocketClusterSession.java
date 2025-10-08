@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class WebSocketClusterSession implements Serializable {
-    @Id
     @Column(name = "session_id")
     private String sessionId;
 
     @Column(name = "pod_ip", nullable = false, length = 30)
     private String podIp;
 
+    @Id
     @Column(name = "charge_box_id", nullable = false)
     private String chargeBoxId;
 

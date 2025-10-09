@@ -142,7 +142,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         if (isHeartbeatMessage(incomingString)) {
             ChargerConnectionHeartbeatRequest heartbeatReq = ChargerConnectionHeartbeatRequest.builder()
                     .chargerBoxId(chargeBoxId)
-                    .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                    .lastSeenAt(LocalDateTime.now(Clock.systemUTC()))
                     .build();
 
             analyticsClient.updateLastSeen(heartbeatReq)
@@ -189,7 +189,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         }
         ChargerConnectionRequest req = ChargerConnectionRequest.builder()
                 .chargerBoxId(chargeBoxId)
-                .connectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .connectedAt(LocalDateTime.now(Clock.systemUTC()))
                 .podIp(podIp)
                 .serverType("JAVA")
                 .build();
@@ -228,7 +228,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String chargeBoxId = getChargeBoxId(session);
         ChargerConnectionDisconnectRequest req = ChargerConnectionDisconnectRequest.builder()
                 .chargerBoxId(chargeBoxId)
-                .disConnectedAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .disConnectedAt(LocalDateTime.now(Clock.systemUTC()))
                 .build();
 
         analyticsClient.updateConnection(req)

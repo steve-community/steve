@@ -322,7 +322,7 @@ public class CentralSystemService16_Service {
 
         ChargerConnectionHeartbeatRequest req = ChargerConnectionHeartbeatRequest.builder()
                 .chargerBoxId(chargeBoxIdentity)
-                .lastSeenAt(String.valueOf(LocalDateTime.now(Clock.systemUTC())))
+                .lastSeenAt(LocalDateTime.now(Clock.systemUTC()))
                 .build();
 
         analyticsClient.updateLastSeen(req)

@@ -1,0 +1,2929 @@
+openapi: 3.0.0
+info:
+  version: 2.3.0
+  title: CPO OICP-2.3
+  description: "## Introduction\n### The Hubject Platform\n\nThe goal of the “Hubject B2B Service Platform (HBS)” is to enable the electric mobility market by providing an information and transactional gateway for businesses such as charging infrastructure providers, mobility service providers and vehicle manufacturers.\n\n![Hubject Process](images/hubject_1.png)\n\nThe platform enabler functions include: \n\n* Ensuring the interoperability of the public and semi-public infrastructure through promotion of accepted standards within the network and open business user interfaces to the platform\n* Simplification of authentication and authorization procedures through a trustworthy instance as well as safekeeping of sensitive data through the uncoupling of personal data and anonymous user data\n* Automation of contract-based business relationships between power suppliers, car manufacturers, infrastructure service providers as well as further mobility business parties\n* B2B information services for the realization of advanced services within the areas of energy management, traffic management, vehicle reservations, intelligent charging, car sharing and intermodal mobility\n\n### The Charge Point Operator (CPO)\nHubject has been connecting various players in electric mobility since being founded in 2012. Hubject provides Europe-wide, customer-friendly charging for electric vehicles via eRoaming.\n\nThe two main partner groups are, on the one hand, providers of emobility services (EMP), which want to enable EV drivers to access charging infrastructure and, on the other hand, charge point operators (CPO), which want to boost the capacity utilization of their charging infrastructure.\n\nOur solution for ChargePoint Operators: \n\nAs a CPO, you can profit from our solution, intercharge CPO. It allows customers who have a contract with an EMP to charge their vehicles using your charging infrastructure via eRoaming. For this purpose, you need to get connected to the HBS (Hubject Brokering System) eRoaming platform. The HBS functions as an open electric mobility marketplace, which creates an open synergetic network that everyone profits from in the end.\n\n### Scope\n\nThe information exchange between Hubject and CPO systems is entirely based on web service communication. This document describes the relevant service interfaces for CPO. The Open InterCharge Protocol (OICP) is the most widely implemented communication standard between EMP and CPO systems.\n\nThe information exchange is, in most cases, based on contractual relationships between EMPs and CPOs. In these cases, Hubject only processes service requests if there is a valid contract for the requested service. How EMPs and CPOs manage their service contracts is out of the scope of this document because the contract management aspects of the platform are used via a GUI-based system component.\n\n### Conventions\n\nThe key words `MUST\"`, `MUST NOT`, `REQUIRED`, `SHALL`, `SHALL NOT`, `SHOULD`, `SHOULD NOT`, `RECOMMENDED`, `MAY` and `OPTIONAL` in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).  \n\n### Overview\n\nThe following diagram gives an overview of all service operation messages that can be exchanged between Hubject and the corresponding EMP, respectively CPO systems.\n[\"Services and Operations\"](02_CPO_Services_and_Operations.asciidoc) chapter introduces the supported web services and the corresponding service operations in detail and defines the messages that will be exchanged between Hubject and partner systems. Chapter [Data Types](03_CPO_Data_Types.asciidoc) specifies the data types of the messages. Furthermore, every service is described in detail by a business process diagram, which is part of the [appendix](04_Appendix.asciidoc)\n\n![Hubject Web Services Diagram](images/web_services.png)\n\n### Release management  \n\nHubject intends to pursue a release frequency; whereby, a new update of the OICP can be done within a time frame of two years with the HBS. The frequency of releases to be expected in the future should however not result in additional implementation complexity for partners, since each new release will lead to a new version of the affected services that will run in parallel to the current service version. Consequently, partners do not need to perform an upgrade with each new release, but will rather have the flexibility to choose which of the available valid service versions they wish to use. Service validity is dependent on the OICP version with which they are released (i.e. service versions available in deprecated OICP versions are only considered invalid and will not be supported by the HBS). Only service versions available in active OICP versions shall be supported. Each OICP version `MUST` be supported for two years by the HBS. \n\nSee below for an example of the implications of the HBS release management approach\n\n*NOTE*: \n>_the dates and content in the diagram below are strictly meant for explanation purposes only. This is not to be considered as an official communication of release dates\n\n![OICP Versions Release](images/oicp_version_release_example.png)\n\n* Service versions: in this example, assuming the current date is October 15th 2021, only service versions highlighted in green will be supported by the HBS; whereas services highlighted in grey will no longer be supported, since these service versions are only available in deprecated OICP versions (i.e. the OICP versions highlighted in red). Consequently, partners can choose one of 3 valid service versions to implement for “Service A”, and one of 2 valid versions for “Service B” and “Service C”. \n* OICP versions: the OICP versions highlighted in red will not be supported by the HBS assuming the current date is 15th October 2021 since they are old therefore deprecated. Also, as depicted in the above example and in contrast to the HBS release management approach, more than two OICP versions can be supported simultaneously going forward.\n\nAll partners using the HBS `MUST` indicate the OICP version they are currently running in their system (i.e. OICP version being used in the communication with the HBS). On the database level however, the current specifications are to be implemented in all systems, i.e. new mandatory fields should be filled with a value.\n### Further Documents\n\nTo enable a fast and efficient connection process between the Hubject Brokering System and Partner Systems, the following online webpage contains further information:\n\n* [*support.hubject.com*](https://support.hubject.com/hc/en-us) – Contains all relevant information regarding the onboarding process and other technical information (e.g. Dynamic Pricing 1.0 - Functional Guide for Service Implementation)\n* [*Release notes from OICP2.2 to OICP2.3*](https://github.com/hubject/oicp/blob/master/OICP-2.3/Realease_Notes.asciidoc)\n\n### OICP protocol version and service versions\n\nBeginning with OICP 2.1, service endpoints are versioned individually and independent of the OICP version. The table below therefore gives an overview of all web services and their current version within OICP version 2.3.\n|Service |Version     |\n|:---|:---:|\n|eRoamingAuthorization|2.1   |   \n|eRoamingChargeDetailRecord|2.2   |\n|eRoamingReservation|1.1   | \n|eRoamingEVSEData|2.3   | \n|eRoamingEVSEStatus|2.1  | \n|eRoamingDynamicPricing|1.0   | \n|eRoamingChargingNotifications|1.1  | \n\n### Overview of Document Reviews  \n\nThe table below provides an overview of all changes made to this document after its initial publication. The changes documented below affect descriptions provided in this document and are mostly corrections or refinements of the specification details.\n\n|Date of Update |Chapter Updated     | Comments |\n|:---|:---:|:---|\n|15th Septmeber 2020|OICP 2.3   |   Implementation description of the new OICP 2.3  \n\n## Communication paradigms\n### REST\nAll new services to be introduced in the future, beginning with OICP 2.2, will be only available over the REST API. This means SOAP communication cannot be used for all new services introduced with OICP version 2.2 or later. Partners that wish to use these new services will therefore need to implement RESTful APIs for the respective communication with the HBS.\n\nAll web services described below are synchronous.  All service messages exchanged between Hubject and partner systems `MUST` use UTF-8 character encoding.\n\n###\tAvailability\n\nThe Hubject system is set up in a highly available environment. Please check the partner contract for details.\n\n### Error handling\n\nIn case that a partner system cannot be addressed by Hubject, Hubject will monitor the connection error in the service session logging.\n\nEach system must be able to cope with possible connection error scenarios as well as with different strategies to solve inconsistencies.\n\nIn case a partner system does not respond to a request by Hubject within the internally defined period, Hubject will monitor the connection timeout in the service session logging.\n\nGeneral HBS related system errors that `MAY` occur during service processing will be caught. The system will then respond to the service requestor with a default _eRoamingAcknowledgement_ message.\n\n### Status codes\nEach message requires a response message in return (at least an acknowledgement).\n\nMost service response messages contain a “StatusCode” field (e.g. eRoamingAcknowledgement). The node provides a standardized code and status description that can be used to return details about certain process statuses. If, for example, an _eRoamingAuthorizeStart_ request fails, the requested provider can specify why the user cannot be authorized.\n\nCode Type contains an overview of all relevant status codes.\n\nThe different states are standardized in order to make automated status processing possible. Backend systems only have to analyze the provided status code, regardless of the functional status description.\n\nThe StatusCode node additionally contains the optional “_AdditionalInfo_” field. This field can be used to provide individual information or process details that go beyond the standardized description. In case the optional “Description” field is used, the field should contain only defined values.\n\n### Session handling\n\nSome web service operations that are defined in <<02_CPO_Services_and_Operations.adoc,Services and Operations>> together form a functional business process, respectively a functional session.\n\n__Example:__\n\nThe operations in _eRoamingAuthorization_ cover a charging session. A charging session can be started with _eRoamingAuthorizeStart_ or _eRoamingAuthorizeRemoteStart_ operations and stopped with the corresponding operations. Energy consumption data can then be sent using the _eRoamingChargeDetailRecord_ operation.\n\nTo be able to relate individual operations to the correct session, Hubject assigns a SessionID to every session after the receipt of an initial request (e.g. _eRoamingAuthorizeStart_). The SessionID is part of the operation response and `MUST` be provided with each subsequent request that belongs to the session. If a request contains a SessionID that was not created by Hubject or one that is not valid, the request receives a negative response and no further process steps are performed.\n\nHubject uses globally unique identifiers (GUID) for SessionID creation. Furthermore, it is possible that partner backend systems use their own session concept. Hubject supports this by offering two (optional) request parameters CPOPartnerSessionID and EMPPartnerSessionID. CPO partner systems can use the CPOPartnerSessionID parameter to send their own session IDs. Hubject will assign the CPOPartnerSessionID to the Hubject SessionID and will add the CPOPartnerSessionID to every operation response so that the CPO partner systems can relate the operations to their own session handling.\n\nNOTE: Regarding eRoaming services, the SessionID will be the leading process identifier.\n\n\n### ProviderIDs and OperatorIDs\n\nMost web service operations require the provision of a ProviderID (EMP) or OperatorID (CPO), depending on whether the operation is requested by EMPs or CPOs. The exact format and examples of these ID’s can be seen in Operator/ProviderID\n\nThe IDs are assigned to a specific partner role and they are cross-market unique. There are two roles: eMobility Service Provider (EMP) and Charge Point Operator (CPO). A partner can have one or both roles. If a partner has both roles, two IDs (ProviderID and OperatorID) will be assigned to the partner. Hubject can identify the role that the partner has regarding the current service session depending on which ID is provided with a service request.\n\n### Security\n\nHubject compares the given Provider- or OperatorID to the partner’s SSL client certificate information with every web service request. This helps Hubject ensures that a partner cannot request operations in the name of another partner by simply sending another partner’s ID. If Hubject detects a mismatch between ProviderID/OperatorID and the client certificate information sent with the request, Hubject will not perform the operation and will respond with the status code 017 “Unauthorized Access”.\n\nThe following process diagram describes the partner identification process. It is performed at the beginning of every web service operation, which is described in this document. Consequently, all process diagrams in the appendix are implicitly preceded by this diagram.\n\n![Security](images/security.png)\n\n### Hub Provider and Hub Operator\n\nPartners that are registered with Hubject have the possibility to bundle sub providers (EMP) or sub operators (CPO) and to act as “hub provider” or “hub operator”. The sub partners ID’s need to be configured with Hubject before they can be used in communicating with Hubject. The following diagram shows the relationships between Hubject, hub partners, and sub partners.\n\n![Hub partners](images/hubpartners.png)\n\nHubject may receive service requests that contain sub partner information, e.g. an EvcoID containing the ProviderID of a sub partner. In such cases - when Hubject does not find the ID within the group of registered partners – Hubject will check whether the corresponding partner is bundled by a registered hub provider or hub operator. If so, the following service process will be conducted on behalf of the hub partner.\n\nNOTE: The web service fields ProviderID and OperatorID `MUST` always provide the ID of the partner communicating directly with Hubject. In case of a hub/sub scenario the fields always provide the ID of the hub partner. Sub partner IDs will only be provided implicitly through EVCO- or EVSEIDs.\n\n*Example:*\n\nThe following diagram shows an example scenario. A hub EMP bundles a sub EMP with the ProviderID “DE*456”. A sub EMP customer wants to charge a vehicle at a CPO’s charging station. The customer identifies themselves via an EvcoID that contains the sub EMP’s ProviderID “DE*456”. Hubject cannot identify “DE*456” within the pool of EMPs that are registered with Hubject. Consequently, Hubject checks whether “DE*456” is bundled by a registered EMP. Hubject identifies the hub EMP and continues the process on behalf of the hub EMP. This means that e.g. an online authorization request or the forwarding of a charge detail record request will be sent to the hub EMP.\n\nIn case you are operating charging stations in different countries, please make sure each EVSE is equipped with the correct country code and the corresponding Operator ID. This Operator ID has to be either a sub-operator ID or your main ID.\n\n![Hub partner diagram](images/hubpartnerdiagram.png)\n\n### Data push operations\n\nHubject offers different operations that allow partners to upload (push) data, e.g. upload of EVSE data by CPOs.\n\nIn order to guarantee data consistency, data push requests that address the same operation `MUST` always be processed sequentially. They `MUST` never be executed in parallel. This means that a partner system `MUST` always wait for the Hubject system’s operation response before initiating the next request.\n\nThe reason for this is that push requests, which are sent in parallel, are also processed in parallel by Hubject. Thus, different requests may overtake each other and change their sequence before Hubject stores the data. This could lead to unintended data conditions.\n\n*Example:*\n\nA CPO sends an EVSE full load with several hundred EVSE records. Shortly after that, the same CPO sends an EVSE full load with only one EVSE record. From the CPO’s point of view, the second request should overwrite the first, resulting in only one valid EVSE record. But probably the second (small) request will overtake the first (big) request. This results in the big request overwriting the small one and with it several hundred valid EVSE records on the Hubject system.\n\n### Time zones\n\nThe time needs to be delivered in the format “complete date plus hours, minutes and seconds” referring to ISO 8601:1988 (E), with a time zone offset in hours and minutes. A time zone offset of \"+hh:mm\" indicates that the date/time uses a local time zone which is \"hh\" hours and \"mm\" minutes ahead of UTC. A time zone offset of \"-hh:mm\" indicates that the date/time uses a local time zone which is \"hh\" hours and \"mm\" minutes behind UTC.\n\n`YYYY-MM-DDThh:mm:ssTZD` *e.g. “2014-02-01T15:45:00+02:00”*\n\nwhere:\n\n| Format | Description                                            |\n|--------|--------------------------------------------------------|\n| YYYY   | four-digit-year                                        |\n| MM     | two-digit month (01=January, etc.)                     |\n| DD     | two-digit day of month (01 through 31)T, separator     |\n| hh     | two digits of hour (00 through 23) (am/pm NOT allowed) |\n| mm     | two digits of minute (00 through 59)                   |\n| ss     | two digits seconds (00 through 59)                     |\n| TZD    | time zone designator (+hh:mm or -hh:mm)                |\n\nMessages that are sent to Hubject and that Hubject directly forwards to another partner (e.g. _eRoamingChargeDetailRecord_ from CPO to EMP) will not be changed by Hubject (including time zone specifics).\n\nIt is mandatory for CPO’s to provide date/time values including a time zone offset which refers to the charge point location due to the need for time based charging fees.\n\nIn the OICP 2.3, the HBS will store all date/time values in their original form. Also, the original Date/Time values as received and stored by the HBS will be provided in the response to requests from partner systems.\n\n### Calibration Law for eMobility Market:\n\nThis topic is specifically important for Partners who are operating inside Germany. Calibration Law is applicable to both CPO and EMP.\n\nThis Calibration Law simply states that Customer of EMP should be able to verify the charging sessions with the help of encrypted data generated by hardware of charging station (basically Smart Energy Meter). There are few exceptional cases where this Calibration Law is not applicable.\n\nThere are three objectives of introducing this chapter in this revision of OICP\n\n1. As a roaming platform we should give possibility for CPOs to transfer the Calibration Law relevant data (Separate fields for various parameter) for charging session to EMPs.\n2. EMPs should be able to first know if the charging station (mainly EVSEID) can generate / store / share the Calibration Law compliant data. This data can be provided as a part of POI data. This will help EMPs to create appropriate B2C pricing and logic for creating appropriate invoices. Refer EVSE Data section (provide the link)\n3. Long term solution for EMPs should be to automate the pre-checking of Calibration Law relevant data for charging session. This can be easily achieved if EMP has all the Calibration Law relevant data available in Charge Detail Record as separate fields. This will eventually provide a more transparent way of transmitting the data from CPOs to EMPs. Currently with older revision of OICP, CPOs are providing this data in the form of url in Charge Detail Record as “Metering Signature” field. Refer CDR section.\n\n## Appendix\n### Business Process Diagram eRoamingAuthorization\n![Business Process Diagram eRoamingAuthorization](images/eroamingauthorization.png)\n\n### Business Process Diagram eRoamingAuthorization Remote\n![Business Process Diagram eRoamingAuthorization Remote](images/eroamingauthorizationremote.png)\n\n### Business Process Diagram eRoaming Reservation\n![Business Process Diagram eRoaming Reservation](images/eroamingreservation.png)\n\n### Business Process Diagram eRoamingAuthorization GetCDRs\n![Business Process Diagram eRoamingAuthorization GetCDRs GetCDRs](images/eroaminggetcdrs.png)\n\n### Business Process Diagram eRoamingEVSEData\n![Business Process Diagram eRoamingEVSEData](images/eroamingevsedata.png)\n\n### Business Process Diagram eRoamingEVSEStatus\n![Business Process Diagram eRoamingEVSEStatus](images/eroamingevsestatus.png)\n\n### Business Process Diagram eRoaming ChargingNotification Start\n![Business Process Diagram eRoaming ChargingNotification Start](images/chargingnotificationstart.png)\n\n### Business Process Diagram eRoaming ChargingNotification Progress\n![Business Process Diagram eRoaming ChargingNotification Progress](images/chargingnotificationprogress.png)\n\n### Business Process Diagram eRoaming ChargingNotification End\n![Business Process Diagram eRoaming ChargingNotification End](images/chargingnotificationend.png)\n\n### Business Process Diagram eRoaming ChargingNotification Error\n![Business Process Diagram eRoaming ChargingNotification Error](images/chargingnotificationerror.png)\n\n## Glossary and Abbreviations\nCharging Station - The unit where an electric vehicle is charged. A charging station consists of one or more charging spots (EVSE).\n\nCPO (Operator) - Charge Point Operator: Mobility partner who operates the charging infrastructure.\n\nEMP (Provider) - Electric Mobility (emobility) Provider: Mobility partner who provides emobility services to customers.\n\nEVCO - Electric Vehicle Contract: Contract between an EMP and a customer.\n\nEvcoID - Electric Vehicle Contract Identifier.\n\nEVSE - Electric Vehicle Supply Equipment: Charging spot.\n\nEvseID - Electric Vehicle Supply Equipment Identifier.\n\nGUI - Graphical User Interface.\n\nGUID - Globally Unique Identifier.\n\nHash / Hash Code - String with a fixed length that represents a data set. The hash code is generated by applying a hash function (e.g. SHA-1 hash function) to the original data.\n\nHubject Brokerage System (HBS) - The Hubject B2B system is the central software component that routes or storesservice information between mobility partners.\n\nMarketplace - The role “Marketplace” is bound to the central the administrative function of the HBS system.\n\nMobility partner system - A mobility partner system is the central software component of a Mobility Service Provider (EMP or CPO) and operates e.g. the charging infrastructure or the electric vehicles of the Service Provider.\n\nSession - Web service operations can be bundled and related to a certain session by unique IDs.\n\nSHA-1 - Secure hash algorithm: A cryptographic hash function that is used to map data values to fixed-length key values.\n\nSOAP - Simple Object Access Protocol: A web service standard that specifies the implementation and information exchange of web services.\n\nSSL - Secure Socket Layer:\n\nUTF-8 - is a variable-width encoding that can represent every character in the Unicode character set\n\nWGS 84 - World Geodetic System (1984): A standard coordinate frame which is used to represent geo coordinates used by the GPS system as reference coordinate system.\n\nWSDL - Web Service Definition Language: Technical description of functionality that is offered by a web service.\n\nXML - Extensible Markup Language: A technical language that defines the format and encoding of documents for data exchange.\n"
+  contact:
+    name: API Support
+    url: 'https://support.hubject.com'
+    email: support@hubject.com
+servers:
+  - url: 'https://service-qa.hubject.com/api/oicp'
+    description: QA environment
+  - url: 'https://service.hubject.com/api/oicp'
+    description: Production environment
+tags:
+  - name: eRoamingAuthorization
+    description: |
+      The service eRoamingAuthorization contains several different operations. It `MUST` be offered by Hubject and the partner systems.
+  - name: eRoamingReservation
+    description: |
+      The service eRoamingReservation contains two operations.
+      It `MUST` be offered by Hubject and MAY be offered by CPO partner systems.
+      The Service `MUST` be enabled by Hubject for the CPO. If the charging station offers reservation services, the CPO can provide this information in the field ValueAddedServices.
+  - name: eRoamingEvseData
+    description: |
+      Hubject offers the possibility to upload and download charging spot (EVSE) data and, thus, to exchange data between different partners.
+
+      See apendix for a detailed business process diagram regarding the EVSE data service.
+
+      The eRoamingEvseData service offers two operations:
+
+      eRoamingPushEvseData in order to give CPOs the possibility to upload (push) EVSE master data
+
+      eRoamingPullEvseData in order to give EMPs the possibility to download (pull) EVSE data from partner operators via Hubject.
+
+      Hub CPOs may also push EVSE data of sub operators. Hubject does not distinguish between EVSE records of hub operators and related sub operators.
+  - name: eRoamingEvseStatus
+    description: |
+      Hubject offers the possibility to upload and download dynamic charging spot (EVSE) status information and thus to exchange the data between different partners.
+
+      The eRoamingEvseStatus service offers two operations:
+
+      1. eRoamingPushEvseStatus in order to give CPOs the possibility to upload (push) EvseStatus data
+
+      2. eRoamingPullEvseStatus in order to give EMPs the possibility to download (pull) EVSE status data from partner operators via Hubject
+
+      Hub CPOs may also push EVSE status records of sub operators. Hubject does not distinguish between EvseStatus records of hub operators and related sub operators.
+  - name: eRoamingDynamicPricing
+    description: |
+      Since OICP 2.2, HBS offers the possibility to flexibly or dynamically price Authorization services. The service mainly enables pushing (upload) and pulling (download) of pricing data to and from the HBS through webservice requests and/or downloads/uploads in the Hubject portal.
+
+      Flexible pricing enables CPOs to offer differentiated pricing (in multiple currencies) of charging processes at their charging stations. The differentiation of prices can be done along relevant dimensions such as charging facility characteristics (e.g. maximum charging power), EVSE location and time. OICP 2.2 and OICP 2.3 offers the possibility to exchange this flexible price differentiation over webservice communication between CPOs and EMPs.
+
+      In addition to the above flexible pricing capability, OICP 2.2 and OICP 2.3 enables more frequent and near real-time update and exchange of pricing information between CPOs and EMPs. This is achieved whereby a CPO continuously pushes valid prices to the HBS for specific EMPs to pull these prices.
+
+      With OICP 2.2 and OICP 2.3 , the HBS offers an extensive breadth of technical capabilities for flexible and dynamic pricing of charging services for CPOs. Please refer to the supplementary document [“Dynamic Pricing - Functional Guide for Service Implementation”](https://support.hubject.com/hc/en-us/articles/360002042838-Introduction-to-Flexible-Dynamic-Pricing) for more details and a holistic view (technical and business perspectives) of how to best capitalize on the capabilities offered by the eRoamingDynamicPricing service.
+
+      The eRoamingDynamicPricing service offers four operations, namely the:
+      1. eRoamingPushPricingProductData operation which gives CPOs the possibility to upload (push) pricing product information. Pricing products refer to the different tariffs offered by a CPO based on the differentiation dimensions mentioned above.
+      2. eRoamingPushEVSEPricing operation which gives CPOs the possibility to assign their various pricing products to individual EVSEs and thereby upload (push) location/EVSE-specific pricing data.
+      3. eRoamingPullPricingProductData operation which gives EMPs the possibility to download (pull) pricing product information uploaded by a CPO for the respective EMP.
+      4. eRoamingPullEVSEPricing operation which gives EMPs the possibility to download (pull) location/EVSE-specific pricing data uploaded by CPOs for the respective EMP.
+  - name: eRoamingChargingNotifications
+paths:
+  '/charging/v21/operators/{operatorID}/authorize/start':
+    post:
+      summary: eRoamingAuthorizeStart_v2.1
+      operationId: eRoamingAuthorizeStart_v2.1
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `MANDATORY`
+
+        __Functional Description:__
+
+        Scenario:
+
+        A customer of an EMP wants to charge a vehicle at a charging point of a CPO. The customer authenticates at the charging point. The CPO’s operator system does not recognize the customer’s authentication data. In order to authorize the charging process, the CPO’s system can send an eRoamingAuthorizeStart request to Hubject. The request MUST contain the OperatorID and the identification data (e.g. UID or EvcoID) and MAY contain the EvseID.
+
+        Hubject generates a SessionID for the charging process and persists important session data (SessionID, EvseID, identification data).
+
+        Regarding the further service processing, there are three different options:
+
+        a. Hubject first tries to authorize the customer offline by checking authentication master data. Authentication data can be uploaded by EMPs using the eRoamingAuthenticationData service.
+        ![Authorize Start offline diagram](images/authorizestart_offline.png)
+
+        b. In case offline authorization is not possible, Hubject tries to derive the EMP from the provided identification data. QR Code and Plug&Charge identification data contain the EvcoID. Hubject can derive the EMP’s ProviderID from the EvcoID. Hubject will directly forward eRoamingAuthorizeStart requests to the EMP. The EMP provider system checks the requested authentication data and responds accordingly, either by authorizing or not authorizing the request. The response `MUST` contain the ProviderID and the AuthorizationStatus and `MAY` contain a list of identification data that is authorized to stop the charging process. In case that the EMP provider system cannot be addressed (e.g. due to technical problems), the corresponding provider will be dealt with as if responding “NotAuthorized”.
+        ![Authorize evco diagram](images/authorize_evco.png)
+
+        c. In case that Hubject cannot derive the EMP from the identification data (e.g. with RFID identification), Hubject identifies all EMPs that are under contract with the CPO (EMPs must be the service subscriber) and forwards the eRoamingAuthorizeStart request to all these EMPs (broadcast). Hubject consolidates all EMP responses and creates an overall response, authorizing the request in case that one EMP authorized the request.
+
+        ![Authorize Start online diagram](images/authorizestart_online.png)
+
+        __Pin Security:__
+
+        The eRoamingAuthorizeStart request contains one of the defined identification types (see IdentificationType). The identification type “QRCodeIdentificationType” (see QRCodeIdentificationType) contains - besides the “EvcoID” field - a “PIN” field or a “HashedPIN” field (only one of the two options must be provided).
+
+        For security reasons and as a general rule, Hubject does not store PINs in clear text, but always as encrypted hash values. In order to prevent hashed PIN values that may have been picked illegally from being used to request the authorization for charging processes, the PIN value `MUST` always be provided in clear text within the eRoamingAuthorizeStart request. This means that this operation `MUST` always provide the “PIN” field (clear text). Hubject will always generate a hash value of the provided PIN before checking the offline authentication data. So, in case that a PIN is provided by mistake as hashed value, Hubject automatically generates a hash of a hash, which eventually leads to a denial of authorization
+
+        In order to create hash values, Hubject applies the hash algorithm that the EMP has assigned to the QR Code identification record
+      tags:
+        - eRoamingAuthorization
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeStart'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAuthorizationStart'
+  '/charging/v21/operators/{operatorID}/authorize/stop':
+    post:
+      summary: eRoamingAuthorizeStop_V2.1
+      operationId: eRoamingAuthorizeStop_V2.1
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `OPTIONAL`
+
+        ![Authorize stop diagram](images/authorizestop.png)
+
+        eRoamingAuthorizeStop basically works in a similar way to the operation eRoamingAuthorizeStart.
+        The request is sent in order to authorize the stopping of a charging process.
+        The request `MUST` contain the SessionID that was created by Hubject after the initial eRoamingAuthorizeStart request.
+        In most cases, Hubject can derive the EMP that authorized the charging process from the SessionID and can directly and offline authorize the request or forward the request for stopping to the EMP.
+        In case the charging session was originally authorized offline by the HBS, the session `MUST` only be stopped with the same medium, which was used for starting the session
+      tags:
+        - eRoamingAuthorization
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeStop'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAuthorizationStop'
+  '/charging/v21/providers/{providerID}/authorize-remote/start':
+    post:
+      summary: eRoamingAuthorizeRemoteStart_v2.1
+      operationId: eRoamingAuthorizeRemoteStart_v2.1
+      description: |
+        __Note:__
+          * To `RECEIVE`
+          * Implementation: `MANDATORY`
+          * This operation is used by EMPs in order to remotely start a charging process
+
+        The service that is offered by Hubject in order to allow customers to directly start a charging process via mobile app.
+
+        ![Remote start diagram](images/remotestart.png)
+
+
+        __Functional Description:__
+
+        __Scenario:__
+
+        A customer of an EMP wants to charge a vehicle at a charging station of a CPO. The customer informs his EMP of his intention, e.g. via mobile phone or smart phone application. The EMP’s provider system can then initiate a charging process at the CPO’s charging station by sending an eRoamingAuthorizeRemoteStart request to Hubject. The request `MUST` contain the ProviderID and the EvseID.
+
+        Hubject will derive the CPO’s OperatorID from the EvseID.
+
+        Hubject will check whether there is a valid contract between the two partners for the service (EMP must be the subscriber). If so, Hubject continues with checking the charging point compatibility. In case that the CPO has uploaded at least one charging point data record, Hubject will check whether the requested EvseID is among the uploaded data. If not, Hubject will respond with the status code 603 “Unknown EvseID”. If yes, Hubject will check whether the charging spot’s property “IsHubjectCompatible” is set “true”. If the property is false, Hubject will respond with the status code 604 “EvseID is not Hubject compatible”.
+
+        In case that the requested EvseID is compatible or the CPO has not uploaded any EVSE records at all, Hubject generates a SessionID for the following process and forwards the request (including the SessionID) to the CPO. The CPO `MUST` return an eRoamingAcknowledgement message that `MUST` contain the result indicating whether the charging process will be started and that `MAY` contain a status code for further information.
+
+        In case that the CPO’s system cannot be addressed (e.g. due to technical problems), Hubject will return to the requestor a “false” result and a message indicating the connection error.
+
+        Best Practices:
+          * Please ensure a request run time of under 10 seconds including network roundtrip.
+      tags:
+        - eRoamingAuthorization
+      parameters:
+        - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteStart'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/charging/v21/providers/{providerID}/authorize-remote/stop':
+    post:
+      summary: eRoamingAuthorizeRemoteStop_v2.1
+      operationId: eRoamingAuthorizeRemoteStop_v2.1
+      description: |
+        __Note:__
+          * To `RECEIVE`
+          * Implementation: `MANDATORY`
+
+        ![Remote stop diagram](images/remotestop.png)
+
+        eRoamingAuthorizeRemoteStop basically works in the same way as eRoamingAuthorizeRemoteStart. The only difference is that this request is sent in order to initiate the stopping of a charging process. The request `MUST` contain the SessionID that was created by Hubject after the initial eRoamingAuthorizeRemoteStart request.
+      tags:
+        - eRoamingAuthorization
+      parameters:
+        - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteStop'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/cdrmgmt/v22/operators/{operatorID}/charge-detail-record':
+    post:
+      summary: eRoamingChargeDetailRecord_V2.2
+      operationId: eRoamingChargeDetailRecord_V2.2
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `MANDATORY`
+
+        ![Charge Detail Record diagram](images/cdr.png)
+
+        __Functional Description:__
+
+        Scenario:
+
+        A customer of an EMP has charged a vehicle at a charging station of a CPO. The charging process was started with an eRoamingAuthorizeStart or an eRoamingAuthorizeRemoteStart operation. The process may have been stopped with an eRoamingAuthorizeStop or an eRoamingAuthorizeRemoteStop operation. A preceding stop request is not a necessary precondition for the processing of an eRoamingChargeDetailRecord request. The CPO’s provider system `MUST` send an eRoamingChargeDetailRecord (CDR) after the end of the charging process in order to inform the EMP of the charging session data (e.g. meter values and consumed energy) and further charging process details.
+
+        Note:
+
+        The CPO `MUST` provide the same SessionID that was assigned to the corresponding charging process. Based on this information Hubject will be able to assign the session data to the correct process.
+
+        Hubject will identify the receiving EMP and will forward the CDR to the corresponding EMP. The EMP `MUST` return an eRoamingAcknowledgement message that `MUST` contain the result indicating whether the session data was received successfully and that `MAY` contain a status code for further information.
+
+        Hubject will accept only one CDR per SessionID.
+
+        In addition to forwarding the CDR to the EMP, Hubject also stores the CDR. In case that the recipient provider’s system cannot be addressed (e.g. due to technical problems), Hubject will nevertheless return to the requestor a positive result provided that storing the CDR was successful.
+
+        Note:
+
+        Please note that in case of EMP role this part of the URL '/api/oicp/cdrmgmt/v21/operators/{operatorID}/charge-detail-record' will be added to your URL endpoint when sending the request through our HBS platform.
+      tags:
+        - eRoamingAuthorization
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingChargeDetailRecord'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/reservation/v11/providers/{providerID}/reservation-start-request':
+    post:
+      summary: eRoamingAuthorizeRemoteReservationStart_V1.1
+      operationId: eRoamingAuthorizeRemoteReservationStart_V1.1
+      description: |
+        __Note:__
+          * To `RECEIVE`
+          * Implementation: `OPTIONAL`
+          * This operation is used by EMPs in order to remotely reserve a charging point.
+
+        ![Reservation start diagram](images/reservationstart.png)
+
+        __Functional Description:__
+
+        Scenario:
+
+        A customer of an EMP wants to reserve a charging point of a CPO for a later charging process.
+        The customer informs his EMP of his intention, e.g. via mobile phone or smart phone application.
+        The EMP’s provider system can then initiate a reservation of the CPO’s charging point by sending an eRoamingAuthorizeRemoteReservationStart request to Hubject.
+        The request `MUST` contain the ProviderID and the EvseID.
+        The demanded reservation product can be specified using the field PartnerProductID.
+
+        Hubject will derive the CPO’s OperatorID from the EvseID.
+
+        Hubject will check whether there is a valid contract between the two partners for the service Reservation (EMP must be the subscriber). If so, Hubject continues with checking the charging point compatibility. In case that the CPO has uploaded at least one charging point data record, Hubject will check whether the requested EvseID is among the uploaded data. If not, Hubject will respond with the status code 603 “Unknown EvseID”. If yes, Hubject will check whether the charging spot’s property “IsHubjectCompatible” is set “true”. If the property is false, Hubject will respond with the status code 604 “EvseID is not Hubject compatible”.
+
+        In case that the requested EvseID is compatible or the CPO has not uploaded any EVSE records at all, Hubject generates a SessionID for the reservation process and forwards the request (including the SessionID) to the CPO. The CPO MUST return an eRoamingAcknowledgement message that MUST contain the result indicating whether the reservation was successful and that MAY contain a status code for further information.
+
+        In case that the CPO’s system cannot be addressed (e.g. due to technical problems), Hubject will return to the requestor a “false” result and a message indicating the connection error.
+      tags:
+        - eRoamingReservation
+      parameters:
+        - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteReservationStart'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/reservation/v11/providers/{providerID}/reservation-stop-request':
+    post:
+      summary: eRoamingAuthorizeRemoteReservationStop_V1.1
+      operationId: eRoamingAuthorizeRemoteReservationStop_V1
+      description: |
+        __Note:__
+          * To `RECEIVE`
+          * Implementation: `OPTIONAL`
+
+        ![Reservation stop diagram](images/reservationstop.png)
+
+        eRoamingAuthorizeRemoteReservationStop basically works in the same way as eRoamingAuthorizeRemoteReservationStart.
+        The only difference is that this request is sent in order to end the reservation of a charging spot.
+        The request `MUST` contain the SessionID that was created by Hubject after the initial eRoamingAuthorizeRemoteReservationStart request.
+        After the eRoamingAuthorizeRemoteReservationStop the CPO `MUST` provide a CDR.
+      tags:
+        - eRoamingReservation
+      parameters:
+        - $ref: '#/components/parameters/providerID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingAuthorizeRemoteReservationStop'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/evsepush/v23/operators/{operatorID}/data-records':
+    post:
+      summary: eRoamingPushEvseData_V2.3
+      operationId: eRoamingPushEvseData_V2.3
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `MANDATORY`
+
+        ![Push evse data diagram](images/pushevsedata.png)
+
+        When a CPO sends an eRoamingPushEvseData request, Hubject checks whether there is a valid contract between Hubject and the CPO for the service type (Hubject must be the subscriber). If so, the operation allows uploading EVSE data to Hubject.
+        Furthermore, it is possible to update or delete EVSE data that has been pushed with an earlier operation request.
+        How Hubject handles the transferred data `MUST` be defined in the request field "ActionType", which offers four options.
+
+        The EvseData that will be inserted or updated `MUST` be provided in the OperatorEvseData field, which consists of EvseDataRecord structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EvseData for every point in time in the past.
+
+        EVSE consistency:
+
+        EvseIDs contain the ID of the corresponding CPO (With every data upload operation Hubject checks whether the given CPO’s OperatorID or Sub-OperatorIDs if necessary) matches every given EvseID. If not, Hubject refuses the data upload and responds with the status code 018.
+
+        Note:
+        * The eRoamingPushEvseData operation `MUST` always be used sequentially as described in Data Push Operations.
+      tags:
+        - eRoamingEvseData
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEvseData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/evsepush/v21/operators/{operatorID}/status-records':
+    post:
+      summary: eRoamingPushEvseStatus_V2.1
+      operationId: eRoamingPushEvseStatus_V2.1
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `Mandatory`
+
+        ![Push EVSE status](images/pushevsestatus.png)
+
+        When a CPO sends an eRoamingPushEvseStatus request, Hubject checks whether there is a valid contract between Hubject and the CPO for the service type (Hubject must be the subscriber). If so, the operation allows uploading EVSE status data to Hubject. Furthermore, it is possible to update EVSE status data that has been pushed with an earlier operation request.
+
+        The way how Hubject handles the transferred data `MUST` be defined in the request field "ActionType2, which offers four options. This option works in the same way as the eRoamingAuthenticationData service. The EVSE status data that will be inserted or updated MUST be provided with the field “OperatorEvseStatus”, which consists of “EvseStatusRecord” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EVSE status data for every point in time in the past.
+
+        Note:
+
+        The eRoamingPushEvseStatus operation `MUST` always be used sequentiallyas described in Data Push Operations
+
+        Best Practices:
+
+        Please try to avoid race conditions by sending multiple status simultaneously. Status should be sent one by one.
+      tags:
+        - eRoamingEvseStatus
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEvseStatus'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/dynamicpricing/v10/operators/{operatorID}/pricing-products':
+    post:
+      summary: eRoamingPushPricingProductData_V1.0
+      operationId: eRoamingPushPricingProductData_V1.0
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `OPTIONAL`
+
+          When a CPO sends an eRoamingPushPricingProductData request, Hubject checks whether there is a valid flexible/dynamic pricing service offer (for the service type Authorization) created by the CPO. If so, the operation allows the upload of pricing product data to Hubject. In addition, it is also possible to update or delete pricing data previously pushed with an upload operation request. How the transferred data is to be processed `MUST` be defined in the “ActionType” field of the request. Four processing options (i.e. Action Types) exist, details of which can be seen in eRoamingPushPricingProductData message
+
+          The pricing product data to be processed `MUST` be provided in the “PricingProductData” field, which consists of “PricingProductDataRecord” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of pricing data for every point in time in the past.
+      tags:
+        - eRoamingDynamicPricing
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushPricingProductData'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  '/dynamicpricing/v10/operators/{operatorID}/evse-pricing':
+    post:
+      summary: eRoamingPushEVSEPricing_V1.0
+      operationId: eRoamingPushEVSEPricing_V1.0
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `OPTIONAL`
+        When a CPO sends an eRoamingPushEVSEPricing request, Hubject checks whether there is a valid flexible/dynamic pricing service offer (for the service type Authorization) created by the CPO. If so, the operation allows the upload of a list containing pricing product assignment to EvseIDs to Hubject. In addition, it is also possible to update or delete EVSE pricing data previously pushed with an upload operation request. How the transferred data is to be processed `MUST` be defined in the “ActionType” field of the request. Four processing options (i.e. Action Types) exist, details of which can be seen in section eRoamingPushEVSEPricing).
+
+        The EVSE pricing data to be processed `MUST` be provided in the “EVSEPricing” field, which consists of “EvseIDProductList” structures. Hubject keeps a history of all updated and changed data records. Every successful push operation – irrespective of the performed action – leads to a new version of currently valid data records. Furthermore, every operation is logged with the current timestamp. Thus, Hubject can reconstruct the status of EVSE pricing data for every point in time in the past.
+
+        EVSE consistency:
+
+        EvseIDs contain the ID of the corresponding CPO (With every EVSE pricing data upload operation, Hubject checks whether the given CPO’s OperatorID or Sub-OperatorIDs if necessary) matches every given EvseID sent in the request. If not, Hubject refuses the data upload and responds with the status code 018.
+
+        Note
+
+        The eRoamingPushEVSEPricing operation `MUST` always be used sequentially.
+      tags:
+        - eRoamingDynamicPricing
+      parameters:
+        - $ref: '#/components/parameters/operatorID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eRoamingPushEVSEPricing'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+  /notificationmgmt/v11/charging-notifications:
+    post:
+      summary: eRoamingChargingNotifications_V1.1
+      operationId: eRoamingChargingNotifications_V1.1
+      description: |
+        __Note:__
+          * To `SEND`
+          * Implementation: `OPTIONAL`
+
+        __Functional Description:__
+
+        ![Charging notifications diagram](images/chargingnotifications.png)
+        The ChargingNotification feature enables CPOs to notify EMPs about the end of charge
+
+        The ChargingNotification feature basically increases the transparency between CPO - EMP - End Consumer to the level of each charging session.
+
+        This feature enables CPO to send various notifications during a single Charging Session. These notifications give the details like
+
+        1. When the charging session has started. The CPO can send ChargingNotification of type “Start” to Hubject containing information like ChargingStart, MeterStartValue, EVSEID etc.
+
+        2. Consumed Energy values during the charging process or duration of successful charging process that has lapsed. The CPO can send ChargingNotification of type “Progress” to Hubject containing information like ChargingStart, EventOccurred, ChargingDuration, ConsumedEnergyProgress, EVSEID etc. The frequency between two progress notifications for one charging session should be at least 5 minutes.
+
+        3. When the charging session has ended (because no energy is transmitted anymore). The CPO can send a ChargingNotification of type “End” to Hubject containing information such as ChargingEnd, ConsumedEnergy, EVSEID etc.
+
+        4. Error occurred before charging starts or during charging process or abrupt changing end. The CPO can send a ChargingNotification of type “Error” to Hubject containing information such as ErrorClass, ErrorAdditionalInfo, EVSEID etc.
+
+        Hubject will forward Start, Progress, End and Error notification requests to the EMP. The EMP responds with an eRoamingAcknowledgement. This acknowledgement is then being forwarded to the CPO.
+
+        This feature should cover all the notifications that could happen between Session Start and Session End in future. Each bit of information increases transparency to the customer of EMP.
+      tags:
+        - eRoamingChargingNotifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/eRoamingChargingNotificationStart'
+                - $ref: '#/components/schemas/eRoamingChargingNotificationProgress'
+                - $ref: '#/components/schemas/eRoamingChargingNotificationEnd'
+                - $ref: '#/components/schemas/eRoamingChargingNotificationError'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eRoamingAcknowledgment'
+components:
+  parameters:
+    operatorID:
+      name: operatorID
+      in: path
+      required: true
+      description: The id of the operator
+      schema:
+        type: string
+    providerID:
+      name: providerID
+      in: path
+      required: true
+      description: The id of the provider
+      schema:
+        type: string
+  schemas:
+    eRoamingAcknowledgment:
+      type: object
+      description: |
+        The acknowledgement is a message that is sent in response to several requests.
+
+        * To `SEND` and `RECEIVE`
+        * Implementation: `MANDATORY`
+      required:
+        - Result
+        - StatusCode
+      properties:
+        Result:
+          type: boolean
+          description: |
+            If result is true, the message was received and the respective operation was performed successfully.
+
+            If result is false, the message was received and the respective operation was not performed successfully.
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+      example:
+        Result: true
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: Success
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+    eRoamingAuthorizationStart:
+      type: object
+      description: |
+        Note:
+          * To `RECEIVE`
+          * Implementation: `MANDATORY`
+
+        eRoamingAuthorizationStart is a message that authorizes a user to charge a car. NOTE: This message describes the response which has to be receive in response to the eRoamingAuthorizeStart.
+      required:
+        - AuthorizationStatus
+        - StatusCode
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        AuthorizationStatus:
+          type: string
+          enum:
+            - Authorized
+            - NotAuthorized
+          description: |
+            Information specifying whether the user is authorized to charge or not.
+
+            | Option | Description |
+            | ------ | ----------- |
+            | Authorized | User is authorized |
+            | NotAuthorized | User is not authorized |
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+        AuthorizationStopIdentifications:
+          type: array
+          description: A list of Identification data that is authorized to stop the charging process.
+          items:
+            type: object
+            properties:
+              RFIDMifareFamilyIdentification:
+                $ref: '#/components/schemas/RFIDMifareFamilyIdentification'
+              RFIDIdentification:
+                $ref: '#/components/schemas/RFIDIdentification'
+              QRCodeIdentification:
+                $ref: '#/components/schemas/QRCodeIdentification'
+              PlugAndChargeIdentification:
+                $ref: '#/components/schemas/PlugAndChargeIdentification'
+              RemoteIdentification:
+                $ref: '#/components/schemas/RemoteIdentification'
+      example:
+        AuthorizationStatus: Authorized
+        AuthorizationStopIdentifications:
+          - RFIDMifareFamilyIdentification:
+              UID: 1234ABCD
+            QRCodeIdentification:
+              EvcoID: DE-DCB-C12345678-X
+              HashedPIN:
+                Function: Bcrypt
+                LegacyHashData:
+                  Function: MD5
+                  Salt: string
+                  Value: string123456
+                Value: string123456
+              PIN: '1234'
+            PlugAndChargeIdentification:
+              EvcoID: DE-DCB-C12345678-X
+            RemoteIdentification:
+              EvcoID: DE-DCB-C12345678-X
+            RFIDIdentification:
+              EvcoID: DE-DCB-C12345678-X
+              ExpiryDate: '2021-01-23T14:21:36.954Z'
+              PrintedNumber: '9876655'
+              RFID: mifareCls
+              UID: 1234ABCD
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: string
+    eRoamingAuthorizationStop:
+      type: object
+      description: |
+        Note:
+          * To `RECEIVE`
+          * Implementation: `OPTIONAL`
+
+        eRoamingAuthorizeStop is a message to request an authorization for stopping a charging process.
+
+        Note:
+
+        This message describes the response which has to be received in return to the eRoamingAuthorizeStop request.
+      required:
+        - AuthorizationStatus
+        - StatusCode
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        AuthorizationStatus:
+          type: string
+          enum:
+            - Authorized
+            - NotAuthorized
+          description: |
+            Information specifying whether the user is authorized to charge or not.
+
+            | Option | Description |
+            | ------ | ----------- |
+            | Authorized | User is authorized |
+            | NotAuthorized | User is not authorized |
+        StatusCode:
+          $ref: '#/components/schemas/StatusCode'
+      example:
+        AuthorizationStatus: Authorized
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        StatusCode:
+          AdditionalInfo: Success
+          Code: '000'
+          Description: string
+    eRoamingAuthorizeRemoteReservationStart:
+      type: object
+      required:
+        - ProviderID
+        - EvseID
+        - Identification
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        EMPPartnerSessionId:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+        Duration:
+          type: integer
+          format: int64
+          maximum: 99
+          minimum: 1
+          example: 10
+          description: Duration of reservation in minutes
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        Duration: 15
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: a5ghdhf73h
+                Value: a5ghdhf73h
+              Value: a5ghdhf73h
+            PIN: '1234'
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: 2021-01-23T14:23:54.228Z
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+        PartnerProductID: Reservation
+        ProviderID: DE-DCB
+        SessionID: b2688855-7f00-0002-6d8e-48d883f6abb6
+    eRoamingAuthorizeRemoteReservationStop:
+      type: object
+      required:
+        - ProviderID
+        - EvseID
+        - SessionID
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        EMPPartnerSessionId:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation. Partner systems can use this field to link their own session handling to HBS processes.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+      example:
+        EvseID: DE*XYZ*ETEST1
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: b2688855-7f00-0002-6d8e-48d883f6abb6
+    eRoamingAuthorizeRemoteStart:
+      type: object
+      required:
+        - SessionID
+        - ProviderID
+        - EvseID
+        - Identification
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: string
+                Value: string123456
+              Value: string123456
+            PIN: '1234'
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: '2021-01-23T14:21:36.954Z'
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        PartnerProductID: AC 1
+        EvseID: DE*XYZ*ETEST1
+    eRoamingAuthorizeRemoteStop:
+      type: object
+      required:
+        - SessionID
+        - ProviderID
+        - EvseID
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        ProviderID:
+          $ref: '#/components/schemas/ProviderID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ProviderID: DE-DCB
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        EvseID: DE*XYZ*ETEST1
+    eRoamingAuthorizeStart:
+      type: object
+      description: |
+        Best Practices:
+        * The EVSE ID is optional for this message which is e.g. defined after the RFID authorization at a charge point. If the Evse ID can be provided, we recommend to include the EVSE ID in this message; it will help for support matters.
+        * If an authorization process could not successfully be executed, please set an error code by refering to the error code list mentioned in the OICP document.
+      required:
+        - OperatorID
+        - Identification
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: TestSession
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: string
+                Value: string123456
+              Value: string123456
+            PIN: '1234'
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: '2021-01-23T14:21:23.744Z'
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+        OperatorID: DE*ABC
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+    eRoamingAuthorizeStop:
+      type: object
+      required:
+        - SessionID
+        - OperatorID
+        - Identification
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: TestSession
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: string
+                Value: string123456
+              Value: string123456
+            PIN: '1234'
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: '2021-01-23T14:21:23.744Z'
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+        OperatorID: DE*ABC
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+    eRoamingChargeDetailRecord:
+      type: object
+      description: eRoamingChargeDetailRecord is a message that contains charging process details (e.g. meter values).
+      required:
+        - SessionID
+        - EvseID
+        - Identification
+        - ChargingStart
+        - ChargingEnd
+        - SessionStart
+        - SessionEnd
+        - ConsumedEnergy
+      properties:
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by the CPO to the related operation.
+        EMPPartnerSessionID:
+          type: string
+          maximum: 250
+          description: Optional field containing the session id assigned by an EMP to the related operation.
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        ChargingEnd:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process stoped.
+        SessionStart:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        SessionEnd:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueEnd:
+          type: number
+          description: The ending meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        ConsumedEnergy:
+          type: number
+          description: The difference between MeterValueEnd and MeterValueStart in kWh.
+        SignedMeteringValues:
+          type: array
+          description: 'Metering Signature basically contains all metering signature values (these values should be in Transparency software format) for different status of charging session for eg start, end or progress. In total you can provide maximum 10 metering signature values'
+          items:
+            type: object
+            properties:
+              SignedMeteringValue:
+                type: string
+                description: |
+                  Metering signature value (in the Transparency software format)
+
+                  SignedMeteringValue `SHOULD` be always sent in following order
+                  1. SignedMeteringValue for Metering Status “Start”
+                  2. SignedMeteringValue for Metering Status “Progress1”
+                  3. SignedMeteringValue for Metering Status “Progress2”
+                  4. …
+                  5. SignedMeteringValue for Metering Status “Progress8”
+                  6. SignedMeteringValue for Metering Status “End”
+
+                  Note:
+
+                  1. This field `MUST` be provided when the EVSEID in the ChargeDetailRecord contains the "External" value in the CalibrationLawDataAvailability field.
+                  2. The MeteringSignatureValue format provided `MUST` be supported by the Transparency Software used by the CPO
+                maximum: 3000
+              MeteringStatus:
+                type: string
+                enum:
+                  - Start
+                  - Progress
+                  - End
+                description: |
+                  | Option | Description |
+                  | ------ | ----------- |
+                  | Start | Metering signature value of the beginning of charging process. |
+                  | Progress | An intermediate metering signature value of the charging process. |
+                  | End | Metering Signature Value of the end of the charging process. |
+        CalibrationLawVerificationInfo:
+          type: object
+          description: This field provides additional information which could help directly or indirectly to verify the signed metering value by using respective Transparency Software
+          properties:
+            CalibrationLawCertificateID:
+              type: string
+              description: 'The Calibration Law Compliance ID from respective authority along with the revision and issueing date (Compliance ID : Revision : Date) For eg PTB - X-X-XXXX : V1 : 01Jan2020'
+              maximum: 100
+            PublicKey:
+              type: string
+              description: Unique PublicKey for EVSEID can be provided here
+              maximum: 1000
+            MeteringSignatureUrl:
+              type: string
+              description: |
+                In this field CPO can also provide a url for xml file. This xml file can give the compiled Calibration Law Data information which can be simply added to invoices for Customer of EMP.
+
+                The information can contain for eg Charging Station Details, Charging Session Date/Time, SignedMeteringValues (Transparency Software format), SignedMeterValuesVerificationInstruction etc.
+              maximum: 200
+            MeteringSignatureEncodingFormat:
+              type: string
+              description: 'Encoding format of the metering signature data as well as the version (e.g. EDL40 Mennekes: V1)'
+              maximum: 50
+            SignedMeteringValuesVerificationInstruction:
+              type: string
+              description: Additional information (e.g. instruction on how to use the transparency software)
+              maximum: 400
+        HubOperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        HubProviderID:
+          $ref: '#/components/schemas/ProviderID'
+      example:
+        CalibrationLawVerificationInfo:
+          CalibrationLawCertificateID: CD-12BD-2783T
+          PublicKey: a9sdh839alskldh/WEDjaskdjis20ij2wdpasodpjlkofi3ed3ed
+          MeteringSignatureUrl: 'http://www.meteringexample1234.com'
+          MeteringSignatureEncodingFormat: UTF-8
+          SignedMeteringValuesVerificationInstruction: please follow instructions provided in the mentioned URL
+        CPOPartnerSessionID: 1234XYZ
+        ChargingEnd: '2020-09-23T14:17:53.038Z'
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        ConsumedEnergy: 10
+        EMPPartnerSessionID: '9876655'
+        EvseID: DE*XYZ*ETEST1
+        HubOperatorID: DE*ABC
+        HubProviderID: DE-DCB
+        Identification:
+          PlugAndChargeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+          QRCodeIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            HashedPIN:
+              Function: Bcrypt
+              LegacyHashData:
+                Function: MD5
+                Salt: string
+                Value: string123456
+              Value: string123456
+            PIN: '1234'
+          RFIDIdentification:
+            EvcoID: DE-DCB-C12345678-X
+            ExpiryDate: '2021-01-23T14:17:53.039Z'
+            PrintedNumber: '9876655'
+            RFID: mifareCls
+            UID: 1234ABCD
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+          RemoteIdentification:
+            EvcoID: DE-DCB-C12345678-X
+        MeterValueEnd: 10
+        MeterValueInBetween:
+          meterValues:
+            - 10
+        MeterValueStart: 0
+        SignedMeteringValues:
+          - SignedMeteringValue: AAAAAAAAAAAAAAABasdno2e89d2ekasdeBBBBBBBBBBBBBBBBCCCCCCCCC23423BBBBBBBBBBBBBAS
+            MeteringStatus: Start
+          - SignedMeteringValue: AAAAAAAAAAAAAAABBBBdaskjhadksiqwd2309nede9owineBBBBBBBBBBBBBCCCCCCCCC23423BBBBBBBBBBBBBAS
+            MeteringStatus: End
+        PartnerProductID: AC 1
+        SessionEnd: '2020-09-23T14:17:53.039Z'
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.039Z'
+    eRoamingChargingNotificationEnd:
+      type: object
+      description: |
+        A customer of an EMP has fully charged a vehicle at a charging station of a CPO. The charging process was started with an eRoamingAuthorizeStart or an eRoamingAuthorizeRemoteStart operation. The energy flow has ended, but the process has not yet been stopped and the vehicle is blocking the charging station.
+
+        The CPO’s backend system MAY send a ChargingNotification of type “End” after the CPO considers the charging of an EV concluded (because no energy is transmitted anymore) in order to inform the EMP that the actual charging (the energy flow) of the vehicle has stopped. The charging process has not yet been stopped by the customer and the session is still active.
+
+        The ChargingNotification of type “End” is a message that contains information about the charging end of a session (e.g. ConsumedEnergy, ChargingEnd).
+      required:
+        - Type
+        - SessionID
+        - EvseID
+        - ChargingEnd
+        - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by the CPO to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by an EMP to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        ChargingEnd:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process stoped.
+        SessionStart:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        SessionEnd:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        ConsumedEnergy:
+          type: number
+          description: The difference between MeterValueEnd and MeterValueStart in kWh.
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueEnd:
+          type: number
+          description: The ending meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+        PenaltyTimeStart:
+          type: string
+          format: date-time
+          description: The date and time at which the penalty time start after the grace period.
+      example:
+        Type: End
+        CPOPartnerSessionID: 1234XYZ
+        ChargingEnd: '2020-09-23T14:17:53.038Z'
+        ChargingStart: '2020-09-23T14:50:53.038Z'
+        ConsumedEnergy: 10
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        MeterValueEnd: 10
+        MeterValueInBetween:
+          meterValues:
+            - 0
+        PartnerProductID: AC 1
+        PenaltyTimeStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionEnd: '2020-09-23T14:50:53.038Z'
+        SessionStart: '2020-09-23T14:17:53.038Z'
+    eRoamingChargingNotificationError:
+      type: object
+      description: |
+        A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc). Due to some errors sometime, it is possible that charging does not start or charging process is abruptly stopped or fluctuations in the charging process. It is really important for Customer as well as EMP to know what exactly is happening at the charging process. This notification eventually helps EMPs well informed about the problem occurred with the charging process. This information can be easily passed onto Customer so that he/she can take appropriate action.
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Error” after the CPO gets an information about the error at the charging station. The CPO can transmit one of the ErrorClass defined by Hubject along with the additional information which elaborated the Error. The customer has to take one of the three action EV needs to be charged at some different station, Cables is properly attached or the error is for information only no action required by customer.
+
+        The ChargingNotification of type “Error” is a message that contains information about the charging end of a session (e.g. ErrorClass, ErrorAdditionalInfo).
+      required:
+        - Type
+        - SessionID
+        - EvseID
+        - ErrorType
+        - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by the CPO to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by an EMP to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ErrorType:
+          type: string
+          enum:
+            - ConnectorError
+            - CriticalError
+          description: |
+            | Option | Description |
+            | ------ | ----------- |
+            | ConnectorError | Charging process cannot be started or stopped. EV driver needs to check if the the Plug is properly inserted or taken out from socket. |
+            | CriticalError | Charging process stopped abruptly. Reason: Physical check at the station is required. Station cannot be reset online. <br /> Or <br /> Error with the software or hardware of the station locally. <br /> Or <br /> Communication failure with the vehicle. <br /> Or <br /> The error needs to be investigated <br /> Or <br /> Ground Failure |
+        ErrorAdditionalInfo:
+          type: string
+          description: The CPO can put in the additional information about the error
+          maximum: 250
+      example:
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        EvseID: DE*XYZ*ETEST1
+        ErrorType: ConnectorError
+        ErrorAdditionalInfo: 'Plug was not connected, EVSEID timed out reached'
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        OperatorID: DE*ABC
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        Type: Error
+    eRoamingChargingNotificationProgress:
+      type: object
+      description: |
+        A customer of EMP has started the charging session. Just like as that of regular gasoline stations customer would like to know either how much charging Duration have passed or how much energy is consumed by the EV so far. This information will help Customer to decide if he/she wants to stop the charging session as per their affordability or journey planning.
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Progess” after the CPO gets the charging energy or time information from EVSEID. This is required in order to inform the EMP that the progress energy or chargingduration for a perticular charging session.
+
+        The ChargingNotification of type “Progress” is a message that contains information about the charging Duration or energy consumed during charging process (e.g. EventOccurred, ChargingDuration, ConsumedEnergyProgress).
+      required:
+        - Type
+        - SessionID
+        - EvseID
+        - ChargingStart
+        - EventOccurred
+        - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by the CPO to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by an EMP to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        EventOccurred:
+          type: string
+          format: date-time
+          description: The date and time at which the charging progress parameters are captured.
+        ChargingDuration:
+          type: integer
+          description: |
+            Charging Duration = EventOccurred - ChargingStart. It is a time in millisecond.
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+        SessionStart:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        ConsumedEnergyProgress:
+          type: number
+          description: |
+            This represents the consumed energy in kWh from the start of the charging process until the charging progress notification is generated (EventOccurred).
+
+            Either ChargingDuration or ConsumedEnergyProgress should be provided. Both can also be provided with each progress notification.
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        MeterValueInBetween:
+          type: object
+          description: List of meter values that may have been taken in between (kWh).
+          properties:
+            meterValues:
+              type: array
+              items:
+                type: number
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Type: Progress
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        EventOccurred: '2020-09-23T14:25:53.038Z'
+        ChargingDuration: 48000
+        ConsumedEnergyProgress: 9
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        MeterValueInBetween:
+          meterValues:
+            - 9
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+    eRoamingChargingNotificationStart:
+      type: object
+      description: |
+        A customer of EMP Authorizes the charging session at particular charging station (via any means for eg REFID card, Mobile etc). The charging session is authorized by Hubject / CPO system. The authorization of charging process and plugging the cable in EV does not guarantee that energy flow into the Vehicle is initiated. It is really important for for EMP and its end consumer to know if the charging has started.
+
+        The CPO’s backend system MAY send a ChargingNotification of type “Start” after the CPO considers the charging of an EV is started (since energy flow have started) in order to inform the EMP that the actual charging (the energy flow) of the vehicle has started.
+
+        The ChargingNotification of type “Start” is a message that contains information about the charging start of a session (e.g. ChargingStart).
+      required:
+        - Type
+        - SessionID
+        - EvseID
+        - ChargingStart
+        - OperatorID
+      properties:
+        Type:
+          $ref: '#/components/schemas/ChargingNotificationType'
+        SessionID:
+          $ref: '#/components/schemas/SessionID'
+        CPOPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by the CPO to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        EMPPartnerSessionID:
+          type: string
+          description: |
+            Optional field containing the session ID assigned by an EMP to the related operation.
+
+            Partner systems can use this field to link their own session handling to HBS processes.
+          maximum: 250
+        Identification:
+          $ref: '#/components/schemas/Identification'
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingStart:
+          type: string
+          format: date-time
+          description: The date and time at which the charging process started.
+        SessionStart:
+          type: string
+          format: date-time
+          description: 'The date and time at which the session started, e.g. swipe of RFID or cable connected.'
+        MeterValueStart:
+          type: number
+          description: The starting meter value in kWh.
+        OperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        PartnerProductID:
+          $ref: '#/components/schemas/ProductID'
+      example:
+        Type: Start
+        CPOPartnerSessionID: 1234XYZ
+        EMPPartnerSessionID: 2345ABC
+        ChargingStart: '2020-09-23T14:17:53.038Z'
+        EvseID: DE*XYZ*ETEST1
+        Identification:
+          RFIDMifareFamilyIdentification:
+            UID: 1234ABCD
+        MeterValueStart: 0
+        PartnerProductID: AC 1
+        SessionID: f98efba4-02d8-4fa0-b810-9a9d50d2c527
+        SessionStart: '2020-09-23T14:17:53.038Z'
+        OperatorID: DE*ABC
+    eRoamingPushEVSEPricing:
+      type: object
+      description: eRoamingPushEVSEPricing is a message that is sent in order to upload a list of EVSEs and the pricing products (i.e. tarrifs) applicable for (charging or reservation) sessions at these EVSEs.
+      required:
+        - ActionType
+        - EVSEPricing
+      properties:
+        ActionType:
+          type: string
+          enum:
+            - fullLoad
+            - update
+            - insert
+            - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        EVSEPricing:
+          type: array
+          description: A list of EVSEs and their respective pricing product relation
+          items:
+            type: object
+            required:
+              - EvseID
+              - ProviderID
+              - EvseIDProductList
+            properties:
+              EvseID:
+                $ref: '#/components/schemas/EvseID'
+              ProviderID:
+                $ref: '#/components/schemas/ProviderIDAsterisk'
+              EvseIDProductList:
+                type: array
+                description: A list of pricing products applicable per EvseID
+                items:
+                  $ref: '#/components/schemas/ProductID'
+      example:
+        ActionType: fullLoad
+        EVSEPricing:
+          - EvseID: DE*XYZ*ETEST1
+            EvseIDProductList:
+              - AC 1
+            ProviderID: '*'
+    eRoamingPushEvseData:
+      type: object
+      required:
+        - ActionType
+        - OperatorEvseData
+      properties:
+        ActionType:
+          type: string
+          enum:
+            - fullLoad
+            - update
+            - insert
+            - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        OperatorEvseData:
+          type: object
+          required:
+            - OperatorID
+            - OperatorName
+            - EvseDataRecord
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              maximum: 100
+              description: Free text for operator
+            EvseDataRecord:
+              type: array
+              description: EVSE entries
+              items:
+                $ref: '#/components/schemas/EvseDataRecord'
+      example:
+        ActionType: fullLoad
+        OperatorEvseData:
+          EvseDataRecord:
+            - Accessibility: Restricted access
+              AccessibilityLocation: ParkingGarage
+              AdditionalInfo:
+                - lang: en
+                  value: This charging station is for testing purposes
+              Address:
+                City: Berlin
+                Country: DEU
+                Floor: 6OG
+                HouseNum: '22'
+                PostalCode: '10829'
+                Region: Berlin
+                Street: EUREF CAMPUS
+                TimeZone: 'UTC+01:00'
+                ParkingFacility: true
+                ParkingSpot: E36
+              AuthenticationModes:
+                - NFC RFID Classic
+                - REMOTE
+              CalibrationLawDataAvailability: Local
+              ChargingFacilities:
+                - Amperage: 32
+                  Power: 22
+                  PowerType: AC_3_PHASE
+                  Voltage: 480
+                  ChargingModes:
+                    - Mode_4
+              ChargingPoolID: DE*ABC*P1234TEST*1
+              ChargingStationID: TEST 1
+              ChargingStationImage: 'http://www.testlink.com'
+              ChargingStationNames:
+                - lang: en
+                  value: ABC Charging Station Test
+                - lang: de
+                  value: ABC Testladestation
+              ChargingStationLocationReference:
+                - lang: en
+                  value: Charging station is inside Hubject Officem Parking Lot
+              ClearinghouseID: TEST ID
+              DynamicInfoAvailable: 'true'
+              DynamicPowerLevel: true
+              EvseID: DE*XYZ*ETEST1
+              EnergySource:
+                - Energy: Solar
+                  Percentage: 85
+                - Energy: Wind
+                  Percentage: 15
+              EnvironmentalImpact:
+                CO2Emission: 30.3
+              GeoChargingPointEntrance:
+                Google:
+                  Coordinates: 52.480495 13.356465
+              GeoCoordinates:
+                Google:
+                  Coordinates: 52.480495 13.356465
+              HardwareManufacturer: Charger Hardware Muster Company
+              HotlinePhoneNumber: '+49123123123123'
+              HubOperatorID: DE*ABC
+              IsHubjectCompatible: true
+              IsOpen24Hours: false
+              MaxCapacity: 50
+              OpeningTimes:
+                - Period:
+                    - begin: '09:00'
+                      end: '18:00'
+                  'on': Everyday
+              PaymentOptions:
+                - No Payment
+              Plugs:
+                - Type 2 Outlet
+              RenewableEnergy: true
+              SubOperatorName: XYZ Technologies
+              ValueAddedServices:
+                - Reservation
+              deltaType: insert
+              lastUpdate: '2018-01-23T14:04:29.377Z'
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+    eRoamingPushEvseStatus:
+      type: object
+      required:
+        - ActionType
+        - OperatorEvseStatus
+      description: eRoamingPushEvseStatus is a message that is sent in order to upload EVSE status data to Hubject.
+      properties:
+        ActionType:
+          type: string
+          enum:
+            - fullLoad
+            - update
+            - insert
+            - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        OperatorEvseStatus:
+          type: object
+          required:
+            - OperatorID
+            - EvseStatusRecord
+          description: Indicates the Eves status
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              description: Free text for operator
+              maximum: 100
+            EvseStatusRecord:
+              type: array
+              description: EvseStatus list
+              items:
+                type: object
+                required:
+                  - EvseID
+                  - EvseStatus
+                properties:
+                  EvseID:
+                    $ref: '#/components/schemas/EvseID'
+                  EvseStatus:
+                    type: string
+                    enum:
+                      - Available
+                      - Reserved
+                      - Occupied
+                      - OutOfService
+                      - EvseNotFound
+                      - Unknown
+                    description: |
+                      | Option | Description |                
+                      | ------ | ----------- |
+                      | Available | Charging Spot is available for charging. |
+                      | Reserved | Charging Spot is reserved and not available for charging. |
+                      | Occupied | Charging Spot is busy. |
+                      | OutOfService | Charging Spot is out of service and not available for charging. |
+                      | EvseNotFound | The requested EvseID and EVSE status does not exist within the Hubject database. |
+                      | Unknown | No status information available. |
+      example:
+        ActionType: fullLoad
+        OperatorEvseStatus:
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+          EvseStatusRecord:
+            - EvseID: DE*XYZ*ETEST1
+              EvseStatus: Available
+    eRoamingPushPricingProductData:
+      type: object
+      description: eRoamingPushPricingProductData is a message that is sent in order to upload data pertaining to a CPO’s pricing products (i.e. tarrifs) to the Hubject system.
+      required:
+        - ActionType
+        - PricingProductData
+      properties:
+        ActionType:
+          type: string
+          enum:
+            - fullLoad
+            - update
+            - insert
+            - delete
+          description: Describes the action that has to be performed by Hubject with the provided data.
+        PricingProductData:
+          type: object
+          required:
+            - OperatorID
+            - ProviderID
+            - PricingDefaultPrice
+            - PricingDefaultPriceCurrency
+            - PricingDefaultReferenceUnit
+            - PricingProductDataRecords
+          description: Details of pricing products offered by a particular operator for a specific provider
+          properties:
+            OperatorID:
+              $ref: '#/components/schemas/OperatorID'
+            OperatorName:
+              type: string
+              description: Free text for operator
+              maximum: 100
+            ProviderID:
+              $ref: '#/components/schemas/ProviderIDAsterisk'
+            PricingDefaultPrice:
+              type: number
+              description: A default price for pricing sessions at undefined EVSEs
+            PricingDefaultPriceCurrency:
+              $ref: '#/components/schemas/CurrencyID'
+            PricingDefaultReferenceUnit:
+              $ref: '#/components/schemas/ReferenceUnit'
+            PricingProductDataRecords:
+              type: array
+              description: A list of pricing products
+              items:
+                $ref: '#/components/schemas/PricingProductDataRecord'
+      example:
+        ActionType: fullLoad
+        PricingProductData:
+          OperatorID: DE*ABC
+          OperatorName: ABC technologies
+          PricingDefaultPrice: 0
+          PricingDefaultPriceCurrency: EUR
+          PricingDefaultReferenceUnit: HOUR
+          PricingProductDataRecords:
+            - AdditionalReferences:
+                - AdditionalReference: PARKING FEE
+                  AdditionalReferenceUnit: HOUR
+                  PricePerAdditionalReferenceUnit: 2
+              IsValid24hours: false
+              MaximumProductChargingPower: 22
+              PricePerReferenceUnit: 1
+              ProductAvailabilityTimes:
+                - Periods:
+                    - begin: '09:00'
+                      end: '18:00'
+                  'on': Everyday
+              ProductID: AC 1
+              ProductPriceCurrency: EUR
+              ReferenceUnit: HOUR
+          ProviderID: '*'
+    EvcoID:
+      type: string
+      pattern: '^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$'
+      description: |
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+        ^(([A-Za-z]{2}\-?[A-Za-z0-9]{3}\-?C[A-Za-z0-9]{8}\-?[\d|A-Za-z])|([A-Za-z]{2}[\*|\-]?[A-Za-z0-9]{3}[\*|\-]?[A-Za-z0-9]{6}[\*|\-]?[\d|X]))$
+        The expression validates the string as EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+        In case the EvcoID is provided corresponding to ISO, the instance part MUST be eight characters long and MUST be provided with a prepended “C”. The optional separating character MUST be “-“.
+
+        In case the EvcoID is provided corresponding to DIN, the instance part MUST be six characters long. The optional separating character can either be “*” or “-“.
+
+        Examples ISO: “DE-8EO-CAet5e4XY-3”, “DE8EOCAet5e43X1”
+
+        Examples DIN: “DE*8EO*Aet5e4*3”, “DE-8EO-Aet5e4-3”, “DE8EOAet5e43”
+      example: DE*8EO*Aet5e4*3
+    GeoCoordinates:
+      type: object
+      description: |
+        Important
+
+        __One of the following three options `MUST` be provided__
+      properties:
+        Google:
+          type: object
+          description: |
+            Geocoordinates using Google Structure
+            Based on WGS84
+          required:
+            - Coordinates
+          properties:
+            Coordinates:
+              type: string
+              pattern: '^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$'
+              description: |
+                A string that `MUST` be valid with respect to the following regular expression:
+
+                `^-?1?\d{1,2}\.\d{1,6}\s*\,?\s*-?1?\d{1,2}\.\d{1,6}$`
+                The expression validates the string as geo coordinates with respect to the Google standard. The string contains latitude and longitude (in this sequence) separated by a space.
+
+                Example: “47.662249 9.360922”
+              example: 47.662249 9.360922
+        DecimalDegree:
+          type: object
+          description: Geocoordinates using DecimalDegree Structure
+          required:
+            - Longitude
+            - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: '^-?1?\d{1,2}\.\d{1,6}$'
+              description: |
+                A string that `MUST` be valid with respect to the following regular expression:
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+                Examples: “9.360922”, “-21.568201”
+              example: '9.360922'
+            Latitude:
+              type: string
+              pattern: '^-?1?\d{1,2}\.\d{1,6}$'
+              description: |
+                A string that `MUST` be valid with respect to the following regular expression:
+
+                `^-?1?\d{1,2}\.\d{1,6}$`
+                The expression validates the string as a geo coordinate (longitude or latitude) with decimal degree syntax.
+
+                Examples: “9.360922”, “-21.568201”
+              example: '9.360922'
+        DegreeMinuteSeconds:
+          type: object
+          description: Geocoordinates using DegreeMinutesSeconds Structure
+          required:
+            - Longitude
+            - Latitude
+          properties:
+            Longitude:
+              type: string
+              pattern: '^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$'
+              description: |
+                A string that `MUST` be valid with respect to the following regular expression:
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$`
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+                Examples: “9°21'39.32''”, “-21°34'23.16''
+              example: 9°21'39.32''
+            Latitude:
+              type: string
+              pattern: '^-?1?\d{1,2}°[ ]?\d{1,2}''[ ]?\d{1,2}\.\d+''''$'
+              description: |
+                A string that `MUST` be valid with respect to the following regular expression:
+
+                `^-?1?\d{1,2}°[ ]?\d{1,2}'[ ]?\d{1,2}\.\d+''$`
+                The expression validates the string as a geo coordinate (longitude or latitude) consisting of degree, minutes, and seconds
+
+                Examples: “9°21'39.32''”, “-21°34'23.16''
+              example: 9°21'39.32''
+    PlugAndChargeIdentification:
+      type: object
+      description: |
+        Authentication required for Plug&Charge (EMAID/EVCOID)
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+        - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    CurrencyID:
+      type: string
+      description: |
+        The ProductPriceCurrencyType allows for the list of active codes of the official ISO 4217 currency names.
+
+        For the full list of active codes of the official ISO 4217 currencies, see: [https://www.iso.org/iso-4217-currency-codes.html](https://www.iso.org/iso-4217-currency-codes.html)
+
+        Examples:
+
+        | Option | Description |
+        | ------ | ----------- |
+        | EUR | Euro |
+        | CHF | Swiss franc |
+        | CAD | Canadian Dollar |
+        | GBP | Pound sterling
+      example: EUR
+    RFIDMifareFamilyIdentification:
+      type: object
+      description: |
+        Authentication data details. The data structure differs depending on the authentication technology
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+      required:
+        - UID
+      example:
+        UID: 7568290FFF765F
+    ChargingNotificationType:
+      type: string
+      description: The type of ChargingNotification
+      enum:
+        - Start
+        - Progress
+        - End
+        - Error
+      example: Start
+    ProductID:
+      type: string
+      description: |
+        The ProductIDType defines some standard values (see below). The type however also supports custom ProductIDs that can be specified by partners (as a string of 50 characters maximum length).
+        | Option | Description |
+        |--------|-------------|
+        | Standard Price | Standard Price |
+        | AC1 | Product for AC 1 Phase charging |
+        | AC3 | Product for AC 3 Phase charging |
+        | DC | Product for DC charging |
+        | CustomProductID | There is no option “CustomProductID”, this sample option is meant to indicates that custom product ID specifications by partners (as a string of 50 characters maximum length) are allowed as well.|
+      example: AC1
+      maximum: 50
+    RemoteIdentification:
+      type: object
+      description: |
+        Authentication data details. The data structure differs depending on the authentication technology
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+      required:
+        - EvcoID
+      example:
+        EvcoID: DE*8EO*Aet5e4*3
+    SessionID:
+      type: string
+      pattern: '^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$'
+      description: |
+        The Hubject SessionID that identifies the process
+
+        A string that `MUST` be valid with respect to the following regular expression:
+
+        `^[A-Za-z0-9]{8}(-[A-Za-z0-9]{4}){3}-[A-Za-z0-9]{12}$`
+
+        The expression validates the string as a GUID.
+
+        Example: “b2688855-7f00-0002-6d8e-48d883f6abb6”
+      example: b2688855-7f00-0002-6d8e-48d883f6abb6
+    RFIDIdentification:
+      type: object
+      description: |
+        Authentication data details. The data structure differs depending on the authentication technology
+      properties:
+        UID:
+          $ref: '#/components/schemas/UID'
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        RFID:
+          type: string
+          description: |
+            Defined RFID Type
+          enum:
+            - mifareCls
+            - mifareDes
+            - calypso
+            - nfc
+            - mifareFamily
+        PrintedNumber:
+          type: string
+          maximum: 150
+          description: A number printed on a customer’s card for manual authorization (e.q. via a call center)
+        ExpiryDate:
+          type: string
+          description: Until when this card is valid. Should not be set if card does not have an expiration
+      required:
+        - UID
+        - RFID
+      example:
+        UID: 7568290FFF765F
+        RFID: mifareCls
+    StatusCode:
+      type: object
+      description: |
+        The structure consists of a defined code, an optional functional description of the status, and optional additional information. It can be used e.g. to send error details or detailed reasons for a certain process or system behavior. The optional AdditionalInfo field can be used in order to provide further individual (non-standardized) information.
+      required:
+        - Code
+      properties:
+        Code:
+          type: string
+          description: |
+            | Option | Description | Area of Usage |
+            | -------|-------------|---------------|
+            | 000 | Success. | General codes |
+            | 001 | Hubject system error. | Internal system codes |
+            | 002 | Hubject database error. |Internal system codes|
+            | 009 |Data transaction error. | Internal system codes|
+            |017 |Unauthorized Access. |Internal system codes |
+            |018 |Inconsistent EvseID. |Internal system codes |
+            |019 |Inconsistent EvcoID. |Internal system codes |
+            |021 |System error. |General codes |
+            |022 |Data error. |General codes |
+            |101 |QR Code Authentication failed – Invalid Credentials. |Authentication codes |
+            |102 |RFID Authentication failed – invalid UID. |Authentication codes |
+            |103 |RFID Authentication failed – card not readable. |Authentication codes |
+            |105 |PLC Authentication failed - invalid EvcoID. |Authentication codes |
+            |106 |No positive authentication response. |Authentication codes / Internal system codes |
+            |110 |QR Code App Authentication failed – time out error. |Authentication codes |
+            |120 |PLC (ISO/ IEC 15118) Authentication failed – invalid underlying EvcoID. |Authentication codes |
+            |121 |PLC (ISO/ IEC 15118) Authentication failed – invalid certificate. |Authentication codes |
+            |122 |PLC (ISO/ IEC 15118) Authentication failed – time out error. |Authentication codes |
+            |200 |EvcoID locked. |Authentication codes |
+            |210 |No valid contract. |Session codes |
+            |300 |Partner not found. |Session codes |
+            |310 |Partner did not respond. |Session codes |
+            |320 |Service not available. |Session codes |
+            |400 |Session is invalid. |Session codes |
+            |501 |Communication to EVSE failed. |EVSE codes |
+            |510 |No EV connected to EVSE. |EVSE codes |
+            |601 |EVSE already reserved. |EVSE codes |
+            |602 |EVSE already in use/ wrong token. |EVSE codes |
+            |603 |Unknown EVSE ID. |EVSE codes |
+            |604 |EVSE ID is not Hubject compatible. |EVSE codes |
+            |700 |EVSE out of service. |EVSE codes |
+        Description:
+          type: string
+          description: description
+          maximum: 200
+        AdditionalInfo:
+          type: string
+          description: More information can be provided here
+          maximum: 1000
+      example:
+        Code: '000'
+        Description: some description
+        AdditionalInfo: some additional info
+    QRCodeIdentification:
+      type: object
+      required:
+        - EvcoID
+      properties:
+        EvcoID:
+          $ref: '#/components/schemas/EvcoID'
+        HashedPIN:
+          type: object
+          required:
+            - Value
+            - Function
+          properties:
+            Value:
+              type: string
+              pattern: '^[0-9A-Za-z\\.+/=\\$]{10,100}$'
+              description: |
+                Hash value created by partner
+
+                The expression validates the string as a hash function result value with a length between 10 and 100 characters
+
+                Example: “a5ghdhf73h”
+              example: a5ghdhf73h
+            Function:
+              type: string
+              enum:
+                - Bcrypt
+              description: Function that was used to generate the hash value.
+              example: Bcrypt
+            LegacyHashData:
+              type: object
+              required:
+                - Function
+              properties:
+                Function:
+                  type: string
+                  enum:
+                    - MD5
+                    - SHA-1
+                  description: Function used for hashing of the PIN at the partner.
+                  example: SHA-1
+                Salt:
+                  type: string
+                  minimum: 0
+                  maximum: 100
+                  description: The salt value used by the partner for hashing the PIN.
+                  example: example-salt
+                Value:
+                  type: string
+                  minimum: 0
+                  maximum: 20
+                  description: PIN hash at the partner.
+                  example: a5ghdhf73h
+        PIN:
+          type: string
+    ProviderID:
+      type: string
+      pattern: '^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$'
+      description: |
+        The ProviderID is defined by Hubject and is used to identify the EMP
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+      example: DE-8EO
+    OperatorID:
+      type: string
+      pattern: '^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$'
+      description: |
+        A string that MUST be valid with respect to the following regular expression: ISO | DIN
+
+        ^(([A-Za-z]{2}\*?[A-Za-z0-9]{3})|(\+?[0-9]{1,3}\*[0-9]{3}))$
+        The expression validates the string as OperatorID including the preceding country code, which is part of EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118. In case the OperatorID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional.
+
+        In case the OperatorID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+        Examples ISO: “DE*A36”, “DEA36”
+
+        Example DIN: “+49*536”
+      example: +49*536
+    EvseID:
+      type: string
+      pattern: '^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$'
+      description: |
+        The ID that identifies the charging spot.
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN.
+
+        `^(([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?E[A-Za-z0-9\*]{1,30})|(\+?[0-9]{1,3}\*[0-9]{3}\*[0-9\*]{1,32}))$`
+        The expression validates the string as EvseID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+        In case the EvseID is provided corresponding to ISO, the country code MUST be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “*” is optional. Furthermore the ID MUST provide an “E” after the OperatorID in order to identify the ID as ISO EvseID without doubt.
+
+        In case the EvseID is provided corresponding to DIN, the country code MUST be provided according to the international telecommunication numbering plan (ITU-T E.164:11/2010) and the separator character “*” is mandatory.
+
+        Examples ISO: “DE*AB7*E840*6487”, “DEAB7E8406487”
+
+        Example DIN: “+49*810*000*438”
+      example: +49*810*000*438
+    UID:
+      type: string
+      pattern: '^([0-9A-F]{8,8}|[0-9A-F]{14,14}|[0-9A-F]{20,20})$'
+      description: |
+        Authentication data details. The data structure differs depending on the authentication technology
+
+        The expression validates the string as a unique RFID with a length of 8, 14 or 20 characters.
+
+        Examples: “7568290FFF765F”
+      example: 7568290FFF765F
+    ReferenceUnit:
+      type: string
+      description: |
+        Default Reference Unit in time or kWh
+
+        | Option | Description |
+        | ------ | ----------- |
+        | HOUR | Defined Reference Unit Type |
+        | KILOWATT_HOUR | Defined Reference Unit Type |
+        | MINUTE | Defined Reference Unit Type |
+      example: HOUR
+    InfoTextType:
+      type: object
+      required:
+        - lang
+        - value
+      properties:
+        lang:
+          type: string
+          pattern: '^[a-z]{2,3}(?:-[A-Z]{2,3}(?:-[a-zA-Z]{4})?)?(?:-x-[a-zA-Z0-9]{1,8})?$'
+          description: |
+            `^[a-z]{2,3}(?:-[A-Z]{2,3}(?:-[a-zA-Z]{4})?)?(?:-x-[a-zA-Z0-9]{1,8})?$`
+
+            The language in which the additional info text is provided
+
+            The expression validates the string as a language code as per ISO-639-1 or ISO-639-2/T
+
+            The LanguageCodeType is used in the AdditionalInfo field, which is part of the EvseDataRecordType.
+        value:
+          type: string
+          maximum: 150
+          description: The Additional Info text
+    ProviderIDAsterisk:
+      type: string
+      pattern: '^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})|\*$'
+      description: |
+        The ProviderID is defined by Hubject and is used to identify the EMP
+
+        A string that `MUST` be valid with respect to the following regular expression: ISO | DIN
+
+        `^([A-Za-z]{2}\-?[A-Za-z0-9]{3}|[A-Za-z]{2}[\*|-]?[A-Za-z0-9]{3})$`
+
+        The expression validates the string as ProviderID including the preceding country code, which is part of EvcoID. It supports both definitions DIN SPEC 91286:2011-11 as well as ISO 15118-1.
+
+        In case the ProviderID is provided corresponding to ISO, the country code `MUST` be provided as Alpha-2-Code (DIN EN ISO-3166-1) and the separator character “-” is optional.
+
+        Examples ISO: “DE8EO”, “DE-8EO”
+
+        Examples DIN: “DE8EO”, “DE*8EO”, “DE-8EO”
+
+         In case the data is to be made available for all EMPs (e.g. for Offer-to-All prices), the asterix character (*) can be set as the value in this field.
+         
+      example: DE-8EO
+    Identification:
+      type: object
+      description: |
+        Authentication data
+
+        1. The option RFIDIdentification `MUST` not be used in the eRoamingAuthorization process. For RFID Authorization, only the option RFIDMifareFamilyIdentification `SHOULD` be used in the respective eRoamingAuthorization messages.
+        2. For the Remote Authorization process, only the option RemoteIdentification MUST be used in the respective messages.
+      properties:
+        RFIDMifareFamilyIdentification:
+          $ref: '#/components/schemas/RFIDMifareFamilyIdentification'
+        RFIDIdentification:
+          $ref: '#/components/schemas/RFIDIdentification'
+        QRCodeIdentification:
+          $ref: '#/components/schemas/QRCodeIdentification'
+        PlugAndChargeIdentification:
+          $ref: '#/components/schemas/PlugAndChargeIdentification'
+        RemoteIdentification:
+          $ref: '#/components/schemas/RemoteIdentification'
+    PricingProductDataRecord:
+      type: object
+      required:
+        - ProductID
+        - ReferenceUnit
+        - ProductPriceCurrency
+        - PricePerReferenceUnit
+        - MaximumProductChargingPower
+        - IsValid24hours
+        - ProductAvailabilityTimes
+      properties:
+        ProductID:
+          $ref: '#/components/schemas/ProductID'
+        ReferenceUnit:
+          $ref: '#/components/schemas/ReferenceUnit'
+        ProductPriceCurrency:
+          $ref: '#/components/schemas/CurrencyID'
+        PricePerReferenceUnit:
+          type: number
+          description: A price per reference unit
+        MaximumProductChargingPower:
+          type: number
+          description: A value in kWh
+        IsValid24hours:
+          type: boolean
+          description: |
+            Set to TRUE if the respective pricing product is applicable 24 hours a day.
+            If FALSE, the respective applicability times `SHOULD` be provided in the field “ProductAvailabilityTimes”.
+        ProductAvailabilityTimes:
+          type: array
+          description: A list indicating when the pricing product is applicable
+          items:
+            type: object
+            required:
+              - Periods
+              - 'on'
+            properties:
+              Periods:
+                type: array
+                items:
+                  type: object
+                  description: |
+                    The starting and end time for pricing product applicability in the specified period
+                  required:
+                    - begin
+                    - end
+                  properties:
+                    begin:
+                      type: string
+                      description: The opening time
+                      pattern: '[0-9]{2}:[0-9]{2}'
+                    end:
+                      type: string
+                      description: The closing time
+                      pattern: '[0-9]{2}:[0-9]{2}'
+              'on':
+                type: string
+                enum:
+                  - Everyday
+                  - Workdays
+                  - Weekend
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+                  - Sunday
+                description: 'Day values to be used in specifying periods on which the product is available. Workdays = Monday – Friday, Weekend = Saturday – Sunday'
+        AdditionalReferences:
+          type: array
+          description: A list of additional reference units and their respective prices
+          items:
+            type: object
+            required:
+              - AdditionalReference
+              - AdditionalReferenceUnit
+              - PricePerAdditionalReferenceUnit
+            properties:
+              AdditionalReference:
+                type: string
+                enum:
+                  - START FEE
+                  - FIXED FEE
+                  - PARKING FEE
+                  - MINIMUM FEE
+                  - MAXIMUM FEE
+                description: |
+                  Additional pricing components to be considered in addition to the base pricing
+
+                  | Option | Description |
+                  | ------ | ----------- |
+                  | START FEE | Can be used in case a fixed fee is charged for the initiation of the charging session. This is a fee charged on top of the main base price defined in the field "PricePerReferenceUnit" for any particular pricing product. |
+                  | FIXED FEE | Can be used if a single price is charged irrespective of charging duration or energy consumption (for instance if all sessions are to be charged a single fixed fee). When used, the value set in the field "PricePerReferenceUnit" for the main base price of respective pricing product SHOULD be set to zero. |
+                  | PARKING FEE | Can be used in case sessions are to be charged for both parking and charging. When used, it needs to be specified in the corresponding service offer on the HBS Portal when parking applies (e.g. from session start to charging start and charging end to session end or for the entire session duration, or x-minutes after charging end, etc) |
+                  | MINIMUM FEE | Can be used in case there is a minimum fee to be paid for all charging sessions. When used, this implies that the eventual price to be paid cannot be less than this minimum fee but can however be a price above/greater than the minimum fee. |
+                  | MAXIMUM FEE | Can be used in case there is a maximum fee to be charged for all charging sessions. When used, this implies that the eventual price to be paid cannot be more than this maximum fee but can however be a price below/lower than the maximum fee. |
+              AdditionalReferenceUnit:
+                $ref: '#/components/schemas/ReferenceUnit'
+              PricePerAdditionalReferenceUnit:
+                type: number
+                description: A price in the given currency
+    EvseDataRecord:
+      type: object
+      required:
+        - EvseID
+        - ChargingStationNames
+        - Address
+        - GeoCoordinates
+        - Plugs
+        - ChargingFacilities
+        - RenewableEnergy
+        - CalibrationLawDataAvailability
+        - AuthenticationModes
+        - PaymentOptions
+        - ValueAddedServices
+        - Accessibility
+        - HotlinePhoneNumber
+        - IsOpen24Hours
+        - IsHubjectCompatible
+        - DynamicInfoAvailable
+      properties:
+        deltaType:
+          type: string
+          enum:
+            - update
+            - insert
+            - delete
+          description: 'In case that the operation “PullEvseData” is performed with the parameter “LastCall”, Hubject assigns this attribute to every response EVSE record in order to return the changes compared to the last call.'
+        lastUpdate:
+          type: string
+          format: date-time
+          description: The attribute indicates the date and time of the last update of the record. Hubject assigns this attribute to every response EVSE record.
+        EvseID:
+          $ref: '#/components/schemas/EvseID'
+        ChargingPoolID:
+          type: string
+          pattern: '([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?P[A-Za-z0-9\*]{1,30})'
+          description: |
+            VSEs may be grouped by using a charging pool id according to emi³ standard definition. The Evse Pool ID MUST match the following structure (the notation corresponds to the augmented Backus-Naur Form (ABNF) as defined in RFC5234):
+            <Evse Pool ID> = <Country Code> <S> <Spot Operator ID> <S> <ID Type> <Pool ID>
+
+            with:
+
+            <Country Code> = 2 ALPHA ; two character country code according to ISO-3166-1 (Alpha-2-Code).
+
+            <Spot Operator ID> = 3 (ALPHA / DIGIT); three alphanumeric characters.
+
+            <ID Type> = “P”; one character “P” indicating that this ID represents a “Pool”.
+
+            <Pool Instance> = (ALPHA / DIGIT) 1 * 30 ( 1*(ALPHA / DIGIT) [/ <S>] ); between 1 and 31sequence of alphanumeric characters, including additional optional separators. Starts with alphanumeric character referring to a specific Pool in EVSE Operator data system.
+
+            ALPHA = %x41-5A / %x61-7A; according to RFC 5234 (7-Bit ASCII).
+
+            DIGIT = %x30-39; according to RFC 5234 (7-Bit ASCII).
+
+            <S> = *1 ( “*” ); optional separator
+
+            An example for a valid Evse Pool ID is “IT*123*P456*AB789” with :
+
+            “IT” indicating Italy,
+
+            “123” representing a particular Spot Operator,
+
+            “P” indicating the Pool, and
+
+            “456*AB789” representing one of its POOL.
+
+            Note
+
+            In contrast to the eMA ID, no check digit is specified for the Evse Pool ID in this document. Alpha characters SHALL be interpreted case insensitively. emi³ strongly recommends that implementations SHOULD - use the separator between Country Code and Spot Operator ID - use the separator between Spot Operator ID and ID type
+            This leads to the following regular expression:
+
+            `([A-Za-z]{2}\*?[A-Za-z0-9]{3}\*?P[A-Za-z0-9\*]{1,30})`
+
+            This regular expression is similar to that of the ISO EvseIDType but E is replaced with P to indicate a pool.
+          example: IT*123*P456*AB789
+        ChargingStationId:
+          type: string
+          description: The ID that identifies the charging station.
+          maximum: 50
+        ChargingStationNames:
+          type: array
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+          description: Name of the charging station
+        HardwareManufacturer:
+          type: string
+          maximum: 50
+          description: Name of the charging point manufacturer
+        ChargingStationImage:
+          type: string
+          maximum: 200
+          description: URL that redirect to an online image of the related EVSEID
+        SubOperatorName:
+          type: string
+          maximum: 100
+          description: Name of the Sub Operator owning the Charging Station
+        Address:
+          type: object
+          required:
+            - Country
+            - City
+            - Street
+            - PostalCode
+            - HouseNum
+          properties:
+            Country:
+              type: string
+              description: |
+                The CountryCodeType allows for Alpha-3 country codes only as of OICP 2.2 and OICP 2.3
+
+                For Alpha-3 (three-letter) country codes as defined in ISO 3166-1.
+
+                __Examples:__
+
+                | Option | Description |
+                | ------ | ----------- |
+                | AUT | Austria |
+                | DEU | Germany |
+                | FRA | France |
+                | USA | United States |
+              maximum: 3
+              minimum: 3
+            City:
+              type: string
+              maximum: 50
+              minimum: 1
+            Street:
+              type: string
+              maximum: 100
+              minimum: 2
+            PostalCode:
+              type: string
+              maximum: 10
+            HouseNum:
+              type: string
+              maximum: 10
+            Floor:
+              type: string
+              maximum: 5
+            Region:
+              type: string
+              maximum: 50
+            ParkingFacility:
+              type: boolean
+            ParkingSpot:
+              type: string
+              maximum: 5
+            TimeZone:
+              type: string
+              pattern: '[U][T][C][+,-][0-9][0-9][:][0-9][0-9]'
+              description: |
+                `[U][T][C][+,-][0-9][0-9][:][0-9][0-9]`
+                The expression validates a string as a Time zone with UTC offset.
+
+                Examples:
+
+                UTC+01:00
+
+                UTC-05:00
+              example: 'UTC-05:00'
+        GeoCoordinates:
+          $ref: '#/components/schemas/GeoCoordinates'
+        Plugs:
+          type: array
+          description: List of plugs that are supported.
+          items:
+            type: string
+            enum:
+              - Small Paddle Inductive
+              - Large Paddle Inductive
+              - AVCON Connector
+              - Tesla Connector
+              - NEMA 5-20
+              - Type E French Standard
+              - Type F Schuko
+              - Type G British Standard
+              - Type J Swiss Standard
+              - Type 1 Connector (Cable Attached)
+              - Type 2 Outlet
+              - Type 2 Connector (Cable Attached)
+              - Type 3 Outlet
+              - IEC 60309 Single Phase
+              - IEC 60309 Three Phase
+              - CCS Combo 2 Plug (Cable Attached)
+              - CCS Combo 1 Plug (Cable Attached)
+              - CHAdeMO
+            description: |
+              | Option | Description |
+              |Small Paddle Inductive | Defined plug type. |
+              | Large Paddle Inductive | Defined plug type.|
+              | AVCON Connector | Defined plug type.|
+              | Tesla Connector | Defined plug type.|
+              | NEMA 5-20 | Defined plug type.|
+              | Type E French Standard | CEE 7/5. |
+              | Type F Schuko | CEE 7/4. |
+              | Type G British Standard | BS 1363. |
+              | Type J Swiss Standard | SEV 1011. |
+              | Type 1 Connector (Cable Attached) | Cable attached to IEC 62196-1 type 1, SAE J1772 connector. |
+              | Type 2 Outlet | IEC 62196-1 type 2. |
+              | Type 2 Connector (Cable Attached) | Cable attached to IEC 62196-1 type 2 connector. |
+              | Type 3 Outlet | IEC 62196-1 type 3. |
+              | IEC 60309 Single Phase | IEC 60309. |
+              | IEC 60309 Three Phase | IEC 60309. |
+              | CCS Combo 2 Plug (Cable Attached) | IEC 62196-3 CDV DC Combined Charging Connector DIN SPEC 70121 refers to ISO / IEC 15118-1 DIS, -2 DIS and 15118-3. |
+              | CCS Combo 1 Plug (Cable Attached) | IEC 62196-3 CDV DC Combined Charging Connector with IEC 62196-1 type 2 SAE J1772 connector. |
+              | CHAdeMO | DC CHAdeMO Connector. |
+            example: CHAdeMO
+        DynamicPowerLevel:
+          type: boolean
+          description: Informs is able to deliver different power outputs.
+        ChargingFacilities:
+          type: array
+          description: List of facilities that are supported.
+          items:
+            type: object
+            required:
+              - PowerType
+              - Power
+            properties:
+              PowerType:
+                type: string
+                description: Charging Facility power type (e.g. AC or DC)
+                enum:
+                  - AC_1_PHASE
+                  - AC_3_PHASE
+                  - DC
+              Voltage:
+                type: integer
+                maximum: 999
+                minimum: 0
+                description: Voltage (Line to Neutral) of the Charging Facility
+              Amperage:
+                type: integer
+                maximum: 99
+                minimum: 0
+                description: Amperage of the Charging Facility
+              Power:
+                type: integer
+                maximum: 999
+                minimum: 0
+                description: Charging Facility power in kW
+              ChargingModes:
+                type: array
+                items:
+                  type: string
+                  description: |
+                    | Option | Description |
+                    | Mode_1 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle without communication or additional safety features (IEC 61851-1) |
+                    | Mode_2 | conductive connection between a standard socket-outlet of an AC supply network and electric vehicle with communication and additional safety features (IEC 61851-1) |
+                    | Mode_3 | conductive connection of an EV to an AC EV supply equipment permanently connected to an AC supply network with communication and additional safety features (IEC 61851-1) |
+                    | Mode_4 | conductive connection of an EV to an AC or DC supply network utilizing a DC EV supply equipment, with (high-level) communication and additional safety features (IEC 61851-1) |
+                    | CHAdeMO | CHAdeMo Specification |
+                  enum:
+                    - Mode_1
+                    - Mode_2
+                    - Mode_3
+                    - Mode_4
+                    - CHAdeMO
+                description: List of charging modes that are supported.
+        RenewableEnergy:
+          type: boolean
+          description: |
+            If the Charging Station provides only renewable energy then the value `MUST` be ”true”, if it use grey energy then value `MUST` be “false”.
+        EnergySource:
+          type: array
+          description: List of energy source that the charging station uses to supply electric energy.
+          items:
+            type: object
+            description: energy source that the charging station uses to supply electric energy
+            properties:
+              Energy:
+                type: string
+                description: |
+                  | Option | Description |
+                  | Solar | Energy coming from Solar radiation |
+                  | Wind | Energy produced by wind |
+                  | HydroPower | Energy produced by the movement of water |
+                  | GeothermalEnergy | Energy coming from the sub-surface of the earth |
+                  | Biomass | Energy produced using plant or animal material as fuel |
+                  | Coal | Energy produced using coal as fuel |
+                  | NuclearEnergy | Energy being produced by nuclear fission |
+                  | Petroleum | Energy produced by using Petroleum as fuel |
+                  | NaturalGas | Energy produced using Natural Gas as fuel |
+                enum:
+                  - Solar
+                  - Wind
+                  - HydroPower
+                  - GeothermalEnergy
+                  - Biomass
+                  - Coal
+                  - NuclearEnergy
+                  - Petroleum
+                  - NaturalGas
+              Percentage:
+                type: integer
+                description: Percentage of EnergyType being used by the charging stations
+                maximum: 99
+                minimum: 0
+        EnvironmentalImpact:
+          type: object
+          properties:
+            CO2Emission:
+              type: number
+              description: Total CO2 emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+            NuclearWaste:
+              type: number
+              description: Total NuclearWaste emited by the energy source being used by this charging station to supply energy to EV. Units are in g/kWh
+              maximum: 99999
+        CalibrationLawDataAvailability:
+          type: string
+          description: |
+            | Option | Description |
+            | Local | Calibration law data is shown at the charging station. |
+            | External | Calibration law data is provided externaly. |
+            | Not Available | Calibration law data is not provided. |
+          enum:
+            - Local
+            - External
+            - Not Available
+        AuthenticationModes:
+          type: array
+          description: List of authentication modes that are supported.
+          items:
+            type: string
+            enum:
+              - NFC RFID Classic
+              - NFC RFID DESFire
+              - PnC
+              - REMOTE
+              - Direct Payment
+              - No Authentication Required
+            description: |
+              | Option | Description |
+              | NFC RFID Classic | Defined authentication. |
+              | NFC RFID DESFire | Defined authentication. |
+              | PnC | ISO/IEC 15118. |
+              | REMOTE | App, QR-Code, Phone. |
+              | Direct Payment | Remote use via direct payment. E.g. intercharge direct |
+              | No Authentication Required | Not Authentication Method Required |
+        MaxCapacity:
+          type: integer
+          description: This field is used if the EVSE has a limited capacity (e.g. built-in battery). Values must be given in kWh.
+        PaymentOptions:
+          type: array
+          description: List of payment options that are supported.
+          items:
+            type: string
+            enum:
+              - No Payment
+              - Direct
+              - Contract
+            description: |
+              | Option | Description |
+              | ------ | ----------- |
+              | No payment | Free. |
+              | Direct | e. g. Cash, Card, SMS, ... |
+              | Contract | i. e. Subscription  |
+
+              Note
+
+              `No Payment` can not be combined with other payment option
+            example: Direct
+        ValueAddedServices:
+          type: array
+          description: List of value added services that are supported.
+          items:
+            type: string
+            enum:
+              - Reservation
+              - DynamicPricing
+              - ParkingSensors
+              - MaximumPowerCharging
+              - PredictiveChargePointUsage
+              - ChargingPlans
+              - RoofProvided
+              - None
+            description: |
+              | Option | Description |
+              | ------ | ----------- |
+              | Reservation | Can an EV driver reserve the charging sport via remote services? |
+              | DynamicPricing | Does the EVSE ID support dynamic pricing? |
+              | ParkingSensors | Is dynamic status info on the parking area in front of the EVSE-ID available? |
+              | MaximumPowerCharging | Does the EVSE-ID offer a dynamic maximum power charging? |
+              | PredictiveChargePointUsage | Is predictive charge Point usage info available for the EVSE-ID? |
+              | ChargingPlans | Does the EVSE-ID offer charging plans, e.g. As described in ISO15118-2? |
+              | RoofProvided | Indicates if the charging station is under a roof |
+              | None | There are no value-added services available. |
+        Accessibility:
+          type: string
+          enum:
+            - Free publicly accessible
+            - Restricted access
+            - Paying publicly accessible
+            - Test Station
+          description: |
+            Specifies how the charging station can be accessed.
+
+            | Option | Description |
+            | ------ | ----------- |
+            | Free publicly accessible | EV Driver can reach the charging point without paying a fee, e.g. street, free public place, free parking lot, etc. |
+            | Restricted access | EV Driver needs permission to reach the charging point, e.g. Campus, building complex, etc. |
+            | Paying publicly accessible | EV Driver needs to pay a fee in order to reach the charging point, e.g. payable parking garage, etc. |
+            | Test Station | Station is just for testing purposes. Access may be restricted. |
+          example: Free publicly accessible
+        AccessibilityLocation:
+          type: string
+          enum:
+            - OnStreet
+            - ParkingLot
+            - ParkingGarage
+            - UndergroundParkingGarage
+          description: |
+            | Option | Description |
+            | ------ | ----------- |
+            | OnStreet | The charging station is located on the street|
+            | ParkingLot | The Charging Point is located inside a Parking Lot|
+            | ParkingGarage | The Charging Point is located inside a Parking Garage|
+            | UndergroundParkingGarage | The Charging Point is located inside an Underground Parking Garage |
+        HotlinePhoneNumber:
+          type: string
+          pattern: '^\+[0-9]{5,15}$'
+          description: |
+            `^\+[0-9]{5,15}$`
+            The expression validates the string as a telephone number starting with “+” and containing only numbers.
+
+            Example: “+0305132787”
+        AdditionalInfo:
+          type: array
+          description: Optional information.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        ChargingStationLocationReference:
+          type: array
+          description: Inform the EV driver where the ChargingPoint could be accessed.
+          items:
+            $ref: '#/components/schemas/InfoTextType'
+        GeoChargingPointEntrance:
+          $ref: '#/components/schemas/GeoCoordinates'
+        IsOpen24Hours:
+          type: boolean
+          description: Set in case the charging spot is open 24 hours.
+        OpeningTimes:
+          type: array
+          description: Opening time in case that the charging station cannot be accessed around the clock.
+          items:
+            $ref: '#/components/schemas/OpeningTimes'
+        HubOperatorID:
+          $ref: '#/components/schemas/OperatorID'
+        ClearinghouseID:
+          type: string
+          maximum: 20
+          description: |
+            Identification of the corresponding clearing house in the event that roaming between different clearing houses `MUST` be processed in the future.
+        IsHubjectCompatible:
+          type: boolean
+          description: Is eRoaming via intercharge at this charging station possible? If set to "false" the charge spot will not be started/stopped remotely via Hubject.
+        DynamicInfoAvailable:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+            - auto
+          description: 'Values: true / false / auto This attribute indicates whether a CPO provides (dynamic) EVSE Status info in addition to the (static) EVSE Data for this EVSERecord. Value auto is set to true by Hubject if the operator offers Hubject EVSEStatus data.'
+    OpeningTimes:
+      type: object
+      required:
+        - Period
+        - 'on'
+      properties:
+        Period:
+          type: array
+          description: |
+            The starting and end time for pricing product applicability in the specified period
+          items:
+            type: object
+            required:
+              - begin
+              - end
+            properties:
+              begin:
+                type: string
+                description: The opening time
+                pattern: '[0-9]{2}:[0-9]{2}'
+              end:
+                type: string
+                description: The closing time
+                pattern: '[0-9]{2}:[0-9]{2}'
+        'on':
+          type: string
+          enum:
+            - Everyday
+            - Workdays
+            - Weekend
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            - Sunday
+          description: 'Day values to be used in specifying periods on which the product is available. Workdays = Monday – Friday, Weekend = Saturday – Sunday'
+      example:
+        Period:
+          - begin: '08:30'
+            end: '22:45'
+        'on': Everyday
+  responses:
+    eRoamingAcknowledgment:
+      description: |
+        The acknowledgement is a message that is sent in response to several requests.
+
+        * To `SEND` and `RECEIVE`
+        * Implementation: `MANDATORY`
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/eRoamingAcknowledgment'
+    eRoamingAuthorizationStart:
+      description: |
+        Note:
+          * To `RECEIVE`
+          * Implementation: `MANDATORY`
+
+        eRoamingAuthorizationStart is a message that authorizes a user to charge a car. NOTE: This message describes the response which has to be receive in response to the eRoamingAuthorizeStart.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/eRoamingAuthorizationStart'
+    eRoamingAuthorizationStop:
+      description: |
+        Note:
+          * To `RECEIVE`
+          * Implementation: `OPTIONAL`
+
+        eRoamingAuthorizeStop is a message to request an authorization for stopping a charging process.
+
+        Note:
+
+        This message describes the response which has to be received in return to the eRoamingAuthorizeStop request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/eRoamingAuthorizationStop'

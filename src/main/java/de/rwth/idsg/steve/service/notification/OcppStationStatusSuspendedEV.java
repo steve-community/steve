@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,27 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service;
+package de.rwth.idsg.steve.service.notification;
 
-import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
-
-import jakarta.mail.MessagingException;
-
-import java.util.List;
+import lombok.Data;
+import org.joda.time.DateTime;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 11.03.2025
+ * @author fnkbsi
+ * @since 12.10.2022
  */
-public interface MailService {
 
-    MailSettings getSettings();
+@Data
+public class OcppStationStatusSuspendedEV {
 
-    void sendTestMail();
-
-    void sendAsync(String subject, String body);
-
-    void send(String subject, String body) throws MessagingException;
-
-    void send(String subject, String body, List<String> eMailAddresses);
+  private final String chargeBoxId;
+  private final int connectorId;
+  private final DateTime timestamp;
 }

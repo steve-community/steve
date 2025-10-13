@@ -36,7 +36,9 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -77,6 +79,19 @@ public class MailServiceDefault implements MailService {
 
     @Override
     public void send(String subject, String body) throws MessagingException {
+        sendInternal(subject, body, MailSettings::getRecipients);
+    }
+
+    @Override
+    public void send(String subject, String body, List<String> eMailAddresses) {
+        try {
+            sendInternal(subject, body, mailSettings -> eMailAddresses);
+        } catch (MessagingException e) {
+            log.error("Failed to send mail", e);
+        }
+    }
+
+    public void sendInternal(String subject, String body, Function<MailSettings, List<String>> emailAddressProvider) throws MessagingException {
         MailSettings settings = getSettings();
         Session session = createSession(settings);
 
@@ -85,7 +100,7 @@ public class MailServiceDefault implements MailService {
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        for (String rep : settings.getRecipients()) {
+        for (String rep : emailAddressProvider.apply(settings)) {
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
 

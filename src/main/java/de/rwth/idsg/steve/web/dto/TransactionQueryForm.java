@@ -39,6 +39,9 @@ public class TransactionQueryForm extends QueryForm {
     // Internal database Id
     @Schema(description = "Database primary key of the transaction")
     private Integer transactionPk;
+    
+    @Schema(description = "ID of the connector")
+    private Integer connectorId;
 
     @Schema(description = "Disabled for the Web APIs. Do not use and set", hidden = true)
     private boolean returnCSV = false;
@@ -59,6 +62,12 @@ public class TransactionQueryForm extends QueryForm {
     public boolean isTransactionPkSet() {
         return transactionPk != null;
     }
+    
+    @Schema(hidden = true)
+    public boolean isConnectorIdSet() {
+        return connectorId != null;
+    }
+
 
     public QueryType getType() {
         return Objects.requireNonNullElse(type, QueryType.ALL);

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
@@ -32,7 +33,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record5;
+import org.jooq.Record6;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
@@ -77,6 +78,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .phone(r.value4())
                 .email(r.value5())
                 .ocppTagEntries(tags)
+                .notificationFeatures(NotificationFeature.splitFeatures(r.value6()))
                 .build();
 
             // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
@@ -165,7 +167,7 @@ public class UserRepositoryImpl implements UserRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private Result<Record5<Integer, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
+    private Result<Record6<Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
         List<Condition> conditions = new ArrayList<>();
 
         if (form.isSetUserPk()) {
@@ -200,7 +202,8 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.FIRST_NAME,
                 USER.LAST_NAME,
                 USER.PHONE,
-                USER.E_MAIL)
+                USER.E_MAIL,
+                USER.NOTIFICATION_FEATURES)
             .from(USER)
             .where(conditions)
             .fetch();
@@ -257,6 +260,7 @@ public class UserRepositoryImpl implements UserRepository {
                       .set(USER.E_MAIL, form.getEMail())
                       .set(USER.NOTE, form.getNote())
                       .set(USER.ADDRESS_PK, addressPk)
+                      .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))
                       .returning(USER.USER_PK)
                       .fetchOne()
                       .getUserPk();
@@ -275,6 +279,7 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.E_MAIL, form.getEMail())
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
+           .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))
            .where(USER.USER_PK.eq(form.getUserPk()))
            .execute();
     }

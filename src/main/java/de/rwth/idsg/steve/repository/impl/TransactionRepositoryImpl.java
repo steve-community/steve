@@ -44,6 +44,7 @@ import java.util.List;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
@@ -81,11 +82,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_REASON,
                 CHARGE_BOX.CHARGE_BOX_PK,
                 OCPP_TAG.OCPP_TAG_PK,
-                TRANSACTION.STOP_EVENT_ACTOR)
+                TRANSACTION.STOP_EVENT_ACTOR,
+                USER_OCPP_TAG.USER_PK)
             .from(TRANSACTION)
             .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
             .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
             .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG))
+            .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
             .where(conditions)
             .orderBy(TRANSACTION.TRANSACTION_PK.desc())
             .fetch()
@@ -104,6 +107,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .chargeBoxPk(r.value10())
                 .ocppTagPk(r.value11())
                 .stopEventActor(r.value12())
+                .userId(r.value13())
                 .build()
             );
     }
@@ -124,6 +128,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_REASON)
             .from(TRANSACTION)
             .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
             .where(conditions)
             .orderBy(TRANSACTION.TRANSACTION_PK.desc())
             .fetch()
@@ -286,8 +291,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         if (form.isUserIdSet()) {
-            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
-            conditions.add(TRANSACTION.ID_TAG.in(query));
+            conditions.add(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

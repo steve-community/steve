@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
+import static de.rwth.idsg.steve.utils.CustomDSL.DATE_TIME_TYPE;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -241,7 +242,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         //
         Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
 
-        Field<DateTime> dateTimeField = t1.field(2, DateTime.class);
+        Field<DateTime> dateTimeField = t1.field(2, DATE_TIME_TYPE);
 
         List<TransactionDetails.MeterValues> values =
                 ctx.select(

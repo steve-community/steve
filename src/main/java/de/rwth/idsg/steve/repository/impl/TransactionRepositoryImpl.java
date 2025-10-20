@@ -121,13 +121,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 CONNECTOR.CHARGE_BOX_ID,
                 CONNECTOR.CONNECTOR_ID,
                 TRANSACTION.ID_TAG,
+                USER_OCPP_TAG.USER_PK,
                 TRANSACTION.START_TIMESTAMP,
                 TRANSACTION.START_VALUE,
                 TRANSACTION.STOP_TIMESTAMP,
-                TRANSACTION.STOP_VALUE,
-                TRANSACTION.STOP_REASON)
+                TRANSACTION.STOP_VALUE)
             .from(TRANSACTION)
             .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+            .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG))
             .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
             .where(conditions)
             .orderBy(TRANSACTION.TRANSACTION_PK.desc())

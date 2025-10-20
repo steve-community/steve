@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jooq.steve.db.enums.TransactionStopEventActor;
+import jakarta.annotation.Nullable;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +34,12 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record12;
-import org.jooq.Record9;
-import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
@@ -63,16 +61,73 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     private final DSLContext ctx;
 
+    /**
+     * Difference from getInternalCSV:
+     * Joins with CHARGE_BOX and OCPP_TAG tables, selects CHARGE_BOX_PK and OCPP_TAG_PK additionally
+     */
     @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
-        return getInternal(form).fetch()
-                                .map(new TransactionMapper());
+        var conditions = getConditions(form);
+
+        return ctx.select(
+                TRANSACTION.TRANSACTION_PK,
+                CONNECTOR.CHARGE_BOX_ID,
+                CONNECTOR.CONNECTOR_ID,
+                TRANSACTION.ID_TAG,
+                TRANSACTION.START_TIMESTAMP,
+                TRANSACTION.START_VALUE,
+                TRANSACTION.STOP_TIMESTAMP,
+                TRANSACTION.STOP_VALUE,
+                TRANSACTION.STOP_REASON,
+                CHARGE_BOX.CHARGE_BOX_PK,
+                OCPP_TAG.OCPP_TAG_PK,
+                TRANSACTION.STOP_EVENT_ACTOR)
+            .from(TRANSACTION)
+            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+            .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG))
+            .where(conditions)
+            .orderBy(TRANSACTION.TRANSACTION_PK.desc())
+            .fetch()
+            .map(r -> Transaction.builder()
+                .id(r.value1())
+                .chargeBoxId(r.value2())
+                .connectorId(r.value3())
+                .ocppIdTag(r.value4())
+                .startTimestamp(r.value5())
+                .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
+                .startValue(r.value6())
+                .stopTimestamp(r.value7())
+                .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
+                .stopValue(r.value8())
+                .stopReason(r.value9())
+                .chargeBoxPk(r.value10())
+                .ocppTagPk(r.value11())
+                .stopEventActor(r.value12())
+                .build()
+            );
     }
 
     @Override
     public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
-        getInternalCSV(form).fetch()
-                            .formatCSV(writer);
+        var conditions = getConditions(form);
+
+        ctx.select(
+                TRANSACTION.TRANSACTION_PK,
+                CONNECTOR.CHARGE_BOX_ID,
+                CONNECTOR.CONNECTOR_ID,
+                TRANSACTION.ID_TAG,
+                TRANSACTION.START_TIMESTAMP,
+                TRANSACTION.START_VALUE,
+                TRANSACTION.STOP_TIMESTAMP,
+                TRANSACTION.STOP_VALUE,
+                TRANSACTION.STOP_REASON)
+            .from(TRANSACTION)
+            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .where(conditions)
+            .orderBy(TRANSACTION.TRANSACTION_PK.desc())
+            .fetch()
+            .formatCSV(writer);
     }
 
     @Override
@@ -98,18 +153,17 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
-                transaction = getInternal(form).fetchOne();
-
-        if (transaction == null) {
+        var transactions = getTransactions(form);
+        if (transactions.size() != 1) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
+        Transaction transaction = transactions.getFirst();
 
-        DateTime startTimestamp = transaction.value5();
-        DateTime stopTimestamp = transaction.value7();
-        String stopValue = transaction.value8();
-        String chargeBoxId = transaction.value2();
-        int connectorId = transaction.value3();
+        DateTime startTimestamp = transaction.getStartTimestamp();
+        DateTime stopTimestamp = transaction.getStopTimestamp();
+        String stopValue = transaction.getStopValue();
+        String chargeBoxId = transaction.getChargeBoxId();
+        int connectorId = transaction.getConnectorId();
 
         // -------------------------------------------------------------------------
         // Step 2: Collect intermediate meter values
@@ -209,162 +263,77 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .filter(TransactionStopServiceHelper::isEnergyValue)
                    .toList();
 
-        return new TransactionDetails(new TransactionMapper().map(transaction), values, nextTx);
+        return new TransactionDetails(transaction, values, nextTx);
     }
 
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private
-    SelectQuery<Record9<Integer, String, Integer, String, DateTime, String, DateTime, String, String>>
-    getInternalCSV(TransactionQueryForm form) {
+    private List<Condition> getConditions(TransactionQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
 
-        SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(TRANSACTION);
-        selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
-        selectQuery.addSelect(
-                TRANSACTION.TRANSACTION_PK,
-                CONNECTOR.CHARGE_BOX_ID,
-                CONNECTOR.CONNECTOR_ID,
-                TRANSACTION.ID_TAG,
-                TRANSACTION.START_TIMESTAMP,
-                TRANSACTION.START_VALUE,
-                TRANSACTION.STOP_TIMESTAMP,
-                TRANSACTION.STOP_VALUE,
-                TRANSACTION.STOP_REASON
-        );
-
-        return addConditions(selectQuery, form);
-    }
-
-    /**
-     * Difference from getInternalCSV:
-     * Joins with CHARGE_BOX and OCPP_TAG tables, selects CHARGE_BOX_PK and OCPP_TAG_PK additionally
-     */
-    @SuppressWarnings("unchecked")
-    private
-    SelectQuery<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>>
-    getInternal(TransactionQueryForm form) {
-
-        SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(TRANSACTION);
-        selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
-        selectQuery.addJoin(CHARGE_BOX, CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID));
-        selectQuery.addJoin(OCPP_TAG, OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG));
-        selectQuery.addSelect(
-                TRANSACTION.TRANSACTION_PK,
-                CONNECTOR.CHARGE_BOX_ID,
-                CONNECTOR.CONNECTOR_ID,
-                TRANSACTION.ID_TAG,
-                TRANSACTION.START_TIMESTAMP,
-                TRANSACTION.START_VALUE,
-                TRANSACTION.STOP_TIMESTAMP,
-                TRANSACTION.STOP_VALUE,
-                TRANSACTION.STOP_REASON,
-                CHARGE_BOX.CHARGE_BOX_PK,
-                OCPP_TAG.OCPP_TAG_PK,
-                TRANSACTION.STOP_EVENT_ACTOR
-        );
-
-        return addConditions(selectQuery, form);
-    }
-
-    @SuppressWarnings("unchecked")
-    private SelectQuery addConditions(SelectQuery selectQuery, TransactionQueryForm form) {
         if (form.isTransactionPkSet()) {
-            selectQuery.addConditions(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
+            conditions.add(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
         }
 
         if (form.isChargeBoxIdSet()) {
-            selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+            conditions.add(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
         if (form.isOcppIdTagSet()) {
-            selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
+            conditions.add(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }
 
         if (form.isUserIdSet()) {
             var query = ocppTagByUserIdQuery(ctx, form.getUserId());
-            selectQuery.addConditions(TRANSACTION.ID_TAG.in(query));
+            conditions.add(TRANSACTION.ID_TAG.in(query));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
-            selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNull());
-
+            conditions.add(TRANSACTION.STOP_TIMESTAMP.isNull());
         } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
-            selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNotNull());
+            conditions.add(TRANSACTION.STOP_TIMESTAMP.isNotNull());
         }
 
-        processType(selectQuery, form);
-
-        // Default order
-        selectQuery.addOrderBy(TRANSACTION.TRANSACTION_PK.desc());
-
-        return selectQuery;
+        var timeCondition = getTimeCondition(form);
+        if (timeCondition != null) {
+            conditions.add(timeCondition);
+        }
+        return conditions;
     }
 
-    private void processType(SelectQuery selectQuery, TransactionQueryForm form) {
+    @Nullable
+    private static Condition getTimeCondition(TransactionQueryForm form) {
         switch (form.getPeriodType()) {
             case TODAY:
-                selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).eq(date(DateTime.now()))
-                );
-                break;
+                return date(TRANSACTION.START_TIMESTAMP).eq(date(DateTime.now()));
 
             case LAST_10:
             case LAST_30:
             case LAST_90:
                 DateTime now = DateTime.now();
-                selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).between(
-                                date(now.minusDays(form.getPeriodType().getInterval())),
-                                date(now)
-                        )
+                return date(TRANSACTION.START_TIMESTAMP).between(
+                    date(now.minusDays(form.getPeriodType().getInterval())),
+                    date(now)
                 );
-                break;
 
             case ALL:
-                break;
+                return null;
 
             case FROM_TO:
                 DateTime from = form.getFrom();
                 DateTime to = form.getTo();
 
                 if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
-                    selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
-
+                    return TRANSACTION.START_TIMESTAMP.between(from, to);
                 } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
-                    selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.between(from, to));
+                    return TRANSACTION.STOP_TIMESTAMP.between(from, to);
+                } else {
+                    return null;
                 }
-
-                break;
-
             default:
                 throw new SteveException("Unknown enum type");
-        }
-    }
-
-    private static class TransactionMapper implements RecordMapper<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>, Transaction> {
-        @Override
-        public Transaction map(Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor> r) {
-            return Transaction.builder()
-                              .id(r.value1())
-                              .chargeBoxId(r.value2())
-                              .connectorId(r.value3())
-                              .ocppIdTag(r.value4())
-                              .startTimestamp(r.value5())
-                              .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
-                              .startValue(r.value6())
-                              .stopTimestamp(r.value7())
-                              .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
-                              .stopValue(r.value8())
-                              .stopReason(r.value9())
-                              .chargeBoxPk(r.value10())
-                              .ocppTagPk(r.value11())
-                              .stopEventActor(r.value12())
-                              .build();
         }
     }
 }

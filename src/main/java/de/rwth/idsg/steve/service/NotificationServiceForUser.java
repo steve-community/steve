@@ -58,11 +58,6 @@ public class NotificationServiceForUser {
     public void ocppStationStatusFailure(OcppStationStatusFailure event) {
         log.debug("Processing: {}", event);
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED",
-                event.getConnectorId(),
-                event.getChargeBoxId()
-        );
-
         var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
             return;
@@ -73,6 +68,11 @@ public class NotificationServiceForUser {
             return;
         }
 
+        String subject = format("Connector '%s' of charging station '%s' is FAULTED",
+            event.getConnectorId(),
+            event.getChargeBoxId()
+        );
+
         // send email if user with eMail address found
         String bodyUserMail =
                 format("User: %s \n\n Connector %d of charging station %s notifies FAULTED! \n\n Error code: %s",
@@ -81,6 +81,7 @@ public class NotificationServiceForUser {
                         event.getChargeBoxId(),
                         event.getErrorCode()
                 );
+
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
 
@@ -89,16 +90,16 @@ public class NotificationServiceForUser {
     public void ocppTransactionStarted(OcppTransactionStarted event) {
         log.debug("Processing: {}", event);
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'",
-                event.getTransactionId(),
-                event.getParams().getChargeBoxId(),
-                event.getParams().getConnectorId()
-        );
-
         var user = getUserForMail(event.getParams().getIdTag(), NotificationFeature.OcppTransactionStarted);
         if (user == null) {
             return;
         }
+
+        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'",
+            event.getTransactionId(),
+            event.getParams().getChargeBoxId(),
+            event.getParams().getConnectorId()
+        );
 
         // send email if user with eMail address found
         String bodyUserMail =
@@ -108,6 +109,7 @@ public class NotificationServiceForUser {
                         event.getParams().getConnectorId(),
                         event.getParams().getChargeBoxId()
                 );
+
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
 
@@ -115,11 +117,6 @@ public class NotificationServiceForUser {
     @EventListener
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV event) {
         log.debug("Processing: {}", event);
-
-        String subject = format("EV stopped charging at charging station %s, Connector %d",
-                    event.getChargeBoxId(),
-                    event.getConnectorId()
-        );
 
         var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
@@ -131,6 +128,11 @@ public class NotificationServiceForUser {
             return;
         }
 
+        String subject = format("EV stopped charging at charging station %s, Connector %d",
+            event.getChargeBoxId(),
+            event.getConnectorId()
+        );
+
         // send email if user with eMail address found
         String bodyUserMail =
                 format("User: %s \n\n Connector %d of charging station %s notifies Suspended_EV",
@@ -138,6 +140,7 @@ public class NotificationServiceForUser {
                         event.getConnectorId(),
                         event.getChargeBoxId()
                 );
+
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
 
@@ -146,17 +149,17 @@ public class NotificationServiceForUser {
     public void ocppTransactionEnded(OcppTransactionEnded event) {
         log.debug("Processing: {}", event);
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'",
-                event.getParams().getTransactionId(),
-                event.getParams().getChargeBoxId()
-        );
-
         var transaction = transactionService.getTransaction(event.getParams().getTransactionId());
 
         var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
         if (user == null) {
             return;
         }
+
+        String subject = format("Transaction '%s' has ended on charging station '%s'",
+            event.getParams().getTransactionId(),
+            event.getParams().getChargeBoxId()
+        );
 
         mailService.send(subject, addTimestamp(createContent(transaction, user)), List.of(user.getEmail()));
     }

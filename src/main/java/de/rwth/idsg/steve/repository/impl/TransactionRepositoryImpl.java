@@ -290,7 +290,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         if (form.isConnectorIdSet()) {
-            selectQuery.addConditions(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
+            conditions.add(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
         }
 
         if (form.isOcppIdTagSet()) {

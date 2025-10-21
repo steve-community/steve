@@ -32,6 +32,7 @@
             <tr><td>ChargeBox ID</td><td><a href="${ctxPath}/manager/chargepoints/details/${details.transaction.chargeBoxPk}">${details.transaction.chargeBoxId}</a></td></tr>
             <tr><td>Connector ID</td><td>${details.transaction.connectorId}</td></tr>
             <tr><td>OCPP ID Tag</td><td><a href="${ctxPath}/manager/ocppTags/details/${details.transaction.ocppTagPk}">${details.transaction.ocppIdTag}</a></td></tr>
+            <tr><td>User ID</td><td><a href="${ctxPath}/manager/users/details/${details.transaction.userId}">${details.transaction.userId}</a></td></tr>
             <tr><td>Start Date/Time</td><td>${details.transaction.startTimestamp}</td></tr>
             <tr><td>Start Value</td><td>${details.transaction.startValue}</td></tr>
             <tr><td>Stop Date/Time</td><td>${details.transaction.stopTimestamp}</td></tr>

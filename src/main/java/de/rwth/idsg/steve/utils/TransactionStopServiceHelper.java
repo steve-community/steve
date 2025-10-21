@@ -19,12 +19,30 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
 
+@Slf4j
 public class TransactionStopServiceHelper {
+
+    public static Double calculateEnergyConsumptionInKWh(Transaction t) {
+        if (t.getStopValue() == null) {
+            return null; // this transaction did not finish yet
+        }
+
+        try {
+            Integer meterValueStop = Integer.valueOf(t.getStopValue());
+            Integer meterValueStart = Integer.valueOf(t.getStartValue());
+            return (meterValueStop - meterValueStart) / 1000.0; // --> kWh
+        } catch (Exception e) {
+            log.error("Failed to calculate charged energy", e);
+            return null;
+        }
+    }
 
     public static String floatingStringToIntString(String s) {
         // meter values can be floating, whereas start/end values are int

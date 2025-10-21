@@ -289,6 +289,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             conditions.add(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
+        if (form.isConnectorIdSet()) {
+            conditions.add(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
+        }
+
         if (form.isOcppIdTagSet()) {
             conditions.add(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }

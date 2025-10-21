@@ -50,7 +50,7 @@ public class GlobalControllerAdvice {
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);
-        binder.registerCustomEditor(List.class, "recipients", batchInsertConverter);
+        binder.registerCustomEditor(List.class, "mailSettings.recipients", batchInsertConverter);
     }
 
     @ExceptionHandler(Exception.class)

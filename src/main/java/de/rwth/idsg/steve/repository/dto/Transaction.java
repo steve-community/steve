@@ -60,6 +60,10 @@ public final class Transaction {
     @Schema(description = "The Ocpp Tag used in the transaction")
     private final String ocppIdTag;
 
+    @Nullable
+    @Schema(description = "The ID of the user who owns the Ocpp Tag associated with this transaction")
+    private final Integer userId;
+
     /**
      * Only relevant for the web pages. Disabled for API
      */

@@ -72,6 +72,7 @@ public class AboutSettingsController {
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
     public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
         String scheme = request.getScheme();
+        String contextPath = request.getContextPath();
 
         model.addAttribute("version", steveProperties.getVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
@@ -79,7 +80,7 @@ public class AboutSettingsController {
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host));
+        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host, contextPath));
         return "about";
     }
 

@@ -26,4 +26,30 @@
 	<tr><td>Zip code:</td><td><form:input path="address.zipCode"/></td></tr>
 	<tr><td>City:</td><td><form:input path="address.city"/></td></tr>
 	<tr><td>Country:</td><td><form:select path="address.country" items="${countryCodes}"/></td></tr>
+	<tr><td>Latitude:</td><td><form:input path="address.latitude"/></td></tr>
+	<tr><td>Longitude:</td><td><form:input path="address.longitude"/></td></tr>
+
+    <!--
+      Extract the address object using spring:bind to make it accessible for JSTL conditionals.
+
+      Why: The form:input tag works with relative paths ("address.latitude"), but JSTL's c:if
+      cannot resolve these relative paths - it needs direct object references. Since address
+      can be nested in different parent objects (cp.address, user.address, etc.), we use
+      spring:bind to resolve the path relative to the form's modelAttribute and expose the
+      actual address object.
+
+      See: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/tags/BindTag.html
+    -->
+    <spring:bind path="address">
+        <c:set var="boundAddress" value="${status.value}" />
+    </spring:bind>
+
+    <c:if test="${(not empty boundAddress.latitude) and (not empty boundAddress.longitude)}">
+        <tr>
+           <td></td>
+           <td><a target="_blank" href="https://maps.google.com/?q=${boundAddress.latitude},${boundAddress.longitude}">
+              Show on Google Maps</a>
+           </td>
+        </tr>
+    </c:if>
 </table>

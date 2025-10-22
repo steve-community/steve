@@ -93,7 +93,6 @@ public class UsersController {
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
-        model.addAttribute("features", NotificationFeature.getUserValues());
         setTags(model, form.getIdTagList());
         return "data-man/userDetails";
     }
@@ -102,7 +101,6 @@ public class UsersController {
     public String addGet(Model model) {
         setTags(model, List.of());
         model.addAttribute("userForm", new UserForm());
-        model.addAttribute("features", NotificationFeature.getUserValues());
         return "data-man/userAdd";
     }
 
@@ -146,6 +144,7 @@ public class UsersController {
 
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
         model.addAttribute("idTagList", idTagList);
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
     // -------------------------------------------------------------------------

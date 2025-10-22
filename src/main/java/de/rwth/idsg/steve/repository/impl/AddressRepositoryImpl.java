@@ -99,6 +99,8 @@ public class AddressRepositoryImpl implements AddressRepository {
                       .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                       .set(ADDRESS.CITY, ad.getCity())
                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                      .set(ADDRESS.LATITUDE, ad.getLatitude())
+                      .set(ADDRESS.LONGITUDE, ad.getLongitude())
                       .returning(ADDRESS.ADDRESS_PK)
                       .fetchOne()
                       .getAddressPk();
@@ -114,6 +116,8 @@ public class AddressRepositoryImpl implements AddressRepository {
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
                        .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                       .set(ADDRESS.LATITUDE, ad.getLatitude())
+                       .set(ADDRESS.LONGITUDE, ad.getLongitude())
                        .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
                        .execute();
 

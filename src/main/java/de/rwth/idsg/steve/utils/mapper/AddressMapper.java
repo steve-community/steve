@@ -40,6 +40,8 @@ public final class AddressMapper {
             address.setZipCode(record.getZipCode());
             address.setCity(record.getCity());
             address.setCountry(CountryCode.getByCode(record.getCountry()));
+            address.setLatitude(record.getLatitude());
+            address.setLongitude(record.getLongitude());
         }
         return address;
     }

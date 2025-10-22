@@ -39,8 +39,6 @@ public final class ChargePointDetailsMapper {
         form.setChargeBoxId(chargeBox.getChargeBoxId());
         form.setNote(chargeBox.getNote());
         form.setDescription(chargeBox.getDescription());
-        form.setLocationLatitude(chargeBox.getLocationLatitude());
-        form.setLocationLongitude(chargeBox.getLocationLongitude());
         form.setInsertConnectorStatusAfterTransactionMsg(chargeBox.getInsertConnectorStatusAfterTransactionMsg());
         form.setAdminAddress(chargeBox.getAdminAddress());
         form.setRegistrationStatus(chargeBox.getRegistrationStatus());

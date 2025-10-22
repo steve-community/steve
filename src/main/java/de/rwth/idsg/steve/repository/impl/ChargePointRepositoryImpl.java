@@ -347,8 +347,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         return ctx.insertInto(CHARGE_BOX)
                   .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                   .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
-                  .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
-                  .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
                   .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
                   .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
                   .set(CHARGE_BOX.NOTE, form.getNote())
@@ -362,8 +360,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
-           .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
-           .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
            .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
            .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
            .set(CHARGE_BOX.NOTE, form.getNote())

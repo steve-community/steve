@@ -22,6 +22,9 @@ import com.neovisionaries.i18n.CountryCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.Range;
+
+import java.math.BigDecimal;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,13 +44,21 @@ public class Address {
     private String city;
     private CountryCode country;
 
+    @Range(min = -90, max = 90, message = "Latitude must be between {min} and {max}")
+    private BigDecimal latitude;
+
+    @Range(min = -180, max = 180, message = "Longitude must be between {min} and {max}")
+    private BigDecimal longitude;
+
     public boolean isEmpty() {
         return addressPk == null
                 && street == null
                 && houseNumber == null
                 && zipCode == null
                 && city == null
-                && country == null;
+                && country == null
+                && latitude == null
+                && longitude == null;
     }
 
     /**

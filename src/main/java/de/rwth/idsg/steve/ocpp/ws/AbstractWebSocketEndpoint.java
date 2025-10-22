@@ -19,16 +19,15 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
@@ -36,6 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -61,7 +61,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final DelegatingTaskScheduler asyncTaskScheduler;
+    private final TaskScheduler taskScheduler;
     private final OcppServerRepository ocppServerRepository;
     private final FutureResponseContextStore futureResponseContextStore;
     private final IncomingPipeline pipeline;
@@ -72,13 +72,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
 
-    public AbstractWebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
+    public AbstractWebSocketEndpoint(TaskScheduler taskScheduler,
                                      OcppServerRepository ocppServerRepository,
                                      FutureResponseContextStore futureResponseContextStore,
                                      ApplicationEventPublisher applicationEventPublisher,
                                      SteveProperties steveProperties,
                                      AbstractTypeStore typeStore) {
-        this.asyncTaskScheduler = asyncTaskScheduler;
+        this.taskScheduler = taskScheduler;
         this.ocppServerRepository = ocppServerRepository;
         this.futureResponseContextStore = futureResponseContextStore;
         this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
@@ -148,7 +148,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
+        ScheduledFuture pingSchedule = taskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
                 Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
                 WebSocketConfiguration.PING_INTERVAL

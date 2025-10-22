@@ -20,11 +20,11 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.Authenticator;
@@ -50,7 +50,7 @@ import java.util.function.Function;
 public class MailServiceDefault implements MailService {
 
     private final SettingsRepository settingsRepository;
-    private final DelegatingTaskExecutor asyncTaskExecutor;
+    private final TaskExecutor taskExecutor;
 
     @Override
     public MailSettings getSettings() {
@@ -68,7 +68,7 @@ public class MailServiceDefault implements MailService {
 
     @Override
     public void sendAsync(String subject, String body) {
-        asyncTaskExecutor.execute(() -> {
+        taskExecutor.execute(() -> {
             try {
                 send(subject, body);
             } catch (MessagingException e) {

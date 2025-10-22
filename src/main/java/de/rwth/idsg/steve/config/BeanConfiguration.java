@@ -144,8 +144,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return new DelegatingTaskScheduler(scheduler);
     }
 
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskExecutor asyncTaskExecutor() {
+    @Bean
+    @Primary
+    public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setThreadNamePrefix("SteVe-TaskExecutor-");
@@ -153,7 +154,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
 
-        return new DelegatingTaskExecutor(executor);
+        return executor;
     }
 
     /**

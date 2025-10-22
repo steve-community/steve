@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
@@ -37,6 +36,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
@@ -61,18 +61,18 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     private final OcppServerRepository ocppServerRepository;
     private final ChargePointRegistrationService chargePointRegistrationService;
-    private final DelegatingTaskExecutor asyncTaskExecutor;
+    private final TaskExecutor taskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
     public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository,
                                     ChargePointRegistrationService chargePointRegistrationService,
-                                    DelegatingTaskExecutor asyncTaskExecutor) {
+                                    TaskExecutor taskExecutor) {
         super(Phase.PRE_INVOKE);
         this.ocppServerRepository = ocppServerRepository;
         this.chargePointRegistrationService = chargePointRegistrationService;
-        this.asyncTaskExecutor = asyncTaskExecutor;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        asyncTaskExecutor.execute(() -> {
+        taskExecutor.execute(() -> {
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {

@@ -132,8 +132,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskScheduler asyncTaskScheduler() {
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
@@ -141,7 +141,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
 
-        return new DelegatingTaskScheduler(scheduler);
+        return scheduler;
     }
 
     @Bean

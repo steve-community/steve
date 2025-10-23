@@ -51,9 +51,7 @@ public class UserForm {
     private LocalDate birthDay;
     private String phone;
     private String note;
-
-    @NotNull(message = "Sex is required")
-    private UserSex sex;
+    private UserSex sex = UserSex.OTHER;
 
     @Email(message = "Not a valid e-mail address")
     private String eMail;
@@ -77,4 +75,7 @@ public class UserForm {
         return true;
     }
 
+    public void setSex(UserSex sex) {
+        this.sex = (sex == null) ? UserSex.OTHER : sex;
+    }
 }

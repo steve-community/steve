@@ -31,3 +31,29 @@ steve:
     ws-session-select-strategy: ${ws.session.select.strategy}
     auto-register-unknown-stations: ${auto.register.unknown.stations}
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
+
+# OCPP 1.6 Security Profiles Configuration
+# See OCPP_SECURITY_PROFILES.md for detailed configuration guide
+#
+ocpp:
+  security:
+    profile: 0
+    tls:
+      enabled: false
+      keystore:
+        type: JKS
+        path:
+        password:
+      truststore:
+        type: JKS
+        path:
+        password:
+
+      client:
+        auth: false
+
+      protocols:
+        - TLSv1.2
+        - TLSv1.3
+
+      ciphers:

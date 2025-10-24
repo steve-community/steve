@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:1.6:2020:3:LogStatusNotification.conf",
+  "type": "object",
+  "additionalProperties": false
+}

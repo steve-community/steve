@@ -42,6 +42,8 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.jooq.tools.jdbc.SingleConnectionDataSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -59,6 +61,7 @@ public class Issue1219 {
     private static final String url = "jdbc:mysql://localhost:3306/stevedb";
     private static final String userName = "steve";
     private static final String password = "changeme";
+    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private final DSLContext ctx;
 
@@ -152,7 +155,7 @@ public class Issue1219 {
     }
 
     private List<String> insertChargeBoxes(int count) {
-        var repository = new ChargePointRepositoryImpl(ctx, new AddressRepositoryImpl());
+        var repository = new ChargePointRepositoryImpl(ctx, new AddressRepositoryImpl(), PASSWORD_ENCODER);
 
         List<String> ids = IntStream.range(0, count).mapToObj(val -> UUID.randomUUID().toString()).collect(Collectors.toList());
         repository.addChargePointList(ids);

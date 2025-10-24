@@ -70,6 +70,14 @@
                             <li><a href="${ctxPath}/manager/operations/tasks">Tasks</a></li>
                         </ul>
                     </li>
+                    <li><a>SECURITY &raquo;</a>
+                        <ul>
+                            <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/firmware">FIRMWARE UPDATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
+                        </ul>
+                    </li>
                     <li><a href="${ctxPath}/manager/settings">SETTINGS</a></li>
                     <li><a href="${ctxPath}/manager/log">LOG</a></li>
                     <li><a href="${ctxPath}/manager/about">ABOUT</a></li>

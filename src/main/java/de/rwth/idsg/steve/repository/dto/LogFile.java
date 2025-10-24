@@ -16,23 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.ocpp15;
+package de.rwth.idsg.steve.repository.dto;
 
-import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
+import lombok.Builder;
+import lombok.Getter;
+import org.joda.time.DateTime;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 15.03.2015
- */
-public final class Ocpp15TypeStore extends AbstractTypeStore {
-
-    public static final Ocpp15TypeStore INSTANCE = new Ocpp15TypeStore();
-
-    private Ocpp15TypeStore() {
-        super(
-                new String[]{ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName()},
-                new String[]{ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()}
-        );
-    }
-
+@Getter
+@Builder
+public class LogFile {
+    private final int logFileId;
+    private final String chargeBoxId;
+    private final String logType;
+    private final Integer requestId;
+    private final String filePath;
+    private final DateTime requestTimestamp;
+    private final String uploadStatus;
+    private final Long bytesUploaded;
 }

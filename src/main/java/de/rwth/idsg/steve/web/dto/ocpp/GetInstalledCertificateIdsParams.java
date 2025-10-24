@@ -16,23 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.ocpp15;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 15.03.2015
- */
-public final class Ocpp15TypeStore extends AbstractTypeStore {
+@Setter
+@Getter
+@Schema(description = "Parameters for retrieving installed certificate IDs from charge points")
+public class GetInstalledCertificateIdsParams extends MultipleChargePointSelect {
 
-    public static final Ocpp15TypeStore INSTANCE = new Ocpp15TypeStore();
+    @Schema(description = "Optional filter by certificate type. If not specified, returns all certificate types.")
+    private CertificateUseEnumType certificateType;
 
-    private Ocpp15TypeStore() {
-        super(
-                new String[]{ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName()},
-                new String[]{ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()}
-        );
+    public enum CertificateUseEnumType {
+        CentralSystemRootCertificate,
+        ManufacturerRootCertificate,
+        ChargePointCertificate
     }
-
 }

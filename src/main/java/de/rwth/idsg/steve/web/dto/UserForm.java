@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.NotificationFeature;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,7 @@ public class UserForm {
 
     private List<NotificationFeature> notificationFeatures;
 
+    @Valid
     private Address address;
 
     @AssertTrue(message = "Some of the selected notification features cannot be enabled for a user")

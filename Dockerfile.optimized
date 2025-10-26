@@ -17,7 +17,7 @@ COPY src ./src
 COPY website ./website
 
 # Build the application
-RUN ./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" -DskipTests
+RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

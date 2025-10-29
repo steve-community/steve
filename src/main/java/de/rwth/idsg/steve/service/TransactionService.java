@@ -35,6 +35,7 @@ import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Writer;
 import java.util.Comparator;
@@ -77,7 +78,11 @@ public class TransactionService {
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ALL);
 
-        return transactionRepository.getTransactions(form).getFirst();
+        List<Transaction> transactions = transactionRepository.getTransactions(form);
+        if (CollectionUtils.isEmpty(transactions)) {
+            return null;
+        }
+        return transactions.getFirst();
     }
 
     public Transaction getLatestActiveTransaction(String chargeBoxId, Integer connectorId) {

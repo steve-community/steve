@@ -148,6 +148,9 @@ public class NotificationServiceForUser {
         log.debug("Processing: {}", event);
 
         var transaction = transactionService.getTransaction(event.getParams().getTransactionId());
+        if (transaction == null) {
+            return;
+        }
 
         var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
         if (user == null) {

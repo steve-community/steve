@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionService;
-import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +54,6 @@ public class TransactionsReservationsController {
     private final ReservationRepository reservationRepository;
     private final ChargePointRepository chargePointRepository;
     private final OcppTagService ocppTagService;
-    private final TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
 
@@ -86,7 +84,7 @@ public class TransactionsReservationsController {
 
     @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
-        transactionStopService.stop(transactionPk);
+        transactionService.stop(transactionPk);
         return "redirect:/manager/transactions";
     }
 

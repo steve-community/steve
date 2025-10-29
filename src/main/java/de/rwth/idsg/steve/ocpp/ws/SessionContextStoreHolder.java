@@ -23,7 +23,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +32,7 @@ import java.util.EnumMap;
 @Component
 public class SessionContextStoreHolder {
 
-    private final EnumMap<OcppVersion, SessionContextStore> storesPerVersion = new EnumMap<>(OcppVersion.class);
+    private final ConcurrentHashMap<OcppVersion, SessionContextStore> storesPerVersion = new ConcurrentHashMap<>();
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
 

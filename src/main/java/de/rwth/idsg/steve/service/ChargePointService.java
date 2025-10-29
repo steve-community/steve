@@ -21,25 +21,43 @@ package de.rwth.idsg.steve.service;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
+import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
+import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
+import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -54,18 +72,15 @@ public class ChargePointService {
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
 
     private final ChargePointRepository chargePointRepository;
+    private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
 
-    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
-        return chargePointRepository.getChargePointSelect(protocol, inStatusFilter, chargeBoxIdFilter);
-    }
+    // SOAP-based charge points are stored in DB with an endpoint address.
+    // But, for WebSocket-based charge points, the active sessions are stored in memory.
+    private final SessionContextStoreHolder sessionContextStoreHolder;
 
     public List<String> getChargeBoxIds() {
         return chargePointRepository.getChargeBoxIds();
-    }
-
-    public Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList) {
-        return chargePointRepository.getChargeBoxIdPkPair(chargeBoxIdList);
     }
 
     public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
@@ -74,14 +89,6 @@ public class ChargePointService {
 
     public ChargePoint.Details getDetails(int chargeBoxPk) {
         return chargePointRepository.getDetails(chargeBoxPk);
-    }
-
-    public List<ConnectorStatus> getChargePointConnectorStatus() {
-        return getChargePointConnectorStatus(null);
-    }
-
-    public List<ConnectorStatus> getChargePointConnectorStatus(@Nullable ConnectorStatusForm form) {
-        return  chargePointRepository.getChargePointConnectorStatus(form);
     }
 
     public List<Integer> getNonZeroConnectorIds(String chargeBoxId) {
@@ -105,7 +112,7 @@ public class ChargePointService {
     }
 
     // -------------------------------------------------------------------------
-    // Unknown
+    // Unknown stations
     // -------------------------------------------------------------------------
 
     public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
@@ -160,6 +167,131 @@ public class ChargePointService {
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '{}'", chargeBoxId, e);
             return Optional.empty();
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Connector stats and status
+    // -------------------------------------------------------------------------
+
+    public Statistics getStats() {
+        Statistics stats = genericRepository.getStats();
+        stats.setNumOcpp12JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getNumberOfChargeBoxes());
+        stats.setNumOcpp15JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getNumberOfChargeBoxes());
+        stats.setNumOcpp16JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getNumberOfChargeBoxes());
+
+        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(null);
+        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
+
+        return stats;
+    }
+
+    public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
+        Set<String> connectedJsonChargeBoxIds = Arrays.stream(OcppVersion.values())
+            .map(version -> sessionContextStoreHolder.getOrCreate(version).getChargeBoxIdList())
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
+
+        // iterate over JSON stations and mark disconnected ones
+        // https://github.com/steve-community/steve/issues/355
+        //
+        for (ConnectorStatus status : latestList) {
+            OcppProtocol protocol = status.getOcppProtocol();
+            if (protocol != null && protocol.getTransport() == OcppTransport.JSON) {
+                status.setJsonAndDisconnected(!connectedJsonChargeBoxIds.contains(status.getChargeBoxId()));
+            }
+        }
+
+        return latestList;
+    }
+
+    public List<OcppJsonStatus> getOcppJsonStatus() {
+        Map<String, Deque<SessionContext>> ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
+        Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
+        Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
+
+        List<String> connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
+            .map(Map::keySet)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+
+        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
+
+        DateTime now = DateTime.now();
+        List<OcppJsonStatus> returnList = new ArrayList<>();
+
+        appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
+        appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup);
+        appendList(ocpp16Map, returnList, now, OcppVersion.V_16, primaryKeyLookup);
+        return returnList;
+    }
+
+    public List<ChargePointSelect> getChargePoints(OcppVersion version) {
+        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
+    }
+
+    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
+        return getChargePoints(version, inStatusFilter, Collections.emptyList());
+    }
+
+    public List<ChargePointSelect> getChargePointsWithIds(OcppVersion version, List<String> chargeBoxIdFilter) {
+        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
+    }
+
+    private List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter,
+                                                    List<String> chargeBoxIdFilter) {
+        List<ChargePointSelect> returnList =  new ArrayList<>();
+
+        // soap stations
+        {
+            List<String> statusFilter = inStatusFilter.stream()
+                .map(RegistrationStatus::value)
+                .collect(Collectors.toList());
+
+            var soapProtocol = version.toProtocol(OcppTransport.SOAP);
+
+            returnList.addAll(chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter));
+        }
+
+        // json stations
+        {
+            SessionContextStore sessionStore = sessionContextStoreHolder.getOrCreate(version);
+
+            List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
+                ? sessionStore.getChargeBoxIdList()
+                : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
+
+            var jsonProtocol = version.toProtocol(OcppTransport.JSON);
+
+            chargeBoxIdList.forEach(chargeBoxId -> returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId)));
+        }
+
+        return returnList;
+    }
+
+    private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
+                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
+
+        for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
+            String chargeBoxId = entry.getKey();
+            Deque<SessionContext> endpointDeque = entry.getValue();
+
+            for (SessionContext ctx : endpointDeque) {
+                DateTime openSince = ctx.getOpenSince();
+
+                OcppJsonStatus status = OcppJsonStatus.builder()
+                    .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
+                    .chargeBoxId(chargeBoxId)
+                    .connectedSinceDT(openSince)
+                    .connectedSince(DateTimeUtils.humanize(openSince))
+                    .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
+                    .version(version)
+                    .build();
+
+                returnList.add(status);
+            }
         }
     }
 

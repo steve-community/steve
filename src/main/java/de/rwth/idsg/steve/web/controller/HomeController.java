@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
@@ -44,7 +43,6 @@ import java.util.List;
 public class HomeController {
 
     private final ChargePointService chargePointService;
-    private final ChargePointHelperService chargePointHelperService;
 
     private static final String PARAMS = "params";
 
@@ -63,7 +61,7 @@ public class HomeController {
 
     @RequestMapping(value = {"", HOME_PREFIX})
     public String getHome(Model model) {
-        model.addAttribute("stats", chargePointHelperService.getStats());
+        model.addAttribute("stats", chargePointService.getStats());
         return "home";
     }
 
@@ -78,7 +76,7 @@ public class HomeController {
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 
-        List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
         model.addAttribute("connectorStatusList", filteredList);
         return "connectorStatus";
@@ -86,7 +84,7 @@ public class HomeController {
 
     @RequestMapping(value = OCPP_JSON_STATUS)
     public String getOcppJsonStatus(Model model) {
-        model.addAttribute("ocppJsonStatusList", chargePointHelperService.getOcppJsonStatus());
+        model.addAttribute("ocppJsonStatusList", chargePointService.getOcppJsonStatus());
         return "ocppJsonStatus";
     }
 }

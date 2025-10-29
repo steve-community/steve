@@ -18,22 +18,28 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -44,11 +50,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChargePointService {
 
-    private final ChargePointRepository chargePointRepository;
+    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
 
-    public Optional<String> getRegistrationStatus(String chargeBoxId) {
-        return chargePointRepository.getRegistrationStatus(chargeBoxId);
-    }
+    private final ChargePointRepository chargePointRepository;
+    private final SteveProperties steveProperties;
 
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
         return chargePointRepository.getChargePointSelect(protocol, inStatusFilter, chargeBoxIdFilter);
@@ -96,6 +102,65 @@ public class ChargePointService {
 
     public void deleteChargePoint(int chargeBoxPk) {
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+    }
+
+    // -------------------------------------------------------------------------
+    // Unknown
+    // -------------------------------------------------------------------------
+
+    public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
+        return unknownChargePointService.getObjects();
+    }
+
+    public void removeUnknown(List<String> chargeBoxIdList) {
+        unknownChargePointService.removeAll(chargeBoxIdList);
+    }
+
+    // -------------------------------------------------------------------------
+    // Registration status
+    // -------------------------------------------------------------------------
+
+    public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
+        Lock l = isRegisteredLocks.get(chargeBoxId);
+        l.lock();
+        try {
+            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
+            if (status.isEmpty()) {
+                unknownChargePointService.processNewUnidentified(chargeBoxId);
+            }
+            return status;
+        } finally {
+            l.unlock();
+        }
+    }
+
+    private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
+        // 1. exit if already registered
+        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        if (status.isPresent()) {
+            try {
+                return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
+            } catch (Exception e) {
+                // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
+                log.error("Exception happened", e);
+                return Optional.empty();
+            }
+        }
+
+        // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
+        if (!steveProperties.getOcpp().isAutoRegisterUnknownStations()) {
+            return Optional.empty();
+        }
+
+        // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
+        try {
+            this.addChargePointList(Collections.singletonList(chargeBoxId));
+            log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
+            return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
+        } catch (Exception e) {
+            log.error("Failed to auto-register unknown chargebox '{}'", chargeBoxId, e);
+            return Optional.empty();
+        }
     }
 
 }

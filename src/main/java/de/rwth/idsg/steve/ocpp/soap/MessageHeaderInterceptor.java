@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
-import de.rwth.idsg.steve.service.ChargePointRegistrationService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.cxf.binding.soap.Soap12;
@@ -60,18 +60,18 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private final OcppServerRepository ocppServerRepository;
-    private final ChargePointRegistrationService chargePointRegistrationService;
+    private final ChargePointService chargePointService;
     private final TaskExecutor taskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
     public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository,
-                                    ChargePointRegistrationService chargePointRegistrationService,
+                                    ChargePointService chargePointService,
                                     TaskExecutor taskExecutor) {
         super(Phase.PRE_INVOKE);
         this.ocppServerRepository = ocppServerRepository;
-        this.chargePointRegistrationService = chargePointRegistrationService;
+        this.chargePointService = chargePointService;
         this.taskExecutor = taskExecutor;
     }
 
@@ -86,7 +86,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
+            Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxId);
             boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
             if (!allow) {
                 throw createAuthFault(opName);

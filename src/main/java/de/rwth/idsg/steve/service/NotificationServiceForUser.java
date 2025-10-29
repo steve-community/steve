@@ -27,7 +27,6 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
-import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -57,7 +56,7 @@ public class NotificationServiceForUser {
     public void ocppStationStatusFailure(OcppStationStatusFailure event) {
         log.debug("Processing: {}", event);
 
-        var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
+        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
             return;
         }
@@ -117,7 +116,7 @@ public class NotificationServiceForUser {
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV event) {
         log.debug("Processing: {}", event);
 
-        var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
+        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
             return;
         }

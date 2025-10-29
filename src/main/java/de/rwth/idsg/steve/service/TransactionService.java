@@ -80,7 +80,7 @@ public class TransactionService {
         return transactionRepository.getTransactions(form).getFirst();
     }
 
-    public Transaction getActiveTransaction(String chargeBoxId, Integer connectorId) {
+    public Transaction getLatestActiveTransaction(String chargeBoxId, Integer connectorId) {
         TransactionQueryForm form = new TransactionQueryForm();
         form.setChargeBoxId(chargeBoxId);
         form.setConnectorId(connectorId);
@@ -93,7 +93,10 @@ public class TransactionService {
         } else if (transactions.size() == 1) {
             return transactions.get(0);
         } else {
-            throw new IllegalStateException("There are multiple active transactions with the same charge box id and connector id");
+            log.warn("Found multiple active transactions for chargeBoxId '{}' and connectorId '{}'. Returning the most recent one.", chargeBoxId, connectorId);
+            return transactions.stream()
+                .max(Comparator.comparing(Transaction::getStartTimestamp))
+                .orElse(null); // Should not be null here, but for safety
         }
     }
 

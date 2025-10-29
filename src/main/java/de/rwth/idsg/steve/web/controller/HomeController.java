@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -43,7 +43,7 @@ import java.util.List;
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class HomeController {
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
     private final ChargePointHelperService chargePointHelperService;
 
     private static final String PARAMS = "params";
@@ -74,7 +74,7 @@ public class HomeController {
 
     @RequestMapping(value = CONNECTOR_STATUS_QUERY_PATH)
     public String getConnectorStatusQuery(@ModelAttribute(PARAMS) ConnectorStatusForm params, Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 

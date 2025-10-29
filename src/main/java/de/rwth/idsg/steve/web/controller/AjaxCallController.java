@@ -21,8 +21,8 @@ package de.rwth.idsg.steve.web.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public class AjaxCallController {
 
     private final ObjectMapper objectMapper = createMapper();
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
     private final TransactionService transactionService;
     private final ReservationRepository reservationRepository;
 
@@ -73,7 +72,7 @@ public class AjaxCallController {
     @RequestMapping(value = CONNECTOR_IDS_PATH)
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
-        String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+        String s = serializeArray(chargePointService.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 

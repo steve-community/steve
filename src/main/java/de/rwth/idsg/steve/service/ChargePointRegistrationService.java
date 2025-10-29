@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.config.SteveProperties;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,7 @@ public class ChargePointRegistrationService {
     private final SteveProperties steveProperties;
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
 
     public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
         return unknownChargePointService.getObjects();
@@ -71,7 +70,7 @@ public class ChargePointRegistrationService {
 
     private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        Optional<String> status = chargePointService.getRegistrationStatus(chargeBoxId);
         if (status.isPresent()) {
             try {
                 return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
@@ -89,7 +88,7 @@ public class ChargePointRegistrationService {
 
         // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
         try {
-            chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
+            chargePointService.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
             return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
         } catch (Exception e) {

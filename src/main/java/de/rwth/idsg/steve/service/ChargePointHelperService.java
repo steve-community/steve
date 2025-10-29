@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
@@ -65,7 +64,7 @@ public class ChargePointHelperService {
     private final GenericRepository genericRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
 
     // For WebSocket-based charge points, the active sessions are stored in memory
     private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
@@ -78,7 +77,7 @@ public class ChargePointHelperService {
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
@@ -91,7 +90,7 @@ public class ChargePointHelperService {
 
         Set<String> connectedJsonChargeBoxIds = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
 
         // iterate over JSON stations and mark disconnected ones
         // https://github.com/steve-community/steve/issues/355
@@ -112,7 +111,7 @@ public class ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
 
         List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
-        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
+        Map<String, Integer> primaryKeyLookup = chargePointService.getChargeBoxIdPkPair(idList);
 
         DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
@@ -160,7 +159,7 @@ public class ChargePointHelperService {
                                                   .map(RegistrationStatus::value)
                                                   .collect(Collectors.toList());
 
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
+        List<ChargePointSelect> returnList = chargePointService.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
 
         // json stations
         //

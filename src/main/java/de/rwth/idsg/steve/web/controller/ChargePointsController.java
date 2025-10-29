@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +53,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    protected final ChargePointRepository chargePointRepository;
+    protected final ChargePointService chargePointService;
     protected final ChargePointRegistrationService chargePointRegistrationService;
 
     protected static final String PARAMS = "params";
@@ -105,13 +104,13 @@ public class ChargePointsController {
 
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getOverview(params));
+        model.addAttribute("cpList", chargePointService.getOverview(params));
         model.addAttribute("unknownList", chargePointRegistrationService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
-        ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxPk);
+        ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
         ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
@@ -179,13 +178,13 @@ public class ChargePointsController {
             return "data-man/chargepointDetails";
         }
 
-        chargePointRepository.updateChargePoint(chargePointForm);
+        chargePointService.updateChargePoint(chargePointForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
-        chargePointRepository.deleteChargePoint(chargeBoxPk);
+        chargePointService.deleteChargePoint(chargeBoxPk);
         return toOverview();
     }
 
@@ -235,12 +234,12 @@ public class ChargePointsController {
     }
 
     private void add(ChargePointForm form) {
-        chargePointRepository.addChargePoint(form);
+        chargePointService.addChargePoint(form);
         chargePointRegistrationService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
-        chargePointRepository.addChargePointList(idList);
+        chargePointService.addChargePointList(idList);
         chargePointRegistrationService.removeUnknown(idList);
     }
 }

@@ -20,10 +20,14 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.io.Writer;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,6 +39,22 @@ import org.springframework.stereotype.Service;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+
+    public List<Transaction> getTransactions(TransactionQueryForm form) {
+        return transactionRepository.getTransactions(form);
+    }
+
+    public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
+        transactionRepository.writeTransactionsCSV(form, writer);
+    }
+
+    public List<Integer> getActiveTransactionIds(String chargeBoxId) {
+        return transactionRepository.getActiveTransactionIds(chargeBoxId);
+    }
+
+    public TransactionDetails getDetails(int transactionPk) {
+        return transactionRepository.getDetails(transactionPk);
+    }
 
     public Transaction getTransaction(int transactionPk) {
         TransactionQueryForm form = new TransactionQueryForm();

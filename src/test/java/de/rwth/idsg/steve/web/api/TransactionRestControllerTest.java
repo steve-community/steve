@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.TransactionService;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,13 +55,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TransactionRestControllerTest extends AbstractControllerTest {
 
     @Mock
-    private TransactionRepository transactionRepository;
+    private TransactionService transactionService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
+        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionService))
             .setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType("application/json"))
@@ -75,7 +75,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         List<Transaction> results = Collections.emptyList();
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(results);
+        when(transactionService.getTransactions(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -90,7 +90,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         List<Transaction> results = List.of(Transaction.builder().id(234).build());
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(results);
+        when(transactionService.getTransactions(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -104,7 +104,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("Downstream bean throws exception, expected 500")
     public void test3() throws Exception {
         // when
-        when(transactionRepository.getTransactions(any())).thenThrow(new RuntimeException("failed"));
+        when(transactionService.getTransactions(any())).thenThrow(new RuntimeException("failed"));
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -173,7 +173,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(List.of(transaction));
+        when(transactionService.getTransactions(any())).thenReturn(List.of(transaction));
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
@@ -216,14 +216,14 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
+        when(transactionService.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
                 .param("type", "ACTIVE"))
             .andExpect(status().isOk());
 
-        verify(transactionRepository).getTransactions(formToCapture.capture());
+        verify(transactionService).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ACTIVE);
@@ -237,14 +237,14 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
+        when(transactionService.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
                 .param("periodType", "LAST_30"))
             .andExpect(status().isOk());
 
-        verify(transactionRepository).getTransactions(formToCapture.capture());
+        verify(transactionService).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ALL);

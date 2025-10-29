@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
@@ -28,7 +27,6 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
-import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -51,19 +49,19 @@ public class NotificationServiceForUser {
 
     private final MailService mailService;
     private final TransactionService transactionService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Async
     @EventListener
     public void ocppStationStatusFailure(OcppStationStatusFailure event) {
         log.debug("Processing: {}", event);
 
-        var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
+        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
             return;
         }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusFailure);
+        var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusFailure);
         if (user == null) {
             return;
         }
@@ -90,7 +88,7 @@ public class NotificationServiceForUser {
     public void ocppTransactionStarted(OcppTransactionStarted event) {
         log.debug("Processing: {}", event);
 
-        var user = getUserForMail(event.getParams().getIdTag(), NotificationFeature.OcppTransactionStarted);
+        var user = userService.getUserForMail(event.getParams().getIdTag(), NotificationFeature.OcppTransactionStarted);
         if (user == null) {
             return;
         }
@@ -118,12 +116,12 @@ public class NotificationServiceForUser {
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV event) {
         log.debug("Processing: {}", event);
 
-        var transaction = transactionService.getActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
+        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
         if (transaction == null) {
             return;
         }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
+        var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
         if (user == null) {
             return;
         }
@@ -150,8 +148,11 @@ public class NotificationServiceForUser {
         log.debug("Processing: {}", event);
 
         var transaction = transactionService.getTransaction(event.getParams().getTransactionId());
+        if (transaction == null) {
+            return;
+        }
 
-        var user = getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
+        var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppTransactionEnded);
         if (user == null) {
             return;
         }
@@ -167,48 +168,6 @@ public class NotificationServiceForUser {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    private User.Overview getUserForMail(String ocppIdTag, NotificationFeature feature) {
-        UserQueryForm form = new UserQueryForm();
-        form.setOcppIdTag(ocppIdTag);
-
-        List<User.Overview> overview = userRepository.getOverview(form);
-        if (overview.isEmpty()) {
-            return null;
-        } else if (overview.size() > 1) {
-            // should not happen
-            log.warn("Multiple users found for OcppTag {}", ocppIdTag);
-            return null;
-        }
-
-        var user = overview.get(0);
-        if (!hasOcppTag(user, ocppIdTag)) {
-            return null;
-        }
-
-        String eMailAddress = user.getEmail();
-        if (Strings.isNullOrEmpty(eMailAddress)) {
-            return null;
-        }
-
-        if (!user.getNotificationFeatures().contains(feature)) {
-            return null;
-        }
-
-        return user;
-    }
-
-    /**
-     * We check this here again, because userRepository.getOverview(..) also returns partial match OcppTags.
-     */
-    private static boolean hasOcppTag(User.Overview user, String ocppIdTag) {
-        for (User.OcppTagEntry ocppTagEntry : user.getOcppTagEntries()) {
-            if (ocppTagEntry.getIdTag().equals(ocppIdTag)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private static String createContent(Transaction params, User.Overview user) {
         Double consumption = TransactionStopServiceHelper.calculateEnergyConsumptionInKWh(params);

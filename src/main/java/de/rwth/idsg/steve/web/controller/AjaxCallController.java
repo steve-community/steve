@@ -21,9 +21,9 @@ package de.rwth.idsg.steve.web.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
+import de.rwth.idsg.steve.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -55,8 +53,8 @@ public class AjaxCallController {
 
     private final ObjectMapper objectMapper = createMapper();
 
-    private final ChargePointRepository chargePointRepository;
-    private final TransactionRepository transactionRepository;
+    private final ChargePointService chargePointService;
+    private final TransactionService transactionService;
     private final ReservationRepository reservationRepository;
 
     // -------------------------------------------------------------------------
@@ -74,14 +72,14 @@ public class AjaxCallController {
     @RequestMapping(value = CONNECTOR_IDS_PATH)
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
-        String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+        String s = serializeArray(chargePointService.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
     @RequestMapping(value = TRANSACTION_IDS_PATH)
     public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
-        String s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
+        String s = serializeArray(transactionService.getActiveTransactionIds(chargeBoxId));
         writeOutput(response, s);
     }
 

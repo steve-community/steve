@@ -77,12 +77,12 @@ public class CentralSystemService16_Service {
     private final SettingsRepository settingsRepository;
     private final OcppTagService ocppTagService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final ChargePointRegistrationService chargePointRegistrationService;
+    private final ChargePointService chargePointService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxIdentity);
+        Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxIdentity);
         applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 

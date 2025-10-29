@@ -127,7 +127,7 @@ public class __DatabasePreparer__ {
 
     public List<ConnectorStatus> getChargePointConnectorStatus() {
         ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
-        return impl.getChargePointConnectorStatus();
+        return impl.getChargePointConnectorStatus(null);
     }
 
     public TransactionDetails getDetails(int transactionPk) {

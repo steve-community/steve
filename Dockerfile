@@ -7,6 +7,7 @@ MAINTAINER Ling Li
 # Download and install dockerize.
 # Needed so the web container will wait for MariaDB to start.
 ENV DOCKERIZE_VERSION v0.19.0
+ENV MVNW_REPOURL=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.2/apache-maven-3.9.2-bin.zip
 RUN curl -sfL https://github.com/powerman/dockerize/releases/download/"$DOCKERIZE_VERSION"/dockerize-`uname -s`-`uname -m` | install /dev/stdin /usr/local/bin/dockerize
 
 EXPOSE 8180

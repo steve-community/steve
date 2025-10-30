@@ -6,8 +6,7 @@ COPY . /code
 
 # Run the build, telling both the wrapper (via http) and 
 # Maven (via the -D flag) to be insecure
-RUN sed -i 's/https/http/' .mvn/wrapper/maven-wrapper.properties && \
-    ./mvnw clean package -Pkubernetes -Dmaven.wagon.http.ssl.insecure=true
+RUN ./mvnw clean package -Pkubernetes
 
 
 # --- STAGE 2: The Final Image ---

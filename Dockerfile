@@ -28,5 +28,6 @@ ENV MVN_DIR $(find . -type d -name "apache-maven-*" | head -n 1)
 # This CMD now calls the 'mvn' binary directly, completely bypassing the wrapper.
 # Your flags will now be correctly passed to Maven.
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true" ./$(find . -type d -name "apache-maven-*" | head -n 1)/bin/mvn clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true \
-    && java -XX:MaxRAMPercentage=85 -jar target/steve.war
+export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true" \
+&& ./$(find . -type d -name "apache-maven-*" | head -n 1)/bin/mvn clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" \
+&& java -XX:MaxRAMPercentage=85 -jar target/steve.war

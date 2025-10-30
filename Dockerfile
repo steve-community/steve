@@ -21,5 +21,6 @@ COPY . /code
 # Wait for the db to startup(via dockerize), then 
 # Build and run steve, requires a db to be available on port 3306
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -XX:MaxRAMPercentage=85 -jar target/steve.war
+	./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true
+    && java -XX:MaxRAMPercentage=85 -jar target/steve.war
+    

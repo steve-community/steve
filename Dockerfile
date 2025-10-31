@@ -27,21 +27,21 @@ ENV MVN_DIR $(find . -type d -name "apache-maven-*" | head -n 1)
 
 # Ensure Java truststore is synced with system CA certificates
 # The ca-certificates-java package should create /etc/ssl/certs/java/cacerts
-RUN if [ -x /usr/sbin/update-ca-certificates-java ]; then \
-    /usr/sbin/update-ca-certificates-java 2>/dev/null || true; \
-    fi && \
-    if [ -f /etc/ssl/certs/java/cacerts ]; then \
-    cp /etc/ssl/certs/java/cacerts "$JAVA_HOME/lib/security/cacerts"; \
-    fi
+# RUN if [ -x /usr/sbin/update-ca-certificates-java ]; then \
+#     /usr/sbin/update-ca-certificates-java 2>/dev/null || true; \
+#     fi && \
+#     if [ -f /etc/ssl/certs/java/cacerts ]; then \
+#     cp /etc/ssl/certs/java/cacerts "$JAVA_HOME/lib/security/cacerts"; \
+#     fi
 
-# If a corporate CA cert is mounted at /etc/ssl/certs/corporate-ca.pem, import it
-RUN if [ -f /etc/ssl/certs/corporate-ca.pem ]; then \
-    keytool -importcert -noprompt -trustcacerts \
-      -alias corporate-ca \
-      -file /etc/ssl/certs/corporate-ca.pem \
-      -keystore "$JAVA_HOME/lib/security/cacerts" \
-      -storepass changeit; \
-    fi
+# # If a corporate CA cert is mounted at /etc/ssl/certs/corporate-ca.pem, import it
+# RUN if [ -f /etc/ssl/certs/corporate-ca.pem ]; then \
+#     keytool -importcert -noprompt -trustcacerts \
+#       -alias corporate-ca \
+#       -file /etc/ssl/certs/corporate-ca.pem \
+#       -keystore "$JAVA_HOME/lib/security/cacerts" \
+#       -storepass changeit; \
+#     fi
 
 # Wait for the db, then build and run steve.
 # This CMD now calls the 'mvn' binary directly, completely bypassing the wrapper.

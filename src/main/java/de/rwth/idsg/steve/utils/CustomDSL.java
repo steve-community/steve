@@ -40,7 +40,7 @@ import static org.jooq.impl.DSL.field;
 public final class CustomDSL {
 
     // https://github.com/steve-community/steve/issues/1520
-    private static final DataType<DateTime> DATE_TIME_TYPE = SQLDataType.TIMESTAMP.asConvertedDataType(new DateTimeConverter());
+    public static final DataType<DateTime> DATE_TIME_TYPE = SQLDataType.TIMESTAMP.asConvertedDataType(new DateTimeConverter());
 
     public static Field<DateTime> date(DateTime dt) {
         return date(DSL.val(dt, DATE_TIME_TYPE));

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,33 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.config;
+package de.rwth.idsg.steve.service.notification;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.io.Closeable;
-import java.io.IOException;
+import lombok.Data;
+import org.joda.time.DateTime;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 02.02.2025
+ * @author fnkbsi
+ * @since 12.10.2022
  */
-@Slf4j
-@RequiredArgsConstructor
-public class DelegatingTaskExecutor implements Closeable {
 
-    private final ThreadPoolTaskExecutor delegate;
+@Data
+public class OcppStationStatusSuspendedEV {
 
-    @Override
-    public void close() throws IOException {
-        log.info("Shutting down");
-        delegate.shutdown();
-    }
-
-    public void execute(Runnable task) {
-        delegate.execute(task);
-    }
-
+  private final String chargeBoxId;
+  private final int connectorId;
+  private final DateTime timestamp;
 }

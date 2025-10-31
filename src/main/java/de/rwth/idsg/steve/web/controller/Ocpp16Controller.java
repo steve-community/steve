@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
@@ -60,10 +60,10 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private final ChargingProfileRepository chargingProfileRepository;
 
     public Ocpp16Controller(OcppTagService ocppTagService,
-                            ChargePointHelperService chargePointHelperService,
+                            ChargePointService chargePointService,
                             ChargePointServiceClient chargePointServiceClient,
                             ChargingProfileRepository chargingProfileRepository) {
-        super(ocppTagService, chargePointHelperService, chargePointServiceClient);
+        super(ocppTagService, chargePointService, chargePointServiceClient);
         this.chargingProfileRepository = chargingProfileRepository;
     }
 
@@ -87,7 +87,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @Override
     protected void setCommonAttributesForTx(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16));
+        model.addAttribute("cpList", chargePointService.getChargePoints(OcppVersion.V_16));
         model.addAttribute("opVersion", "v1.6");
     }
 
@@ -101,7 +101,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @Override
     protected void setCommonAttributes(Model model) {
         List<RegistrationStatus> inStatusFilter = Arrays.asList(RegistrationStatus.ACCEPTED, RegistrationStatus.PENDING);
-        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16, inStatusFilter));
+        model.addAttribute("cpList", chargePointService.getChargePoints(OcppVersion.V_16, inStatusFilter));
         model.addAttribute("opVersion", "v1.6");
     }
 

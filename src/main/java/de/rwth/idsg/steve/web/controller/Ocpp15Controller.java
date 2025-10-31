@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -52,9 +52,9 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 public class Ocpp15Controller extends Ocpp12Controller {
 
     public Ocpp15Controller(OcppTagService ocppTagService,
-                            ChargePointHelperService chargePointHelperService,
+                            ChargePointService chargePointService,
                             ChargePointServiceClient chargePointServiceClient) {
-        super(ocppTagService, chargePointHelperService, chargePointServiceClient);
+        super(ocppTagService, chargePointService, chargePointServiceClient);
     }
 
     // -------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @Override
     protected void setCommonAttributes(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_15));
+        model.addAttribute("cpList", chargePointService.getChargePoints(OcppVersion.V_15));
         model.addAttribute("opVersion", "v1.5");
     }
 

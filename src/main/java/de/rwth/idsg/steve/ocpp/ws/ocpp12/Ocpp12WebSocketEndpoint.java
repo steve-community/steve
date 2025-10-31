@@ -20,13 +20,12 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
-import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.BootNotificationRequest;
@@ -38,6 +37,7 @@ import ocpp.cs._2010._08.StartTransactionRequest;
 import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StopTransactionRequest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,13 +49,13 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final CentralSystemService12_SoapServer server;
 
-    public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
+    public Ocpp12WebSocketEndpoint(TaskScheduler taskScheduler,
                                    OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService12_SoapServer server,
-                                   SteveProperties steveProperties) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, steveProperties, Ocpp12TypeStore.INSTANCE);
+                                   SessionContextStoreHolder sessionContextStoreHolder) {
+        super(taskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp12TypeStore.INSTANCE);
         this.server = server;
     }
 

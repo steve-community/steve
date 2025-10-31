@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.TransactionService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,7 +57,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionsRestController {
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     @Operation(description = """
         Returns a list of transactions based on the query parameters.
@@ -77,7 +77,7 @@ public class TransactionsRestController {
             throw new SteveException.BadRequest("returnCSV=true is not supported for API calls");
         }
 
-        var response = transactionRepository.getTransactions(params);
+        var response = transactionService.getTransactions(params);
         log.debug("Read response for query: {}", response);
         return response;
     }

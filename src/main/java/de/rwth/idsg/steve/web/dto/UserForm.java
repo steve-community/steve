@@ -18,9 +18,13 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.NotificationFeature;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.joda.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
@@ -48,13 +52,32 @@ public class UserForm {
     private LocalDate birthDay;
     private String phone;
     private String note;
-
-    @NotNull(message = "Sex is required")
-    private UserSex sex;
+    private UserSex sex = UserSex.OTHER;
 
     @Email(message = "Not a valid e-mail address")
     private String eMail;
 
+    private List<NotificationFeature> notificationFeatures;
+
+    @Valid
     private Address address;
 
+    @AssertTrue(message = "Some of the selected notification features cannot be enabled for a user")
+    public boolean isNotificationFeaturesForUser() {
+        if (CollectionUtils.isEmpty(notificationFeatures)) {
+            return true;
+        }
+
+        for (var selectedFeature : notificationFeatures) {
+            if (!selectedFeature.isForUser()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void setSex(UserSex sex) {
+        this.sex = (sex == null) ? UserSex.OTHER : sex;
+    }
 }

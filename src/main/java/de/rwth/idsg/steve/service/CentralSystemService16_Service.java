@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
@@ -86,7 +87,7 @@ public class CentralSystemService16_Service {
     private final SettingsRepository settingsRepository;
     private final OcppTagService ocppTagService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final ChargePointRegistrationService chargePointRegistrationService;
+    private final ChargePointService chargePointService;
     private final SecurityRepository securityRepository;
     private final CertificateSigningService certificateSigningService;
     private final SecurityProfileConfiguration securityConfig;
@@ -94,7 +95,7 @@ public class CentralSystemService16_Service {
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxIdentity);
+        Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxIdentity);
         applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
@@ -158,6 +159,11 @@ public class CentralSystemService16_Service {
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
+        }
+
+         if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
+            applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
         }
 
         return new StatusNotificationResponse();

@@ -43,6 +43,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -67,6 +68,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @EnableScheduling
+@EnableAsync
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
@@ -130,8 +132,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskScheduler asyncTaskScheduler() {
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
@@ -139,11 +141,12 @@ public class BeanConfiguration implements WebMvcConfigurer {
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
 
-        return new DelegatingTaskScheduler(scheduler);
+        return scheduler;
     }
 
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskExecutor asyncTaskExecutor() {
+    @Bean
+    @Primary
+    public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setThreadNamePrefix("SteVe-TaskExecutor-");
@@ -151,7 +154,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
 
-        return new DelegatingTaskExecutor(executor);
+        return executor;
     }
 
     /**

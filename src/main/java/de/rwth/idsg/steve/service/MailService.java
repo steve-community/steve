@@ -22,6 +22,8 @@ import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 
 import jakarta.mail.MessagingException;
 
+import java.util.List;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 11.03.2025
@@ -35,4 +37,6 @@ public interface MailService {
     void sendAsync(String subject, String body);
 
     void send(String subject, String body) throws MessagingException;
+
+    void send(String subject, String body, List<String> eMailAddresses);
 }

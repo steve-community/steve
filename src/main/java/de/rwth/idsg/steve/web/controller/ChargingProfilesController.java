@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
@@ -45,7 +45,7 @@ import jakarta.validation.Valid;
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
     private final ChargingProfileRepository repository;
 
     private static final String PARAMS = "params";
@@ -138,7 +138,7 @@ public class ChargingProfilesController {
     public String getAssignments(@ModelAttribute(PARAMS) ChargingProfileAssignmentQueryForm form, Model model) {
         model.addAttribute(PARAMS, form);
         model.addAttribute("profileList", repository.getBasicInfo());
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("assignments", repository.getAssignments(form));
         return "data-man/chargingProfileAssignments";
     }

@@ -25,15 +25,19 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
+import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.io.Writer;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,14 +46,64 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.12.2018
+ * @since 02.10.2025
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class TransactionStopService {
+public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final OcppServerRepository ocppServerRepository;
+
+    public List<Transaction> getTransactions(TransactionQueryForm form) {
+        return transactionRepository.getTransactions(form);
+    }
+
+    public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
+        transactionRepository.writeTransactionsCSV(form, writer);
+    }
+
+    public List<Integer> getActiveTransactionIds(String chargeBoxId) {
+        return transactionRepository.getActiveTransactionIds(chargeBoxId);
+    }
+
+    public TransactionDetails getDetails(int transactionPk) {
+        return transactionRepository.getDetails(transactionPk);
+    }
+
+    public Transaction getTransaction(int transactionPk) {
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setTransactionPk(transactionPk);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ALL);
+
+        List<Transaction> transactions = transactionRepository.getTransactions(form);
+        if (CollectionUtils.isEmpty(transactions)) {
+            return null;
+        }
+        return transactions.getFirst();
+    }
+
+    public Transaction getLatestActiveTransaction(String chargeBoxId, Integer connectorId) {
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setChargeBoxId(chargeBoxId);
+        form.setConnectorId(connectorId);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ACTIVE);
+
+        var transactions = transactionRepository.getTransactions(form);
+        if (transactions.isEmpty()) {
+            return null;
+        } else if (transactions.size() == 1) {
+            return transactions.get(0);
+        } else {
+            log.warn("Found multiple active transactions for chargeBoxId '{}' and connectorId '{}'. Returning the most recent one.", chargeBoxId, connectorId);
+            return transactions.stream()
+                .max(Comparator.comparing(Transaction::getStartTimestamp))
+                .orElse(null); // Should not be null here, but for safety
+        }
+    }
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()

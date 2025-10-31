@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.UserService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ import java.util.List;
 public class UsersController {
 
     private final OcppTagService ocppTagService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     private static final String PARAMS = "params";
 
@@ -82,12 +82,13 @@ public class UsersController {
 
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("userList", userRepository.getOverview(params));
+        model.addAttribute("userList", userService.getOverview(params));
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
-        User.Details details = userRepository.getDetails(userPk);
+        User.Details details = userService.getDetails(userPk);
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
@@ -110,7 +111,7 @@ public class UsersController {
             return "data-man/userAdd";
         }
 
-        userRepository.add(userForm);
+        userService.add(userForm);
         return toOverview();
     }
 
@@ -122,13 +123,13 @@ public class UsersController {
             return "data-man/userDetails";
         }
 
-        userRepository.update(userForm);
+        userService.update(userForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("userPk") int userPk) {
-        userRepository.delete(userPk);
+        userService.delete(userPk);
         return toOverview();
     }
 
@@ -142,6 +143,7 @@ public class UsersController {
 
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
         model.addAttribute("idTagList", idTagList);
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
     // -------------------------------------------------------------------------

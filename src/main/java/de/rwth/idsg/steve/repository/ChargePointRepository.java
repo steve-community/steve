@@ -41,19 +41,11 @@ public interface ChargePointRepository {
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 
-    default List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
-        return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
-    }
-
     List<String> getChargeBoxIds();
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
     ChargePoint.Details getDetails(int chargeBoxPk);
-
-    default List<ConnectorStatus> getChargePointConnectorStatus() {
-        return getChargePointConnectorStatus(null);
-    }
 
     List<ConnectorStatus> getChargePointConnectorStatus(@Nullable ConnectorStatusForm form);
 

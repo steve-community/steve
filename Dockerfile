@@ -4,7 +4,8 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Install dockerize, and also add 'unzip' which we will need
 ENV DOCKERIZE_VERSION=v0.19.0
-RUN apt-get update && apt-get install -y unzip curl && \
+RUN apt-get update && apt-get install -y unzip curl ca-certificates ca-certificates-java && \
+    update-ca-certificates -f && \
     curl -sfL https://github.com/powerman/dockerize/releases/download/"$DOCKERIZE_VERSION"/dockerize-`uname -s`-`uname -m` | install /dev/stdin /usr/local/bin/dockerize
 
 EXPOSE 8180
@@ -23,6 +24,24 @@ RUN MVN_URL="$(grep 'distributionUrl' .mvn/wrapper/maven-wrapper.properties | cu
     curl -k -L -o maven.zip "$MVN_URL"
 RUN unzip maven.zip
 ENV MVN_DIR $(find . -type d -name "apache-maven-*" | head -n 1)
+
+# Ensure Java truststore is synced with system CA certificates
+# The ca-certificates-java package should create /etc/ssl/certs/java/cacerts
+RUN if [ -x /usr/sbin/update-ca-certificates-java ]; then \
+    /usr/sbin/update-ca-certificates-java 2>/dev/null || true; \
+    fi && \
+    if [ -f /etc/ssl/certs/java/cacerts ]; then \
+    cp /etc/ssl/certs/java/cacerts "$JAVA_HOME/lib/security/cacerts"; \
+    fi
+
+# If a corporate CA cert is mounted at /etc/ssl/certs/corporate-ca.pem, import it
+RUN if [ -f /etc/ssl/certs/corporate-ca.pem ]; then \
+    keytool -importcert -noprompt -trustcacerts \
+      -alias corporate-ca \
+      -file /etc/ssl/certs/corporate-ca.pem \
+      -keystore "$JAVA_HOME/lib/security/cacerts" \
+      -storepass changeit; \
+    fi
 
 # Wait for the db, then build and run steve.
 # This CMD now calls the 'mvn' binary directly, completely bypassing the wrapper.

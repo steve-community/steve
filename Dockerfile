@@ -50,4 +50,4 @@ ENV MVN_DIR $(find . -type d -name "apache-maven-*" | head -n 1)
 # export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true" \
 # && ./$(find . -type d -name "apache-maven-*" | head -n 1)/bin/mvn -U -e clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" \
 # && java -XX:MaxRAMPercentage=85 -jar target/steve.war
-CMD ["/bin/bash"]
+CMD ["tail", "-f", "/dev/null"]

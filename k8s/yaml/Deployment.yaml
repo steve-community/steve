@@ -38,3 +38,24 @@ spec:
           value: "STEVE-API-KEY"
         - name: WEBAPI_VALUE
           value: ""
+        ports:
+        - containerPort: 8180
+          name: http
+        - containerPort: 8443
+          name: https
+        livenessProbe:
+          httpGet:
+            path: /steve/
+            port: 8180
+          initialDelaySeconds: 300  # 5 minutes to allow Maven build to complete
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /steve/
+            port: 8180
+          initialDelaySeconds: 300  # 5 minutes to allow Maven build to complete
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3

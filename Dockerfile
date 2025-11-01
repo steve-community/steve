@@ -19,11 +19,12 @@ COPY . /code
 
 # --- THIS IS THE FIX ---
 # 1. Read the URL from the wrapper's config file
-RUN MVN_URL="$(grep 'distributionUrl' .mvn/wrapper/maven-wrapper.properties | cut -d'=' -f2 | sed 's#\\/#/#g')" && \
-    echo "Downloading Maven from: $MVN_URL" && \
-    curl -k -L -o maven.zip "$MVN_URL"
-RUN unzip maven.zip
-ENV MVN_DIR $(find . -type d -name "apache-maven-*" | head -n 1)
+# RUN MVN_URL="$(grep 'distributionUrl' .mvn/wrapper/maven-wrapper.properties | cut -d'=' -f2 | sed 's#\\/#/#g')" && \
+#     echo "Downloading Maven from: $MVN_URL" && \
+#     curl -k -L -o maven.zip "$MVN_URL"
+# RUN unzip maven.zip
+# ENV MVN_DIR="$(find . -type d -name "apache-maven-*" | head -n 1)"
+RUN apt-get update && apt-get install -y vim
 
 # Ensure Java truststore is synced with system CA certificates
 # The ca-certificates-java package should create /etc/ssl/certs/java/cacerts

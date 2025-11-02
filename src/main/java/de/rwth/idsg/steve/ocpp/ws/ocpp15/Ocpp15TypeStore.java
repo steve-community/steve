@@ -30,8 +30,8 @@ public final class Ocpp15TypeStore extends AbstractTypeStore {
 
     private Ocpp15TypeStore() {
         super(
-                new String[]{ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName()},
-                new String[]{ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()}
+                ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName(),
+                ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()
         );
     }
 

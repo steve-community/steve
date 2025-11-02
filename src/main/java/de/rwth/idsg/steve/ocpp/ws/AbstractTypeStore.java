@@ -27,6 +27,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.RegexPatternTypeFilter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -42,8 +43,13 @@ public abstract class AbstractTypeStore implements TypeStore {
     private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
     private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
 
-    public AbstractTypeStore(String[] packagesForRequestClassMap,
-                             String[] packagesForActionResponseMap) {
+    public AbstractTypeStore(String packageForRequestClassMap,
+                             String packageForActionResponseMap) {
+        this(List.of(packageForRequestClassMap), List.of(packageForActionResponseMap));
+    }
+
+    public AbstractTypeStore(List<String> packagesForRequestClassMap,
+                             List<String> packagesForActionResponseMap) {
         for (var pkg : packagesForRequestClassMap) {
             populateRequestClassMap(pkg.trim());
         }

@@ -27,10 +27,10 @@ import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import ocpp._2020._03.LogStatusNotificationRequest;
-import ocpp._2020._03.SecurityEventNotificationRequest;
-import ocpp._2020._03.SignCertificateRequest;
-import ocpp._2020._03.SignedFirmwareStatusNotificationRequest;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.DataTransferRequest;
@@ -82,11 +82,13 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
             case HeartbeatRequest request -> server.heartbeat(request, chargeBoxId);
             case AuthorizeRequest request -> server.authorize(request, chargeBoxId);
             case DataTransferRequest request -> server.dataTransfer(request, chargeBoxId);
-            case SignCertificateRequest request -> server.signCertificate(request, chargeBoxId);
-            case SecurityEventNotificationRequest request -> server.securityEventNotification(request, chargeBoxId);
-            case SignedFirmwareStatusNotificationRequest request ->
-                    server.signedFirmwareStatusNotification(request, chargeBoxId);
-            case LogStatusNotificationRequest request -> server.logStatusNotification(request, chargeBoxId);
+
+            // "Improved security for OCPP 1.6-J" additions
+            case SignCertificate request -> server.signCertificate(request, chargeBoxId);
+            case SecurityEventNotification request -> server.securityEventNotification(request, chargeBoxId);
+            case SignedFirmwareStatusNotification request -> server.signedFirmwareStatusNotification(request, chargeBoxId);
+            case LogStatusNotification request -> server.logStatusNotification(request, chargeBoxId);
+
             case null, default ->
                 throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
         };

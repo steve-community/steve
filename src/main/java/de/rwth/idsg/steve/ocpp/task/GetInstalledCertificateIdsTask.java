@@ -23,8 +23,8 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.GetInstalledCertificateIdsRequest;
-import ocpp._2020._03.GetInstalledCertificateIdsResponse;
+import ocpp._2022._02.security.GetInstalledCertificateIds;
+import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
 
 public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, String> {
 
@@ -38,10 +38,10 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
     }
 
     @Override
-    public GetInstalledCertificateIdsRequest getOcpp16Request() {
-        var request = new GetInstalledCertificateIdsRequest();
+    public GetInstalledCertificateIds getOcpp16Request() {
+        var request = new GetInstalledCertificateIds();
         if (params.getCertificateType() != null) {
-            request.setCertificateType(GetInstalledCertificateIdsRequest.CertificateUseEnumType.valueOf(
+            request.setCertificateType(GetInstalledCertificateIds.CertificateUseEnumType.valueOf(
                     params.getCertificateType().toString()));
         }
         return request;

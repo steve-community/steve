@@ -23,8 +23,8 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.InstallCertificateRequest;
-import ocpp._2020._03.InstallCertificateResponse;
+import ocpp._2022._02.security.InstallCertificate;
+import ocpp._2022._02.security.InstallCertificateResponse;
 
 public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, String> {
 
@@ -38,9 +38,9 @@ public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificat
     }
 
     @Override
-    public InstallCertificateRequest getOcpp16Request() {
-        var request = new InstallCertificateRequest();
-        request.setCertificateType(InstallCertificateRequest.CertificateUseEnumType.valueOf(
+    public InstallCertificate getOcpp16Request() {
+        var request = new InstallCertificate();
+        request.setCertificateType(InstallCertificate.CertificateUseEnumType.valueOf(
                 params.getCertificateType().toString()));
         request.setCertificate(params.getCertificate());
         return request;

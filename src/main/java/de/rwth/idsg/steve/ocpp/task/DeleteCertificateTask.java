@@ -23,9 +23,9 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.CertificateHashDataType;
-import ocpp._2020._03.DeleteCertificateRequest;
-import ocpp._2020._03.DeleteCertificateResponse;
+import ocpp._2022._02.security.CertificateHashDataType;
+import ocpp._2022._02.security.DeleteCertificate;
+import ocpp._2022._02.security.DeleteCertificateResponse;
 
 public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, String> {
 
@@ -39,8 +39,8 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
     }
 
     @Override
-    public DeleteCertificateRequest getOcpp16Request() {
-        var request = new DeleteCertificateRequest();
+    public DeleteCertificate getOcpp16Request() {
+        var request = new DeleteCertificate();
 
         var hashData = new CertificateHashDataType();
         hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.valueOf(params.getHashAlgorithm()));

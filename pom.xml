@@ -383,82 +383,6 @@
                     </generator>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <configuration>
-                    <preserveDir>false</preserveDir>
-                    <ignoreMissingFile>false</ignoreMissingFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>add-request-interface-1-6-security-profile</id>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-1.6_Security_3rd_Edition_schemas/*Request.json</filesToInclude>
-                            <outputDir>${project.build.directory}/generated-resources/1-6-security-profile</outputDir>
-                            <replacements>
-                                <replacement>
-                                    <token>("\$id"\s*:\s*"urn:OCPP:Cp:1\.6:2020:3:[^"]+\.req"\s*,\s*)</token>
-                                    <value>$1"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.RequestType"],</value>
-                                </replacement>
-                            </replacements>
-                            <regex>true</regex>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-response-interface-1-6-security-profile</id>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-1.6_Security_3rd_Edition_schemas/*Response.json</filesToInclude>
-                            <outputDir>${project.build.directory}/generated-resources/1-6-security-profile</outputDir>
-                            <replacements>
-                                <replacement>
-                                    <token>("\$id"\s*:\s*"urn:OCPP:Cp:1\.6:2020:3:[^"]+\.conf"\s*,\s*)</token>
-                                    <value>$1"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.ResponseType"],</value>
-                                </replacement>
-                            </replacements>
-                            <regex>true</regex>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jsonschema2pojo</groupId>
-                <artifactId>jsonschema2pojo-maven-plugin</artifactId>
-                <version>1.2.2</version>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                    <generateBuilders>true</generateBuilders>
-                    <includeJsr303Annotations>true</includeJsr303Annotations>
-                    <includeGeneratedAnnotation>true</includeGeneratedAnnotation>
-                    <useJakartaValidation>true</useJakartaValidation>
-                    <useJodaDates>true</useJodaDates>
-                    <useJodaLocalDates>true</useJodaLocalDates>
-                    <useJodaLocalTimes>true</useJodaLocalTimes>
-                </configuration>
-                <executions>
-                    <execution>
-                      <id>generate-1-6-security-profile</id>
-                      <goals>
-                          <goal>generate</goal>
-                      </goals>
-                      <phase>process-resources</phase>
-                      <configuration>
-                          <sourceDirectory>${project.build.directory}/generated-resources/1-6-security-profile</sourceDirectory>
-                          <targetPackage>ocpp._2020._03</targetPackage>
-                      </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -519,7 +443,7 @@
         <dependency>
             <groupId>com.github.steve-community</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.9</version>
+            <version>0.0.11</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

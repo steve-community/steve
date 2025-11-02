@@ -23,8 +23,8 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.ExtendedTriggerMessageRequest;
-import ocpp._2020._03.ExtendedTriggerMessageResponse;
+import ocpp._2022._02.security.ExtendedTriggerMessage;
+import ocpp._2022._02.security.ExtendedTriggerMessageResponse;
 
 public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, String> {
 
@@ -38,10 +38,10 @@ public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTrigg
     }
 
     @Override
-    public ExtendedTriggerMessageRequest getOcpp16Request() {
-        var request = new ExtendedTriggerMessageRequest();
+    public ExtendedTriggerMessage getOcpp16Request() {
+        var request = new ExtendedTriggerMessage();
         request.setRequestedMessage(
-            ExtendedTriggerMessageRequest.MessageTriggerEnumType.valueOf(params.getRequestedMessage().toString())
+            ExtendedTriggerMessage.MessageTriggerEnumType.valueOf(params.getRequestedMessage().toString())
         );
 
         if (params.getConnectorId() != null) {

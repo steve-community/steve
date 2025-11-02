@@ -23,14 +23,14 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp._2020._03.LogStatusNotificationRequest;
-import ocpp._2020._03.LogStatusNotificationResponse;
-import ocpp._2020._03.SecurityEventNotificationRequest;
-import ocpp._2020._03.SecurityEventNotificationResponse;
-import ocpp._2020._03.SignCertificateRequest;
-import ocpp._2020._03.SignCertificateResponse;
-import ocpp._2020._03.SignedFirmwareStatusNotificationRequest;
-import ocpp._2020._03.SignedFirmwareStatusNotificationResponse;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -142,23 +142,22 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
         return service.dataTransfer(parameters, chargeBoxIdentity);
     }
 
-    public SignCertificateResponse signCertificate(
-            SignCertificateRequest parameters, String chargeBoxIdentity) {
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
         return service.signCertificate(parameters, chargeBoxIdentity);
     }
 
-    public SecurityEventNotificationResponse securityEventNotification(
-            SecurityEventNotificationRequest parameters, String chargeBoxIdentity) {
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
+                                                                       String chargeBoxIdentity) {
         return service.securityEventNotification(parameters, chargeBoxIdentity);
     }
 
-    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
-            SignedFirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
         return service.signedFirmwareStatusNotification(parameters, chargeBoxIdentity);
     }
 
-    public LogStatusNotificationResponse logStatusNotification(
-            LogStatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
         return service.logStatusNotification(parameters, chargeBoxIdentity);
     }
 

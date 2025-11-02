@@ -23,9 +23,9 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.FirmwareType;
-import ocpp._2020._03.SignedUpdateFirmwareRequest;
-import ocpp._2020._03.SignedUpdateFirmwareResponse;
+import ocpp._2022._02.security.FirmwareType;
+import ocpp._2022._02.security.SignedUpdateFirmware;
+import ocpp._2022._02.security.SignedUpdateFirmwareResponse;
 
 public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFirmwareParams, String> {
 
@@ -39,8 +39,8 @@ public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFir
     }
 
     @Override
-    public SignedUpdateFirmwareRequest getOcpp16Request() {
-        var request = new SignedUpdateFirmwareRequest();
+    public SignedUpdateFirmware getOcpp16Request() {
+        var request = new SignedUpdateFirmware();
         request.setRequestId(params.getRequestId());
 
         var firmware = new FirmwareType();

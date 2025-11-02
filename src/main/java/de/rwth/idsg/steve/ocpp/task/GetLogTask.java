@@ -23,9 +23,10 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.GetLogRequest;
-import ocpp._2020._03.GetLogResponse;
-import ocpp._2020._03.LogParametersType;
+
+import ocpp._2022._02.security.GetLog;
+import ocpp._2022._02.security.GetLogResponse;
+import ocpp._2022._02.security.LogParametersType;
 
 public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
 
@@ -39,9 +40,9 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
     }
 
     @Override
-    public GetLogRequest getOcpp16Request() {
-        var request = new GetLogRequest();
-        request.setLogType(GetLogRequest.LogEnumType.valueOf(params.getLogType().toString()));
+    public GetLog getOcpp16Request() {
+        var request = new GetLog();
+        request.setLogType(GetLog.LogEnumType.valueOf(params.getLogType().toString()));
         request.setRequestId(params.getRequestId());
 
         var logParams = new LogParametersType();

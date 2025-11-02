@@ -35,14 +35,14 @@ import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp._2020._03.LogStatusNotificationRequest;
-import ocpp._2020._03.LogStatusNotificationResponse;
-import ocpp._2020._03.SecurityEventNotificationRequest;
-import ocpp._2020._03.SecurityEventNotificationResponse;
-import ocpp._2020._03.SignCertificateRequest;
-import ocpp._2020._03.SignCertificateResponse;
-import ocpp._2020._03.SignedFirmwareStatusNotificationRequest;
-import ocpp._2020._03.SignedFirmwareStatusNotificationResponse;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -289,7 +289,7 @@ public class CentralSystemService16_Service {
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 
-    public SignCertificateResponse signCertificate(SignCertificateRequest parameters, String chargeBoxIdentity) {
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
         log.info("Received SignCertificateRequest from '{}' with CSR length: {}", chargeBoxIdentity,
                 parameters.getCsr() != null ? parameters.getCsr().length() : 0);
 
@@ -385,7 +385,7 @@ public class CentralSystemService16_Service {
         return response;
     }
 
-    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotificationRequest parameters,
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
         var eventType = parameters.getType();
         var eventTimestamp = parameters.getTimestamp();
@@ -416,7 +416,7 @@ public class CentralSystemService16_Service {
     }
 
     public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
-            SignedFirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+            SignedFirmwareStatusNotification parameters, String chargeBoxIdentity) {
         var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
         var requestId = parameters.getRequestId();
 
@@ -448,7 +448,7 @@ public class CentralSystemService16_Service {
         return new SignedFirmwareStatusNotificationResponse();
     }
 
-    public LogStatusNotificationResponse logStatusNotification(LogStatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters, String chargeBoxIdentity) {
         var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
         var requestId = parameters.getRequestId();
 

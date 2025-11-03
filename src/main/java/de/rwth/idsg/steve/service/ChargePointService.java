@@ -43,8 +43,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +76,7 @@ public class ChargePointService {
     private final ChargePointRepository chargePointRepository;
     private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
+    private final PasswordEncoder passwordEncoder;
 
     // SOAP-based charge points are stored in DB with an endpoint address.
     // But, for WebSocket-based charge points, the active sessions are stored in memory.
@@ -127,6 +130,31 @@ public class ChargePointService {
     // Registration status
     // -------------------------------------------------------------------------
 
+    public boolean validatePassword(String chargeBoxId, String passwordFromHeaders, String storedHashedPassword) {
+        // if no password in DB, this station needs no validation
+        if (StringUtils.isEmpty(storedHashedPassword)) {
+            log.info("No password configured for charge point '{}' - authentication disabled", chargeBoxId);
+            return true;
+        }
+
+        // there is a password in DB, but the station provided no password
+        if (StringUtils.isEmpty(passwordFromHeaders)) {
+            log.warn("Empty password provided for charge point '{}'", chargeBoxId);
+            return false;
+        }
+
+        try {
+            var matches = passwordEncoder.matches(passwordFromHeaders, storedHashedPassword);
+            if (!matches) {
+                log.warn("Invalid password attempt for charge point '{}'", chargeBoxId);
+            }
+            return matches;
+        } catch (Exception e) {
+            log.error("Exception while checking password for charge point '{}'", chargeBoxId, e);
+            return false;
+        }
+    }
+
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
@@ -143,10 +171,10 @@ public class ChargePointService {
 
     private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        var status = chargePointRepository.getRegistration(chargeBoxId);
         if (status.isPresent()) {
             try {
-                return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
+                return Optional.ofNullable(RegistrationStatus.fromValue(status.get().registrationStatus()));
             } catch (Exception e) {
                 // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
                 log.error("Exception happened", e);

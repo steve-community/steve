@@ -45,8 +45,6 @@ import org.jooq.DSLContext;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +72,6 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_CHARGE_BOX_ID = "charge_box_2aa6a783d47d";
     private static final String REGISTERED_CHARGE_BOX_ID_2 = "charge_box_2aa6a783d47d_2";
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
-    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private final DSLContext dslContext;
 
@@ -129,7 +126,7 @@ public class __DatabasePreparer__ {
     }
 
     public List<ConnectorStatus> getChargePointConnectorStatus() {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl(), PASSWORD_ENCODER);
+        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         return impl.getChargePointConnectorStatus(null);
     }
 
@@ -144,7 +141,7 @@ public class __DatabasePreparer__ {
     }
 
     public ChargePoint.Details getCBDetails(String chargeboxID) {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl(), PASSWORD_ENCODER);
+        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         Map<String, Integer> pkMap = impl.getChargeBoxIdPkPair(Arrays.asList(chargeboxID));
         int pk = pkMap.get(chargeboxID);
         return impl.getDetails(pk);

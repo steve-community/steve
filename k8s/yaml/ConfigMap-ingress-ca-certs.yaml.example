@@ -1,0 +1,33 @@
+# Example ConfigMap for Kubernetes Ingress CA Certificates
+# 
+# To create this ConfigMap:
+# 1. Extract the CA certificate from your ingress:
+#    kubectl get secret -n <ingress-namespace> <ingress-tls-secret-name> -o jsonpath='{.data.ca\.crt}' | base64 -d > ingress-ca.crt
+#
+#    OR if using cert-manager, get the CA from the certificate:
+#    kubectl get certificate <certificate-name> -n <namespace> -o jsonpath='{.spec.issuerRef.name}'
+#
+# 2. If using a self-signed certificate or internal CA, extract it from the certificate:
+#    kubectl get secret <ingress-tls-secret-name> -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -outform PEM > ingress-ca.crt
+#
+# 3. Create the ConfigMap:
+#    kubectl create configmap k8s-ingress-ca-certs \
+#      --from-file=ingress-ca.crt \
+#      --namespace=steve
+#
+# Or apply this file after adding your certificate data:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-ingress-ca-certs
+  namespace: steve
+data:
+  # Replace with your actual CA certificate (base64 encoded or plain text)
+  # The entrypoint script will import all .crt, .pem, and .cer files from this mount
+  ingress-ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    # Replace this with your actual CA certificate content
+    # You can paste the certificate content directly here
+    -----END CERTIFICATE-----
+

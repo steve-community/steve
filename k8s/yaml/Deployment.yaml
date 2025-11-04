@@ -59,3 +59,18 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
+        volumeMounts:
+        - name: k8s-ca-certs
+          mountPath: /etc/ssl/certs/k8s-ca
+          readOnly: true
+      volumes:
+      - name: k8s-ca-certs
+        # Option 1: Mount from ConfigMap (for CA certificates)
+        configMap:
+          name: k8s-ingress-ca-certs
+        # Option 2: Mount from Secret (if certificate is in a Secret)
+        # secret:
+        #   secretName: k8s-ingress-ca-certs
+        #   items:
+        #   - key: ca.crt
+        #     path: ingress-ca.crt

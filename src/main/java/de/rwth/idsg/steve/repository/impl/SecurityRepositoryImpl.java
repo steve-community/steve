@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
+import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -33,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
+import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_STATUS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
@@ -93,6 +95,19 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_STATUS, status)
             .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP, timestamp)
             .execute();
+    }
+
+    @Override
+    public int insertNewLogUploadJob(GetLogParams params) {
+        return ctx.insertInto(CHARGE_BOX_LOG_UPLOAD_JOB)
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.CREATED_AT, DateTime.now())
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.LOG_TYPE, params.getLogType().value())
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.REMOTE_LOCATION, params.getLocation())
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.OLDEST_TIMESTAMP, params.getStart())
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.LATEST_TIMESTAMP, params.getStop())
+            .returning(CHARGE_BOX_LOG_UPLOAD_JOB.JOB_ID)
+            .fetchOne()
+            .getJobId();
     }
 
     @Override

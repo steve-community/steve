@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +52,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
     }
 
     private static final String EXTENDED_TRIGGER_MESSAGE_PATH = "/ExtendedTriggerMessage";
+    private static final String GET_LOG_PATH = "/GetLog";
 
     /**
      * "Improved security for OCPP 1.6-J" white paper defines new operations only for JSON. Therefore, our station
@@ -64,12 +66,27 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         model.addAttribute("opVersion", "v1.6");
     }
 
+    // -------------------------------------------------------------------------
+    // Http methods (GET)
+    // -------------------------------------------------------------------------
+
     @RequestMapping(value = EXTENDED_TRIGGER_MESSAGE_PATH, method = RequestMethod.GET)
     public String getExtendedTriggerMessage(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new ExtendedTriggerMessageParams());
         return getPrefix() + EXTENDED_TRIGGER_MESSAGE_PATH;
     }
+
+    @RequestMapping(value = GET_LOG_PATH, method = RequestMethod.GET)
+    public String getGetLog(Model model) {
+        setCommonAttributesForImprovedSecurity(model);
+        model.addAttribute(PARAMS, new GetLogParams());
+        return getPrefix() + GET_LOG_PATH;
+    }
+
+    // -------------------------------------------------------------------------
+    // Http methods (POST)
+    // -------------------------------------------------------------------------
 
     @RequestMapping(value = EXTENDED_TRIGGER_MESSAGE_PATH, method = RequestMethod.POST)
     public String postTriggerMessage(@Valid @ModelAttribute(PARAMS) ExtendedTriggerMessageParams params,
@@ -79,6 +96,16 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             return getPrefix() + EXTENDED_TRIGGER_MESSAGE_PATH;
         }
         return REDIRECT_TASKS_PATH + chargePointServiceClient.extendedTriggerMessage(params);
+    }
+
+    @RequestMapping(value = GET_LOG_PATH, method = RequestMethod.POST)
+    public String postGetLog(@Valid @ModelAttribute(PARAMS) GetLogParams params,
+                             BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributesForImprovedSecurity(model);
+            return getPrefix() + GET_LOG_PATH;
+        }
+        return GET_LOG_PATH + chargePointServiceClient.getLog(params);
     }
 
 

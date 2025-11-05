@@ -45,6 +45,7 @@
             <li><a href="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile">Clear Charging Profile</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SetChargingProfile">Set Charging Profile</a></li>
             <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/ExtendedTriggerMessage"><i>Extended Trigger Message</i></a></li>
+            <li><a href="${ctxPath}/manager/operations/${opVersion}/GetLog"><i>Get Log</i></a></li>
         </ul>
     </div>
     <div class="op16-content">

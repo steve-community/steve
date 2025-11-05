@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
+import de.rwth.idsg.steve.ocpp.task.GetLogTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
@@ -44,6 +45,7 @@ import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
@@ -59,6 +61,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
@@ -91,6 +94,7 @@ public class ChargePointServiceClient {
     private final ChargingProfileRepository chargingProfileRepository;
     private final ReservationRepository reservationRepository;
     private final OcppTagService ocppTagService;
+    private final SecurityRepository securityRepository;
 
     private final TaskExecutor taskExecutor;
     private final TaskStore taskStore;
@@ -468,6 +472,24 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.extendedTriggerMessage(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int getLog(GetLogParams params,
+                            OcppCallback<String>... callbacks) {
+        int requestId = securityRepository.insertNewLogUploadJob(params);
+
+        GetLogTask task = new GetLogTask(params, requestId);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.getLog(c, task));
 
         return taskStore.add(task);
     }

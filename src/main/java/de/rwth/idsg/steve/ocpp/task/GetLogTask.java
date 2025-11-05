@@ -21,17 +21,19 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
-
-import jakarta.xml.ws.AsyncHandler;
-
 import ocpp._2022._02.security.GetLog;
 import ocpp._2022._02.security.GetLogResponse;
 import ocpp._2022._02.security.LogParametersType;
 
+import jakarta.xml.ws.AsyncHandler;
+
 public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
 
-    public GetLogTask(GetLogParams params) {
+    private final int requestId;
+
+    public GetLogTask(GetLogParams params, int requestId) {
         super(params);
+        this.requestId = requestId;
     }
 
     @Override
@@ -41,29 +43,17 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
 
     @Override
     public GetLog getOcpp16Request() {
-        var request = new GetLog();
-        request.setLogType(GetLog.LogEnumType.valueOf(params.getLogType().toString()));
-        request.setRequestId(params.getRequestId());
-
         var logParams = new LogParametersType();
         logParams.setRemoteLocation(params.getLocation());
+        logParams.setOldestTimestamp(params.getStart());
+        logParams.setLatestTimestamp(params.getStop());
 
-        if (params.getOldestTimestamp() != null) {
-            logParams.setOldestTimestamp(params.getOldestTimestamp());
-        }
-        if (params.getLatestTimestamp() != null) {
-            logParams.setLatestTimestamp(params.getLatestTimestamp());
-        }
-
+        var request = new GetLog();
+        request.setRequestId(requestId);
+        request.setLogType(params.getLogType());
+        request.setRetries(params.getRetries());
+        request.setRetryInterval(params.getRetryInterval());
         request.setLog(logParams);
-
-        if (params.getRetries() != null) {
-            request.setRetries(params.getRetries());
-        }
-        if (params.getRetryInterval() != null) {
-            request.setRetryInterval(params.getRetryInterval());
-        }
-
         return request;
     }
 
@@ -72,9 +62,13 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
         return res -> {
             try {
                 var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                var filename = response.getFilename() != null ? response.getFilename() : "N/A";
-                success(chargeBoxId, status + " (filename: " + filename + ")");
+                var status = response.getStatus().value();
+
+                String responseMessage = (response.getFilename() == null)
+                    ? status
+                    : status + " (filename: " + response.getFilename() + ")";
+
+                success(chargeBoxId, responseMessage);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

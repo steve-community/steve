@@ -21,49 +21,16 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
+import ocpp._2022._02.security.GetLog;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
 @Setter
 @Getter
 @Schema(description = "Parameters for requesting diagnostic or security logs from charge points")
-public class GetLogParams extends MultipleChargePointSelect {
+public class GetLogParams extends GetDiagnosticsParams {
 
     @NotNull(message = "Log type is required")
     @Schema(description = "Type of log to retrieve", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LogEnumType logType;
-
-    @NotNull(message = "Request ID is required")
-    @Min(value = 1, message = "Request ID must be at least {value}")
-    @Schema(description = "Unique request identifier", requiredMode = Schema.RequiredMode.REQUIRED, minimum = "1")
-    private Integer requestId;
-
-    @NotBlank(message = "Location is required")
-    @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")
-    @Schema(description = "FTP/SFTP URL where charge point should upload the log file",
-            requiredMode = Schema.RequiredMode.REQUIRED, example = "ftp://user:pass@example.com/logs/")
-    private String location;
-
-    @Min(value = 1, message = "Retries must be at least {value}")
-    @Schema(description = "Number of times charge point should retry upload if it fails", minimum = "1")
-    private Integer retries;
-
-    @Min(value = 1, message = "Retry Interval must be at least {value}")
-    @Schema(description = "Interval in seconds between retry attempts", minimum = "1")
-    private Integer retryInterval;
-
-    @Schema(description = "Oldest timestamp to include in log file")
-    private DateTime oldestTimestamp;
-
-    @Schema(description = "Latest timestamp to include in log file")
-    private DateTime latestTimestamp;
-
-    public enum LogEnumType {
-        DiagnosticsLog,
-        SecurityLog
-    }
+    private GetLog.LogEnumType logType;
 }

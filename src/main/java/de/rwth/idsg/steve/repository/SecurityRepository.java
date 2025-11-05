@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
+import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public interface SecurityRepository {
     void insertLogUploadStatus(String chargeBoxIdentity, Integer requestId, String status, DateTime timestamp);
 
     void insertFirmwareUpdateStatus(String chargeBoxIdentity, Integer requestId, String value, DateTime timestamp);
+
+    int insertNewLogUploadJob(GetLogParams params);
 
     List<SecurityEvent> getSecurityEvents(String chargeBoxId, Integer limit);
 

@@ -28,8 +28,7 @@ import java.util.List;
 
 public interface SecurityRepository {
 
-    void insertSecurityEvent(String chargeBoxId, String eventType, DateTime timestamp, String techInfo,
-                             String severity);
+    void insertSecurityEvent(String chargeBoxId, String eventType, DateTime timestamp, String techInfo);
 
     List<SecurityEvent> getSecurityEvents(String chargeBoxId, Integer limit);
 

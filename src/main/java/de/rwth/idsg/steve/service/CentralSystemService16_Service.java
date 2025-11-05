@@ -300,29 +300,12 @@ public class CentralSystemService16_Service {
             if (csr == null || csr.trim().isEmpty()) {
                 log.error("Empty or null CSR received from '{}'", chargeBoxIdentity);
                 response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-
-                securityRepository.insertSecurityEvent(
-                    chargeBoxIdentity,
-                    "SignCertificateRejected",
-                    DateTime.now(),
-                    "Empty CSR received",
-                    "MEDIUM"
-                );
-
                 return response;
             }
 
             if (!certificateSigningService.isInitialized()) {
                 log.error("Certificate signing service not initialized. Check TLS configuration.");
                 response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-
-                securityRepository.insertSecurityEvent(
-                    chargeBoxIdentity,
-                    "SignCertificateUnavailable",
-                    DateTime.now(),
-                    "Certificate signing service not initialized",
-                    "HIGH"
-                );
 
                 return response;
             }
@@ -344,14 +327,6 @@ public class CentralSystemService16_Service {
                 2048
             );
 
-            securityRepository.insertSecurityEvent(
-                chargeBoxIdentity,
-                "SignCertificateRequest",
-                DateTime.now(),
-                "CSR signed successfully, certificate ID: " + certificateId,
-                "INFO"
-            );
-
             response.setStatus(SignCertificateResponse.GenericStatusEnumType.ACCEPTED);
             log.info("SignCertificateRequest from '{}' processed successfully. Certificate stored with ID: {}. "
                       + "Send certificate to charge point using CertificateSignedTask with certificate chain: {}",
@@ -361,25 +336,9 @@ public class CentralSystemService16_Service {
             log.error("Invalid CSR from '{}': {}", chargeBoxIdentity, e.getMessage());
             response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
 
-            securityRepository.insertSecurityEvent(
-                chargeBoxIdentity,
-                "SignCertificateRejected",
-                DateTime.now(),
-                "Invalid CSR: " + e.getMessage(),
-                "HIGH"
-            );
-
         } catch (Exception e) {
             log.error("Error signing certificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
             response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-
-            securityRepository.insertSecurityEvent(
-                chargeBoxIdentity,
-                "SignCertificateError",
-                DateTime.now(),
-                "Error signing CSR: " + e.getMessage(),
-                "HIGH"
-            );
         }
 
         return response;
@@ -387,27 +346,13 @@ public class CentralSystemService16_Service {
 
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
-        var eventType = parameters.getType();
-        var eventTimestamp = parameters.getTimestamp();
-        var techInfo = parameters.getTechInfo();
-
-        log.info("SecurityEvent from '{}': type={}, timestamp={}", chargeBoxIdentity, eventType, eventTimestamp);
-
         try {
-            var severity = determineSeverity(eventType);
-
             securityRepository.insertSecurityEvent(
                 chargeBoxIdentity,
-                eventType,
-                eventTimestamp,
-                techInfo != null ? techInfo : "",
-                severity
+                parameters.getType(),
+                parameters.getTimestamp(),
+                parameters.getTechInfo()
             );
-
-            if ("CRITICAL".equals(severity) || "HIGH".equals(severity)) {
-                log.warn("High-severity security event from '{}': {}", chargeBoxIdentity, eventType);
-            }
-
         } catch (Exception e) {
             log.error("Error storing security event from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
         }
@@ -431,15 +376,6 @@ public class CentralSystemService16_Service {
             } else {
                 log.warn("No firmware update found for chargeBox '{}'", chargeBoxIdentity);
             }
-
-            securityRepository.insertSecurityEvent(
-                chargeBoxIdentity,
-                "FirmwareStatusNotification",
-                DateTime.now(),
-                "Firmware status: " + status + (requestId != null ? ", requestId: " + requestId : ""),
-                "INFO"
-            );
-
         } catch (Exception e) {
             log.error("Error processing firmware status notification from '{}': {}",
                     chargeBoxIdentity, e.getMessage(), e);
@@ -465,15 +401,6 @@ public class CentralSystemService16_Service {
                     log.warn("No log file found for requestId {}", requestId);
                 }
             }
-
-            securityRepository.insertSecurityEvent(
-                chargeBoxIdentity,
-                "LogStatusNotification",
-                DateTime.now(),
-                "Log upload status: " + status + (requestId != null ? ", requestId: " + requestId : ""),
-                "INFO"
-            );
-
         } catch (Exception e) {
             log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
         }
@@ -497,28 +424,5 @@ public class CentralSystemService16_Service {
             return null;
         }
         return transactionId;
-    }
-
-    private static String determineSeverity(String eventType) {
-        if (eventType == null) {
-            return "INFO";
-        }
-
-        var upperType = eventType.toUpperCase();
-
-        if (upperType.contains("ATTACK") || upperType.contains("BREACH") || upperType.contains("TAMPER")) {
-            return "CRITICAL";
-        }
-
-        if (upperType.contains("FAIL") || upperType.contains("ERROR") || upperType.contains("INVALID")
-            || upperType.contains("UNAUTHORIZED") || upperType.contains("REJECT")) {
-            return "HIGH";
-        }
-
-        if (upperType.contains("WARNING") || upperType.contains("EXPIR")) {
-            return "MEDIUM";
-        }
-
-        return "INFO";
     }
 }

@@ -32,6 +32,8 @@ public interface SecurityRepository {
 
     void insertLogUploadStatus(String chargeBoxIdentity, Integer requestId, String status, DateTime timestamp);
 
+    void insertFirmwareUpdateStatus(String chargeBoxIdentity, Integer requestId, String value, DateTime timestamp);
+
     List<SecurityEvent> getSecurityEvents(String chargeBoxId, Integer limit);
 
     int insertCertificate(String chargeBoxId, String certificateType, String certificateData,

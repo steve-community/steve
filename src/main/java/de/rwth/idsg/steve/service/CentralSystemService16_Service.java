@@ -359,6 +359,27 @@ public class CentralSystemService16_Service {
 
         return new SecurityEventNotificationResponse();
     }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
+        try {
+            if (parameters.getRequestId() == null) {
+                log.warn("No requestId in {}", parameters);
+            } else {
+                securityRepository.insertFirmwareUpdateStatus(
+                    chargeBoxIdentity,
+                    parameters.getRequestId(),
+                    parameters.getStatus().value(),
+                    DateTime.now()
+                );
+            }
+        } catch (Exception e) {
+            log.error("Error processing firmware status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SignedFirmwareStatusNotificationResponse();
+    }
+
     public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
                                                                String chargeBoxIdentity) {
         try {
@@ -377,30 +398,6 @@ public class CentralSystemService16_Service {
         }
 
         return new LogStatusNotificationResponse();
-    }
-
-    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
-            SignedFirmwareStatusNotification parameters, String chargeBoxIdentity) {
-        var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
-        var requestId = parameters.getRequestId();
-
-        log.info("FirmwareStatus from '{}': status={}, requestId={}", chargeBoxIdentity, status, requestId);
-
-        try {
-            var firmwareUpdate = securityRepository.getCurrentFirmwareUpdate(chargeBoxIdentity);
-
-            if (firmwareUpdate != null) {
-                securityRepository.updateFirmwareUpdateStatus(firmwareUpdate.getFirmwareUpdateId(), status);
-                log.info("Updated firmware status for chargeBox '{}' to '{}'", chargeBoxIdentity, status);
-            } else {
-                log.warn("No firmware update found for chargeBox '{}'", chargeBoxIdentity);
-            }
-        } catch (Exception e) {
-            log.error("Error processing firmware status notification from '{}': {}",
-                    chargeBoxIdentity, e.getMessage(), e);
-        }
-
-        return new SignedFirmwareStatusNotificationResponse();
     }
 
     // -------------------------------------------------------------------------

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
+import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_STATUS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
@@ -75,6 +76,22 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             .set(CHARGE_BOX_LOG_UPLOAD_STATUS.JOB_ID, requestId)
             .set(CHARGE_BOX_LOG_UPLOAD_STATUS.EVENT_STATUS, status)
             .set(CHARGE_BOX_LOG_UPLOAD_STATUS.EVENT_TIMESTAMP, timestamp)
+            .execute();
+    }
+
+    @Override
+    public void insertFirmwareUpdateStatus(String chargeBoxId, Integer requestId, String status, DateTime timestamp) {
+        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
+        if (chargeBoxPk == null) {
+            log.error("Cannot insert log upload status for unknown chargeBoxId: {}", chargeBoxId);
+            return;
+        }
+
+        ctx.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_STATUS)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK, chargeBoxPk)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID, requestId)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_STATUS, status)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP, timestamp)
             .execute();
     }
 

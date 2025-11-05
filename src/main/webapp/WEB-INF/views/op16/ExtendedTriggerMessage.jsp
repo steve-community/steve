@@ -41,14 +41,13 @@
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SendLocalList">Send Local List</a></li>
             <hr>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/TriggerMessage">Trigger Message</a></li>
-            <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/GetCompositeSchedule">Get Composite Schedule</a></li>
+            <li><a href="${ctxPath}/manager/operations/${opVersion}/GetCompositeSchedule">Get Composite Schedule</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile">Clear Charging Profile</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SetChargingProfile">Set Charging Profile</a></li>
-            <li><a href="${ctxPath}/manager/operations/${opVersion}/ExtendedTriggerMessage"><i>Extended Trigger Message</i></a></li>
+            <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/ExtendedTriggerMessage"><i>Extended Trigger Message</i></a></li>
         </ul>
     </div>
     <div class="op16-content">
-        <%@ include file="../op-forms/GetCompositeScheduleForm.jsp" %>
+        <%@ include file="../op-forms/ExtendedTriggerMessageForm.jsp" %>
     </div></div>
-</div></div>
 <%@ include file="../00-footer.jsp" %>

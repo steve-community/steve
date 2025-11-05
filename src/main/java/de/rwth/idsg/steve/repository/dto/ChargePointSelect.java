@@ -47,4 +47,8 @@ public final class ChargePointSelect {
     public boolean isSoap() {
         return OcppTransport.SOAP == ocppProtocol.getTransport();
     }
+
+    public boolean isJson() {
+        return OcppTransport.JSON == ocppProtocol.getTransport();
+    }
 }

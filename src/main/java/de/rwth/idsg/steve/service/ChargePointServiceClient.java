@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
@@ -54,6 +55,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
@@ -450,4 +452,23 @@ public class ChargePointServiceClient {
         return taskStore.add(task);
     }
 
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
+    @SafeVarargs
+    public final int extendedTriggerMessage(ExtendedTriggerMessageParams params,
+                                            OcppCallback<String>... callbacks) {
+        ExtendedTriggerMessageTask task = new ExtendedTriggerMessageTask(params);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.extendedTriggerMessage(c, task));
+
+        return taskStore.add(task);
+    }
 }

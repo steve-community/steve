@@ -53,8 +53,8 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.03.2018
  */
-@Controller
-@RequestMapping(value = "/manager/operations/v1.6")
+//@Controller
+//@RequestMapping(value = "/manager/operations/v1.6")
 public class Ocpp16Controller extends Ocpp15Controller {
 
     private final ChargingProfileRepository chargingProfileRepository;

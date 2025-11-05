@@ -268,34 +268,44 @@ public class ChargePointService {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
     }
 
-    private List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter,
+    public List<ChargePointSelect> getChargePoints(OcppProtocol protocol,
+                                                   List<RegistrationStatus> inStatusFilter,
+                                                   List<String> chargeBoxIdFilter) {
+        OcppVersion version = protocol.getVersion();
+        OcppTransport transport = protocol.getTransport();
+
+        switch (transport) {
+            case SOAP -> {
+                List<String> statusFilter = inStatusFilter.stream()
+                    .map(RegistrationStatus::value)
+                    .collect(Collectors.toList());
+
+                var soapProtocol = version.toProtocol(OcppTransport.SOAP);
+                return chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter);
+            }
+            case JSON -> {
+                SessionContextStore sessionStore = sessionContextStoreHolder.getOrCreate(version);
+
+                List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
+                    ? sessionStore.getChargeBoxIdList()
+                    : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
+
+                var jsonProtocol = version.toProtocol(OcppTransport.JSON);
+
+                return chargeBoxIdList.stream()
+                    .map(chargeBoxId -> new ChargePointSelect(jsonProtocol, chargeBoxId))
+                    .toList();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + transport);
+        }
+    }
+
+    private List<ChargePointSelect> getChargePoints(OcppVersion version,
+                                                    List<RegistrationStatus> inStatusFilter,
                                                     List<String> chargeBoxIdFilter) {
         List<ChargePointSelect> returnList =  new ArrayList<>();
-
-        // soap stations
-        {
-            List<String> statusFilter = inStatusFilter.stream()
-                .map(RegistrationStatus::value)
-                .collect(Collectors.toList());
-
-            var soapProtocol = version.toProtocol(OcppTransport.SOAP);
-
-            returnList.addAll(chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter));
-        }
-
-        // json stations
-        {
-            SessionContextStore sessionStore = sessionContextStoreHolder.getOrCreate(version);
-
-            List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
-                ? sessionStore.getChargeBoxIdList()
-                : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
-
-            var jsonProtocol = version.toProtocol(OcppTransport.JSON);
-
-            chargeBoxIdList.forEach(chargeBoxId -> returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId)));
-        }
-
+        returnList.addAll(getChargePoints(version.toProtocol(OcppTransport.SOAP), inStatusFilter, chargeBoxIdFilter));
+        returnList.addAll(getChargePoints(version.toProtocol(OcppTransport.JSON), inStatusFilter, chargeBoxIdFilter));
         return returnList;
     }
 

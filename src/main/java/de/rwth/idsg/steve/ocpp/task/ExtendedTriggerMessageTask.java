@@ -21,10 +21,10 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
-
-import jakarta.xml.ws.AsyncHandler;
 import ocpp._2022._02.security.ExtendedTriggerMessage;
 import ocpp._2022._02.security.ExtendedTriggerMessageResponse;
+
+import jakarta.xml.ws.AsyncHandler;
 
 public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, String> {
 
@@ -40,14 +40,8 @@ public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTrigg
     @Override
     public ExtendedTriggerMessage getOcpp16Request() {
         var request = new ExtendedTriggerMessage();
-        request.setRequestedMessage(
-            ExtendedTriggerMessage.MessageTriggerEnumType.valueOf(params.getRequestedMessage().toString())
-        );
-
-        if (params.getConnectorId() != null) {
-            request.setConnectorId(params.getConnectorId());
-        }
-
+        request.setRequestedMessage(params.getTriggerMessage());
+        request.setConnectorId(params.getConnectorId());
         return request;
     }
 
@@ -55,9 +49,7 @@ public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTrigg
     public AsyncHandler<ExtendedTriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                success(chargeBoxId, status);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

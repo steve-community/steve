@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
+import ocpp._2022._02.security.ExtendedTriggerMessage;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,19 +29,9 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 public class ExtendedTriggerMessageParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "Requested message is required")
-    private MessageTriggerEnumType requestedMessage;
+    @NotNull(message = "Trigger Message is required")
+    private ExtendedTriggerMessage.MessageTriggerEnumType triggerMessage;
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
-
-    public enum MessageTriggerEnumType {
-        BootNotification,
-        LogStatusNotification,
-        FirmwareStatusNotification,
-        Heartbeat,
-        MeterValues,
-        SignChargePointCertificate,
-        StatusNotification
-    }
 }

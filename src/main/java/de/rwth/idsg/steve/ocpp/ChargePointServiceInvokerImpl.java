@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
@@ -232,6 +233,16 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.triggerMessage(cp, task);
         } else {
+            chargePointServiceJsonInvoker.runPipeline(cp, task);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions. Only for JSON
+    // -------------------------------------------------------------------------
+
+    public void extendedTriggerMessage(ChargePointSelect cp, ExtendedTriggerMessageTask task) {
+        if (cp.isJson()) {
             chargePointServiceJsonInvoker.runPipeline(cp, task);
         }
     }

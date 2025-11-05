@@ -18,7 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
-<form:form action="${ctxPath}/manager/operations/${opVersion}/UpdateFirmware" modelAttribute="params">
+<form:form action="${ctxPath}/manager/operations/${opVersion}/SignedUpdateFirmware" modelAttribute="params">
     <section><span>Charge Points with OCPP ${opVersion}</span></section>
     <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
@@ -31,6 +31,13 @@
                 <form:input path="retrieveDateTime" cssClass="dateTimePicker"/>
             </td>
         </tr>
+        <tr><td>Install Date/Time:</td>
+            <td>
+                <form:input path="installDateTime" cssClass="dateTimePicker" placeholder="optional"/>
+            </td>
+        </tr>
+        <tr><td>Signature:</td><td><form:textarea path="signature" /></td></tr>
+        <tr><td>Signing Certificate:</td><td><form:textarea path="signingCertificate" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

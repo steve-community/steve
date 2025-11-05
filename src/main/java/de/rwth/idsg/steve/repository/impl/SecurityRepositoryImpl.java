@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
+import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_STATUS;
@@ -106,6 +108,20 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             .set(CHARGE_BOX_LOG_UPLOAD_JOB.OLDEST_TIMESTAMP, params.getStart())
             .set(CHARGE_BOX_LOG_UPLOAD_JOB.LATEST_TIMESTAMP, params.getStop())
             .returning(CHARGE_BOX_LOG_UPLOAD_JOB.JOB_ID)
+            .fetchOne()
+            .getJobId();
+    }
+
+    @Override
+    public int insertNewFirmwareUpdateJob(SignedUpdateFirmwareParams params) {
+        return ctx.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.CREATED_AT, DateTime.now())
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.FIRMWARE_LOCATION, params.getLocation())
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.RETRIEVE_DATETIME, params.getRetrieveDateTime())
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.INSTALL_DATETIME, params.getInstallDateTime())
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.SIGNING_CERTIFICATE, params.getSigningCertificate())
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.SIGNATURE, params.getSignature())
+            .returning(CHARGE_BOX_FIRMWARE_UPDATE_JOB.JOB_ID)
             .fetchOne()
             .getJobId();
     }

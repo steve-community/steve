@@ -40,6 +40,7 @@ import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskFromDB;
+import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
@@ -69,6 +70,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
@@ -490,6 +492,24 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.getLog(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int signedUpdateFirmware(SignedUpdateFirmwareParams params,
+                                          OcppCallback<String>... callbacks) {
+        int requestId = securityRepository.insertNewFirmwareUpdateJob(params);
+
+        SignedUpdateFirmwareTask task = new SignedUpdateFirmwareTask(params, requestId);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.signedUpdateFirmware(c, task));
 
         return taskStore.add(task);
     }

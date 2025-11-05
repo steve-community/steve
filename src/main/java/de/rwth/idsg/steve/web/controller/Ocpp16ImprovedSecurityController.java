@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,6 +54,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
 
     private static final String EXTENDED_TRIGGER_MESSAGE_PATH = "/ExtendedTriggerMessage";
     private static final String GET_LOG_PATH = "/GetLog";
+    private static final String SIGNED_UPDATE_FIRMWARE_PATH = "/SignedUpdateFirmware";
 
     /**
      * "Improved security for OCPP 1.6-J" white paper defines new operations only for JSON. Therefore, our station
@@ -84,6 +86,13 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return getPrefix() + GET_LOG_PATH;
     }
 
+    @RequestMapping(value = SIGNED_UPDATE_FIRMWARE_PATH, method = RequestMethod.GET)
+    public String getSignedUpdateFirmware(Model model) {
+        setCommonAttributesForImprovedSecurity(model);
+        model.addAttribute(PARAMS, new SignedUpdateFirmwareParams());
+        return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
+    }
+
     // -------------------------------------------------------------------------
     // Http methods (POST)
     // -------------------------------------------------------------------------
@@ -108,5 +117,14 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return GET_LOG_PATH + chargePointServiceClient.getLog(params);
     }
 
+    @RequestMapping(value = SIGNED_UPDATE_FIRMWARE_PATH, method = RequestMethod.POST)
+    public String postSignedUpdateFirmware(@Valid @ModelAttribute(PARAMS) SignedUpdateFirmwareParams params,
+                                           BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributesForImprovedSecurity(model);
+            return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
+        }
+        return GET_LOG_PATH + chargePointServiceClient.signedUpdateFirmware(params);
+    }
 
 }

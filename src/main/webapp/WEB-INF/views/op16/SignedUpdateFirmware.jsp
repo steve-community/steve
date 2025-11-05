@@ -22,7 +22,7 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../snippets/clearChargingProfile.js" %>
+        <%@ include file="../snippets/dateTimePicker-future.js" %>
     });
 </script>
 <div class="content">
@@ -47,15 +47,14 @@
             <hr>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/TriggerMessage">Trigger Message</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/GetCompositeSchedule">Get Composite Schedule</a></li>
-            <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile">Clear Charging Profile</a></li>
+            <li><a href="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile">Clear Charging Profile</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SetChargingProfile">Set Charging Profile</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/ExtendedTriggerMessage"><i>Extended Trigger Message</i></a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/GetLog"><i>Get Log</i></a></li>
-            <li><a href="${ctxPath}/manager/operations/${opVersion}/SignedUpdateFirmware"><i>Signed Update Firmware</i></a></li>
+            <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/SignedUpdateFirmware"><i>Signed Update Firmware</i></a></li>
         </ul>
     </div>
     <div class="op16-content">
-        <%@ include file="../op-forms/ClearChargingProfileForm.jsp" %>
+        <%@ include file="../op-forms/SignedUpdateFirmwareForm.jsp" %>
     </div></div>
-</div></div>
 <%@ include file="../00-footer.jsp" %>

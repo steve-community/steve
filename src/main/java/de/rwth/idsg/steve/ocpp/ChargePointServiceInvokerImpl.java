@@ -37,6 +37,7 @@ import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
@@ -249,6 +250,12 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     }
 
     public void getLog(ChargePointSelect cp, GetLogTask task) {
+        if (cp.isJson()) {
+            chargePointServiceJsonInvoker.runPipeline(cp, task);
+        }
+    }
+
+    public void signedUpdateFirmware(ChargePointSelect cp, SignedUpdateFirmwareTask task) {
         if (cp.isJson()) {
             chargePointServiceJsonInvoker.runPipeline(cp, task);
         }

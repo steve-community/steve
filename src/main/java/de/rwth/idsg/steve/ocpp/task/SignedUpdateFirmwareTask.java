@@ -21,16 +21,19 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
-
-import jakarta.xml.ws.AsyncHandler;
 import ocpp._2022._02.security.FirmwareType;
 import ocpp._2022._02.security.SignedUpdateFirmware;
 import ocpp._2022._02.security.SignedUpdateFirmwareResponse;
 
+import jakarta.xml.ws.AsyncHandler;
+
 public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFirmwareParams, String> {
 
-    public SignedUpdateFirmwareTask(SignedUpdateFirmwareParams params) {
+    private final int requestId;
+
+    public SignedUpdateFirmwareTask(SignedUpdateFirmwareParams params, int requestId) {
         super(params);
+        this.requestId = requestId;
     }
 
     @Override
@@ -40,25 +43,18 @@ public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFir
 
     @Override
     public SignedUpdateFirmware getOcpp16Request() {
-        var request = new SignedUpdateFirmware();
-        request.setRequestId(params.getRequestId());
-
         var firmware = new FirmwareType();
-        firmware.setLocation(params.getFirmwareLocation());
+        firmware.setLocation(params.getLocation());
         firmware.setRetrieveDateTime(params.getRetrieveDateTime());
         firmware.setInstallDateTime(params.getInstallDateTime());
         firmware.setSigningCertificate(params.getSigningCertificate());
-        firmware.setSignature(params.getFirmwareSignature());
+        firmware.setSignature(params.getSignature());
 
+        var request = new SignedUpdateFirmware();
+        request.setRequestId(requestId);
         request.setFirmware(firmware);
-
-        if (params.getRetries() != null) {
-            request.setRetries(params.getRetries());
-        }
-        if (params.getRetryInterval() != null) {
-            request.setRetryInterval(params.getRetryInterval());
-        }
-
+        request.setRetries(params.getRetries());
+        request.setRetryInterval(params.getRetryInterval());
         return request;
     }
 
@@ -66,9 +62,7 @@ public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFir
     public AsyncHandler<SignedUpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                success(chargeBoxId, status);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

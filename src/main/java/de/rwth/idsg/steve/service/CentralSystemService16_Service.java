@@ -359,6 +359,25 @@ public class CentralSystemService16_Service {
 
         return new SecurityEventNotificationResponse();
     }
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
+        try {
+            if (parameters.getRequestId() == null) {
+                log.warn("No requestId in {}", parameters);
+            } else {
+                securityRepository.insertLogUploadStatus(
+                    chargeBoxIdentity,
+                    parameters.getRequestId(),
+                    parameters.getStatus().value(),
+                    DateTime.now()
+                );
+            }
+        } catch (Exception e) {
+            log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new LogStatusNotificationResponse();
+    }
 
     public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(
             SignedFirmwareStatusNotification parameters, String chargeBoxIdentity) {
@@ -382,30 +401,6 @@ public class CentralSystemService16_Service {
         }
 
         return new SignedFirmwareStatusNotificationResponse();
-    }
-
-    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters, String chargeBoxIdentity) {
-        var status = parameters.getStatus() != null ? parameters.getStatus().toString() : "Unknown";
-        var requestId = parameters.getRequestId();
-
-        log.info("LogStatus from '{}': status={}, requestId={}", chargeBoxIdentity, status, requestId);
-
-        try {
-            if (requestId != null) {
-                var logFile = securityRepository.getLogFile(requestId);
-
-                if (logFile != null) {
-                    securityRepository.updateLogFileStatus(requestId, status, null);
-                    log.info("Updated log file status for requestId {} to '{}'", requestId, status);
-                } else {
-                    log.warn("No log file found for requestId {}", requestId);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
-        }
-
-        return new LogStatusNotificationResponse();
     }
 
     // -------------------------------------------------------------------------

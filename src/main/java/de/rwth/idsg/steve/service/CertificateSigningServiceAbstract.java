@@ -18,9 +18,23 @@
  */
 package de.rwth.idsg.steve.service;
 
-public interface CertificateSigningService {
+import org.slf4j.Logger;
 
-    boolean isEnabled();
+public abstract class CertificateSigningServiceAbstract implements CertificateSigningService {
 
-    void processCSR(String csrPem, String chargeBoxId);
+    @Override
+    public void processCSR(String csrPem, String chargeBoxId) {
+        try {
+            String certificateChain = this.signCertificate(csrPem, chargeBoxId);
+            this.sendCertificateSignedToStation(certificateChain, chargeBoxId);
+        } catch (Exception e) {
+            getLog().error(e.getMessage(), e);
+        }
+    }
+
+    protected abstract Logger getLog();
+
+    protected abstract String signCertificate(String csrPem, String chargeBoxId) throws Exception;
+
+    protected abstract void sendCertificateSignedToStation(String certificateChain, String chargeBoxId);
 }

@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
@@ -41,6 +40,7 @@ import ocpp._2022._02.security.SecurityEventNotification;
 import ocpp._2022._02.security.SecurityEventNotificationResponse;
 import ocpp._2022._02.security.SignCertificate;
 import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignCertificateResponse.GenericStatusEnumType;
 import ocpp._2022._02.security.SignedFirmwareStatusNotification;
 import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -70,8 +70,10 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -90,7 +92,7 @@ public class CentralSystemService16_Service {
     private final ChargePointService chargePointService;
     private final SecurityRepository securityRepository;
     private final CertificateSigningService certificateSigningService;
-    private final SecurityProfileConfiguration securityConfig;
+    private final TaskScheduler taskScheduler;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -290,58 +292,28 @@ public class CentralSystemService16_Service {
     }
 
     public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
-        log.info("Received SignCertificateRequest from '{}' with CSR length: {}", chargeBoxIdentity,
-                parameters.getCsr() != null ? parameters.getCsr().length() : 0);
-
-        var response = new SignCertificateResponse();
-
         try {
+            if (!certificateSigningService.isEnabled()) {
+                log.error("Certificate signing service is not enabled.");
+                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+            }
+
             var csr = parameters.getCsr();
             if (csr == null || csr.trim().isEmpty()) {
                 log.error("Empty or null CSR received from '{}'", chargeBoxIdentity);
-                response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-                return response;
+                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
             }
 
-            if (!certificateSigningService.isInitialized()) {
-                log.error("Certificate signing service not initialized. Check TLS configuration.");
-                response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-
-                return response;
-            }
-
-            var signedCertificatePem = certificateSigningService.signCertificateRequest(csr, chargeBoxIdentity);
-            var caCertificatePem = certificateSigningService.getCertificateChain();
-            var certificateChain = signedCertificatePem + caCertificatePem;
-
-            var certificateId = securityRepository.insertCertificate(
-                chargeBoxIdentity,
-                "ChargePointCertificate",
-                signedCertificatePem,
-                null,
-                null,
-                null,
-                DateTime.now(),
-                DateTime.now().plusYears(securityConfig.getCertificateValidityYears()),
-                "SHA256WithRSA",
-                2048
+            taskScheduler.schedule(
+                () -> certificateSigningService.processCSR(csr, chargeBoxIdentity),
+                Instant.now().plusSeconds(5)
             );
 
-            response.setStatus(SignCertificateResponse.GenericStatusEnumType.ACCEPTED);
-            log.info("SignCertificateRequest from '{}' processed successfully. Certificate stored with ID: {}. "
-                      + "Send certificate to charge point using CertificateSignedTask with certificate chain: {}",
-                    chargeBoxIdentity, certificateId, certificateChain.length());
-
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid CSR from '{}': {}", chargeBoxIdentity, e.getMessage());
-            response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
-
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.ACCEPTED);
         } catch (Exception e) {
-            log.error("Error signing certificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
-            response.setStatus(SignCertificateResponse.GenericStatusEnumType.REJECTED);
+            log.error("Error processing SignCertificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
         }
-
-        return response;
     }
 
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,

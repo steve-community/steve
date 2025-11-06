@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.service.CertificateSigningService;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -94,7 +93,7 @@ public class SecurityController {
         model.addAttribute("truststoreType", securityConfig.getTruststoreType());
         model.addAttribute("clientAuthRequired", securityConfig.isClientAuthRequired());
         model.addAttribute("tlsProtocols", String.join(", ", securityConfig.getTlsProtocols()));
-        model.addAttribute("signingServiceInitialized", certificateSigningService.isInitialized());
+        model.addAttribute("signingServiceInitialized", certificateSigningService.isEnabled());
 
         return "security-man/configuration";
     }

@@ -64,18 +64,4 @@ public interface SecurityRepository {
     void deleteCertificate(int certificateId);
 
     Certificate getCertificateBySerialNumber(String serialNumber);
-
-    int insertLogFile(String chargeBoxId, String logType, Integer requestId, String filePath);
-
-    void updateLogFileStatus(int logFileId, String uploadStatus, Long bytesUploaded);
-
-    LogFile getLogFile(int logFileId);
-
-    int insertFirmwareUpdate(String chargeBoxId, String firmwareLocation, String firmwareSignature,
-                             String signingCertificate, DateTime retrieveDate, DateTime installDate);
-
-    void updateFirmwareUpdateStatus(int firmwareUpdateId, String status);
-
-    FirmwareUpdate getCurrentFirmwareUpdate(String chargeBoxId);
-
 }

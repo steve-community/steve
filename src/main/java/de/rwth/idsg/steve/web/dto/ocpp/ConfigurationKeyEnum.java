@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -29,6 +30,7 @@ import static de.rwth.idsg.steve.ocpp.OcppVersion.V_15;
 import static de.rwth.idsg.steve.ocpp.OcppVersion.V_16;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.W;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -107,6 +109,17 @@ public enum ConfigurationKeyEnum {
     MaxChargingProfilesInstalled("integer", R, newHashSet(V_16)),
 
     // -------------------------------------------------------------------------
+    // New in Improved security for OCPP 1.6-J
+    // -------------------------------------------------------------------------
+
+    AdditionalRootCertificateCheck("boolean", R, newHashSet(V_16)),
+    AuthorizationKey("string", W, newHashSet(V_16)),
+    CertificateSignedMaxChainSize("integer", R, newHashSet(V_16)),
+    CertificateStoreMaxLength("integer", R, newHashSet(V_16)),
+    CpoName("string", RW, newHashSet(V_16)),
+    SecurityProfile("integer", RW, newHashSet(V_16)),
+
+    // -------------------------------------------------------------------------
     // Recommended additional configuration keys for OCMF by SAFE e.V.
     // see https://github.com/SAFE-eV/OCMF-Open-Charge-Metering-Format/blob/master/OCMF-de.md
     // -------------------------------------------------------------------------
@@ -125,8 +138,10 @@ public enum ConfigurationKeyEnum {
     public static final Map<String, String> OCPP_15_MAP = asMap(OcppVersion.V_15, RW);
 
     // In OCPP 1.6 some Configuration Keys are Read-Only
+    // After "Improved security for OCPP 1.6-J", one key is Write-Only
     public static final Map<String, String> OCPP_16_MAP_R = asMap(OcppVersion.V_16, R);
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
+    public static final Map<String, String> OCPP_16_MAP_W = asMap(OcppVersion.V_16, W);
 
 
     ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
@@ -149,13 +164,21 @@ public enum ConfigurationKeyEnum {
         throw new IllegalArgumentException(v);
     }
 
-    private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWriteEnum rw) {
+    private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWriteEnum requestedType) {
         Map<String, String> map = new TreeMap<>();
-        for (ConfigurationKeyEnum c : ConfigurationKeyEnum.values()) {
-            if (c.versions.contains(version) && c.rw == rw) {
-                map.put(c.value, c.text);
-            } else if (c.versions.contains(version) && rw == ConfigurationKeyReadWriteEnum.R) {
-                map.put(c.value, c.text);
+        for (ConfigurationKeyEnum confType : ConfigurationKeyEnum.values()) {
+            if (!confType.versions.contains(version)) {
+                continue;
+            }
+
+            boolean shouldInclude = switch (requestedType) {
+                case R -> confType.rw == R || confType.rw == RW;
+                case W -> confType.rw == W || confType.rw == RW;
+                case RW -> confType.rw == RW;
+            };
+
+            if (shouldInclude) {
+                map.put(confType.value, confType.text);
             }
         }
         return map;

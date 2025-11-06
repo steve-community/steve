@@ -61,7 +61,7 @@ public class SecurityController {
             model.addAttribute("events", securityRepository.getSecurityEvents(params));
         }
 
-        return "security/events";
+        return "security-man/events";
     }
 
     @RequestMapping(value = "/certificates", method = RequestMethod.GET)
@@ -75,7 +75,7 @@ public class SecurityController {
         model.addAttribute("selectedChargeBoxId", chargeBoxId);
         model.addAttribute("selectedCertificateType", certificateType);
 
-        return "security/certificates";
+        return "security-man/certificates";
     }
 
     @RequestMapping(value = "/certificates/delete/{certificateId}", method = RequestMethod.POST)
@@ -96,7 +96,7 @@ public class SecurityController {
         model.addAttribute("tlsProtocols", String.join(", ", securityConfig.getTlsProtocols()));
         model.addAttribute("signingServiceInitialized", certificateSigningService.isInitialized());
 
-        return "security/configuration";
+        return "security-man/configuration";
     }
 
     @RequestMapping(value = "/firmware", method = RequestMethod.GET)
@@ -111,6 +111,6 @@ public class SecurityController {
         model.addAttribute("chargeBoxIdList", chargePointRepository.getChargeBoxIds());
         model.addAttribute("selectedChargeBoxId", chargeBoxId);
 
-        return "security/firmware";
+        return "security-man/firmware";
     }
 }

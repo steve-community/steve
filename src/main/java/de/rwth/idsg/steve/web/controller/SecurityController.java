@@ -21,8 +21,10 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.service.CertificateSigningService;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -64,29 +67,35 @@ public class SecurityController {
         return "security-man/events";
     }
 
-    @RequestMapping(value = "/firmwareUpdates", method = RequestMethod.GET)
-    public String getFirmwareUpdateEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
-                                          BindingResult result, Model model) {
+    @RequestMapping(value = "/statusEvents", method = RequestMethod.GET)
+    public String getStatusEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
+                                  BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
 
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());
         } else {
-            model.addAttribute("events", securityRepository.getFirmwareUpdateEvents(params));
+            List<StatusEvent> events = securityRepository.getStatusEvents(params);
+            model.addAttribute("events", events);
         }
 
-        return "security-man/firmwareUpdates";
+        return "security-man/statusEvents";
     }
 
-    @RequestMapping(value = "/firmwareUpdates/{jobId}", method = RequestMethod.GET)
-    public String getFirmwareUpdateJobDetails(@PathVariable("jobId") int jobId, Model model) {
-        var record = securityRepository.getFirmwareUpdateDetails(jobId);
-        model.addAttribute("details", record);
-        return "security-man/firmwareUpdateDetails";
+    @RequestMapping(value = "/statusEvents/{eventType}/{jobId}", method = RequestMethod.GET)
+    public String getStatusEventJobDetails(@PathVariable("eventType") StatusEventType eventType,
+                                           @PathVariable("jobId") int jobId,
+                                           Model model) {
+        var details = switch (eventType) {
+            case FirmwareUpdate -> securityRepository.getFirmwareUpdateDetails(jobId);
+            case LogUpload -> securityRepository.getLogUploadDetails(jobId);
+        };
+
+        model.addAttribute("eventType", eventType.name());
+        model.addAttribute("details", details);
+        return "security-man/statusEventJobDetails";
     }
-
-
 
 
 

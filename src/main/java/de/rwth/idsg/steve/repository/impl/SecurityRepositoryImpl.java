@@ -26,10 +26,12 @@ import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
+import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -48,6 +50,7 @@ import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_STATUS;
+import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
 
@@ -170,38 +173,44 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Override
-    public List<StatusEvent> getFirmwareUpdateEvents(StatusEventsQueryForm form) {
+    public List<StatusEvent> getStatusEvents(StatusEventsQueryForm form) {
         List<Condition> conditions = new ArrayList<>();
 
+        if (form.getEventType() != null) {
+            conditions.add(CHARGE_BOX_STATUS_EVENT.EVENT_TYPE.eq(form.getEventType().name()));
+        }
+
         if (form.isJobIdSet()) {
-            conditions.add(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID.eq(form.getJobId()));
+            conditions.add(CHARGE_BOX_STATUS_EVENT.JOB_ID.eq(form.getJobId()));
         }
 
         if (form.isChargeBoxIdSet()) {
             conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        var timeCondition = getTimeCondition(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP, form);
+        var timeCondition = getTimeCondition(CHARGE_BOX_STATUS_EVENT.EVENT_TIMESTAMP, form);
         if (timeCondition != null) {
             conditions.add(timeCondition);
         }
 
         return ctx.select(
-                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID,
+                CHARGE_BOX_STATUS_EVENT.JOB_ID,
                 CHARGE_BOX.CHARGE_BOX_ID,
-                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK,
-                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_STATUS,
-                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP)
-            .from(CHARGE_BOX_FIRMWARE_UPDATE_STATUS)
-            .join(CHARGE_BOX).on(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+                CHARGE_BOX_STATUS_EVENT.CHARGE_BOX_PK,
+                CHARGE_BOX_STATUS_EVENT.EVENT_STATUS,
+                CHARGE_BOX_STATUS_EVENT.EVENT_TIMESTAMP,
+                CHARGE_BOX_STATUS_EVENT.EVENT_TYPE)
+            .from(CHARGE_BOX_STATUS_EVENT)
+            .join(CHARGE_BOX).on(CHARGE_BOX_STATUS_EVENT.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
             .where(conditions)
-            .orderBy(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP.desc())
+            .orderBy(CHARGE_BOX_STATUS_EVENT.EVENT_TIMESTAMP.desc())
             .fetch(record -> StatusEvent.builder()
                 .jobId(record.value1())
                 .chargeBoxId(record.value2())
                 .chargeBoxPk(record.value3())
                 .status(record.value4())
                 .timestamp(record.value5())
+                .eventType(StatusEventType.valueOf(record.value6()))
                 .build()
             );
     }
@@ -214,6 +223,19 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 
         if (rec == null) {
             throw new SteveException.NotFound("Firmware update job not found");
+        }
+
+        return rec;
+    }
+
+    @Override
+    public ChargeBoxLogUploadJobRecord getLogUploadDetails(int jobId) {
+        var rec = ctx.selectFrom(CHARGE_BOX_LOG_UPLOAD_JOB)
+            .where(CHARGE_BOX_LOG_UPLOAD_JOB.JOB_ID.eq(jobId))
+            .fetchOne();
+
+        if (rec == null) {
+            throw new SteveException.NotFound("Log upload job not found");
         }
 
         return rec;

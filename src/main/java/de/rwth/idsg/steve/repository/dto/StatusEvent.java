@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.web.dto.StatusEventType;
 import lombok.Builder;
 import lombok.Getter;
 import org.joda.time.DateTime;
@@ -7,6 +8,7 @@ import org.joda.time.DateTime;
 @Getter
 @Builder
 public class StatusEvent {
+    private final StatusEventType eventType;
     private final Integer jobId;
     private final String chargeBoxId;
     private final int chargeBoxPk;

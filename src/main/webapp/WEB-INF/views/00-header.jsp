@@ -65,7 +65,7 @@
                     <li><a>SECURITY MANAGEMENT &raquo;</a>
                         <ul>
                             <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
-                            <li><a href="${ctxPath}/manager/security/firmwareUpdates">FIRMWARE UPDATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/statusEvents">STATUS EVENTS</a></li>
                             <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
                             <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
                         </ul>

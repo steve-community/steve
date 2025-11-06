@@ -29,20 +29,20 @@
 </script>
 <div class="content">
     <section>
-        <span>
-            Signed Firmware Updates
-            <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
-            <span>
-            <em>Improved security for OCPP 1.6-J</em> supports signed firmware updates to ensure the integrity and authenticity of firmware installed on charge points.
-            Use the <em>OPERATIONS > OCPP v1.6 > Signed Update Firmware</em> menu to initiate a signed firmware update request to a charge point.
-            </span>
-            </a>
-        </span>
+        <span>Status Events</span>
     </section>
-    <form:form action="${ctxPath}/manager/security/firmwareUpdates" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/security/statusEvents" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
-                <td>Job ID:</td>
+                <td>Event Type:</td>
+                <td><form:select path="eventType">
+                        <option value="" selected>All</option>
+                        <form:options items="${eventType}"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>Job/Request ID:</td>
                 <td><form:input path="jobId"/></td>
             </tr>
             <tr>
@@ -80,6 +80,7 @@
     <table class="res">
         <thead>
         <tr>
+            <th data-sort="string">Event Type</th>
             <th data-sort="int">Job/Request ID</th>
             <th data-sort="string">ChargeBox ID</th>
             <th data-sort="string">Status</th>
@@ -89,7 +90,8 @@
         <tbody>
         <c:forEach items="${events}" var="event">
             <tr>
-                <td><a href="${ctxPath}/manager/security/firmwareUpdates/${event.jobId}">${event.jobId}</a></td>
+                <td>${event.eventType}</td>
+                <td><a href="${ctxPath}/manager/security/statusEvents/${event.eventType}/${event.jobId}">${event.jobId}</a></td>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${event.chargeBoxPk}">${event.chargeBoxId}</a></td>
                 <td>${event.status}</td>
                 <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>

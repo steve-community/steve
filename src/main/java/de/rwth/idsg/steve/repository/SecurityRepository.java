@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
+import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -46,9 +47,11 @@ public interface SecurityRepository {
 
     List<SecurityEvent> getSecurityEvents(SecurityEventsQueryForm form);
 
-    List<StatusEvent> getFirmwareUpdateEvents(StatusEventsQueryForm params);
+    List<StatusEvent> getStatusEvents(StatusEventsQueryForm params);
 
     ChargeBoxFirmwareUpdateJobRecord getFirmwareUpdateDetails(int jobId);
+
+    ChargeBoxLogUploadJobRecord getLogUploadDetails(int jobId);
 
     int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
                           String serialNumber, String issuerName, String subjectName,

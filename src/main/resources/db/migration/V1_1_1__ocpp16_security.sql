@@ -68,6 +68,27 @@ CREATE TABLE IF NOT EXISTS charge_box_log_upload_status (
     INDEX idx_event_timestamp (event_timestamp)
 );
 
+
+CREATE OR REPLACE VIEW charge_box_status_event AS
+SELECT
+    job_id,
+    charge_box_pk,
+    event_status,
+    event_timestamp,
+    'FirmwareUpdate' AS event_type
+FROM charge_box_firmware_update_status
+
+UNION ALL
+
+SELECT
+    job_id,
+    charge_box_pk,
+    event_status,
+    event_timestamp,
+    'LogUpload' AS event_type
+FROM charge_box_log_upload_status;
+
+
 --
 -- TODO: This table will be reviewed later.
 --

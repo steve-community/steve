@@ -33,6 +33,7 @@ import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.GetLogTask;
+import de.rwth.idsg.steve.ocpp.task.InstallCertificateTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
@@ -63,6 +64,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
+import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
@@ -510,6 +512,23 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.signedUpdateFirmware(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int installCertificate(InstallCertificateParams params,
+                                        OcppCallback<String>... callbacks) {
+
+        InstallCertificateTask task = new InstallCertificateTask(params);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.installCertificate(c, task));
 
         return taskStore.add(task);
     }

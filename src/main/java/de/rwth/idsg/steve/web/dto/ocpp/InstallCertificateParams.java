@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import ocpp._2022._02.security.InstallCertificate;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,16 +34,10 @@ public class InstallCertificateParams extends MultipleChargePointSelect {
 
     @NotNull(message = "Certificate type is required")
     @Schema(description = "Type of certificate to install", requiredMode = Schema.RequiredMode.REQUIRED)
-    private CertificateUseEnumType certificateType;
+    private InstallCertificate.CertificateUseEnumType certificateType;
 
     @NotBlank(message = "Certificate is required")
     @Size(max = 5500, message = "Certificate must not exceed {max} characters")
-    @Schema(description = "PEM-encoded X.509 certificate", requiredMode = Schema.RequiredMode.REQUIRED,
-            maxLength = 5500)
+    @Schema(description = "PEM-encoded X.509 certificate", requiredMode = Schema.RequiredMode.REQUIRED)
     private String certificate;
-
-    public enum CertificateUseEnumType {
-        CentralSystemRootCertificate,
-        ManufacturerRootCertificate
-    }
 }

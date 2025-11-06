@@ -44,5 +44,6 @@
     <li><a ${activePage == 'ExtendedTriggerMessage' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/ExtendedTriggerMessage"><i>Extended Trigger Message</i></a></li>
     <li><a ${activePage == 'GetLog'                 ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/GetLog"><i>Get Log</i></a></li>
     <li><a ${activePage == 'SignedUpdateFirmware'   ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/SignedUpdateFirmware"><i>Signed Update Firmware</i></a></li>
+    <li><a ${activePage == 'InstallCertificate'     ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/InstallCertificate"><i>Install Certificate</i></a></li>
 </ul>
 </div>

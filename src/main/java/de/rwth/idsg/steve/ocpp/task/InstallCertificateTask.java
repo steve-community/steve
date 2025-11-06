@@ -21,10 +21,10 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
-
-import jakarta.xml.ws.AsyncHandler;
 import ocpp._2022._02.security.InstallCertificate;
 import ocpp._2022._02.security.InstallCertificateResponse;
+
+import jakarta.xml.ws.AsyncHandler;
 
 public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, String> {
 
@@ -40,8 +40,7 @@ public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificat
     @Override
     public InstallCertificate getOcpp16Request() {
         var request = new InstallCertificate();
-        request.setCertificateType(InstallCertificate.CertificateUseEnumType.valueOf(
-                params.getCertificateType().toString()));
+        request.setCertificateType(params.getCertificateType());
         request.setCertificate(params.getCertificate());
         return request;
     }
@@ -51,8 +50,7 @@ public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificat
         return res -> {
             try {
                 var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                success(chargeBoxId, status);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

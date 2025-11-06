@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
+import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Controller;
@@ -55,6 +56,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
     private static final String EXTENDED_TRIGGER_MESSAGE_PATH = "/ExtendedTriggerMessage";
     private static final String GET_LOG_PATH = "/GetLog";
     private static final String SIGNED_UPDATE_FIRMWARE_PATH = "/SignedUpdateFirmware";
+    private static final String INSTALL_CERTIFICATE_PATH = "/InstallCertificate";
 
     /**
      * "Improved security for OCPP 1.6-J" white paper defines new operations only for JSON. Therefore, our station
@@ -93,6 +95,13 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
     }
 
+    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.GET)
+    public String getInstallCertificate(Model model) {
+        setCommonAttributesForImprovedSecurity(model);
+        model.addAttribute(PARAMS, new InstallCertificateParams());
+        return getPrefix() + INSTALL_CERTIFICATE_PATH;
+    }
+
     // -------------------------------------------------------------------------
     // Http methods (POST)
     // -------------------------------------------------------------------------
@@ -125,6 +134,16 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
         }
         return GET_LOG_PATH + chargePointServiceClient.signedUpdateFirmware(params);
+    }
+
+    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.POST)
+    public String postInstallCertificate(@Valid @ModelAttribute(PARAMS) InstallCertificateParams params,
+                                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributesForImprovedSecurity(model);
+            return getPrefix() + INSTALL_CERTIFICATE_PATH;
+        }
+        return GET_LOG_PATH + chargePointServiceClient.installCertificate(params);
     }
 
 }

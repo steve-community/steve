@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.service.CertificateSigningService;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,6 +64,33 @@ public class SecurityController {
         return "security-man/events";
     }
 
+    @RequestMapping(value = "/firmwareUpdates", method = RequestMethod.GET)
+    public String getFirmwareUpdateEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
+                                          BindingResult result, Model model) {
+        model.addAttribute(PARAMS, params);
+        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+
+        if (result.hasErrors()) {
+            model.addAttribute("events", Collections.emptyList());
+        } else {
+            model.addAttribute("events", securityRepository.getFirmwareUpdateEvents(params));
+        }
+
+        return "security-man/firmwareUpdates";
+    }
+
+    @RequestMapping(value = "/firmwareUpdates/{jobId}", method = RequestMethod.GET)
+    public String getFirmwareUpdateJobDetails(@PathVariable("jobId") int jobId, Model model) {
+        var record = securityRepository.getFirmwareUpdateDetails(jobId);
+        model.addAttribute("details", record);
+        return "security-man/firmwareUpdateDetails";
+    }
+
+
+
+
+
+
     @RequestMapping(value = "/certificates", method = RequestMethod.GET)
     public String getCertificates(
             @RequestParam(value = "chargeBoxId", required = false) String chargeBoxId,
@@ -98,18 +126,4 @@ public class SecurityController {
         return "security-man/configuration";
     }
 
-    @RequestMapping(value = "/firmware", method = RequestMethod.GET)
-    public String getFirmwareUpdates(
-            @RequestParam(value = "chargeBoxId", required = false) String chargeBoxId,
-            Model model) {
-
-        if (chargeBoxId != null && !chargeBoxId.isEmpty()) {
-            model.addAttribute("currentUpdate", securityRepository.getCurrentFirmwareUpdate(chargeBoxId));
-        }
-
-        model.addAttribute("chargeBoxIdList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("selectedChargeBoxId", chargeBoxId);
-
-        return "security-man/firmware";
-    }
 }

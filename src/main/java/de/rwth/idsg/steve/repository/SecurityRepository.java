@@ -18,13 +18,16 @@
  */
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.Certificate;
-import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
+import de.rwth.idsg.steve.repository.dto.LogFile;
+import de.rwth.idsg.steve.repository.dto.SecurityEvent;
+import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
+import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -42,6 +45,10 @@ public interface SecurityRepository {
     int insertNewFirmwareUpdateJob(SignedUpdateFirmwareParams params);
 
     List<SecurityEvent> getSecurityEvents(SecurityEventsQueryForm form);
+
+    List<StatusEvent> getFirmwareUpdateEvents(StatusEventsQueryForm params);
+
+    ChargeBoxFirmwareUpdateJobRecord getFirmwareUpdateDetails(int jobId);
 
     int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
                           String serialNumber, String issuerName, String subjectName,

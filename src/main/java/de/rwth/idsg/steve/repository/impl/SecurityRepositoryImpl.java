@@ -24,14 +24,18 @@ import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
+import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
+import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.Nullable;
@@ -140,7 +144,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        var timeCondition = getTimeCondition(form);
+        var timeCondition = getTimeCondition(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP, form);
         if (timeCondition != null) {
             conditions.add(timeCondition);
         }
@@ -163,6 +167,56 @@ public class SecurityRepositoryImpl implements SecurityRepository {
                 .techInfo(record.value5())
                 .build()
             );
+    }
+
+    @Override
+    public List<StatusEvent> getFirmwareUpdateEvents(StatusEventsQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
+
+        if (form.isJobIdSet()) {
+            conditions.add(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID.eq(form.getJobId()));
+        }
+
+        if (form.isChargeBoxIdSet()) {
+            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+        }
+
+        var timeCondition = getTimeCondition(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP, form);
+        if (timeCondition != null) {
+            conditions.add(timeCondition);
+        }
+
+        return ctx.select(
+                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID,
+                CHARGE_BOX.CHARGE_BOX_ID,
+                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK,
+                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_STATUS,
+                CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP)
+            .from(CHARGE_BOX_FIRMWARE_UPDATE_STATUS)
+            .join(CHARGE_BOX).on(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+            .where(conditions)
+            .orderBy(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP.desc())
+            .fetch(record -> StatusEvent.builder()
+                .jobId(record.value1())
+                .chargeBoxId(record.value2())
+                .chargeBoxPk(record.value3())
+                .status(record.value4())
+                .timestamp(record.value5())
+                .build()
+            );
+    }
+
+    @Override
+    public ChargeBoxFirmwareUpdateJobRecord getFirmwareUpdateDetails(int jobId) {
+        var rec = ctx.selectFrom(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
+            .where(CHARGE_BOX_FIRMWARE_UPDATE_JOB.JOB_ID.eq(jobId))
+            .fetchOne();
+
+        if (rec == null) {
+            throw new SteveException.NotFound("Firmware update job not found");
+        }
+
+        return rec;
     }
 
     @Override
@@ -448,16 +502,16 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Nullable
-    private static Condition getTimeCondition(SecurityEventsQueryForm form) {
+    private static Condition getTimeCondition(Field<DateTime> timestampField, SecurityEventsQueryForm form) {
         switch (form.getPeriodType()) {
             case TODAY:
-                return date(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP).eq(date(DateTime.now()));
+                return date(timestampField).eq(date(DateTime.now()));
 
             case LAST_10:
             case LAST_30:
             case LAST_90:
                 DateTime now = DateTime.now();
-                return date(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP).between(
+                return date(timestampField).between(
                     date(now.minusDays(form.getPeriodType().getInterval())),
                     date(now)
                 );
@@ -468,7 +522,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             case FROM_TO:
                 DateTime from = form.getFrom();
                 DateTime to = form.getTo();
-                return CHARGE_BOX_SECURITY_EVENT.TIMESTAMP.between(from, to);
+                return timestampField.between(from, to);
             default:
                 throw new SteveException("Unknown enum type");
         }

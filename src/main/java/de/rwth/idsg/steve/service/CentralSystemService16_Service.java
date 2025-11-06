@@ -291,6 +291,10 @@ public class CentralSystemService16_Service {
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
     public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
         try {
             if (!certificateSigningService.isEnabled()) {
@@ -304,6 +308,13 @@ public class CentralSystemService16_Service {
                 return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
             }
 
+            /*
+             * Creating an artificial delay of a couple of seconds, such that the SignCertificateResponse is sent,
+             * and we start CSR processing only after that. Otherwise, for example in case of signing the certificates
+             * locally, there is a chance of SignCertificateResponse and CertificateSignedRequest arriving in wrong
+             * order: Ocpp specifies first SignCertificateResponse and later CertificateSignedRequest (in a decoupled
+             * subsequent process)
+             */
             taskScheduler.schedule(
                 () -> certificateSigningService.processCSR(csr, chargeBoxIdentity),
                 Instant.now().plusSeconds(5)

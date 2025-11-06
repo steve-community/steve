@@ -19,41 +19,45 @@
 
 --%>
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
+        <%@ include file="../snippets/dateTimePicker-past.js" %>
+        <%@ include file="../snippets/periodTypeSelect.js" %>
         <%@ include file="../snippets/sortable.js" %>
     });
 </script>
 <div class="content">
     <section><span>Security Events</span></section>
-    <form:form action="${ctxPath}/manager/security/events" method="get">
+    <form:form action="${ctxPath}/manager/security/events" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>ChargeBox ID:</td>
-                <td>
-                    <select name="chargeBoxId">
-                        <option value="">All</option>
-                        <c:forEach items="${chargeBoxIdList}" var="id">
-                            <option value="${id}" ${id == selectedChargeBoxId ? 'selected' : ''}>${id}</option>
-                        </c:forEach>
-                    </select>
+                <td><form:select path="chargeBoxId">
+                        <option value="" selected>All</option>
+                        <form:options items="${cpList}"/>
+                    </form:select>
                 </td>
             </tr>
             <tr>
-                <td>Limit:</td>
-                <td>
-                    <select name="limit">
-                        <option value="50" ${limit == 50 ? 'selected' : ''}>50</option>
-                        <option value="100" ${limit == 100 ? 'selected' : ''}>100</option>
-                        <option value="250" ${limit == 250 ? 'selected' : ''}>250</option>
-                        <option value="500" ${limit == 500 ? 'selected' : ''}>500</option>
-                    </select>
+                <td>Period Type:</td>
+                <td><form:select path="periodType" id="periodTypeSelect">
+                        <form:options items="${periodType}" itemLabel="value"/>
+                    </form:select>
                 </td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><form:input path="from" id="intervalPeriodTypeFrom" cssClass="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>To:</td>
+                <td><form:input path="to" id="intervalPeriodTypeTo" cssClass="dateTimePicker"/></td>
             </tr>
             <tr>
                 <td></td>
                 <td id="add_space">
-                    <input type="submit" value="Filter">
+                    <input type="submit" value="Get">
                 </td>
             </tr>
         </table>
@@ -63,32 +67,18 @@
         <thead>
         <tr>
             <th data-sort="string">ChargeBox ID</th>
-            <th data-sort="string">Event Type</th>
+            <th data-sort="string">Type</th>
             <th data-sort="date">Timestamp</th>
             <th data-sort="string">Technical Info</th>
-            <th data-sort="string">Severity</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${events}" var="event">
             <tr>
-                <td>${event.chargeBoxId}</td>
-                <td>${event.eventType}</td>
+                <td><a href="${ctxPath}/manager/chargepoints/details/${event.chargeBoxPk}">${event.chargeBoxId}</a></td>
+                <td>${event.type}</td>
                 <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>
                 <td><encode:forHtml value="${event.techInfo}" /></td>
-                <td>
-                    <c:choose>
-                        <c:when test="${event.severity == 'CRITICAL' || event.severity == 'HIGH'}">
-                            <span style="color: red; font-weight: bold;">${event.severity}</span>
-                        </c:when>
-                        <c:when test="${event.severity == 'MEDIUM'}">
-                            <span style="color: orange; font-weight: bold;">${event.severity}</span>
-                        </c:when>
-                        <c:otherwise>
-                            ${event.severity}
-                        </c:otherwise>
-                    </c:choose>
-                </td>
             </tr>
         </c:forEach>
         </tbody>

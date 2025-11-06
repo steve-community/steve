@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
+import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import org.joda.time.DateTime;
@@ -40,7 +41,7 @@ public interface SecurityRepository {
 
     int insertNewFirmwareUpdateJob(SignedUpdateFirmwareParams params);
 
-    List<SecurityEvent> getSecurityEvents(String chargeBoxId, Integer limit);
+    List<SecurityEvent> getSecurityEvents(SecurityEventsQueryForm form);
 
     int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
                           String serialNumber, String issuerName, String subjectName,

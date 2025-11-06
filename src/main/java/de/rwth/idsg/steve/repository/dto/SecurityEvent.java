@@ -25,10 +25,9 @@ import org.joda.time.DateTime;
 @Getter
 @Builder
 public class SecurityEvent {
-    private final int securityEventId;
     private final String chargeBoxId;
-    private final String eventType;
-    private final DateTime eventTimestamp;
+    private final int chargeBoxPk;
+    private final String type;
+    private final DateTime timestamp;
     private final String techInfo;
-    private final String severity;
 }

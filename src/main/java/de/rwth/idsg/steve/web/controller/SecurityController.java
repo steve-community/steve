@@ -22,13 +22,20 @@ import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.service.CertificateSigningService;
+import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.validation.Valid;
+import java.util.Collections;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,16 +47,19 @@ public class SecurityController {
     private final SecurityProfileConfiguration securityConfig;
     private final CertificateSigningService certificateSigningService;
 
-    @RequestMapping(value = "/events", method = RequestMethod.GET)
-    public String getSecurityEvents(
-            @RequestParam(value = "chargeBoxId", required = false) String chargeBoxId,
-            @RequestParam(value = "limit", required = false, defaultValue = "100") Integer limit,
-            Model model) {
+    private static final String PARAMS = "params";
 
-        model.addAttribute("events", securityRepository.getSecurityEvents(chargeBoxId, limit));
-        model.addAttribute("chargeBoxIdList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("selectedChargeBoxId", chargeBoxId);
-        model.addAttribute("limit", limit);
+    @RequestMapping(value = "/events", method = RequestMethod.GET)
+    public String getSecurityEvents(@Valid @ModelAttribute(PARAMS) SecurityEventsQueryForm params,
+                                    BindingResult result, Model model) {
+        model.addAttribute(PARAMS, params);
+        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+
+        if (result.hasErrors()) {
+            model.addAttribute("events", Collections.emptyList());
+        } else {
+            model.addAttribute("events", securityRepository.getSecurityEvents(params));
+        }
 
         return "security/events";
     }

@@ -18,22 +18,28 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
 import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
+import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import jakarta.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
@@ -127,37 +133,36 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Override
-    public List<SecurityEvent> getSecurityEvents(String chargeBoxId, Integer limit) {
-        return Collections.emptyList();
+    public List<SecurityEvent> getSecurityEvents(SecurityEventsQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
 
-//        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-//        if (chargeBoxPk == null) {
-//            return List.of();
-//        }
-//
-//        var baseQuery = ctx.select(
-//                       SECURITY_EVENT.EVENT_ID,
-//                       CHARGE_BOX.CHARGE_BOX_ID,
-//                       SECURITY_EVENT.EVENT_TYPE,
-//                       SECURITY_EVENT.EVENT_TIMESTAMP,
-//                       SECURITY_EVENT.TECH_INFO,
-//                       SECURITY_EVENT.SEVERITY
-//                   )
-//                   .from(SECURITY_EVENT)
-//                   .join(CHARGE_BOX).on(SECURITY_EVENT.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
-//                   .where(SECURITY_EVENT.CHARGE_BOX_PK.eq(chargeBoxPk))
-//                   .orderBy(SECURITY_EVENT.EVENT_TIMESTAMP.desc());
-//
-//        var query = (limit != null && limit > 0) ? baseQuery.limit(limit) : baseQuery;
-//
-//        return query.fetch(record -> SecurityEvent.builder()
-//                                                   .securityEventId(record.value1())
-//                                                   .chargeBoxId(record.value2())
-//                                                   .eventType(record.value3())
-//                                                   .eventTimestamp(record.value4())
-//                                                   .techInfo(record.value5())
-//                                                   .severity(record.value6())
-//                                                   .build());
+        if (form.isChargeBoxIdSet()) {
+            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+        }
+
+        var timeCondition = getTimeCondition(form);
+        if (timeCondition != null) {
+            conditions.add(timeCondition);
+        }
+
+        return ctx.select(
+                CHARGE_BOX.CHARGE_BOX_ID,
+                CHARGE_BOX_SECURITY_EVENT.CHARGE_BOX_PK,
+                CHARGE_BOX_SECURITY_EVENT.TYPE,
+                CHARGE_BOX_SECURITY_EVENT.TIMESTAMP,
+                CHARGE_BOX_SECURITY_EVENT.TECH_INFO)
+            .from(CHARGE_BOX_SECURITY_EVENT)
+            .join(CHARGE_BOX).on(CHARGE_BOX_SECURITY_EVENT.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+            .where(conditions)
+            .orderBy(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP.desc())
+            .fetch(record -> SecurityEvent.builder()
+                .chargeBoxId(record.value1())
+                .chargeBoxPk(record.value2())
+                .type(record.value3())
+                .timestamp(record.value4())
+                .techInfo(record.value5())
+                .build()
+            );
     }
 
     @Override
@@ -440,5 +445,32 @@ public class SecurityRepositoryImpl implements SecurityRepository {
                                      .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                                      .fetchOne();
         return record != null ? record.value1() : null;
+    }
+
+    @Nullable
+    private static Condition getTimeCondition(SecurityEventsQueryForm form) {
+        switch (form.getPeriodType()) {
+            case TODAY:
+                return date(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP).eq(date(DateTime.now()));
+
+            case LAST_10:
+            case LAST_30:
+            case LAST_90:
+                DateTime now = DateTime.now();
+                return date(CHARGE_BOX_SECURITY_EVENT.TIMESTAMP).between(
+                    date(now.minusDays(form.getPeriodType().getInterval())),
+                    date(now)
+                );
+
+            case ALL:
+                return null;
+
+            case FROM_TO:
+                DateTime from = form.getFrom();
+                DateTime to = form.getTo();
+                return CHARGE_BOX_SECURITY_EVENT.TIMESTAMP.between(from, to);
+            default:
+                throw new SteveException("Unknown enum type");
+        }
     }
 }

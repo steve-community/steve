@@ -62,20 +62,20 @@
                             <li><a href="${ctxPath}/manager/transactions">TRANSACTIONS</a></li>
                         </ul>
                     </li>
+                    <li><a>SECURITY MANAGEMENT &raquo;</a>
+                        <ul>
+                            <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/firmware">FIRMWARE UPDATES</a></li>
+                            <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
+                        </ul>
+                    </li>
                     <li><a>OPERATIONS &raquo;</a>
                         <ul>
                             <li><a href="${ctxPath}/manager/operations/v1.2">OCPP v1.2</a></li>
                             <li><a href="${ctxPath}/manager/operations/v1.5">OCPP v1.5</a></li>
                             <li><a href="${ctxPath}/manager/operations/v1.6">OCPP v1.6</a></li>
                             <li><a href="${ctxPath}/manager/operations/tasks">Tasks</a></li>
-                        </ul>
-                    </li>
-                    <li><a>SECURITY &raquo;</a>
-                        <ul>
-                            <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
-                            <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
-                            <li><a href="${ctxPath}/manager/security/firmware">FIRMWARE UPDATES</a></li>
-                            <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
                         </ul>
                     </li>
                     <li><a href="${ctxPath}/manager/settings">SETTINGS</a></li>

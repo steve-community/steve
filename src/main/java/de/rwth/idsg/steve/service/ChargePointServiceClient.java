@@ -48,9 +48,10 @@ import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
@@ -104,7 +105,8 @@ public class ChargePointServiceClient {
     private final ChargingProfileRepository chargingProfileRepository;
     private final ReservationRepository reservationRepository;
     private final OcppTagService ocppTagService;
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository certificateRepository;
+    private final EventRepository eventRepository;
 
     private final TaskExecutor taskExecutor;
     private final TaskStore taskStore;
@@ -489,7 +491,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int getLog(GetLogParams params,
                             OcppCallback<String>... callbacks) {
-        int requestId = securityRepository.insertNewLogUploadJob(params);
+        int requestId = eventRepository.insertLogUploadJob(params);
 
         GetLogTask task = new GetLogTask(params, requestId);
 
@@ -507,7 +509,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int signedUpdateFirmware(SignedUpdateFirmwareParams params,
                                           OcppCallback<String>... callbacks) {
-        int requestId = securityRepository.insertNewFirmwareUpdateJob(params);
+        int requestId = eventRepository.insertFirmwareUpdateJob(params);
 
         SignedUpdateFirmwareTask task = new SignedUpdateFirmwareTask(params, requestId);
 
@@ -541,7 +543,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int deleteCertificate(DeleteCertificateParams params,
                                        OcppCallback<String>... callbacks) {
-        DeleteCertificateTask task = new DeleteCertificateTask(params, securityRepository);
+        DeleteCertificateTask task = new DeleteCertificateTask(params, certificateRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -557,7 +559,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int certificateSigned(CertificateSignedParams params,
                                        OcppCallback<String>... callbacks) {
-        CertificateSignedTask task = new CertificateSignedTask(params, securityRepository);
+        CertificateSignedTask task = new CertificateSignedTask(params, certificateRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -573,7 +575,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int getInstalledCertificateIds(GetInstalledCertificateIdsParams params,
                                                 OcppCallback<String>... callbacks) {
-        GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(params, securityRepository);
+        GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(params, certificateRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);

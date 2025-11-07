@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
@@ -48,7 +48,7 @@ import java.util.List;
 @RequestMapping(value = "/manager/certificates")
 public class CertificatesController {
 
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
     private final ChargePointServiceClient chargePointServiceClient;
 

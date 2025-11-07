@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateHashDataType;
@@ -33,12 +33,12 @@ import jakarta.xml.ws.AsyncHandler;
 @Slf4j
 public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, String> {
 
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository certificateRepository;
 
     public DeleteCertificateTask(DeleteCertificateParams params,
-                                 SecurityRepository securityRepository) {
+                                 CertificateRepository certificateRepository) {
         super(params);
-        this.securityRepository = securityRepository;
+        this.certificateRepository = certificateRepository;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
 
     @Override
     public DeleteCertificate getOcpp16Request() {
-        var record = securityRepository.getInstalledCertificateRecord(params.getInstalledCertificateId());
+        var record = certificateRepository.getInstalledCertificateRecord(params.getInstalledCertificateId());
 
         var hashData = new CertificateHashDataType();
         hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.fromValue(record.getHashAlgorithm()));
@@ -70,7 +70,7 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
 
                 if (status == DeleteCertificateStatusEnumType.ACCEPTED) {
                     log.info("Request accepted. Deleting from database...");
-                    securityRepository.deleteInstalledCertificate(params.getInstalledCertificateId());
+                    certificateRepository.deleteInstalledCertificate(params.getInstalledCertificateId());
                 }
             } catch (Exception e) {
                 failed(chargeBoxId, e);

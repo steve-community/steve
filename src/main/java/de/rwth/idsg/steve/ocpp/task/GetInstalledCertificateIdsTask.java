@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 import ocpp._2022._02.security.CertificateHashData;
 import ocpp._2022._02.security.GetInstalledCertificateIds;
@@ -32,12 +32,12 @@ import java.util.List;
 
 public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, String> {
 
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository certificateRepository;
 
     public GetInstalledCertificateIdsTask(GetInstalledCertificateIdsParams params,
-                                          SecurityRepository securityRepository) {
+                                          CertificateRepository certificateRepository) {
         super(params);
-        this.securityRepository = securityRepository;
+        this.certificateRepository = certificateRepository;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
                 }
 
                 String certType = params.getCertificateType().value();
-                securityRepository.deleteInstalledCertificates(chargeBoxId, certType);
-                securityRepository.insertInstalledCertificates(chargeBoxId, certType, certificateHashData);
+                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
+                certificateRepository.insertInstalledCertificates(chargeBoxId, certType, certificateHashData);
 
             } catch (Exception e) {
                 failed(chargeBoxId, e);

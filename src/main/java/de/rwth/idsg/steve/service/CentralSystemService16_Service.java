@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
@@ -90,7 +90,7 @@ public class CentralSystemService16_Service {
     private final OcppTagService ocppTagService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChargePointService chargePointService;
-    private final SecurityRepository securityRepository;
+    private final EventRepository eventRepository;
     private final CertificateSigningService certificateSigningService;
     private final TaskScheduler taskScheduler;
 
@@ -330,7 +330,7 @@ public class CentralSystemService16_Service {
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
         try {
-            securityRepository.insertSecurityEvent(
+            eventRepository.insertSecurityEvent(
                 chargeBoxIdentity,
                 parameters.getType(),
                 parameters.getTimestamp(),
@@ -349,7 +349,7 @@ public class CentralSystemService16_Service {
             if (parameters.getRequestId() == null) {
                 log.warn("No requestId in {}", parameters);
             } else {
-                securityRepository.insertFirmwareUpdateStatus(
+                eventRepository.insertFirmwareUpdateStatus(
                     chargeBoxIdentity,
                     parameters.getRequestId(),
                     parameters.getStatus().value(),
@@ -369,7 +369,7 @@ public class CentralSystemService16_Service {
             if (parameters.getRequestId() == null) {
                 log.warn("No requestId in {}", parameters);
             } else {
-                securityRepository.insertLogUploadStatus(
+                eventRepository.insertLogUploadStatus(
                     chargeBoxIdentity,
                     parameters.getRequestId(),
                     parameters.getStatus().value(),

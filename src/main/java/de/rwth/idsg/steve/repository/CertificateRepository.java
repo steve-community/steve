@@ -19,59 +19,34 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.InstalledCertificate;
-import de.rwth.idsg.steve.repository.dto.SecurityEvent;
-import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
-import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.SignedCertificateQueryForm;
-import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
-import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.CertificateRecord;
 import jooq.steve.db.tables.records.ChargeBoxCertificateInstalledRecord;
 import jooq.steve.db.tables.records.ChargeBoxCertificateSignedViewRecord;
-import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
-import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import ocpp._2022._02.security.CertificateHashData;
-import org.joda.time.DateTime;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-public interface SecurityRepository {
+public interface CertificateRepository {
 
-    void insertSecurityEvent(String chargeBoxId, String eventType, DateTime timestamp, String techInfo);
-
-    void insertLogUploadStatus(String chargeBoxIdentity, Integer requestId, String status, DateTime timestamp);
-
-    void insertFirmwareUpdateStatus(String chargeBoxIdentity, Integer requestId, String value, DateTime timestamp);
-
-    int insertNewLogUploadJob(GetLogParams params);
-
-    int insertNewFirmwareUpdateJob(SignedUpdateFirmwareParams params);
-
-    List<SecurityEvent> getSecurityEvents(SecurityEventsQueryForm form);
-
-    List<StatusEvent> getStatusEvents(StatusEventsQueryForm params);
-
-    ChargeBoxFirmwareUpdateJobRecord getFirmwareUpdateDetails(int jobId);
-
-    ChargeBoxLogUploadJobRecord getLogUploadDetails(int jobId);
+    // -------------------------------------------------------------------------
+    // Certificate signing
+    // -------------------------------------------------------------------------
 
     CertificateRecord insertCertificate(X509Certificate certificate, String certificateChainPEM);
-
     void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted);
+    List<ChargeBoxCertificateSignedViewRecord> getSignedCertificates(SignedCertificateQueryForm params);
+
+    // -------------------------------------------------------------------------
+    // Installed certificates
+    // -------------------------------------------------------------------------
 
     ChargeBoxCertificateInstalledRecord getInstalledCertificateRecord(long installedCertificateId);
-
     void deleteInstalledCertificate(long installedCertificateId);
-
     void deleteInstalledCertificates(String chargeBoxId, String certificateType);
-
     void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData);
-
     List<InstalledCertificate> getInstalledCertificates(InstalledCertificateQueryForm params);
-
-    List<ChargeBoxCertificateSignedViewRecord> getSignedCertificates(SignedCertificateQueryForm params);
 
 }

@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
@@ -44,7 +44,7 @@ import java.util.Collections;
 @RequestMapping(value = "/manager/events")
 public class EventsController {
 
-    private final SecurityRepository securityRepository;
+    private final EventRepository eventRepository;
     private final ChargePointRepository chargePointRepository;
 
     private static final String PARAMS = "params";
@@ -58,7 +58,7 @@ public class EventsController {
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());
         } else {
-            model.addAttribute("events", securityRepository.getSecurityEvents(params));
+            model.addAttribute("events", eventRepository.getSecurityEvents(params));
         }
 
         return "security-man/securityEvents";
@@ -73,7 +73,7 @@ public class EventsController {
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());
         } else {
-            model.addAttribute("events", securityRepository.getStatusEvents(params));
+            model.addAttribute("events", eventRepository.getStatusEvents(params));
         }
 
         return "security-man/statusEvents";
@@ -84,8 +84,8 @@ public class EventsController {
                                            @PathVariable("jobId") int jobId,
                                            Model model) {
         var details = switch (eventType) {
-            case FirmwareUpdate -> securityRepository.getFirmwareUpdateDetails(jobId);
-            case LogUpload -> securityRepository.getLogUploadDetails(jobId);
+            case FirmwareUpdate -> eventRepository.getFirmwareUpdateDetails(jobId);
+            case LogUpload -> eventRepository.getLogUploadDetails(jobId);
         };
 
         model.addAttribute("eventType", eventType.name());

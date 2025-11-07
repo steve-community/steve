@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateSigned;
@@ -32,12 +32,12 @@ import jakarta.xml.ws.AsyncHandler;
 @Slf4j
 public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedParams, String> {
 
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository certificateRepository;
 
     public CertificateSignedTask(CertificateSignedParams params,
-                                 SecurityRepository securityRepository) {
+                                 CertificateRepository certificateRepository) {
         super(params);
-        this.securityRepository = securityRepository;
+        this.certificateRepository = certificateRepository;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedP
                 }
 
                 boolean accepted = (status == CertificateSignedStatusEnumType.ACCEPTED);
-                securityRepository.insertCertificateSignResponse(chargeBoxId, params.getCertificateId(), accepted);
+                certificateRepository.insertCertificateSignResponse(chargeBoxId, params.getCertificateId(), accepted);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

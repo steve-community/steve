@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.CertificateUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
@@ -72,7 +72,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
 
     private final SteveProperties.Ocpp.Security securityProperties;
-    private final SecurityRepository securityRepository;
+    private final CertificateRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
     private final ChargePointServiceClient chargePointServiceClient;
 
@@ -84,7 +84,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
     public CertificateSigningServiceLocal(Ssl ssl,
                                           SteveProperties steveProperties,
-                                          SecurityRepository securityRepository,
+                                          CertificateRepository securityRepository,
                                           ChargePointRepository chargePointRepository,
                                           ChargePointServiceClient chargePointServiceClient) throws Exception {
         this.securityProperties = steveProperties.getOcpp().getSecurity();

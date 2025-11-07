@@ -52,9 +52,9 @@ import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.Tables.CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
-import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
+import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
-import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_STATUS;
+import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
@@ -85,11 +85,11 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     public void insertLogUploadStatus(String chargeBoxId, Integer requestId, String status, DateTime timestamp) {
         var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
-        ctx.insertInto(CHARGE_BOX_LOG_UPLOAD_STATUS)
-            .set(CHARGE_BOX_LOG_UPLOAD_STATUS.CHARGE_BOX_PK, chargeBoxPk)
-            .set(CHARGE_BOX_LOG_UPLOAD_STATUS.JOB_ID, requestId)
-            .set(CHARGE_BOX_LOG_UPLOAD_STATUS.EVENT_STATUS, status)
-            .set(CHARGE_BOX_LOG_UPLOAD_STATUS.EVENT_TIMESTAMP, timestamp)
+        ctx.insertInto(CHARGE_BOX_LOG_UPLOAD_EVENT)
+            .set(CHARGE_BOX_LOG_UPLOAD_EVENT.CHARGE_BOX_PK, chargeBoxPk)
+            .set(CHARGE_BOX_LOG_UPLOAD_EVENT.JOB_ID, requestId)
+            .set(CHARGE_BOX_LOG_UPLOAD_EVENT.EVENT_STATUS, status)
+            .set(CHARGE_BOX_LOG_UPLOAD_EVENT.EVENT_TIMESTAMP, timestamp)
             .execute();
     }
 
@@ -97,11 +97,11 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     public void insertFirmwareUpdateStatus(String chargeBoxId, Integer requestId, String status, DateTime timestamp) {
         var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
-        ctx.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_STATUS)
-            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK, chargeBoxPk)
-            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.JOB_ID, requestId)
-            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_STATUS, status)
-            .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.EVENT_TIMESTAMP, timestamp)
+        ctx.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_EVENT)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_EVENT.CHARGE_BOX_PK, chargeBoxPk)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_EVENT.JOB_ID, requestId)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_EVENT.EVENT_STATUS, status)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_EVENT.EVENT_TIMESTAMP, timestamp)
             .execute();
     }
 

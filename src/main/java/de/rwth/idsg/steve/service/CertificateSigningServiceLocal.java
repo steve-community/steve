@@ -159,7 +159,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     private void validateCsr(PKCS10CertificationRequest csr, String chargeBoxId) throws Exception {
         {
             ContentVerifierProvider verifierProvider = new JcaContentVerifierProviderBuilder()
-                .setProvider("BC")
+                .setProvider(PROVIDER_NAME)
                 .build(csr.getSubjectPublicKeyInfo());
 
             boolean valid = csr.isSignatureValid(verifierProvider);

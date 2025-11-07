@@ -1,3 +1,5 @@
+START TRANSACTION;
+
 ALTER TABLE charge_box
     ADD COLUMN security_profile INT DEFAULT 0,
     ADD COLUMN auth_password VARCHAR(500) DEFAULT NULL;
@@ -26,7 +28,7 @@ CREATE TABLE IF NOT EXISTS charge_box_firmware_update_job (
     signature MEDIUMTEXT
 );
 
-CREATE TABLE IF NOT EXISTS charge_box_firmware_update_status (
+CREATE TABLE IF NOT EXISTS charge_box_firmware_update_event (
     job_id INT NOT NULL,
     charge_box_pk INT NOT NULL,
 
@@ -52,7 +54,7 @@ CREATE TABLE IF NOT EXISTS charge_box_log_upload_job (
     latest_timestamp TIMESTAMP NULL DEFAULT NULL
 );
 
-CREATE TABLE IF NOT EXISTS charge_box_log_upload_status (
+CREATE TABLE IF NOT EXISTS charge_box_log_upload_event (
     job_id INT NOT NULL,
     charge_box_pk INT NOT NULL,
 
@@ -76,7 +78,7 @@ SELECT
     event_status,
     event_timestamp,
     'FirmwareUpdate' AS event_type
-FROM charge_box_firmware_update_status
+FROM charge_box_firmware_update_event
 
 UNION ALL
 
@@ -86,7 +88,7 @@ SELECT
     event_status,
     event_timestamp,
     'LogUpload' AS event_type
-FROM charge_box_log_upload_status;
+FROM charge_box_log_upload_event;
 
 CREATE TABLE IF NOT EXISTS certificate (
     certificate_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -118,3 +120,5 @@ CREATE TABLE IF NOT EXISTS charge_box_certificate (
     FOREIGN KEY (certificate_id) REFERENCES certificate (certificate_id) ON DELETE CASCADE,
     FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE
 );
+
+COMMIT;

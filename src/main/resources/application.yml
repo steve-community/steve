@@ -15,8 +15,16 @@ server:
     enabled: ${server.gzip.enabled}
   ssl:
     enabled: ${https.enabled}
+    key-store-type:
     key-store: ${keystore.path}
     key-store-password: ${keystore.password}
+    trust-store-type:
+    trust-store:
+    trust-store-password:
+    enabled-protocols:
+      - TLSv1.2
+      - TLSv1.3
+    ciphers:
 
 steve:
   version: @project.version@
@@ -32,28 +40,12 @@ steve:
     auto-register-unknown-stations: ${auto.register.unknown.stations}
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
 
-# OCPP 1.6 Security Profiles Configuration
-# See OCPP_SECURITY_PROFILES.md for detailed configuration guide
-#
-ocpp:
-  security:
-    profile: 0
-    tls:
-      enabled: false
-      keystore:
-        type: JKS
-        path:
-        password:
-      truststore:
-        type: JKS
-        path:
-        password:
-
-      client:
-        auth: false
-
-      protocols:
-        - TLSv1.2
-        - TLSv1.3
-
-      ciphers:
+    # OCPP 1.6 Security Profiles Configuration
+    # Other settings are inherited from server.ssl
+    security:
+      # Profile 0: No HTTP basic authentication, no TLS
+      # Profile 1: HTTP basic authentication, no TLS
+      # Profile 2: HTTP basic authentication, TLS with server-side certificate
+      # Profile 3: TLS with client-side certificate, TLS with server-side certificate -> mutual TLS (mTLS)
+      profile: 0
+      certificate-validity-years: 1

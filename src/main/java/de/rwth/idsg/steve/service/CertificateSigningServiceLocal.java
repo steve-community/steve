@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
@@ -43,6 +43,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 import org.jooq.tools.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -70,7 +71,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     private static final String PROVIDER_NAME = "BC"; // represents BouncyCastle
     private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
 
-    private final SecurityProfileConfiguration securityConfig;
+    private final SteveProperties.Ocpp.Security securityProperties;
     private final SecurityRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
     private final ChargePointServiceClient chargePointServiceClient;
@@ -81,16 +82,17 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public CertificateSigningServiceLocal(SecurityProfileConfiguration securityConfig,
+    public CertificateSigningServiceLocal(Ssl ssl,
+                                          SteveProperties steveProperties,
                                           SecurityRepository securityRepository,
                                           ChargePointRepository chargePointRepository,
                                           ChargePointServiceClient chargePointServiceClient) throws Exception {
-        this.securityConfig = securityConfig;
+        this.securityProperties = steveProperties.getOcpp().getSecurity();
         this.securityRepository = securityRepository;
         this.chargePointRepository = chargePointRepository;
         this.chargePointServiceClient = chargePointServiceClient;
 
-        if (!securityConfig.requiresTls() || securityConfig.getKeystorePath().isEmpty()) {
+        if (!securityProperties.requiresTls() || ssl.getKeyStore().isEmpty()) {
             log.info("Will not initialize (TLS not configured)");
             this.caPrivateKey = null;
             this.caCertificate = null;
@@ -98,9 +100,9 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
             return;
         }
 
-        String keystorePath = securityConfig.getKeystorePath();
-        String keystorePassword = securityConfig.getKeystorePassword();
-        String keystoreType = securityConfig.getKeystoreType();
+        String keystorePath = ssl.getKeyStore();
+        String keystorePassword = ssl.getKeyStorePassword();
+        String keystoreType = ssl.getKeyStoreType();
 
         KeyStore keystore = KeyStore.getInstance(keystoreType);
         try (FileInputStream fis = new FileInputStream(keystorePath)) {
@@ -257,7 +259,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
         var issuer = new X500Name(caCertificate.getSubjectX500Principal().getName());
         var serial = new BigInteger(64, secureRandom);
         var notBefore = DateTime.now().toDate();
-        var notAfter = DateTime.now().plusYears(securityConfig.getCertificateValidityYears()).toDate();
+        var notAfter = DateTime.now().plusYears(securityProperties.getCertificateValidityYears()).toDate();
         var subject = csr.getSubject();
         var publicKeyInfo = csr.getSubjectPublicKeyInfo();
 

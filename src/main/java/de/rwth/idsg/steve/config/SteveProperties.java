@@ -66,5 +66,16 @@ public class SteveProperties {
         WsSessionSelectStrategyEnum wsSessionSelectStrategy;
         boolean autoRegisterUnknownStations;
         String chargeBoxIdValidationRegex;
+        Security security = new Security();
+
+        @Data
+        public static class Security {
+            private int profile;
+            private int certificateValidityYears;
+
+            public boolean requiresTls() {
+                return profile >= 2;
+            }
+        }
     }
 }

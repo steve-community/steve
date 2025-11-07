@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -42,6 +44,15 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+
+    /**
+     * Because it is not a Bean by default.
+     */
+    @Bean
+    @ConfigurationProperties(prefix = "server.ssl")
+    public Ssl ssl() {
+        return new Ssl();
+    }
 
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to

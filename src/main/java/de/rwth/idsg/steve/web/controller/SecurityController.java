@@ -18,11 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
-import de.rwth.idsg.steve.service.CertificateSigningService;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
@@ -47,8 +45,6 @@ public class SecurityController {
 
     private final SecurityRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
-    private final SecurityProfileConfiguration securityConfig;
-    private final CertificateSigningService certificateSigningService;
 
     private static final String PARAMS = "params";
 
@@ -118,21 +114,6 @@ public class SecurityController {
     public String deleteCertificate(@PathVariable("certificateId") int certificateId) {
         securityRepository.deleteCertificate(certificateId);
         return "redirect:/manager/security/certificates";
-    }
-
-    @RequestMapping(value = "/configuration", method = RequestMethod.GET)
-    public String getConfiguration(Model model) {
-        model.addAttribute("securityProfile", securityConfig.getSecurityProfile());
-        model.addAttribute("tlsEnabled", securityConfig.isTlsEnabled());
-        model.addAttribute("keystorePath", securityConfig.getKeystorePath());
-        model.addAttribute("keystoreType", securityConfig.getKeystoreType());
-        model.addAttribute("truststorePath", securityConfig.getTruststorePath());
-        model.addAttribute("truststoreType", securityConfig.getTruststoreType());
-        model.addAttribute("clientAuthRequired", securityConfig.isClientAuthRequired());
-        model.addAttribute("tlsProtocols", String.join(", ", securityConfig.getTlsProtocols()));
-        model.addAttribute("signingServiceInitialized", certificateSigningService.isEnabled());
-
-        return "security-man/configuration";
     }
 
 }

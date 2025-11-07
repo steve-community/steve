@@ -88,27 +88,33 @@ SELECT
     'LogUpload' AS event_type
 FROM charge_box_log_upload_status;
 
-
---
--- TODO: This table will be reviewed later.
---
 CREATE TABLE IF NOT EXISTS certificate (
     certificate_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    charge_box_pk INT,
-    certificate_type VARCHAR(50) NOT NULL,
-    certificate_data MEDIUMTEXT NOT NULL,
-    serial_number VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    serial_number BIGINT,
     issuer_name VARCHAR(500),
     subject_name VARCHAR(500),
-    valid_from TIMESTAMP NULL DEFAULT NULL,
-    valid_to TIMESTAMP NULL DEFAULT NULL,
-    signature_algorithm VARCHAR(100),
+    organization_name VARCHAR(500),
+    common_name VARCHAR(500),
     key_size INT,
-    installed_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20) NOT NULL DEFAULT 'Installed',
-    CONSTRAINT FK_certificate_charge_box FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE,
-    INDEX idx_charge_box_pk (charge_box_pk),
-    INDEX idx_certificate_type (certificate_type),
-    INDEX idx_status (status),
-    INDEX idx_serial_number (serial_number)
+    valid_from TIMESTAMP,
+    valid_to TIMESTAMP,
+    signature_algorithm ENUM('RSA', 'ECDSA'),
+    certificate_chain_pem MEDIUMTEXT NOT NULL,
+
+    INDEX idx_serial_number (serial_number),
+    INDEX idx_created_at (created_at),
+    INDEX idx_valid_from (valid_from),
+    INDEX idx_valid_to (valid_to)
+);
+
+CREATE TABLE IF NOT EXISTS charge_box_certificate (
+    certificate_id INT NOT NULL,
+    charge_box_pk INT NOT NULL,
+    accepted BOOL NOT NULL,
+    responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (certificate_id) REFERENCES certificate (certificate_id) ON DELETE CASCADE,
+    FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE
 );

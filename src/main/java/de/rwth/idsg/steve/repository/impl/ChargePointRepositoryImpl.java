@@ -87,6 +87,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
+    public String getSerialNumber(String chargeBoxId) {
+        return ctx.select(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+            .fetchOne(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER);
+    }
+
+    @Override
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
         Condition chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
             ? DSL.trueCondition()

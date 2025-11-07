@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import jooq.steve.db.tables.records.CertificateRecord;
 import org.slf4j.Logger;
 
 public abstract class CertificateSigningServiceAbstract implements CertificateSigningService {
@@ -25,8 +26,8 @@ public abstract class CertificateSigningServiceAbstract implements CertificateSi
     @Override
     public void processCSR(String csrPem, String chargeBoxId) {
         try {
-            String certificateChain = this.signCertificate(csrPem, chargeBoxId);
-            this.sendCertificateSignedToStation(certificateChain, chargeBoxId);
+            CertificateRecord record = this.signCertificate(csrPem, chargeBoxId);
+            this.sendCertificateSignedToStation(record, chargeBoxId);
         } catch (Exception e) {
             getLog().error(e.getMessage(), e);
         }
@@ -34,7 +35,7 @@ public abstract class CertificateSigningServiceAbstract implements CertificateSi
 
     protected abstract Logger getLog();
 
-    protected abstract String signCertificate(String csrPem, String chargeBoxId) throws Exception;
+    protected abstract CertificateRecord signCertificate(String csrPem, String chargeBoxId) throws Exception;
 
-    protected abstract void sendCertificateSignedToStation(String certificateChain, String chargeBoxId);
+    protected abstract void sendCertificateSignedToStation(CertificateRecord record, String chargeBoxId);
 }

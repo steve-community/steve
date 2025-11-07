@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
@@ -55,6 +56,7 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
@@ -519,7 +521,6 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int installCertificate(InstallCertificateParams params,
                                         OcppCallback<String>... callbacks) {
-
         InstallCertificateTask task = new InstallCertificateTask(params);
 
         for (var callback : callbacks) {
@@ -529,6 +530,22 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.installCertificate(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int certificateSigned(CertificateSignedParams params,
+                                       OcppCallback<String>... callbacks) {
+        CertificateSignedTask task = new CertificateSignedTask(params, securityRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.certificateSigned(c, task));
 
         return taskStore.add(task);
     }

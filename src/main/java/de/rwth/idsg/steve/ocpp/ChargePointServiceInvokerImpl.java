@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.ocpp.soap.ChargePointServiceSoapInvoker;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
@@ -263,6 +264,12 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     }
 
     public void installCertificate(ChargePointSelect cp, InstallCertificateTask task) {
+        if (cp.isJson()) {
+            chargePointServiceJsonInvoker.runPipeline(cp, task);
+        }
+    }
+
+    public void certificateSigned(ChargePointSelect cp, CertificateSignedTask task) {
         if (cp.isJson()) {
             chargePointServiceJsonInvoker.runPipeline(cp, task);
         }

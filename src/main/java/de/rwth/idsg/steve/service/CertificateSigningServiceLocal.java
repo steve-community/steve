@@ -19,72 +19,85 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.config.SecurityProfileConfiguration;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
-import lombok.RequiredArgsConstructor;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.utils.CertificateUtils;
+import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
+import jooq.steve.db.tables.records.CertificateRecord;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
+import org.jooq.tools.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static de.rwth.idsg.steve.utils.CertificateUtils.certificatesToPEM;
+import static de.rwth.idsg.steve.utils.CertificateUtils.parseCsr;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class CertificateSigningServiceLocal extends CertificateSigningServiceAbstract {
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private static final String PROVIDER_NAME = "BC"; // represents BouncyCastle
+    private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
 
     private final SecurityProfileConfiguration securityConfig;
     private final SecurityRepository securityRepository;
+    private final ChargePointRepository chargePointRepository;
+    private final ChargePointServiceClient chargePointServiceClient;
 
-    private PrivateKey caPrivateKey;
-    private X509Certificate caCertificate;
-    private boolean initialized = false;
+    private final PrivateKey caPrivateKey;
+    private final X509Certificate caCertificate;
+    private final boolean initialized;
+
     private final SecureRandom secureRandom = new SecureRandom();
 
-    @PostConstruct
-    public void init() {
-        Security.addProvider(new BouncyCastleProvider());
+    public CertificateSigningServiceLocal(SecurityProfileConfiguration securityConfig,
+                                          SecurityRepository securityRepository,
+                                          ChargePointRepository chargePointRepository,
+                                          ChargePointServiceClient chargePointServiceClient) throws Exception {
+        this.securityConfig = securityConfig;
+        this.securityRepository = securityRepository;
+        this.chargePointRepository = chargePointRepository;
+        this.chargePointServiceClient = chargePointServiceClient;
 
-        if (securityConfig.requiresTls() && !securityConfig.getKeystorePath().isEmpty()) {
-            try {
-                loadCACertificate();
-                initialized = true;
-                log.info("Certificate signing service initialized successfully");
-            } catch (Exception e) {
-                log.warn("Failed to initialize certificate signing service: {}. "
-                        + "Certificate signing will not be available.", e.getMessage());
-                initialized = false;
-            }
-        } else {
-            log.info("Certificate signing service not initialized (TLS not configured)");
+        if (!securityConfig.requiresTls() || securityConfig.getKeystorePath().isEmpty()) {
+            log.info("Will not initialize (TLS not configured)");
+            this.caPrivateKey = null;
+            this.caCertificate = null;
+            this.initialized = false;
+            return;
         }
-    }
 
-    private void loadCACertificate() throws Exception {
         String keystorePath = securityConfig.getKeystorePath();
         String keystorePassword = securityConfig.getKeystorePassword();
         String keystoreType = securityConfig.getKeystoreType();
@@ -95,10 +108,11 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
         }
 
         String alias = keystore.aliases().nextElement();
-        caPrivateKey = (PrivateKey) keystore.getKey(alias, keystorePassword.toCharArray());
-        caCertificate = (X509Certificate) keystore.getCertificate(alias);
+        this.caPrivateKey = (PrivateKey) keystore.getKey(alias, keystorePassword.toCharArray());
+        this.caCertificate = (X509Certificate) keystore.getCertificate(alias);
+        this.initialized = true;
 
-        log.info("Loaded CA certificate: {}", caCertificate.getSubjectX500Principal().getName());
+        log.info("Initialized successfully. Loaded CA certificate: {}", caCertificate.getSubjectX500Principal().getName());
     }
 
     @Override
@@ -112,122 +126,151 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     }
 
     @Override
-    protected String signCertificate(String csrPem, String chargeBoxId) throws Exception {
+    protected CertificateRecord signCertificate(String csrPem, String chargeBoxId) throws Exception {
         if (!initialized) {
-            throw new IllegalStateException("Certificate signing service is not initialized. "
-                + "Check TLS configuration and keystore settings.");
+            throw new IllegalStateException("Service is not initialized. Check configuration.");
         }
 
         PKCS10CertificationRequest csr = parseCsr(csrPem);
         validateCsr(csr, chargeBoxId);
         X509Certificate signedCert = signCertificate(csr);
-        var signedCertificatePem = certificateToPem(signedCert);
 
-        var caCertificatePem = this.getCertificateChain();
-        var certificateChain = signedCertificatePem + caCertificatePem;
+        // Chain Order: Always order certificates from end-entity → intermediates (if any) → root
+        X509Certificate[] chain = new X509Certificate[]{
+            signedCert,   // newly signed certificate (from CSR)
+            caCertificate // Root CA certificate
+        };
+        String certificateChain = certificatesToPEM(chain);
 
-        var certificateId = securityRepository.insertCertificate(
-            chargeBoxId,
-            "ChargePointCertificate",
-            signedCertificatePem,
-            null,
-            null,
-            null,
-            DateTime.now(),
-            DateTime.now().plusYears(securityConfig.getCertificateValidityYears()),
-            "SHA256WithRSA",
-            2048
-        );
-
-        log.info("SignCertificateRequest from '{}' processed successfully. Certificate stored with ID: {}. "
-                + "Send certificate to charge point using CertificateSignedTask with certificate chain: {}",
-            chargeBoxId, certificateId, certificateChain.length());
-
-        return certificateChain;
+        CertificateRecord record = securityRepository.insertCertificate(signedCert, certificateChain);
+        log.info("SignCertificateRequest from '{}' processed successfully. Certificate stored with ID: {}", chargeBoxId, record.getCertificateId());
+        return record;
     }
 
     @Override
-    protected void sendCertificateSignedToStation(String certificateChain, String chargeBoxId) {
-        // TODO: implement this
+    protected void sendCertificateSignedToStation(CertificateRecord record, String chargeBoxId) {
+        var params = new CertificateSignedParams();
+        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
+        params.setCertificateId(record.getCertificateId());
+        params.setCertificateChain(record.getCertificateChainPem());
+        chargePointServiceClient.certificateSigned(params);
     }
 
-    private String getCertificateChain() throws Exception {
-        if (!initialized || caCertificate == null) {
-            throw new IllegalStateException("CA certificate not loaded");
-        }
+    private void validateCsr(PKCS10CertificationRequest csr, String chargeBoxId) throws Exception {
+        {
+            ContentVerifierProvider verifierProvider = new JcaContentVerifierProviderBuilder()
+                .setProvider("BC")
+                .build(csr.getSubjectPublicKeyInfo());
 
-        StringBuilder chain = new StringBuilder();
-        chain.append(certificateToPem(caCertificate));
-
-        return chain.toString();
-    }
-
-    private PKCS10CertificationRequest parseCsr(String csrPem) throws Exception {
-        try (PEMParser pemParser = new PEMParser(new StringReader(csrPem))) {
-            Object parsedObj = pemParser.readObject();
-
-            if (parsedObj instanceof PKCS10CertificationRequest) {
-                return (PKCS10CertificationRequest) parsedObj;
-            } else {
-                throw new IllegalArgumentException("Invalid CSR format. Expected PKCS10 certificate request.");
+            boolean valid = csr.isSignatureValid(verifierProvider);
+            if (!valid) {
+                throw new IllegalArgumentException("CSR signature validation failed");
             }
-        }
-    }
-
-    private void validateCsr(PKCS10CertificationRequest csr, String chargePointId) throws Exception {
-        if (!csr.isSignatureValid(new org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder()
-                .setProvider("BC").build(csr.getSubjectPublicKeyInfo()))) {
-            throw new IllegalArgumentException("CSR signature validation failed");
         }
 
         X500Name subject = csr.getSubject();
-        RDN[] cnRdns = subject.getRDNs(BCStyle.CN);
-        if (cnRdns.length == 0) {
-            throw new IllegalArgumentException("CSR subject does not contain Common Name (CN)");
+
+        // A00.FR.404 :
+        // The Central System SHALL verify that the certificate is owned by the CPO (or an
+        // organization trusted by the CPO) by checking that the O (organizationName) RDN
+        // in the subject field of the certificate contains the CPO name.
+        {
+            String organizationName = CertificateUtils.getOrganization(subject);
+            String cpoName = getCpoName(chargeBoxId);
+            if (!cpoName.equals(organizationName)) {
+                throw new IllegalArgumentException("CSR signature validation failed: organizationName is not equal to CPO name");
+            }
         }
 
-        String csrCommonName = IETFUtils.valueToString(cnRdns[0].getFirst().getValue());
-        if (!csrCommonName.equals(chargePointId)) {
-            throw new IllegalArgumentException(
-                String.format("CSR Common Name '%s' does not match charge point ID '%s'",
-                    csrCommonName, chargePointId)
-            );
+        // A00.FR.405 :
+        // The Central System SHALL verify that the certificate belongs to this Charge Point by
+        // checking that the CN (commonName) RDN in the subject field of the certificate
+        // contains the unique Serial Number of the Charge Point
+        {
+            String commonName = CertificateUtils.getCommonName(subject);
+            String serialNumber = getSerialNumber(chargeBoxId);
+            if (!serialNumber.equals(commonName)) {
+                throw new IllegalArgumentException("CSR signature validation failed: commonName is not equal to Serial Number of the Charge Point");
+            }
         }
 
-        log.info("CSR validated for charge point '{}'. Subject: {}",
-                chargePointId, csr.getSubject().toString());
+        log.info("CSR validated for charge point '{}'", chargeBoxId);
+    }
+
+    private String getSerialNumber(String chargeBoxId) {
+        String val = chargePointRepository.getSerialNumber(chargeBoxId);
+        if (StringUtils.isEmpty(val)) {
+            throw new NullPointerException("Serial number is not set for chargeBoxId: " + chargeBoxId);
+        }
+        return val;
+    }
+
+    /**
+     * Fetches the CpoName config from the station by sending a GetConfigurationRequest and waiting for response.
+     */
+    private String getCpoName(String chargeBoxId) throws Exception {
+        var countDownLatch = new CountDownLatch(1);
+
+        var callback = new OcppCallback<GetConfigurationTask.ResponseWrapper>() {
+
+            private String cpoName = null;
+
+            @Override
+            public void success(String chargeBoxId, GetConfigurationTask.ResponseWrapper response) {
+                for (GetConfigurationTask.KeyValue conf : response.getConfigurationKeys()) {
+                    if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
+                        cpoName = conf.getValue();
+                        break;
+                    }
+                }
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void success(String chargeBoxId, OcppJsonError error) {
+                log.warn("Could not get configuration CpoName from charge point '{}', because: {}", chargeBoxId, error);
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                log.warn("Could not get configuration CpoName from charge point '{}'", chargeBoxId, e);
+                countDownLatch.countDown();
+            }
+        };
+
+        var params = new GetConfigurationParams();
+        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
+        params.setConfKeyList(List.of(ConfigurationKeyEnum.CpoName.name()));
+        chargePointServiceClient.getConfiguration(params, callback);
+
+        countDownLatch.await(30, TimeUnit.SECONDS);
+
+        if (callback.cpoName == null) {
+            throw new NullPointerException("CpoName is null");
+        }
+
+        return callback.cpoName;
     }
 
     private X509Certificate signCertificate(PKCS10CertificationRequest csr) throws Exception {
-        X500Name issuer = new X500Name(caCertificate.getSubjectX500Principal().getName());
-        X500Name subject = csr.getSubject();
-        BigInteger serial = new BigInteger(64, secureRandom);
-        Date notBefore = DateTime.now().toDate();
-        int validityYears = securityConfig.getCertificateValidityYears();
-        Date notAfter = DateTime.now().plusYears(validityYears).toDate();
+        var issuer = new X500Name(caCertificate.getSubjectX500Principal().getName());
+        var serial = new BigInteger(64, secureRandom);
+        var notBefore = DateTime.now().toDate();
+        var notAfter = DateTime.now().plusYears(securityConfig.getCertificateValidityYears()).toDate();
+        var subject = csr.getSubject();
+        var publicKeyInfo = csr.getSubjectPublicKeyInfo();
 
-        SubjectPublicKeyInfo subPubKeyInfo = csr.getSubjectPublicKeyInfo();
+        var certBuilder = new X509v3CertificateBuilder(issuer, serial, notBefore, notAfter, subject, publicKeyInfo);
 
-        X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-                issuer, serial, notBefore, notAfter, subject, subPubKeyInfo
-        );
+        var signer = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM)
+            .setProvider(PROVIDER_NAME)
+            .build(caPrivateKey);
 
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA")
-                .setProvider("BC")
-                .build(caPrivateKey);
-
-        X509CertificateHolder certHolder = certBuilder.build(signer);
+        var certHolder = certBuilder.build(signer);
 
         return new JcaX509CertificateConverter()
-                .setProvider("BC")
-                .getCertificate(certHolder);
-    }
-
-    private String certificateToPem(X509Certificate certificate) throws Exception {
-        StringWriter sw = new StringWriter();
-        try (JcaPEMWriter pemWriter = new JcaPEMWriter(sw)) {
-            pemWriter.writeObject(certificate);
-        }
-        return sw.toString();
+            .setProvider(PROVIDER_NAME)
+            .getCertificate(certHolder);
     }
 }

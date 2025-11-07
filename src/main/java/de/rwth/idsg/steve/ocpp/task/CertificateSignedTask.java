@@ -20,16 +20,24 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
+import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.CertificateSigned;
+import ocpp._2022._02.security.CertificateSignedResponse;
+import ocpp._2022._02.security.CertificateSignedResponse.CertificateSignedStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
-import ocpp._2020._03.CertificateSignedRequest;
-import ocpp._2020._03.CertificateSignedResponse;
 
+@Slf4j
 public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedParams, String> {
 
-    public CertificateSignedTask(CertificateSignedParams params) {
+    private final SecurityRepository securityRepository;
+
+    public CertificateSignedTask(CertificateSignedParams params,
+                                 SecurityRepository securityRepository) {
         super(params);
+        this.securityRepository = securityRepository;
     }
 
     @Override
@@ -38,8 +46,8 @@ public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedP
     }
 
     @Override
-    public CertificateSignedRequest getOcpp16Request() {
-        var request = new CertificateSignedRequest();
+    public CertificateSigned getOcpp16Request() {
+        var request = new CertificateSigned();
         request.setCertificateChain(params.getCertificateChain());
         return request;
     }
@@ -48,9 +56,16 @@ public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedP
     public AsyncHandler<CertificateSignedResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                success(chargeBoxId, status);
+                var status = res.get().getStatus();
+                success(chargeBoxId, status.value());
+
+                switch (status) {
+                    case ACCEPTED -> log.info("Request was {} by charge point '{}'", status, chargeBoxId);
+                    case REJECTED -> log.warn("Request was {} by charge point '{}'", status, chargeBoxId);
+                }
+
+                boolean accepted = (status == CertificateSignedStatusEnumType.ACCEPTED);
+                securityRepository.insertCertificateSignResponse(chargeBoxId, params.getCertificateId(), accepted);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

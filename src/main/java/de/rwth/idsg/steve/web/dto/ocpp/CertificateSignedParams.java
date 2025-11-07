@@ -30,6 +30,9 @@ import jakarta.validation.constraints.Size;
 @Schema(description = "Parameters for sending a signed certificate to charge points")
 public class CertificateSignedParams extends MultipleChargePointSelect {
 
+    @Schema(description = "Certificate ID from database")
+    private int certificateId;
+
     @NotBlank(message = "Certificate chain is required")
     @Size(max = 10000, message = "Certificate chain must not exceed {max} characters")
     @Schema(description = "PEM-encoded certificate chain (signed certificate + CA certificate)",

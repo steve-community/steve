@@ -38,6 +38,7 @@ import java.util.Optional;
  */
 public interface ChargePointRepository {
     Optional<ChargePointRegistration> getRegistration(String chargeBoxId);
+    String getSerialNumber(String chargeBoxId);
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 

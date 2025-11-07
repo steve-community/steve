@@ -21,15 +21,15 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.dto.Certificate;
-import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
-import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
+import de.rwth.idsg.steve.utils.CertificateUtils;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
+import jooq.steve.db.tables.records.CertificateRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import lombok.RequiredArgsConstructor;
@@ -38,14 +38,19 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.Nullable;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static jooq.steve.db.Tables.CERTIFICATE;
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_STATUS;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
@@ -63,11 +68,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 
     @Override
     public void insertSecurityEvent(String chargeBoxId, String eventType, DateTime timestamp, String techInfo) {
-        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-        if (chargeBoxPk == null) {
-            log.error("Cannot insert security event for unknown chargeBoxId: {}", chargeBoxId);
-            return;
-        }
+        var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
         ctx.insertInto(CHARGE_BOX_SECURITY_EVENT)
            .set(CHARGE_BOX_SECURITY_EVENT.CHARGE_BOX_PK, chargeBoxPk)
@@ -82,11 +83,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 
     @Override
     public void insertLogUploadStatus(String chargeBoxId, Integer requestId, String status, DateTime timestamp) {
-        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-        if (chargeBoxPk == null) {
-            log.error("Cannot insert log upload status for unknown chargeBoxId: {}", chargeBoxId);
-            return;
-        }
+        var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
         ctx.insertInto(CHARGE_BOX_LOG_UPLOAD_STATUS)
             .set(CHARGE_BOX_LOG_UPLOAD_STATUS.CHARGE_BOX_PK, chargeBoxPk)
@@ -98,11 +95,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 
     @Override
     public void insertFirmwareUpdateStatus(String chargeBoxId, Integer requestId, String status, DateTime timestamp) {
-        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-        if (chargeBoxPk == null) {
-            log.error("Cannot insert log upload status for unknown chargeBoxId: {}", chargeBoxId);
-            return;
-        }
+        var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
         ctx.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_STATUS)
             .set(CHARGE_BOX_FIRMWARE_UPDATE_STATUS.CHARGE_BOX_PK, chargeBoxPk)
@@ -239,6 +232,43 @@ public class SecurityRepositoryImpl implements SecurityRepository {
         }
 
         return rec;
+    }
+
+    @Override
+    public CertificateRecord insertCertificate(X509Certificate cert, String certificateChainPEM) {
+        var rec = new CertificateRecord();
+        rec.setCreatedAt(DateTime.now());
+        rec.setSerialNumber(cert.getSerialNumber().longValue());
+        rec.setIssuerName(cert.getIssuerX500Principal().getName());
+        rec.setSubjectName(cert.getSubjectX500Principal().getName());
+        rec.setOrganizationName(CertificateUtils.getOrganization(cert));
+        rec.setCommonName(CertificateUtils.getCommonName(cert));
+        rec.setKeySize(CertificateUtils.getKeySize(cert));
+        rec.setValidFrom(new DateTime(cert.getNotBefore().getTime()));
+        rec.setValidTo(new DateTime(cert.getNotAfter().getTime()));
+        rec.setSignatureAlgorithm(CertificateUtils.getSignatureAlgorithm(cert));
+        rec.setCertificateChainPem(certificateChainPEM);
+
+        int id = ctx.insertInto(CERTIFICATE)
+            .set(rec)
+            .returningResult(CERTIFICATE.CERTIFICATE_ID)
+            .fetchOne()
+            .value1();
+
+        rec.setCertificateId(id);
+        return rec;
+    }
+
+    @Override
+    public void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted) {
+        var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
+
+        ctx.insertInto(CHARGE_BOX_CERTIFICATE)
+            .set(CHARGE_BOX_CERTIFICATE.CHARGE_BOX_PK, chargeBoxPk)
+            .set(CHARGE_BOX_CERTIFICATE.CERTIFICATE_ID, certificateId)
+            .set(CHARGE_BOX_CERTIFICATE.ACCEPTED, accepted)
+            .set(CHARGE_BOX_CERTIFICATE.RESPONDED_AT, DateTime.now())
+            .execute();
     }
 
     @Override
@@ -380,12 +410,10 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 //                                                 .build());
     }
 
-    private Integer getChargeBoxPk(String chargeBoxId) {
-        var record = ctx.select(CHARGE_BOX.CHARGE_BOX_PK)
-                                     .from(CHARGE_BOX)
-                                     .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-                                     .fetchOne();
-        return record != null ? record.value1() : null;
+    private SelectConditionStep<Record1<Integer>> getChargeBoxPkQuery(String chargeBoxId) {
+        return ctx.select(CHARGE_BOX.CHARGE_BOX_PK)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
     }
 
     @Nullable

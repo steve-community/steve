@@ -19,18 +19,18 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.Certificate;
-import de.rwth.idsg.steve.repository.dto.FirmwareUpdate;
-import de.rwth.idsg.steve.repository.dto.LogFile;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
+import jooq.steve.db.tables.records.CertificateRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import org.joda.time.DateTime;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 public interface SecurityRepository {
@@ -52,6 +52,10 @@ public interface SecurityRepository {
     ChargeBoxFirmwareUpdateJobRecord getFirmwareUpdateDetails(int jobId);
 
     ChargeBoxLogUploadJobRecord getLogUploadDetails(int jobId);
+
+    CertificateRecord insertCertificate(X509Certificate certificate, String certificateChainPEM);
+
+    void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted);
 
     int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
                           String serialNumber, String issuerName, String subjectName,

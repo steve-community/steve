@@ -57,15 +57,7 @@ public interface SecurityRepository {
 
     void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted);
 
-    int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
-                          String serialNumber, String issuerName, String subjectName,
-                          DateTime validFrom, DateTime validTo, String signatureAlgorithm, Integer keySize);
-
-    void updateCertificateStatus(int certificateId, String status);
-
     List<Certificate> getInstalledCertificates(String chargeBoxId, String certificateType);
 
     void deleteCertificate(int certificateId);
-
-    Certificate getCertificateBySerialNumber(String serialNumber);
 }

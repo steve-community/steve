@@ -51,10 +51,10 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.Tables.CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE;
-import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
-import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
+import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
+import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
@@ -238,7 +238,7 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     public CertificateRecord insertCertificate(X509Certificate cert, String certificateChainPEM) {
         var rec = new CertificateRecord();
         rec.setCreatedAt(DateTime.now());
-        rec.setSerialNumber(cert.getSerialNumber().longValue());
+        rec.setSerialNumber(cert.getSerialNumber().toString());
         rec.setIssuerName(cert.getIssuerX500Principal().getName());
         rec.setSubjectName(cert.getSubjectX500Principal().getName());
         rec.setOrganizationName(CertificateUtils.getOrganization(cert));
@@ -269,46 +269,6 @@ public class SecurityRepositoryImpl implements SecurityRepository {
             .set(CHARGE_BOX_CERTIFICATE.ACCEPTED, accepted)
             .set(CHARGE_BOX_CERTIFICATE.RESPONDED_AT, DateTime.now())
             .execute();
-    }
-
-    @Override
-    public int insertCertificate(String chargeBoxId, String certificateType, String certificateData,
-                                 String serialNumber, String issuerName, String subjectName,
-                                 DateTime validFrom, DateTime validTo, String signatureAlgorithm,
-                                 Integer keySize) {
-        return 0;
-//        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-//        if (chargeBoxPk == null) {
-//            log.error("Cannot insert certificate for unknown chargeBoxId: {}", chargeBoxId);
-//            return -1;
-//        }
-//
-//        var certificateId = ctx.insertInto(CERTIFICATE)
-//                               .set(CERTIFICATE.CHARGE_BOX_PK, chargeBoxPk)
-//                               .set(CERTIFICATE.CERTIFICATE_TYPE, certificateType)
-//                               .set(CERTIFICATE.CERTIFICATE_DATA, certificateData)
-//                               .set(CERTIFICATE.SERIAL_NUMBER, serialNumber)
-//                               .set(CERTIFICATE.ISSUER_NAME, issuerName)
-//                               .set(CERTIFICATE.SUBJECT_NAME, subjectName)
-//                               .set(CERTIFICATE.VALID_FROM, validFrom)
-//                               .set(CERTIFICATE.VALID_TO, validTo)
-//                               .set(CERTIFICATE.SIGNATURE_ALGORITHM, signatureAlgorithm)
-//                               .set(CERTIFICATE.KEY_SIZE, keySize)
-//                               .set(CERTIFICATE.STATUS, "Installed")
-//                               .returningResult(CERTIFICATE.CERTIFICATE_ID)
-//                               .fetchOne()
-//                               .value1();
-//
-//        log.info("Certificate type '{}' installed for chargeBox '{}' with ID {}", certificateType, chargeBoxId, certificateId);
-//        return certificateId;
-    }
-
-    @Override
-    public void updateCertificateStatus(int certificateId, String status) {
-//        ctx.update(CERTIFICATE)
-//           .set(CERTIFICATE.STATUS, status)
-//           .where(CERTIFICATE.CERTIFICATE_ID.eq(certificateId))
-//           .execute();
     }
 
     @Override
@@ -369,45 +329,6 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 //           .execute();
 //
 //        log.info("Certificate {} marked as deleted", certificateId);
-    }
-
-    @Override
-    public Certificate getCertificateBySerialNumber(String serialNumber) {
-        return null;
-
-//        return ctx.select(
-//                      CERTIFICATE.CERTIFICATE_ID,
-//                      CHARGE_BOX.CHARGE_BOX_ID,
-//                      CERTIFICATE.CERTIFICATE_TYPE,
-//                      CERTIFICATE.CERTIFICATE_DATA,
-//                      CERTIFICATE.SERIAL_NUMBER,
-//                      CERTIFICATE.ISSUER_NAME,
-//                      CERTIFICATE.SUBJECT_NAME,
-//                      CERTIFICATE.VALID_FROM,
-//                      CERTIFICATE.VALID_TO,
-//                      CERTIFICATE.SIGNATURE_ALGORITHM,
-//                      CERTIFICATE.KEY_SIZE,
-//                      CERTIFICATE.INSTALLED_DATE,
-//                      CERTIFICATE.STATUS
-//                  )
-//                  .from(CERTIFICATE)
-//                  .join(CHARGE_BOX).on(CERTIFICATE.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
-//                  .where(CERTIFICATE.SERIAL_NUMBER.eq(serialNumber))
-//                  .fetchOne(record -> Certificate.builder()
-//                                                 .certificateId(record.value1())
-//                                                 .chargeBoxId(record.value2())
-//                                                 .certificateType(record.value3())
-//                                                 .certificateData(record.value4())
-//                                                 .serialNumber(record.value5())
-//                                                 .issuerName(record.value6())
-//                                                 .subjectName(record.value7())
-//                                                 .validFrom(record.value8())
-//                                                 .validTo(record.value9())
-//                                                 .signatureAlgorithm(record.value10())
-//                                                 .keySize(record.value11())
-//                                                 .installedDate(record.value12())
-//                                                 .status(record.value13())
-//                                                 .build());
     }
 
     private SelectConditionStep<Record1<Integer>> getChargeBoxPkQuery(String chargeBoxId) {

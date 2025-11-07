@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS certificate (
     certificate_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    serial_number BIGINT,
+    serial_number VARCHAR(255),
     issuer_name VARCHAR(500),
     subject_name VARCHAR(500),
     organization_name VARCHAR(500),

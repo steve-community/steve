@@ -275,6 +275,26 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Override
+    public ChargeBoxCertificateInstalledRecord getInstalledCertificateRecord(long installedCertificateId) {
+        var rec = ctx.selectFrom(CHARGE_BOX_CERTIFICATE_INSTALLED)
+            .where(CHARGE_BOX_CERTIFICATE_INSTALLED.ID.eq(installedCertificateId))
+            .fetchOne();
+
+        if (rec == null) {
+            throw new SteveException.NotFound("Installed certificate not found");
+        }
+
+        return rec;
+    }
+
+    @Override
+    public void deleteInstalledCertificate(long installedCertificateId) {
+        ctx.deleteFrom(CHARGE_BOX_CERTIFICATE_INSTALLED)
+            .where(CHARGE_BOX_CERTIFICATE_INSTALLED.ID.eq(installedCertificateId))
+            .execute();
+    }
+
+    @Override
     public void deleteInstalledCertificates(String chargeBoxId, String certificateType) {
         var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
@@ -292,11 +312,13 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 
         try {
             var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId).fetchOne(CHARGE_BOX.CHARGE_BOX_PK);
+            DateTime now = DateTime.now();
 
             var batch = certificateHashData.stream()
                 .map(it -> ctx
                     .newRecord(CHARGE_BOX_CERTIFICATE_INSTALLED)
                     .setChargeBoxPk(chargeBoxPk)
+                    .setRespondedAt(now)
                     .setCertificateType(certificateType)
                     .setHashAlgorithm(it.getHashAlgorithm().value())
                     .setIssuerNameHash(it.getIssuerNameHash())
@@ -361,16 +383,6 @@ public class SecurityRepositoryImpl implements SecurityRepository {
 //                                                .installedDate(record.value12())
 //                                                .status(record.value13())
 //                                                .build());
-    }
-
-    @Override
-    public void deleteCertificate(int certificateId) {
-//        ctx.update(CERTIFICATE)
-//           .set(CERTIFICATE.STATUS, "Deleted")
-//           .where(CERTIFICATE.CERTIFICATE_ID.eq(certificateId))
-//           .execute();
-//
-//        log.info("Certificate {} marked as deleted", certificateId);
     }
 
     private SelectConditionStep<Record1<Integer>> getChargeBoxPkQuery(String chargeBoxId) {

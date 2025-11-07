@@ -18,12 +18,16 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
+import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +49,7 @@ public class SecurityController {
 
     private final SecurityRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
+    private final ChargePointServiceClient chargePointServiceClient;
 
     private static final String PARAMS = "params";
 
@@ -110,10 +115,15 @@ public class SecurityController {
         return "security-man/certificates";
     }
 
-    @RequestMapping(value = "/certificates/delete/{certificateId}", method = RequestMethod.POST)
-    public String deleteCertificate(@PathVariable("certificateId") int certificateId) {
-        securityRepository.deleteCertificate(certificateId);
-        return "redirect:/manager/security/certificates";
+    @RequestMapping(value = "/certificates/installed/{chargeBoxId}/delete/{installedCertificateId}", method = RequestMethod.POST)
+    public String deleteCertificate(@PathVariable("chargeBoxId") String chargeBoxId,
+                                    @PathVariable("installedCertificateId") long installedCertificateId) {
+        DeleteCertificateParams params = new DeleteCertificateParams();
+        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
+        params.setInstalledCertificateId(installedCertificateId);
+        int taskId = chargePointServiceClient.deleteCertificate(params);
+
+        return "redirect:/manager/operations/tasks/" + taskId;
     }
 
 }

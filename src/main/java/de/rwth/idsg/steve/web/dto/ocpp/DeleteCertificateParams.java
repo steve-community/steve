@@ -21,29 +21,12 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 @Setter
 @Getter
-public class DeleteCertificateParams extends MultipleChargePointSelect {
+public class DeleteCertificateParams extends SingleChargePointSelect {
 
-    @NotBlank(message = "Certificate hash data is required")
-    @Size(max = 128, message = "Hash data must not exceed {max} characters")
-    private String certificateHashData;
-
-    @NotBlank(message = "Hash algorithm is required")
-    private String hashAlgorithm;
-
-    @NotBlank(message = "Issuer name hash is required")
-    @Size(max = 128, message = "Issuer name hash must not exceed {max} characters")
-    private String issuerNameHash;
-
-    @NotBlank(message = "Issuer key hash is required")
-    @Size(max = 128, message = "Issuer key hash must not exceed {max} characters")
-    private String issuerKeyHash;
-
-    @NotBlank(message = "Serial number is required")
-    @Size(max = 40, message = "Serial number must not exceed {max} characters")
-    private String serialNumber;
+    @NotNull(message = "installedCertificateId cannot be null")
+    private Long installedCertificateId;
 }

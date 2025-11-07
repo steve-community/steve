@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.DeleteCertificateTask;
 import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
@@ -265,6 +266,12 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     }
 
     public void installCertificate(ChargePointSelect cp, InstallCertificateTask task) {
+        if (cp.isJson()) {
+            chargePointServiceJsonInvoker.runPipeline(cp, task);
+        }
+    }
+
+    public void deleteCertificate(ChargePointSelect cp, DeleteCertificateTask task) {
         if (cp.isJson()) {
             chargePointServiceJsonInvoker.runPipeline(cp, task);
         }

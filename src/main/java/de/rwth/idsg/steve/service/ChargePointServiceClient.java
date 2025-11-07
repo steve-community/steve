@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.DeleteCertificateTask;
 import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
@@ -62,6 +63,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
@@ -532,6 +534,22 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.installCertificate(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int deleteCertificate(DeleteCertificateParams params,
+                                       OcppCallback<String>... callbacks) {
+        DeleteCertificateTask task = new DeleteCertificateTask(params, securityRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forFirst(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.deleteCertificate(c, task));
 
         return taskStore.add(task);
     }

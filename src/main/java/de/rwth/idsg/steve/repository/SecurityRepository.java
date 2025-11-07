@@ -61,11 +61,14 @@ public interface SecurityRepository {
 
     void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted);
 
+    ChargeBoxCertificateInstalledRecord getInstalledCertificateRecord(long installedCertificateId);
+
+    void deleteInstalledCertificate(long installedCertificateId);
+
     void deleteInstalledCertificates(String chargeBoxId, String certificateType);
 
     void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData);
 
     List<ChargeBoxCertificateInstalledRecord> getInstalledCertificates(String chargeBoxId, String certificateType);
 
-    void deleteCertificate(int certificateId);
 }

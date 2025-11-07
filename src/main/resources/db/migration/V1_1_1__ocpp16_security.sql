@@ -122,7 +122,10 @@ CREATE TABLE IF NOT EXISTS charge_box_certificate (
 );
 
 CREATE TABLE IF NOT EXISTS charge_box_certificate_installed (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, -- synthetic PK to be able to identify a row (for ex for deletions)
     charge_box_pk INT NOT NULL,
+    responded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     certificate_type VARCHAR(255) NOT NULL,
     hash_algorithm VARCHAR(128) NOT NULL,
     issuer_name_hash VARCHAR(128) NOT NULL,

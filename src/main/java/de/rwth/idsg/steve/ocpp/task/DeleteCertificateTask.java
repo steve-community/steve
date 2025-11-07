@@ -20,17 +20,25 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
-
-import jakarta.xml.ws.AsyncHandler;
+import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateHashDataType;
 import ocpp._2022._02.security.DeleteCertificate;
 import ocpp._2022._02.security.DeleteCertificateResponse;
+import ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatusEnumType;
 
+import jakarta.xml.ws.AsyncHandler;
+
+@Slf4j
 public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, String> {
 
-    public DeleteCertificateTask(DeleteCertificateParams params) {
+    private final SecurityRepository securityRepository;
+
+    public DeleteCertificateTask(DeleteCertificateParams params,
+                                 SecurityRepository securityRepository) {
         super(params);
+        this.securityRepository = securityRepository;
     }
 
     @Override
@@ -40,14 +48,15 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
 
     @Override
     public DeleteCertificate getOcpp16Request() {
-        var request = new DeleteCertificate();
+        var record = securityRepository.getInstalledCertificateRecord(params.getInstalledCertificateId());
 
         var hashData = new CertificateHashDataType();
-        hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.valueOf(params.getHashAlgorithm()));
-        hashData.setIssuerNameHash(params.getIssuerNameHash());
-        hashData.setIssuerKeyHash(params.getIssuerKeyHash());
-        hashData.setSerialNumber(params.getSerialNumber());
+        hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.valueOf(record.getHashAlgorithm()));
+        hashData.setIssuerNameHash(record.getIssuerNameHash());
+        hashData.setIssuerKeyHash(record.getIssuerKeyHash());
+        hashData.setSerialNumber(record.getSerialNumber());
 
+        var request = new DeleteCertificate();
         request.setCertificateHashData(hashData);
         return request;
     }
@@ -56,9 +65,13 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
     public AsyncHandler<DeleteCertificateResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                success(chargeBoxId, status);
+                var status = res.get().getStatus();
+                success(chargeBoxId, status.value());
+
+                if (status == DeleteCertificateStatusEnumType.ACCEPTED) {
+                    log.info("Request accepted. Deleting from database...");
+                    securityRepository.deleteInstalledCertificate(params.getInstalledCertificateId());
+                }
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

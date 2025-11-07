@@ -52,6 +52,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED_VIEW;
 import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -157,7 +158,8 @@ public class __DatabasePreparer__ {
                 Settings.SETTINGS,
                 OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
                 TRANSACTION, // only a view
-                CHARGE_BOX_STATUS_EVENT // only a view
+                CHARGE_BOX_STATUS_EVENT, // only a view
+                CHARGE_BOX_CERTIFICATE_SIGNED_VIEW // only a view
         );
 
         ctx.transaction(configuration -> {

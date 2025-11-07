@@ -35,7 +35,6 @@ public class CertificateSignedParams extends MultipleChargePointSelect {
 
     @NotBlank(message = "Certificate chain is required")
     @Size(max = 10000, message = "Certificate chain must not exceed {max} characters")
-    @Schema(description = "PEM-encoded certificate chain (signed certificate + CA certificate)",
-            requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 10000)
+    @Schema(description = "PEM-encoded certificate chain (signed certificate + CA certificate)")
     private String certificateChain;
 }

@@ -31,6 +31,6 @@ import jakarta.validation.constraints.NotNull;
 public class GetLogParams extends GetDiagnosticsParams {
 
     @NotNull(message = "Log type is required")
-    @Schema(description = "Type of log to retrieve", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Type of log to retrieve")
     private GetLog.LogEnumType logType;
 }

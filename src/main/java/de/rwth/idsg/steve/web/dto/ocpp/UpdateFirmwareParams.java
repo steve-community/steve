@@ -38,7 +38,6 @@ import jakarta.validation.constraints.Pattern;
 public class UpdateFirmwareParams extends MultipleChargePointSelect {
 
     @Schema(description = "URL where charge point can download the firmware",
-            requiredMode = Schema.RequiredMode.REQUIRED,
             example = "https://firmware.example.com/v2.3.bin")
     @NotBlank(message = "Location is required")
     @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")
@@ -52,8 +51,7 @@ public class UpdateFirmwareParams extends MultipleChargePointSelect {
     @Min(value = 1, message = "Retry Interval must be at least {value}")
     private Integer retryInterval;
 
-    @Schema(description = "When charge point should start downloading firmware",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "When charge point should start downloading firmware")
     @Future(message = "Retrieve Date/Time must be in future")
     @NotNull(message = "Retrieve Date/Time is required")
     private DateTime retrieveDateTime;

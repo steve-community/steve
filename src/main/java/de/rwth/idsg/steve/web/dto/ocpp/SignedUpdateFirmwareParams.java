@@ -34,8 +34,7 @@ public class SignedUpdateFirmwareParams extends UpdateFirmwareParams {
 
     @NotBlank(message = "Firmware signature is required")
     @Size(max = 800, message = "Firmware signature must not exceed {max} characters")
-    @Schema(description = "Cryptographic signature of the firmware file",
-            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Cryptographic signature of the firmware file")
     private String signature;
 
     @NotBlank(message = "Signing certificate is required")

@@ -33,11 +33,11 @@ import jakarta.validation.constraints.Size;
 public class InstallCertificateParams extends MultipleChargePointSelect {
 
     @NotNull(message = "Certificate type is required")
-    @Schema(description = "Type of certificate to install", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Type of certificate to install")
     private InstallCertificate.CertificateUseEnumType certificateType;
 
     @NotBlank(message = "Certificate is required")
     @Size(max = 5500, message = "Certificate must not exceed {max} characters")
-    @Schema(description = "PEM-encoded X.509 certificate", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "PEM-encoded X.509 certificate")
     private String certificate;
 }

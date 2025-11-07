@@ -38,7 +38,6 @@ import jakarta.validation.constraints.Pattern;
 public class GetDiagnosticsParams extends MultipleChargePointSelect {
 
     @Schema(description = "The URL where charge point should upload the log file",
-            requiredMode = Schema.RequiredMode.REQUIRED,
             example = "ftp://user:pass@example.com/logs/")
     @NotBlank(message = "Location is required")
     @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")

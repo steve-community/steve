@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetInstalledCertificateIdsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.GetLogTask;
 import de.rwth.idsg.steve.ocpp.task.InstallCertificateTask;
@@ -270,6 +271,12 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     }
 
     public void certificateSigned(ChargePointSelect cp, CertificateSignedTask task) {
+        if (cp.isJson()) {
+            chargePointServiceJsonInvoker.runPipeline(cp, task);
+        }
+    }
+
+    public void getInstalledCertificateIds(ChargePointSelect cp, GetInstalledCertificateIdsTask task) {
         if (cp.isJson()) {
             chargePointServiceJsonInvoker.runPipeline(cp, task);
         }

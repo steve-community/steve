@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SecurityRepository;
-import de.rwth.idsg.steve.repository.dto.Certificate;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.utils.CertificateUtils;
@@ -30,10 +29,12 @@ import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.CertificateRecord;
+import jooq.steve.db.tables.records.ChargeBoxCertificateInstalledRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.CertificateHashData;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -41,6 +42,7 @@ import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.annotation.Nullable;
 import java.security.cert.X509Certificate;
@@ -51,6 +53,7 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.Tables.CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE;
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_INSTALLED;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
@@ -272,7 +275,46 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Override
-    public List<Certificate> getInstalledCertificates(String chargeBoxId, String certificateType) {
+    public void deleteInstalledCertificates(String chargeBoxId, String certificateType) {
+        var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
+
+        ctx.deleteFrom(CHARGE_BOX_CERTIFICATE_INSTALLED)
+            .where(CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK.eq(chargeBoxPk))
+            .and(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(certificateType))
+            .execute();
+    }
+
+    @Override
+    public void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData) {
+        if (CollectionUtils.isEmpty(certificateHashData)) {
+            return;
+        }
+
+        try {
+            var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId).fetchOne(CHARGE_BOX.CHARGE_BOX_PK);
+
+            var batch = certificateHashData.stream()
+                .map(it -> ctx
+                    .newRecord(CHARGE_BOX_CERTIFICATE_INSTALLED)
+                    .setChargeBoxPk(chargeBoxPk)
+                    .setCertificateType(certificateType)
+                    .setHashAlgorithm(it.getHashAlgorithm().value())
+                    .setIssuerNameHash(it.getIssuerNameHash())
+                    .setIssuerKeyHash(it.getIssuerKeyHash())
+                    .setSerialNumber(it.getSerialNumber())
+                );
+
+            ctx.loadInto(CHARGE_BOX_CERTIFICATE_INSTALLED)
+                .loadRecords(batch)
+                .fieldsCorresponding()
+                .execute();
+        } catch (Exception e) {
+            throw new SteveException("Failed to insert InstalledCertificates", e);
+        }
+    }
+
+    @Override
+    public List<ChargeBoxCertificateInstalledRecord> getInstalledCertificates(String chargeBoxId, String certificateType) {
         return Collections.emptyList();
 
 //        var chargeBoxPk = getChargeBoxPk(chargeBoxId);

@@ -20,16 +20,24 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
-
-import jakarta.xml.ws.AsyncHandler;
+import ocpp._2022._02.security.CertificateHashData;
 import ocpp._2022._02.security.GetInstalledCertificateIds;
 import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
 
+import jakarta.xml.ws.AsyncHandler;
+import java.util.Collections;
+import java.util.List;
+
 public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, String> {
 
-    public GetInstalledCertificateIdsTask(GetInstalledCertificateIdsParams params) {
+    private final SecurityRepository securityRepository;
+
+    public GetInstalledCertificateIdsTask(GetInstalledCertificateIdsParams params,
+                                          SecurityRepository securityRepository) {
         super(params);
+        this.securityRepository = securityRepository;
     }
 
     @Override
@@ -40,10 +48,7 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
     @Override
     public GetInstalledCertificateIds getOcpp16Request() {
         var request = new GetInstalledCertificateIds();
-        if (params.getCertificateType() != null) {
-            request.setCertificateType(GetInstalledCertificateIds.CertificateUseEnumType.valueOf(
-                    params.getCertificateType().toString()));
-        }
+        request.setCertificateType(params.getCertificateType());
         return request;
     }
 
@@ -52,10 +57,22 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
         return res -> {
             try {
                 var response = res.get();
-                var status = response.getStatus() != null ? response.getStatus().toString() : "Unknown";
-                var certCount = response.getCertificateHashData() != null
-                        ? response.getCertificateHashData().size() : 0;
-                success(chargeBoxId, status + " (" + certCount + " certificates)");
+                var status = response.getStatus().value();
+
+                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
+                    ? Collections.emptyList()
+                    : response.getCertificateHashData();
+
+                success(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
+
+                if (certificateHashData.isEmpty()) {
+                    return;
+                }
+
+                String certType = params.getCertificateType().value();
+                securityRepository.deleteInstalledCertificates(chargeBoxId, certType);
+                securityRepository.insertInstalledCertificates(chargeBoxId, certType, certificateHashData);
+
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

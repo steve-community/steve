@@ -26,10 +26,14 @@ import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.CertificateRecord;
+import jooq.steve.db.tables.records.ChargeBoxCertificateInstalledRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
+import ocpp._2022._02.security.CertificateHashData;
+import ocpp._2022._02.security.GetInstalledCertificateIds;
 import org.joda.time.DateTime;
 
+import jakarta.validation.constraints.NotNull;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -57,7 +61,11 @@ public interface SecurityRepository {
 
     void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted);
 
-    List<Certificate> getInstalledCertificates(String chargeBoxId, String certificateType);
+    void deleteInstalledCertificates(String chargeBoxId, String certificateType);
+
+    void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData);
+
+    List<ChargeBoxCertificateInstalledRecord> getInstalledCertificates(String chargeBoxId, String certificateType);
 
     void deleteCertificate(int certificateId);
 }

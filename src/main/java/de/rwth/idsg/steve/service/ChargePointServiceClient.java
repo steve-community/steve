@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetInstalledCertificateIdsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.GetLogTask;
 import de.rwth.idsg.steve.ocpp.task.InstallCertificateTask;
@@ -65,6 +66,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
@@ -546,6 +548,22 @@ public class ChargePointServiceClient {
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
             .execute(c -> invoker.certificateSigned(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int getInstalledCertificateIds(GetInstalledCertificateIdsParams params,
+                                                OcppCallback<String>... callbacks) {
+        GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(params, securityRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.getInstalledCertificateIds(c, task));
 
         return taskStore.add(task);
     }

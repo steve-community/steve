@@ -121,4 +121,17 @@ CREATE TABLE IF NOT EXISTS charge_box_certificate (
     FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS charge_box_certificate_installed (
+    charge_box_pk INT NOT NULL,
+    certificate_type VARCHAR(255) NOT NULL,
+    hash_algorithm VARCHAR(128) NOT NULL,
+    issuer_name_hash VARCHAR(128) NOT NULL,
+    issuer_key_hash VARCHAR(128) NOT NULL,
+    serial_number VARCHAR(255) NOT NULL,
+
+    FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE,
+    INDEX idx_charge_box_pk (charge_box_pk),
+    INDEX idx_certificate_type (certificate_type)
+);
+
 COMMIT;

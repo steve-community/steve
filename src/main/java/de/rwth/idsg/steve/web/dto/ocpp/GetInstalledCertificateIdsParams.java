@@ -21,18 +21,16 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import ocpp._2022._02.security.GetInstalledCertificateIds;
+
+import jakarta.validation.constraints.NotNull;
 
 @Setter
 @Getter
 @Schema(description = "Parameters for retrieving installed certificate IDs from charge points")
 public class GetInstalledCertificateIdsParams extends MultipleChargePointSelect {
 
-    @Schema(description = "Optional filter by certificate type. If not specified, returns all certificate types.")
-    private CertificateUseEnumType certificateType;
-
-    public enum CertificateUseEnumType {
-        CentralSystemRootCertificate,
-        ManufacturerRootCertificate,
-        ChargePointCertificate
-    }
+    @NotNull
+    @Schema(description = "Filter by certificate type.")
+    private GetInstalledCertificateIds.CertificateUseEnumType certificateType;
 }

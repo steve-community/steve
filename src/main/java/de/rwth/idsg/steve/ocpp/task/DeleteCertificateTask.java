@@ -51,7 +51,7 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
         var record = securityRepository.getInstalledCertificateRecord(params.getInstalledCertificateId());
 
         var hashData = new CertificateHashDataType();
-        hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.valueOf(record.getHashAlgorithm()));
+        hashData.setHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.fromValue(record.getHashAlgorithm()));
         hashData.setIssuerNameHash(record.getIssuerNameHash());
         hashData.setIssuerKeyHash(record.getIssuerKeyHash());
         hashData.setSerialNumber(record.getSerialNumber());

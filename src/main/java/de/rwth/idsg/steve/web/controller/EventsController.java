@@ -18,16 +18,11 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.SecurityRepository;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.StatusEvent;
-import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
-import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,24 +31,25 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
-import java.util.List;
 
+/**
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @since 07.11.2025
+ */
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(value = "/manager/security")
-public class SecurityController {
+@RequestMapping(value = "/manager/events")
+public class EventsController {
 
     private final SecurityRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
-    private final ChargePointServiceClient chargePointServiceClient;
 
     private static final String PARAMS = "params";
 
-    @RequestMapping(value = "/events", method = RequestMethod.GET)
+    @RequestMapping(value = "/security", method = RequestMethod.GET)
     public String getSecurityEvents(@Valid @ModelAttribute(PARAMS) SecurityEventsQueryForm params,
                                     BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -65,10 +61,10 @@ public class SecurityController {
             model.addAttribute("events", securityRepository.getSecurityEvents(params));
         }
 
-        return "security-man/events";
+        return "security-man/securityEvents";
     }
 
-    @RequestMapping(value = "/statusEvents", method = RequestMethod.GET)
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     public String getStatusEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
                                   BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -77,14 +73,13 @@ public class SecurityController {
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());
         } else {
-            List<StatusEvent> events = securityRepository.getStatusEvents(params);
-            model.addAttribute("events", events);
+            model.addAttribute("events", securityRepository.getStatusEvents(params));
         }
 
         return "security-man/statusEvents";
     }
 
-    @RequestMapping(value = "/statusEvents/{eventType}/{jobId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/status/{eventType}/{jobId}", method = RequestMethod.GET)
     public String getStatusEventJobDetails(@PathVariable("eventType") StatusEventType eventType,
                                            @PathVariable("jobId") int jobId,
                                            Model model) {
@@ -97,33 +92,4 @@ public class SecurityController {
         model.addAttribute("details", details);
         return "security-man/statusEventJobDetails";
     }
-
-
-
-
-    @RequestMapping(value = "/certificates", method = RequestMethod.GET)
-    public String getCertificates(
-            @RequestParam(value = "chargeBoxId", required = false) String chargeBoxId,
-            @RequestParam(value = "certificateType", required = false) String certificateType,
-            Model model) {
-
-        model.addAttribute("certificates", securityRepository.getInstalledCertificates(chargeBoxId, certificateType));
-        model.addAttribute("chargeBoxIdList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("selectedChargeBoxId", chargeBoxId);
-        model.addAttribute("selectedCertificateType", certificateType);
-
-        return "security-man/certificates";
-    }
-
-    @RequestMapping(value = "/certificates/installed/{chargeBoxId}/delete/{installedCertificateId}", method = RequestMethod.POST)
-    public String deleteCertificate(@PathVariable("chargeBoxId") String chargeBoxId,
-                                    @PathVariable("installedCertificateId") long installedCertificateId) {
-        DeleteCertificateParams params = new DeleteCertificateParams();
-        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
-        params.setInstalledCertificateId(installedCertificateId);
-        int taskId = chargePointServiceClient.deleteCertificate(params);
-
-        return "redirect:/manager/operations/tasks/" + taskId;
-    }
-
 }

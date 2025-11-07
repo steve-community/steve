@@ -62,12 +62,12 @@
                             <li><a href="${ctxPath}/manager/transactions">TRANSACTIONS</a></li>
                         </ul>
                     </li>
-                    <li><a>SECURITY MANAGEMENT &raquo;</a>
+                    <li><a>EVENTS AND CERTIFICATES &raquo;</a>
                         <ul>
-                            <li><a href="${ctxPath}/manager/security/events">SECURITY EVENTS</a></li>
-                            <li><a href="${ctxPath}/manager/security/statusEvents">STATUS EVENTS</a></li>
-                            <li><a href="${ctxPath}/manager/security/certificates">CERTIFICATES</a></li>
-                            <li><a href="${ctxPath}/manager/security/configuration">CONFIGURATION</a></li>
+                            <li><a href="${ctxPath}/manager/events/security">SECURITY EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/events/status">STATUS EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/certificates/installed">INSTALLED CERTIFICATES</a></li>
+                            <li><a href="${ctxPath}/manager/certificates/signed">SIGNED CERTIFICATES</a></li>
                         </ul>
                     </li>
                     <li><a>OPERATIONS &raquo;</a>

@@ -20,9 +20,11 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.repository.dto.InstalledCertificate;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.utils.CertificateUtils;
+import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
@@ -47,7 +49,6 @@ import org.springframework.util.CollectionUtils;
 import jakarta.annotation.Nullable;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
@@ -336,53 +337,43 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     }
 
     @Override
-    public List<ChargeBoxCertificateInstalledRecord> getInstalledCertificates(String chargeBoxId, String certificateType) {
-        return Collections.emptyList();
+    public List<InstalledCertificate> getInstalledCertificates(InstalledCertificateQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
 
-//        var chargeBoxPk = getChargeBoxPk(chargeBoxId);
-//        if (chargeBoxPk == null) {
-//            return List.of();
-//        }
-//
-//        var query = ctx.select(
-//                       CERTIFICATE.CERTIFICATE_ID,
-//                       CHARGE_BOX.CHARGE_BOX_ID,
-//                       CERTIFICATE.CERTIFICATE_TYPE,
-//                       CERTIFICATE.CERTIFICATE_DATA,
-//                       CERTIFICATE.SERIAL_NUMBER,
-//                       CERTIFICATE.ISSUER_NAME,
-//                       CERTIFICATE.SUBJECT_NAME,
-//                       CERTIFICATE.VALID_FROM,
-//                       CERTIFICATE.VALID_TO,
-//                       CERTIFICATE.SIGNATURE_ALGORITHM,
-//                       CERTIFICATE.KEY_SIZE,
-//                       CERTIFICATE.INSTALLED_DATE,
-//                       CERTIFICATE.STATUS
-//                   )
-//                   .from(CERTIFICATE)
-//                   .join(CHARGE_BOX).on(CERTIFICATE.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
-//                   .where(CERTIFICATE.CHARGE_BOX_PK.eq(chargeBoxPk))
-//                   .and(CERTIFICATE.STATUS.eq("Installed"));
-//
-//        if (certificateType != null) {
-//            query = query.and(CERTIFICATE.CERTIFICATE_TYPE.eq(certificateType));
-//        }
-//
-//        return query.fetch(record -> Certificate.builder()
-//                                                .certificateId(record.value1())
-//                                                .chargeBoxId(record.value2())
-//                                                .certificateType(record.value3())
-//                                                .certificateData(record.value4())
-//                                                .serialNumber(record.value5())
-//                                                .issuerName(record.value6())
-//                                                .subjectName(record.value7())
-//                                                .validFrom(record.value8())
-//                                                .validTo(record.value9())
-//                                                .signatureAlgorithm(record.value10())
-//                                                .keySize(record.value11())
-//                                                .installedDate(record.value12())
-//                                                .status(record.value13())
-//                                                .build());
+        if (form.isChargeBoxIdSet()) {
+            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+        }
+
+        if (form.getCertificateType() != null) {
+            conditions.add(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(form.getCertificateType().value()));
+        }
+
+        return ctx.select(
+                CHARGE_BOX_CERTIFICATE_INSTALLED.ID,
+                CHARGE_BOX.CHARGE_BOX_ID,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.RESPONDED_AT,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.HASH_ALGORITHM,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.ISSUER_NAME_HASH,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.ISSUER_KEY_HASH,
+                CHARGE_BOX_CERTIFICATE_INSTALLED.SERIAL_NUMBER)
+            .from(CHARGE_BOX_CERTIFICATE_INSTALLED)
+            .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+            .where(conditions)
+            .orderBy(CHARGE_BOX_CERTIFICATE_INSTALLED.RESPONDED_AT.desc())
+            .fetch(record -> InstalledCertificate.builder()
+                .id(record.value1())
+                .chargeBoxId(record.value2())
+                .chargeBoxPk(record.value3())
+                .respondedAt(record.value4())
+                .certificateType(record.value5())
+                .hashAlgorithm(record.value6())
+                .issuerNameHash(record.value7())
+                .issuerKeyHash(record.value8())
+                .serialNumber(record.value9())
+                .build()
+            );
     }
 
     private SelectConditionStep<Record1<Integer>> getChargeBoxPkQuery(String chargeBoxId) {

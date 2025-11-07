@@ -22,14 +22,12 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../snippets/dateTimePicker-past.js" %>
-        <%@ include file="../snippets/periodTypeSelect.js" %>
         <%@ include file="../snippets/sortable.js" %>
     });
 </script>
 <div class="content">
-    <section><span>Security Events</span></section>
-    <form:form action="${ctxPath}/manager/security/events" method="get" modelAttribute="params">
+    <section><span>Installed Certificates</span></section>
+    <form:form action="${ctxPath}/manager/certificates/installed" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>ChargeBox ID:</td>
@@ -40,19 +38,12 @@
                 </td>
             </tr>
             <tr>
-                <td>Period Type:</td>
-                <td><form:select path="periodType" id="periodTypeSelect">
-                        <form:options items="${periodType}" itemLabel="value"/>
+                <td>Certificate Type:</td>
+                <td><form:select path="certificateType">
+                        <option value="" selected>All</option>
+                        <form:options items="${certificateType}" itemLabel="value"/>
                     </form:select>
                 </td>
-            </tr>
-            <tr>
-                <td>From:</td>
-                <td><form:input path="from" id="intervalPeriodTypeFrom" cssClass="dateTimePicker"/></td>
-            </tr>
-            <tr>
-                <td>To:</td>
-                <td><form:input path="to" id="intervalPeriodTypeTo" cssClass="dateTimePicker"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -63,22 +54,34 @@
         </table>
     </form:form>
     <br>
-    <table class="res">
+    <table class="res action">
         <thead>
         <tr>
             <th data-sort="string">ChargeBox ID</th>
-            <th data-sort="string">Type</th>
-            <th data-sort="date">Timestamp</th>
-            <th data-sort="string">Technical Info</th>
+            <th data-sort="string">Certificate Type</th>
+            <th data-sort="date">Responded At</th>
+            <th data-sort="string">Hash Algorithm</th>
+            <th data-sort="string">Issuer Name Hash</th>
+            <th data-sort="string">Issuer Key Hash</th>
+            <th data-sort="string">Serial Number</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${events}" var="event">
+        <c:forEach items="${certificates}" var="cert">
             <tr>
-                <td><a href="${ctxPath}/manager/chargepoints/details/${event.chargeBoxPk}">${event.chargeBoxId}</a></td>
-                <td>${event.type}</td>
-                <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>
-                <td><encode:forHtml value="${event.techInfo}" /></td>
+                <td><a href="${ctxPath}/manager/chargepoints/details/${cert.chargeBoxPk}">${cert.chargeBoxId}</a></td>
+                <td>${cert.certificateType}</td>
+                <td data-sort-value="${cert.respondedAt.millis}">${cert.respondedAt}</td>
+                <td><encode:forHtml value="${cert.hashAlgorithm}" /></td>
+                <td><encode:forHtml value="${cert.issuerNameHash}" /></td>
+                <td><encode:forHtml value="${cert.issuerKeyHash}" /></td>
+                <td><encode:forHtml value="${cert.serialNumber}" /></td>
+                <td>
+                    <form:form action="${ctxPath}/manager/certificates/installed/${cert.chargeBoxId}/delete/${cert.id}" method="post">
+                        <input type="submit" class="redSubmit" value="Delete" onclick="return confirm('Are you sure you want to delete this certificate? It will delete the certificate at the station and then in database.');">
+                    </form:form>
+                </td>
             </tr>
         </c:forEach>
         </tbody>

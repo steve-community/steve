@@ -24,18 +24,14 @@ import org.joda.time.DateTime;
 
 @Getter
 @Builder
-public class Certificate {
-    private final int certificateId;
+public class InstalledCertificate {
+    private final long id;
     private final String chargeBoxId;
+    private final long chargeBoxPk;
+    private final DateTime respondedAt;
     private final String certificateType;
-    private final String certificateData;
+    private final String hashAlgorithm;
+    private final String issuerNameHash;
+    private final String issuerKeyHash;
     private final String serialNumber;
-    private final String issuerName;
-    private final String subjectName;
-    private final DateTime validFrom;
-    private final DateTime validTo;
-    private final String signatureAlgorithm;
-    private final Integer keySize;
-    private final DateTime installedDate;
-    private final String status;
 }

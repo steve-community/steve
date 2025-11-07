@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.BooleanType;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import org.joda.time.DateTime;
@@ -464,9 +465,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.FALSE);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getExpired(), BooleanType.FALSE);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), BooleanType.ALL);
     }
 
     @Test
@@ -486,9 +487,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.TRUE);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getExpired(), BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.TRUE);
+        assertEquals(capturedForm.getBlocked(), BooleanType.ALL);
     }
 
     @Test
@@ -508,9 +509,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.FALSE);
+        assertEquals(capturedForm.getExpired(), BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), BooleanType.FALSE);
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

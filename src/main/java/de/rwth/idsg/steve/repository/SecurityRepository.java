@@ -23,11 +23,13 @@ import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
 import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
+import de.rwth.idsg.steve.web.dto.SignedCertificateQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.CertificateRecord;
 import jooq.steve.db.tables.records.ChargeBoxCertificateInstalledRecord;
+import jooq.steve.db.tables.records.ChargeBoxCertificateSignedViewRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import ocpp._2022._02.security.CertificateHashData;
@@ -69,5 +71,7 @@ public interface SecurityRepository {
     void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData);
 
     List<InstalledCertificate> getInstalledCertificates(InstalledCertificateQueryForm params);
+
+    List<ChargeBoxCertificateSignedViewRecord> getSignedCertificates(SignedCertificateQueryForm params);
 
 }

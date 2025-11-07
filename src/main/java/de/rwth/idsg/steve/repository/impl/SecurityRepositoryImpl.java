@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SecurityRepository;
+import de.rwth.idsg.steve.web.dto.BooleanType;
+import de.rwth.idsg.steve.web.dto.SignedCertificateQueryForm;
 import de.rwth.idsg.steve.repository.dto.InstalledCertificate;
 import de.rwth.idsg.steve.repository.dto.SecurityEvent;
 import de.rwth.idsg.steve.repository.dto.StatusEvent;
@@ -32,6 +34,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import jooq.steve.db.tables.records.CertificateRecord;
 import jooq.steve.db.tables.records.ChargeBoxCertificateInstalledRecord;
+import jooq.steve.db.tables.records.ChargeBoxCertificateSignedViewRecord;
 import jooq.steve.db.tables.records.ChargeBoxFirmwareUpdateJobRecord;
 import jooq.steve.db.tables.records.ChargeBoxLogUploadJobRecord;
 import lombok.RequiredArgsConstructor;
@@ -52,9 +55,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.CERTIFICATE;
-import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE;
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_INSTALLED;
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED_VIEW;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
@@ -267,11 +272,11 @@ public class SecurityRepositoryImpl implements SecurityRepository {
     public void insertCertificateSignResponse(String chargeBoxId, int certificateId, boolean accepted) {
         var chargeBoxPk = getChargeBoxPkQuery(chargeBoxId);
 
-        ctx.insertInto(CHARGE_BOX_CERTIFICATE)
-            .set(CHARGE_BOX_CERTIFICATE.CHARGE_BOX_PK, chargeBoxPk)
-            .set(CHARGE_BOX_CERTIFICATE.CERTIFICATE_ID, certificateId)
-            .set(CHARGE_BOX_CERTIFICATE.ACCEPTED, accepted)
-            .set(CHARGE_BOX_CERTIFICATE.RESPONDED_AT, DateTime.now())
+        ctx.insertInto(CHARGE_BOX_CERTIFICATE_SIGNED)
+            .set(CHARGE_BOX_CERTIFICATE_SIGNED.CHARGE_BOX_PK, chargeBoxPk)
+            .set(CHARGE_BOX_CERTIFICATE_SIGNED.CERTIFICATE_ID, certificateId)
+            .set(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED, accepted)
+            .set(CHARGE_BOX_CERTIFICATE_SIGNED.RESPONDED_AT, DateTime.now())
             .execute();
     }
 
@@ -374,6 +379,39 @@ public class SecurityRepositoryImpl implements SecurityRepository {
                 .serialNumber(record.value9())
                 .build()
             );
+    }
+
+    @Override
+    public List<ChargeBoxCertificateSignedViewRecord> getSignedCertificates(SignedCertificateQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
+
+        if (form.isChargeBoxIdSet()) {
+            conditions.add(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+        }
+
+        if (form.getSerialNumber() != null) {
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getSerialNumber()));
+        }
+
+        if (form.getIssuerName() != null) {
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getIssuerName()));
+        }
+
+        if (form.getSubjectName() != null) {
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getSubjectName()));
+        }
+
+        if (form.getOrganizationName() != null) {
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getOrganizationName()));
+        }
+
+        if (form.getAccepted() != BooleanType.ALL) {
+            conditions.add(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.ACCEPTED.eq(form.getAccepted().getBoolValue()));
+        }
+
+        return ctx.selectFrom(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW)
+            .where(conditions)
+            .fetch();
     }
 
     private SelectConditionStep<Record1<Integer>> getChargeBoxPkQuery(String chargeBoxId) {

@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.repository.SecurityRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
+import de.rwth.idsg.steve.web.dto.SignedCertificateQueryForm;
 import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -53,9 +54,24 @@ public class CertificatesController {
 
     private static final String PARAMS = "params";
 
+    @RequestMapping(value = "/signed", method = RequestMethod.GET)
+    public String getSignedCertificates(@Valid @ModelAttribute(PARAMS) SignedCertificateQueryForm params,
+                                        BindingResult result, Model model) {
+        model.addAttribute(PARAMS, params);
+        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+
+        if (result.hasErrors()) {
+            model.addAttribute("certificates", Collections.emptyList());
+        } else {
+            model.addAttribute("certificates", securityRepository.getSignedCertificates(params));
+        }
+
+        return "security-man/certificatesSigned";
+    }
+
     @RequestMapping(value = "/installed", method = RequestMethod.GET)
-    public String getCertificates(@Valid @ModelAttribute(PARAMS) InstalledCertificateQueryForm params,
-                                  BindingResult result, Model model) {
+    public String getInstalledCertificates(@Valid @ModelAttribute(PARAMS) InstalledCertificateQueryForm params,
+                                           BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
 
@@ -69,8 +85,8 @@ public class CertificatesController {
     }
 
     @RequestMapping(value = "/installed/{chargeBoxId}/delete/{installedCertificateId}", method = RequestMethod.POST)
-    public String deleteCertificate(@PathVariable("chargeBoxId") String chargeBoxId,
-                                    @PathVariable("installedCertificateId") long installedCertificateId) {
+    public String deleteInstalledCertificate(@PathVariable("chargeBoxId") String chargeBoxId,
+                                             @PathVariable("installedCertificateId") long installedCertificateId) {
         DeleteCertificateParams params = new DeleteCertificateParams();
         params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
         params.setInstalledCertificateId(installedCertificateId);

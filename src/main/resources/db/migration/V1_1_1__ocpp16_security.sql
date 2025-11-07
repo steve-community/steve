@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS certificate (
     INDEX idx_valid_to (valid_to)
 );
 
-CREATE TABLE IF NOT EXISTS charge_box_certificate (
+CREATE TABLE IF NOT EXISTS charge_box_certificate_signed (
     certificate_id INT NOT NULL,
     charge_box_pk INT NOT NULL,
     accepted BOOL NOT NULL,
@@ -120,6 +120,18 @@ CREATE TABLE IF NOT EXISTS charge_box_certificate (
     FOREIGN KEY (certificate_id) REFERENCES certificate (certificate_id) ON DELETE CASCADE,
     FOREIGN KEY (charge_box_pk) REFERENCES charge_box (charge_box_pk) ON DELETE CASCADE
 );
+
+
+CREATE OR REPLACE VIEW charge_box_certificate_signed_view AS
+SELECT c.*,
+       cb.charge_box_id,
+       cbcs.charge_box_pk,
+       cbcs.accepted,
+       cbcs.responded_at
+FROM certificate c
+INNER JOIN charge_box_certificate_signed cbcs ON cbcs.certificate_id = c.certificate_id
+INNER JOIN charge_box cb ON cb.charge_box_pk = cbcs.charge_box_pk;
+
 
 CREATE TABLE IF NOT EXISTS charge_box_certificate_installed (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, -- synthetic PK to be able to identify a row (for ex for deletions)

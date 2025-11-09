@@ -4,7 +4,7 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Install dockerize, and also add 'unzip' which we will need
 ENV DOCKERIZE_VERSION=v0.19.0
-RUN apt-get update && apt-get install -y unzip curl iproute2 traceroute net-tools dnsutils iputils-ping ca-certificates ca-certificates-java && \
+RUN apt-get update && apt-get install -y unzip curl iproute2 traceroute netcat-traditional net-tools dnsutils iputils-ping ca-certificates ca-certificates-java && \
     update-ca-certificates -f && \
     curl -sfL https://github.com/powerman/dockerize/releases/download/"$DOCKERIZE_VERSION"/dockerize-`uname -s`-`uname -m` | install /dev/stdin /usr/local/bin/dockerize
 

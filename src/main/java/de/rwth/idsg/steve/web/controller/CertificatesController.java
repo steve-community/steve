@@ -66,7 +66,7 @@ public class CertificatesController {
             model.addAttribute("certificates", securityRepository.getSignedCertificates(params));
         }
 
-        return "security-man/certificatesSigned";
+        return "events-certs/certificatesSigned";
     }
 
     @RequestMapping(value = "/installed", method = RequestMethod.GET)
@@ -81,7 +81,7 @@ public class CertificatesController {
             model.addAttribute("certificates", securityRepository.getInstalledCertificates(params));
         }
 
-        return "security-man/certificatesInstalled";
+        return "events-certs/certificatesInstalled";
     }
 
     @RequestMapping(value = "/installed/{chargeBoxId}/delete/{installedCertificateId}", method = RequestMethod.POST)

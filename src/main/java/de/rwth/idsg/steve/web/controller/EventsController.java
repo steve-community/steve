@@ -61,7 +61,7 @@ public class EventsController {
             model.addAttribute("events", eventRepository.getSecurityEvents(params));
         }
 
-        return "security-man/securityEvents";
+        return "events-certs/securityEvents";
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
@@ -76,7 +76,7 @@ public class EventsController {
             model.addAttribute("events", eventRepository.getStatusEvents(params));
         }
 
-        return "security-man/statusEvents";
+        return "events-certs/statusEvents";
     }
 
     @RequestMapping(value = "/status/{eventType}/{jobId}", method = RequestMethod.GET)
@@ -90,6 +90,6 @@ public class EventsController {
 
         model.addAttribute("eventType", eventType.name());
         model.addAttribute("details", details);
-        return "security-man/statusEventJobDetails";
+        return "events-certs/statusEventJobDetails";
     }
 }

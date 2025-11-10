@@ -28,13 +28,21 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class StatusEventsQueryForm extends SecurityEventsQueryForm {
+public class StatusEventsQueryForm extends QueryPeriodTypeFilter {
+
+    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
+    private String chargeBoxId;
 
     @Schema(description = "If not set, all types of events will be returned")
     private StatusEventType eventType;
 
     @Schema(description = "The identifier of the job")
     private Integer jobId;
+
+    @Schema(hidden = true)
+    public boolean isChargeBoxIdSet() {
+        return chargeBoxId != null;
+    }
 
     @Schema(hidden = true)
     public boolean isJobIdSet() {

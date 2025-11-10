@@ -34,16 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Repository;
 
-import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
@@ -251,32 +249,5 @@ public class EventRepositoryImpl implements EventRepository {
         return ctx.select(CHARGE_BOX.CHARGE_BOX_PK)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
-    }
-
-    @Nullable
-    private static Condition getTimeCondition(Field<DateTime> timestampField, SecurityEventsQueryForm form) {
-        switch (form.getPeriodType()) {
-            case TODAY:
-                return date(timestampField).eq(date(DateTime.now()));
-
-            case LAST_10:
-            case LAST_30:
-            case LAST_90:
-                DateTime now = DateTime.now();
-                return date(timestampField).between(
-                    date(now.minusDays(form.getPeriodType().getInterval())),
-                    date(now)
-                );
-
-            case ALL:
-                return null;
-
-            case FROM_TO:
-                DateTime from = form.getFrom();
-                DateTime to = form.getTo();
-                return timestampField.between(from, to);
-            default:
-                throw new SteveException("Unknown enum type");
-        }
     }
 }

@@ -31,7 +31,7 @@
     <section>
         <span>Status Events</span>
     </section>
-    <form:form action="${ctxPath}/manager/security/statusEvents" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/events/status" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>Event Type:</td>
@@ -54,7 +54,7 @@
                 </td>
             </tr>
             <tr>
-                <td>Period Type:</td>
+                <td><i>Timestamp</i> Filter:</td>
                 <td><form:select path="periodType" id="periodTypeSelect">
                         <form:options items="${periodType}" itemLabel="value"/>
                     </form:select>
@@ -91,7 +91,7 @@
         <c:forEach items="${events}" var="event">
             <tr>
                 <td>${event.eventType}</td>
-                <td><a href="${ctxPath}/manager/security/statusEvents/${event.eventType}/${event.jobId}">${event.jobId}</a></td>
+                <td><a href="${ctxPath}/manager/events/status/${event.eventType}/${event.jobId}">${event.jobId}</a></td>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${event.chargeBoxPk}">${event.chargeBoxId}</a></td>
                 <td>${event.status}</td>
                 <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>

@@ -43,6 +43,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_INSTALLED;
@@ -126,6 +127,11 @@ public class CertificateRepositoryImpl implements CertificateRepository {
             conditions.add(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.ACCEPTED.eq(form.getAccepted().getBoolValue()));
         }
 
+        var timeCondition = getTimeCondition(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.RESPONDED_AT, form);
+        if (timeCondition != null) {
+            conditions.add(timeCondition);
+        }
+
         return ctx.selectFrom(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW)
             .where(conditions)
             .fetch();
@@ -206,6 +212,11 @@ public class CertificateRepositoryImpl implements CertificateRepository {
 
         if (form.getCertificateType() != null) {
             conditions.add(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(form.getCertificateType().value()));
+        }
+
+        var timeCondition = getTimeCondition(CHARGE_BOX_CERTIFICATE_INSTALLED.RESPONDED_AT, form);
+        if (timeCondition != null) {
+            conditions.add(timeCondition);
         }
 
         return ctx.select(

@@ -22,6 +22,8 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
+        <%@ include file="../snippets/dateTimePicker-past.js" %>
+        <%@ include file="../snippets/periodTypeSelect.js" %>
         <%@ include file="../snippets/sortable.js" %>
     });
 </script>
@@ -44,6 +46,21 @@
                         <form:options items="${certificateType}" itemLabel="value"/>
                     </form:select>
                 </td>
+            </tr>
+            <tr>
+                <td><i>Responded At</i> Filter:</td>
+                <td><form:select path="periodType" id="periodTypeSelect">
+                        <form:options items="${periodType}" itemLabel="value"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><form:input path="from" id="intervalPeriodTypeFrom" cssClass="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>To:</td>
+                <td><form:input path="to" id="intervalPeriodTypeTo" cssClass="dateTimePicker"/></td>
             </tr>
             <tr>
                 <td></td>

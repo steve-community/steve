@@ -18,37 +18,35 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Objects;
+@RequiredArgsConstructor
+public enum QueryPeriodType {
+    ALL("All", -1),
+    TODAY("Today", -1),
+    LAST_10("Last 10 days", 10),
+    LAST_30("Last 30 days", 30),
+    LAST_90("Last 90 days", 90),
+    FROM_TO("From/To", -1);
 
-@Getter
-@Setter
-@ToString
-public class SignedCertificateQueryForm extends QueryPeriodTypeFilter {
+    @Getter
+    private final String value;
+    private final int interval;
 
-    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
-    private String chargeBoxId;
-
-    private String serialNumber;
-
-    private String issuerName;
-
-    private String subjectName;
-
-    private String organizationName;
-
-    private BooleanType accepted = BooleanType.ALL;
-
-    @Schema(hidden = true)
-    public boolean isChargeBoxIdSet() {
-        return chargeBoxId != null;
+    public int getInterval() {
+        if (this.interval == -1) {
+            throw new UnsupportedOperationException("This enum does not have any meaningful interval set.");
+        }
+        return this.interval;
     }
 
-    public BooleanType getAccepted() {
-        return Objects.requireNonNullElse(accepted, BooleanType.ALL);
+    public static QueryPeriodType fromValue(String v) {
+        for (QueryPeriodType c: QueryPeriodType.values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
     }
 }

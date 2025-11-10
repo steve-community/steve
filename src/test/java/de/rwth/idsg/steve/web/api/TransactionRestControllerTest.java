@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.service.TransactionService;
+import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -227,7 +228,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ACTIVE);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.ALL);
+        assertEquals(capturedForm.getPeriodType(), QueryPeriodType.ALL);
     }
 
     @Test
@@ -248,7 +249,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ALL);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.LAST_30);
+        assertEquals(capturedForm.getPeriodType(), QueryPeriodType.LAST_30);
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

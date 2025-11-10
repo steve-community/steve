@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.web.dto.QueryPeriodTypeFilter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
@@ -28,6 +30,7 @@ import org.jooq.Field;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
+import jakarta.annotation.Nullable;
 import java.sql.Timestamp;
 
 import static org.jooq.impl.DSL.field;
@@ -79,5 +82,32 @@ public final class CustomDSL {
 
     public static Field<Timestamp> utcTimestamp() {
         return field("{utc_timestamp()}", Timestamp.class);
+    }
+
+    @Nullable
+    public static Condition getTimeCondition(Field<DateTime> timestampField, QueryPeriodTypeFilter form) {
+        switch (form.getPeriodType()) {
+            case TODAY:
+                return date(timestampField).eq(date(DateTime.now()));
+
+            case LAST_10:
+            case LAST_30:
+            case LAST_90:
+                DateTime now = DateTime.now();
+                return date(timestampField).between(
+                    date(now.minusDays(form.getPeriodType().getInterval())),
+                    date(now)
+                );
+
+            case ALL:
+                return null;
+
+            case FROM_TO:
+                DateTime from = form.getFrom();
+                DateTime to = form.getTo();
+                return timestampField.between(from, to);
+            default:
+                throw new SteveException("Unknown enum type");
+        }
     }
 }

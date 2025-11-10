@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
+import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jakarta.annotation.Nullable;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
@@ -159,7 +160,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         TransactionQueryForm form = new TransactionQueryForm();
         form.setTransactionPk(transactionPk);
         form.setType(TransactionQueryForm.QueryType.ALL);
-        form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
+        form.setPeriodType(QueryPeriodType.ALL);
 
         var transactions = getTransactions(form);
         if (transactions.size() != 1) {

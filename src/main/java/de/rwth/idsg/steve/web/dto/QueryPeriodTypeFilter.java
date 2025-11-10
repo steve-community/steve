@@ -20,35 +20,17 @@ package de.rwth.idsg.steve.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Objects;
-
 @Getter
 @Setter
+@NoArgsConstructor
 @ToString
-public class SignedCertificateQueryForm extends QueryPeriodTypeFilter {
+public class QueryPeriodTypeFilter extends QueryPeriodFromToFilter {
 
-    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
-    private String chargeBoxId;
+    @Schema(description = "Return the time period of the events. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to LAST_10")
+    private QueryPeriodType periodType = QueryPeriodType.LAST_10;
 
-    private String serialNumber;
-
-    private String issuerName;
-
-    private String subjectName;
-
-    private String organizationName;
-
-    private BooleanType accepted = BooleanType.ALL;
-
-    @Schema(hidden = true)
-    public boolean isChargeBoxIdSet() {
-        return chargeBoxId != null;
-    }
-
-    public BooleanType getAccepted() {
-        return Objects.requireNonNullElse(accepted, BooleanType.ALL);
-    }
 }

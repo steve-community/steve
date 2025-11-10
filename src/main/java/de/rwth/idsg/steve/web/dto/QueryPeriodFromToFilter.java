@@ -20,35 +20,33 @@ package de.rwth.idsg.steve.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.joda.time.DateTime;
 
-import java.util.Objects;
+import jakarta.validation.constraints.AssertTrue;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @ToString
-public class SignedCertificateQueryForm extends QueryPeriodTypeFilter {
+public class QueryPeriodFromToFilter {
 
-    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
-    private String chargeBoxId;
+    @Schema(description = "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime from;
 
-    private String serialNumber;
-
-    private String issuerName;
-
-    private String subjectName;
-
-    private String organizationName;
-
-    private BooleanType accepted = BooleanType.ALL;
+    @Schema(description = "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime to;
 
     @Schema(hidden = true)
-    public boolean isChargeBoxIdSet() {
-        return chargeBoxId != null;
+    @AssertTrue(message = "'To' must be after 'From'")
+    public boolean isFromToValid() {
+        return !isFromToSet() || to.isAfter(from);
     }
 
-    public BooleanType getAccepted() {
-        return Objects.requireNonNullElse(accepted, BooleanType.ALL);
+    @Schema(hidden = true)
+    boolean isFromToSet() {
+        return from != null && to != null;
     }
 }

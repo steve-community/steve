@@ -27,7 +27,7 @@ import ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType
 @Getter
 @Setter
 @ToString
-public class InstalledCertificateQueryForm {
+public class InstalledCertificateQueryForm extends QueryPeriodTypeFilter {
 
     @Schema(description = "The identifier of the chargebox (i.e. charging station)")
     private String chargeBoxId;

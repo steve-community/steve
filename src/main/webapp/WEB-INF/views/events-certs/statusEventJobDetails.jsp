@@ -29,7 +29,7 @@
     <c:when test="${'FirmwareUpdate'.equals(eventType)}">
         <section><span>Firmware Update Job Details</span></section>
         <table class="userInput">
-            <tr><td>Job/Request ID:</td><td><a href="${ctxPath}/manager/security/statusEvents?eventType=${eventType}&jobId=${details.jobId}">${details.jobId}</a></td></tr>
+            <tr><td>Job/Request ID:</td><td><a href="${ctxPath}/manager/events/status?eventType=${eventType}&jobId=${details.jobId}">${details.jobId}</a></td></tr>
             <tr><td>Created at:</td><td>${details.createdAt}</td></tr>
             <tr><td>Location:</td><td><encode:forHtml value="${details.firmwareLocation}" /></td></tr>
             <tr><td>Retrieve Date/Time:</td><td>${details.retrieveDatetime}</td></tr>
@@ -41,7 +41,7 @@
     <c:when test="${'LogUpload'.equals(eventType)}">
         <section><span>Log Upload Job Details</span></section>
         <table class="userInput">
-            <tr><td>Job/Request ID:</td><td><a href="${ctxPath}/manager/security/statusEvents?eventType=${eventType}&jobId=${details.jobId}">${details.jobId}</a></td></tr>
+            <tr><td>Job/Request ID:</td><td><a href="${ctxPath}/manager/events/status?eventType=${eventType}&jobId=${details.jobId}">${details.jobId}</a></td></tr>
             <tr><td>Created at:</td><td>${details.createdAt}</td></tr>
             <tr><td>Log Type:</td><td>${details.logType}</td></tr>
             <tr><td>Remote Location:</td><td>${details.remoteLocation}</td></tr>

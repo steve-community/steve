@@ -40,7 +40,7 @@
                 </td>
             </tr>
             <tr>
-                <td>Period Type:</td>
+                <td><i>Timestamp</i> Filter:</td>
                 <td><form:select path="periodType" id="periodTypeSelect">
                         <form:options items="${periodType}" itemLabel="value"/>
                     </form:select>

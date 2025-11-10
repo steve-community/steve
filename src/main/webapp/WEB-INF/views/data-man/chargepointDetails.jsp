@@ -112,6 +112,18 @@
                     <tr><td>Registration status:</td><td>
                         <form:select path="registrationStatus" items="${registrationStatusList}"/>
                     </td></tr>
+                    <tr>
+                        <td>Security Profile:</td>
+                        <td>
+                            <form:select path="securityProfile">
+                                <form:options items="${securityProfile}" itemLabel="description"/>
+                            </form:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Basic Auth Password:</td>
+                        <td><form:input path="authPassword" type="password" placeholder="${chargePointForm.hasAuthPassword ? 'Enter new password' : 'Enter password'}" /></td>
+                    </tr>
                 </tbody>
             </table>
 

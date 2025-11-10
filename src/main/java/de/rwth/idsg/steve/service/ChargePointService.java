@@ -103,15 +103,25 @@ public class ChargePointService {
     }
 
     public int addChargePoint(ChargePointForm form) {
+        encodePasswordIfNeeded(form);
         return chargePointRepository.addChargePoint(form);
     }
 
     public void updateChargePoint(ChargePointForm form) {
+        encodePasswordIfNeeded(form);
         chargePointRepository.updateChargePoint(form);
     }
 
     public void deleteChargePoint(int chargeBoxPk) {
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+    }
+
+    private void encodePasswordIfNeeded(ChargePointForm form) {
+        String encodedPwd = StringUtils.isEmpty(form.getAuthPassword())
+            ? null
+            : passwordEncoder.encode(form.getAuthPassword());
+
+        form.setAuthPassword(encodedPwd);
     }
 
     // -------------------------------------------------------------------------

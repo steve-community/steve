@@ -18,17 +18,17 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -60,4 +60,18 @@ public class ChargePointForm {
 
     @URL(message = "Admin address must be a valid URL")
     private String adminAddress;
+
+    @NotNull
+    private OcppSecurityProfile securityProfile = OcppSecurityProfile.Profile_0;
+
+    /**
+     * Reads (from DB to browser): This field is NEVER set. Do not expose to browser.
+     *
+     * Writes (from browser to backend): The field comes as plain password in form. Service layer REPLACES it with
+     * encoded password value, and sends it to repository layer.
+     */
+    @Schema(accessMode = Schema.AccessMode.WRITE_ONLY)
+    private String authPassword;
+
+    private boolean hasAuthPassword;
 }

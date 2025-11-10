@@ -18,11 +18,13 @@
  */
 package de.rwth.idsg.steve.utils.mapper;
 
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -43,6 +45,10 @@ public final class ChargePointDetailsMapper {
         form.setAdminAddress(chargeBox.getAdminAddress());
         form.setRegistrationStatus(chargeBox.getRegistrationStatus());
         form.setAddress(AddressMapper.recordToDto(cp.getAddress()));
+
+        form.setSecurityProfile(OcppSecurityProfile.fromValue(chargeBox.getSecurityProfile()));
+        form.setAuthPassword(null); // make sure that the pwd from record does not escape
+        form.setHasAuthPassword(!StringUtils.isEmpty(chargeBox.getAuthPassword()));
 
         return form;
     }

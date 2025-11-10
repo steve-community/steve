@@ -49,6 +49,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -356,29 +357,41 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     private int addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
-        return ctx.insertInto(CHARGE_BOX)
-                  .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
-                  .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
-                  .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
-                  .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
-                  .set(CHARGE_BOX.NOTE, form.getNote())
-                  .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
-                  .set(CHARGE_BOX.ADDRESS_PK, addressPk)
-                  .returning(CHARGE_BOX.CHARGE_BOX_PK)
-                  .fetchOne()
-                  .getChargeBoxPk();
+        var query = ctx.insertInto(CHARGE_BOX)
+                       .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
+                       .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
+                       .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
+                       .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
+                       .set(CHARGE_BOX.NOTE, form.getNote())
+                       .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
+                       .set(CHARGE_BOX.SECURITY_PROFILE, form.getSecurityProfile().getValue());
+
+        if (!StringUtils.isEmpty(form.getAuthPassword())) {
+            query = query.set(CHARGE_BOX.AUTH_PASSWORD, form.getAuthPassword());
+        }
+
+        return query.set(CHARGE_BOX.ADDRESS_PK, addressPk)
+                    .returning(CHARGE_BOX.CHARGE_BOX_PK)
+                    .fetchOne()
+                    .getChargeBoxPk();
     }
 
     private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
-        ctx.update(CHARGE_BOX)
-           .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
-           .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
-           .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
-           .set(CHARGE_BOX.NOTE, form.getNote())
-           .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
-           .set(CHARGE_BOX.ADDRESS_PK, addressPk)
-           .where(CHARGE_BOX.CHARGE_BOX_PK.equal(form.getChargeBoxPk()))
-           .execute();
+       var query = ctx.update(CHARGE_BOX)
+                      .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
+                      .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
+                      .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
+                      .set(CHARGE_BOX.NOTE, form.getNote())
+                      .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
+                      .set(CHARGE_BOX.SECURITY_PROFILE, form.getSecurityProfile().getValue());
+
+        if (!StringUtils.isEmpty(form.getAuthPassword())) {
+            query = query.set(CHARGE_BOX.AUTH_PASSWORD, form.getAuthPassword());
+        }
+
+        query.set(CHARGE_BOX.ADDRESS_PK, addressPk)
+             .where(CHARGE_BOX.CHARGE_BOX_PK.equal(form.getChargeBoxPk()))
+             .execute();
     }
 
     private void deleteChargePointInternal(DSLContext ctx, int chargeBoxPk) {

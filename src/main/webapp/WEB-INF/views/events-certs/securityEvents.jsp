@@ -68,8 +68,8 @@
         <tr>
             <th data-sort="string">ChargeBox ID</th>
             <th data-sort="string">Type</th>
-            <th data-sort="date">Timestamp</th>
             <th data-sort="string">Technical Info</th>
+            <th data-sort="date">Timestamp</th>
         </tr>
         </thead>
         <tbody>
@@ -77,8 +77,8 @@
             <tr>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${event.chargeBoxPk}">${event.chargeBoxId}</a></td>
                 <td>${event.type}</td>
-                <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>
                 <td><encode:forHtml value="${event.techInfo}" /></td>
+                <td data-sort-value="${event.timestamp.millis}">${event.timestamp}</td>
             </tr>
         </c:forEach>
         </tbody>

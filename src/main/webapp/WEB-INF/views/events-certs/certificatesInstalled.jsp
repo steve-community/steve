@@ -76,11 +76,11 @@
         <tr>
             <th data-sort="string">ChargeBox ID</th>
             <th data-sort="string">Certificate Type</th>
-            <th data-sort="date">Responded At</th>
             <th data-sort="string">Hash Algorithm</th>
             <th data-sort="string">Issuer Name Hash</th>
             <th data-sort="string">Issuer Key Hash</th>
             <th data-sort="string">Serial Number</th>
+            <th data-sort="date">Responded At</th>
             <th></th>
         </tr>
         </thead>
@@ -89,11 +89,11 @@
             <tr>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${cert.chargeBoxPk}">${cert.chargeBoxId}</a></td>
                 <td>${cert.certificateType}</td>
-                <td data-sort-value="${cert.respondedAt.millis}">${cert.respondedAt}</td>
                 <td><encode:forHtml value="${cert.hashAlgorithm}" /></td>
                 <td><encode:forHtml value="${cert.issuerNameHash}" /></td>
                 <td><encode:forHtml value="${cert.issuerKeyHash}" /></td>
                 <td><encode:forHtml value="${cert.serialNumber}" /></td>
+                <td data-sort-value="${cert.respondedAt.millis}">${cert.respondedAt}</td>
                 <td>
                     <form:form action="${ctxPath}/manager/certificates/installed/${cert.chargeBoxId}/delete/${cert.id}" method="post">
                         <input type="submit" class="redSubmit" value="Delete" onclick="return confirm('Are you sure you want to delete this certificate? It will delete the certificate at the station and then in database.');">

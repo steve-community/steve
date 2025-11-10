@@ -148,6 +148,7 @@ public class ChargePointsController {
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
+            model.addAttribute("chargePointForm", chargePointForm);
             return "data-man/chargepointAdd";
         }
 
@@ -172,7 +173,8 @@ public class ChargePointsController {
     public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            addCountryCodes(model);
+            setCommonAttributesForSingleAdd(model);
+            model.addAttribute("chargePointForm", chargePointForm);
             return "data-man/chargepointDetails";
         }
 

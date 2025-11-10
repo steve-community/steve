@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
+import de.rwth.idsg.steve.web.validation.SecurityProfileValid;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import static de.rwth.idsg.steve.ocpp.OcppSecurityProfile.Profile_0;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.12.2014
@@ -37,6 +40,7 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter
 @ToString
+@SecurityProfileValid
 public class ChargePointForm {
 
     // Internal database id
@@ -62,7 +66,7 @@ public class ChargePointForm {
     private String adminAddress;
 
     @NotNull
-    private OcppSecurityProfile securityProfile = OcppSecurityProfile.Profile_0;
+    private OcppSecurityProfile securityProfile = Profile_0;
 
     /**
      * Reads (from DB to browser): This field is NEVER set. Do not expose to browser.
@@ -73,5 +77,6 @@ public class ChargePointForm {
     @Schema(accessMode = Schema.AccessMode.WRITE_ONLY)
     private String authPassword;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private boolean hasAuthPassword;
 }

@@ -22,6 +22,10 @@
     <section><span>Charge Points with OCPP ${opVersion}</span></section>
     <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
+    <div class="info"><b>Info:</b>
+    Once this operation is triggered at a station, it will send status notifications about the progress and result.
+    You can view them <a href="${ctxPath}/manager/events/status?eventType=FirmwareUpdate">here</a>.
+    </div>
     <table class="userInput">
         <tr><td>Location (directory URI):</td><td><form:input path="location" /></td></tr>
         <tr><td>Retries (integer):</td><td><form:input path="retries" placeholder="optional" /></td></tr>

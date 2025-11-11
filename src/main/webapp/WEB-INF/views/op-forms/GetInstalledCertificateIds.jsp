@@ -22,6 +22,10 @@
     <section><span>Charge Points with OCPP ${opVersion}</span></section>
     <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
+    <div class="info"><b>Info:</b>
+    The certificates sent by the station will be stored in database.
+    You can view them <a href="${ctxPath}/manager/certificates/installed">here</a>.
+    </div>
     <table class="userInput">
         <tr>
             <td>Certificate Type:</td>

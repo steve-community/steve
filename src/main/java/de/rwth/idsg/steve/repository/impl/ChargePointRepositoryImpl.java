@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
@@ -76,11 +77,18 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public Optional<ChargePointRegistration> getRegistration(String chargeBoxId) {
-        var status = ctx.select(CHARGE_BOX.REGISTRATION_STATUS, CHARGE_BOX.AUTH_PASSWORD)
+        var status = ctx.select(
+                            CHARGE_BOX.REGISTRATION_STATUS,
+                            CHARGE_BOX.SECURITY_PROFILE,
+                            CHARGE_BOX.AUTH_PASSWORD)
                         .from(CHARGE_BOX)
                         .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                         .fetch()
-                        .map(rec -> new ChargePointRegistration(rec.value1(), rec.value2()));
+                        .map(rec -> new ChargePointRegistration(
+                            rec.value1(),
+                            OcppSecurityProfile.fromValue(rec.value2()),
+                            rec.value3()
+                        ));
 
         return status.isEmpty()
             ? Optional.empty()

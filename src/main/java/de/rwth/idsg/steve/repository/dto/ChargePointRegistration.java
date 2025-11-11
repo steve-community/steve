@@ -18,8 +18,20 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import ocpp.cs._2015._10.RegistrationStatus;
+
 public record ChargePointRegistration(
     String registrationStatus,
+    OcppSecurityProfile securityProfile,
     String hashedAuthPassword
 ) {
+
+    public static ChargePointRegistration withUnsecureDefaults() {
+        return new ChargePointRegistration(
+            RegistrationStatus.ACCEPTED.value(),
+            OcppSecurityProfile.Profile_0,
+            null
+        );
+    }
 }

@@ -47,4 +47,11 @@ public enum OcppSecurityProfile {
         }
         throw new IllegalArgumentException(String.valueOf(value));
     }
+
+    public boolean requiresBasicAuth() {
+        return switch (this) {
+            case Profile_1, Profile_2 -> true;
+            default -> false;
+        };
+    }
 }

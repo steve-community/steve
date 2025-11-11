@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
@@ -43,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -140,56 +142,63 @@ public class ChargePointService {
     // Registration status
     // -------------------------------------------------------------------------
 
-    public boolean validatePassword(String chargeBoxId, String passwordFromHeaders, String storedHashedPassword) {
-        // if no password in DB, this station needs no validation
-        if (StringUtils.isEmpty(storedHashedPassword)) {
-            log.info("No password configured for charge point '{}' - authentication disabled", chargeBoxId);
-            return true;
+    public boolean validateBasicAuth(Authentication authFromRequest, String encodedPassword) {
+        if (authFromRequest == null) {
+            log.warn("Failed to find username and password in Basic Authorization header");
+            return false;
         }
 
-        // there is a password in DB, but the station provided no password
-        if (StringUtils.isEmpty(passwordFromHeaders)) {
-            log.warn("Empty password provided for charge point '{}'", chargeBoxId);
+        String chargeBoxId = (String) authFromRequest.getPrincipal();
+        String rawPassword = (String) authFromRequest.getCredentials();
+
+        // if no password in DB, we have a big configuration problem.
+        if (StringUtils.isEmpty(encodedPassword)) {
+            log.error("No password configured for ChargeBoxId '{}' - authentication misconfiguration", chargeBoxId);
+            return false;
+        }
+
+        // the station provided no password
+        if (StringUtils.isEmpty(rawPassword)) {
+            log.warn("Empty password provided for ChargeBoxId '{}'", chargeBoxId);
             return false;
         }
 
         try {
-            var matches = passwordEncoder.matches(passwordFromHeaders, storedHashedPassword);
+            var matches = passwordEncoder.matches(rawPassword, encodedPassword);
             if (!matches) {
-                log.warn("Invalid password attempt for charge point '{}'", chargeBoxId);
+                log.warn("Invalid password attempt for ChargeBoxId '{}'", chargeBoxId);
             }
             return matches;
         } catch (Exception e) {
-            log.error("Exception while checking password for charge point '{}'", chargeBoxId, e);
+            log.error("Exception while checking password for ChargeBoxId '{}'", chargeBoxId, e);
             return false;
         }
     }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
+        return chargePointRepository.getRegistration(chargeBoxId)
+            .map(it -> RegistrationStatus.fromValue(it.registrationStatus()));
+    }
+
+    public Optional<ChargePointRegistration> getRegistration(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
         try {
-            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
-            if (status.isEmpty()) {
+            Optional<ChargePointRegistration> entry = getRegistrationInternal(chargeBoxId);
+            if (entry.isEmpty()) {
                 unknownChargePointService.processNewUnidentified(chargeBoxId);
             }
-            return status;
+            return entry;
         } finally {
             l.unlock();
         }
     }
 
-    private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
+    private Optional<ChargePointRegistration> getRegistrationInternal(String chargeBoxId) {
         // 1. exit if already registered
-        var status = chargePointRepository.getRegistration(chargeBoxId);
-        if (status.isPresent()) {
-            try {
-                return Optional.ofNullable(RegistrationStatus.fromValue(status.get().registrationStatus()));
-            } catch (Exception e) {
-                // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
-                log.error("Exception happened", e);
-                return Optional.empty();
-            }
+        var entry = chargePointRepository.getRegistration(chargeBoxId);
+        if (entry.isPresent()) {
+            return entry;
         }
 
         // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
@@ -201,7 +210,7 @@ public class ChargePointService {
         try {
             this.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
+            return Optional.of(ChargePointRegistration.withUnsecureDefaults());
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '{}'", chargeBoxId, e);
             return Optional.empty();

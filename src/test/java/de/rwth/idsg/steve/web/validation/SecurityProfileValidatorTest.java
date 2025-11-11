@@ -59,12 +59,14 @@ public class SecurityProfileValidatorTest {
                                     boolean stationExistsInDB,
                                     String authPasswordInDB,
                                     boolean isValid) {
+        OcppSecurityProfile securityProfile = OcppSecurityProfile.fromValue(securityProfileNumber);
+
         ChargePointForm form = new ChargePointForm();
-        form.setSecurityProfile(OcppSecurityProfile.fromValue(securityProfileNumber));
+        form.setSecurityProfile(securityProfile);
         form.setAuthPassword(authPassword);
 
         ChargePointRegistration toReturn = stationExistsInDB
-            ? new ChargePointRegistration("Accepted", authPasswordInDB)
+            ? new ChargePointRegistration("Accepted", securityProfile, authPasswordInDB)
             : null;
 
         when(chargePointRepository.getRegistration(any())).thenReturn(Optional.ofNullable(toReturn));

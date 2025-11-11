@@ -10,9 +10,6 @@ import org.springframework.util.StringUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import static de.rwth.idsg.steve.ocpp.OcppSecurityProfile.Profile_0;
-import static de.rwth.idsg.steve.ocpp.OcppSecurityProfile.Profile_3;
-
 @Component
 @RequiredArgsConstructor
 public class SecurityProfileValidator implements ConstraintValidator<SecurityProfileValid, ChargePointForm> {
@@ -24,7 +21,7 @@ public class SecurityProfileValidator implements ConstraintValidator<SecurityPro
         OcppSecurityProfile securityProfile = form.getSecurityProfile();
         String newAuthPassword = form.getAuthPassword();
 
-        if (securityProfile == Profile_0 || securityProfile == Profile_3) {
+        if (!securityProfile.requiresBasicAuth()) {
             return true;
         }
 

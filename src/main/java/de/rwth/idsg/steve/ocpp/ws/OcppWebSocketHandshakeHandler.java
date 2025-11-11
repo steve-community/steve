@@ -18,14 +18,18 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketHttpHeaders;
@@ -53,6 +57,8 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointService chargePointService;
 
+    private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
+
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
      * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
@@ -78,10 +84,10 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxId);
+        Optional<ChargePointRegistration> registration = chargePointService.getRegistration(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
-        boolean allowConnection = status.isPresent();
+        boolean allowConnection = registration.isPresent();
 
         // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
@@ -90,10 +96,35 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
+        // -------------------------------------------------------------------------
+        // 2. Check basic auth (if needed)
+        // -------------------------------------------------------------------------
+
+        OcppSecurityProfile profile = registration.get().securityProfile();
+
+        if (profile.requiresBasicAuth()) {
+            ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+
+            UsernamePasswordAuthenticationToken authentication;
+            try {
+                authentication = converter.convert(casted.getServletRequest());
+            } catch (Exception e) {
+                log.warn("Failed to extract Authentication from request", e);
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                return false;
+            }
+
+            boolean valid = chargePointService.validateBasicAuth(authentication, registration.get().hashedAuthPassword());
+            if (!valid) {
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+        }
+
         attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
 
         // -------------------------------------------------------------------------
-        // 2. Route according to the selected protocol
+        // 3. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
         List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();

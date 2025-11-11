@@ -27,6 +27,12 @@ COPY . /code
 # Wait for the db, then build and run steve.
 # This CMD now calls the 'mvn' binary directly, completely bypassing the wrapper.
 # Your flags will now be correctly passed to Maven.
-CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-./mvnw clean package -Pkubernetes && \
+# Pass database connection parameters as Maven system properties to override properties file values
+CMD dockerize -wait tcp://${DB_HOST:-mariadb}:${DB_PORT:-3306} -timeout 60s && \
+./mvnw clean package -Pkubernetes \
+  -Ddb.ip=${DB_HOST} \
+  -Ddb.port=${DB_PORT} \
+  -Ddb.schema=${DB_DATABASE} \
+  -Ddb.user=${DB_USERNAME} \
+  -Ddb.password=${DB_PASSWORD} && \
 java -XX:MaxRAMPercentage=85 -jar target/steve.war

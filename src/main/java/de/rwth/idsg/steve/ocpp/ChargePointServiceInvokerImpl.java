@@ -248,44 +248,30 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     // -------------------------------------------------------------------------
 
     public void extendedTriggerMessage(ChargePointSelect cp, ExtendedTriggerMessageTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void getLog(ChargePointSelect cp, GetLogTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void signedUpdateFirmware(ChargePointSelect cp, SignedUpdateFirmwareTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void installCertificate(ChargePointSelect cp, InstallCertificateTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void deleteCertificate(ChargePointSelect cp, DeleteCertificateTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void certificateSigned(ChargePointSelect cp, CertificateSignedTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
     public void getInstalledCertificateIds(ChargePointSelect cp, GetInstalledCertificateIdsTask task) {
-        if (cp.isJson()) {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
-        }
+        chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 }

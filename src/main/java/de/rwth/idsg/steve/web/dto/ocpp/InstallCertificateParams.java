@@ -37,7 +37,7 @@ public class InstallCertificateParams extends MultipleChargePointSelect {
     private InstallCertificate.CertificateUseEnumType certificateType;
 
     @NotBlank(message = "Certificate is required")
-    @Size(max = 5500, message = "Certificate must not exceed {max} characters")
+    @Size(max = 5_500, message = "Certificate must not exceed {max} characters")
     @Schema(description = "PEM-encoded X.509 certificate")
     private String certificate;
 }

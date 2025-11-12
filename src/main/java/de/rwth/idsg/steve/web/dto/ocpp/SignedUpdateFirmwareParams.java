@@ -38,7 +38,7 @@ public class SignedUpdateFirmwareParams extends UpdateFirmwareParams {
     private String signature;
 
     @NotBlank(message = "Signing certificate is required")
-    @Size(max = 5500, message = "Signing certificate must not exceed {max} characters")
+    @Size(max = 5_500, message = "Signing certificate must not exceed {max} characters")
     @Schema(description = "PEM-encoded certificate used to sign the firmware")
     private String signingCertificate;
 

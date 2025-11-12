@@ -148,8 +148,8 @@ public class ChargePointService {
             return false;
         }
 
-        String chargeBoxId = (String) authFromRequest.getPrincipal();
-        String rawPassword = (String) authFromRequest.getCredentials();
+        var chargeBoxId = (String) authFromRequest.getPrincipal();
+        var rawPassword = (String) authFromRequest.getCredentials();
 
         // if no password in DB, we have a big configuration problem.
         if (StringUtils.isEmpty(encodedPassword)) {
@@ -227,14 +227,14 @@ public class ChargePointService {
         stats.setNumOcpp15JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getNumberOfChargeBoxes());
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(null);
+        var latestList = chargePointRepository.getChargePointConnectorStatus(null);
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
     }
 
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
-        Set<String> connectedJsonChargeBoxIds = Arrays.stream(OcppVersion.values())
+        var connectedJsonChargeBoxIds = Arrays.stream(OcppVersion.values())
             .map(version -> sessionContextStoreHolder.getOrCreate(version).getChargeBoxIdList())
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
@@ -244,8 +244,8 @@ public class ChargePointService {
         // iterate over JSON stations and mark disconnected ones
         // https://github.com/steve-community/steve/issues/355
         //
-        for (ConnectorStatus status : latestList) {
-            OcppProtocol protocol = status.getOcppProtocol();
+        for (var status : latestList) {
+            var protocol = status.getOcppProtocol();
             if (protocol != null && protocol.getTransport() == OcppTransport.JSON) {
                 status.setJsonAndDisconnected(!connectedJsonChargeBoxIds.contains(status.getChargeBoxId()));
             }
@@ -255,18 +255,18 @@ public class ChargePointService {
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        Map<String, Deque<SessionContext>> ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
-        Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
-        Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
+        var ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
+        var ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
+        var ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
 
-        List<String> connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
+        var connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
             .map(Map::keySet)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
-        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
+        var primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
 
-        DateTime now = DateTime.now();
+        var now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
         appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
@@ -290,12 +290,12 @@ public class ChargePointService {
     public List<ChargePointSelect> getChargePoints(OcppProtocol protocol,
                                                    List<RegistrationStatus> inStatusFilter,
                                                    List<String> chargeBoxIdFilter) {
-        OcppVersion version = protocol.getVersion();
-        OcppTransport transport = protocol.getTransport();
+        var version = protocol.getVersion();
+        var transport = protocol.getTransport();
 
         switch (transport) {
             case SOAP -> {
-                List<String> statusFilter = inStatusFilter.stream()
+                var statusFilter = inStatusFilter.stream()
                     .map(RegistrationStatus::value)
                     .collect(Collectors.toList());
 
@@ -303,9 +303,9 @@ public class ChargePointService {
                 return chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter);
             }
             case JSON -> {
-                SessionContextStore sessionStore = sessionContextStoreHolder.getOrCreate(version);
+                var sessionStore = sessionContextStoreHolder.getOrCreate(version);
 
-                List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
+                var chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
                     ? sessionStore.getChargeBoxIdList()
                     : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
 
@@ -331,11 +331,11 @@ public class ChargePointService {
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
                                    DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
-        for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
-            String chargeBoxId = entry.getKey();
-            Deque<SessionContext> endpointDeque = entry.getValue();
+        for (var entry : map.entrySet()) {
+            var chargeBoxId = entry.getKey();
+            var endpointDeque = entry.getValue();
 
-            for (SessionContext ctx : endpointDeque) {
+            for (var ctx : endpointDeque) {
                 DateTime openSince = ctx.getOpenSince();
 
                 OcppJsonStatus status = OcppJsonStatus.builder()

@@ -121,8 +121,6 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             }
         }
 
-        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
-
         // -------------------------------------------------------------------------
         // 3. Route according to the selected protocol
         // -------------------------------------------------------------------------
@@ -143,6 +141,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
+        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
     }

@@ -43,6 +43,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 import org.jooq.tools.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.server.Ssl;
 import org.springframework.stereotype.Service;
 
@@ -82,7 +83,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public CertificateSigningServiceLocal(Ssl ssl,
+    public CertificateSigningServiceLocal(ServerProperties serverProperties,
                                           SteveProperties steveProperties,
                                           CertificateRepository securityRepository,
                                           ChargePointRepository chargePointRepository,
@@ -91,6 +92,8 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
         this.securityRepository = securityRepository;
         this.chargePointRepository = chargePointRepository;
         this.chargePointServiceClient = chargePointServiceClient;
+
+        Ssl ssl = serverProperties.getSsl();
 
         if (!securityProperties.requiresTls() || ssl.getKeyStore().isEmpty()) {
             log.info("Will not initialize (TLS not configured)");

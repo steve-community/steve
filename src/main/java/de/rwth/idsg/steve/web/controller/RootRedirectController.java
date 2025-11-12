@@ -33,11 +33,10 @@ import org.springframework.web.servlet.view.RedirectView;
 public class RootRedirectController {
 
     @GetMapping
-    public RedirectView redirectToManager(HttpServletRequest request) {
-        // Use RedirectView to generate absolute URLs that include the port
+    public String redirectToManager() {
+        // Return string redirect - RedirectConfiguration interceptor will convert to absolute URL
         // This respects X-Forwarded-* headers when server.forward-headers-strategy = native
-        RedirectView redirectView = new RedirectView("/manager", false);
-        redirectView.setContextRelative(false);
-        return redirectView;
+        // Or uses server.external-hostname if configured
+        return "redirect:/manager";
     }
 }

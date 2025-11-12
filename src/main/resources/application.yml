@@ -25,6 +25,8 @@ server:
       - TLSv1.2
       - TLSv1.3
     ciphers:
+    # or 'need' for strict security profile 3 (mTLS)
+    client-auth: want
 
 steve:
   version: @project.version@

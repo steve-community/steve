@@ -18,9 +18,11 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,7 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RootRedirectController {
 
     @GetMapping
-    public String redirectToManager() {
-        return "redirect:/manager";
+    public RedirectView redirectToManager(HttpServletRequest request) {
+        // Use RedirectView to generate absolute URLs that include the port
+        // This respects X-Forwarded-* headers when server.forward-headers-strategy = native
+        RedirectView redirectView = new RedirectView("/manager", false);
+        redirectView.setContextRelative(false);
+        return redirectView;
     }
 }

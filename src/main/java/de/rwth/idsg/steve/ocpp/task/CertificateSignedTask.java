@@ -62,6 +62,7 @@ public class CertificateSignedTask extends Ocpp16AndAboveTask<CertificateSignedP
                 switch (status) {
                     case ACCEPTED -> log.info("Request was {} by charge point '{}'", status, chargeBoxId);
                     case REJECTED -> log.warn("Request was {} by charge point '{}'", status, chargeBoxId);
+                    default -> log.warn("Unexpected status {} by charge point '{}'", status, chargeBoxId);
                 }
 
                 boolean accepted = (status == CertificateSignedStatusEnumType.ACCEPTED);

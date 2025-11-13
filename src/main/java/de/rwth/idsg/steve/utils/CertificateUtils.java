@@ -19,10 +19,10 @@
 package de.rwth.idsg.steve.utils;
 
 import jooq.steve.db.enums.CertificateSignatureAlgorithm;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -33,7 +33,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
@@ -42,6 +41,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECParameterSpec;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CertificateUtils {
 
     public static PKCS10CertificationRequest parseCsr(String csrPem) throws Exception {
@@ -121,10 +121,10 @@ public class CertificateUtils {
                 // RSA signature algorithms (under pkcs-1 branch)
                 return CertificateSignatureAlgorithm.RSA;
 
-            } else if (algorithm.on(X9ObjectIdentifiers.id_ecSigType) ||
-                algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA256) ||
-                algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA384) ||
-                algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA512)) {
+            } else if (algorithm.on(X9ObjectIdentifiers.id_ecSigType)
+                || algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA256)
+                || algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA384)
+                || algorithm.equals(X9ObjectIdentifiers.ecdsa_with_SHA512)) {
                 // ECDSA signature algorithms
                 return CertificateSignatureAlgorithm.ECDSA;
             }

@@ -88,7 +88,9 @@ public class UserService {
     }
 
     public void delete(int userPk) {
+        var details = getDetails(userPk);
         userRepository.delete(userPk);
+        log.info("Deleted user with userPk={} and email={}", userPk, details.getUserRecord().getEMail());
     }
 
     /**

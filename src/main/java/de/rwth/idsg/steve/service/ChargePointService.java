@@ -108,7 +108,9 @@ public class ChargePointService {
     }
 
     public void deleteChargePoint(int chargeBoxPk) {
+        var details = getDetails(chargeBoxPk);
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+        log.info("Deleted charge point with chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, details.getChargeBox().getChargeBoxId());
     }
 
     // -------------------------------------------------------------------------

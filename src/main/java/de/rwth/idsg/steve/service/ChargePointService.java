@@ -289,8 +289,13 @@ public class ChargePointService {
             for (SessionContext ctx : endpointDeque) {
                 DateTime openSince = ctx.getOpenSince();
 
+                Integer chargeBoxPk = primaryKeyLookup.get(chargeBoxId);
+                if (chargeBoxPk == null) {
+                    log.warn("Could not find chargeBoxPk for chargeBoxId={}", chargeBoxId);
+                }
+
                 OcppJsonStatus status = OcppJsonStatus.builder()
-                    .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
+                    .chargeBoxPk(chargeBoxPk)
                     .chargeBoxId(chargeBoxId)
                     .connectedSinceDT(openSince)
                     .connectedSince(DateTimeUtils.humanize(openSince))

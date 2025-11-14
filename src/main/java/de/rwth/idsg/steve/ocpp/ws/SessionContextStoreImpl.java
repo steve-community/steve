@@ -142,7 +142,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
             if (endpointDeque == null) {
                 return;
             }
-            for (SessionContext sessionContext : endpointDeque) {
+
+            // To prevent a ConcurrentModificationException, iterate over a copy of
+            // endpointDeque when closing sessions. The close() operation can trigger an event
+            // that modifies the deque, causing an error.
+            for (SessionContext sessionContext : new ArrayDeque<>(endpointDeque)) {
                 try {
                     sessionContext.getSession().close();
                 } catch (IOException e) {

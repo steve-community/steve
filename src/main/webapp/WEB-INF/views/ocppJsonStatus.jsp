@@ -43,7 +43,17 @@ Connection Status for JSON Charge Points
         </thead>
         <tbody>
         <c:forEach items="${ocppJsonStatusList}" var="s">
-            <tr><td><a href="${ctxPath}/manager/chargepoints/details/${s.chargeBoxPk}">${s.chargeBoxId}</a></td>
+            <tr>
+                <td>
+                    <c:choose>
+                      <c:when test="${not empty s.chargeBoxPk}">
+                        <a href="${ctxPath}/manager/chargepoints/details/${s.chargeBoxPk}">${s.chargeBoxId}</a>
+                      </c:when>
+                      <c:otherwise>
+                        ${s.chargeBoxId}
+                      </c:otherwise>
+                    </c:choose>
+                </td>
                 <td>${s.version.value}</td>
                 <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectedSince}</td>
                 <td>${s.connectionDuration}</td>

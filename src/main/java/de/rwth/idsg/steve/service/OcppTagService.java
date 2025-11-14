@@ -148,7 +148,9 @@ public class OcppTagService {
     }
 
     public void deleteOcppTag(int ocppTagPk) {
+        var details = getRecord(ocppTagPk);
         ocppTagRepository.deleteOcppTag(ocppTagPk);
+        log.info("Deleted Ocpp Tag with ocppTagPk={} and ocppTagId={}", ocppTagPk, details.getIdTag());
     }
 
     // -------------------------------------------------------------------------

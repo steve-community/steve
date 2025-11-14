@@ -38,6 +38,8 @@ public interface SessionContextStore {
 
     WebSocketSession getSession(String chargeBoxId);
 
+    void closeSessions(String chargeBoxId);
+
     int getSize(String chargeBoxId);
 
     int getNumberOfChargeBoxes();

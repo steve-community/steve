@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -127,6 +128,31 @@ public class SessionContextStoreImpl implements SessionContextStore {
             return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
+        } finally {
+            l.unlock();
+        }
+    }
+
+    @Override
+    public void closeSessions(String chargeBoxId) {
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                return;
+            }
+
+            // To prevent a ConcurrentModificationException, iterate over a copy of
+            // endpointDeque when closing sessions. The close() operation can trigger an event
+            // that modifies the deque, causing an error.
+            for (SessionContext sessionContext : new ArrayDeque<>(endpointDeque)) {
+                try {
+                    sessionContext.getSession().close();
+                } catch (IOException e) {
+                    log.error("Error while closing web socket session for chargeBoxId '{}'", chargeBoxId, e);
+                }
+            }
         } finally {
             l.unlock();
         }

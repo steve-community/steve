@@ -108,7 +108,16 @@ public class ChargePointService {
     }
 
     public void deleteChargePoint(int chargeBoxPk) {
+        var details = getDetails(chargeBoxPk);
+        var chargeBoxId = details.getChargeBox().getChargeBoxId();
+
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+        log.info("Deleted charge point with chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
+
+        // https://github.com/steve-community/steve/issues/1871
+        var version = OcppProtocol.fromCompositeValue(details.getChargeBox().getOcppProtocol()).getVersion();
+        log.info("Closing all WebSocket sessions of chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
+        sessionContextStoreHolder.getOrCreate(version).closeSessions(chargeBoxId);
     }
 
     // -------------------------------------------------------------------------
@@ -281,8 +290,13 @@ public class ChargePointService {
             for (SessionContext ctx : endpointDeque) {
                 DateTime openSince = ctx.getOpenSince();
 
+                Integer chargeBoxPk = primaryKeyLookup.get(chargeBoxId);
+                if (chargeBoxPk == null) {
+                    log.warn("Could not find chargeBoxPk for chargeBoxId={}", chargeBoxId);
+                }
+
                 OcppJsonStatus status = OcppJsonStatus.builder()
-                    .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
+                    .chargeBoxPk(chargeBoxPk)
                     .chargeBoxId(chargeBoxId)
                     .connectedSinceDT(openSince)
                     .connectedSince(DateTimeUtils.humanize(openSince))

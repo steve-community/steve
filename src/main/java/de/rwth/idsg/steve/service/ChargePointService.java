@@ -109,8 +109,14 @@ public class ChargePointService {
 
     public void deleteChargePoint(int chargeBoxPk) {
         var details = getDetails(chargeBoxPk);
+        var chargeBoxId = details.getChargeBox().getChargeBoxId();
+
         chargePointRepository.deleteChargePoint(chargeBoxPk);
-        log.info("Deleted charge point with chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, details.getChargeBox().getChargeBoxId());
+        log.info("Deleted charge point with chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
+
+        var version = OcppProtocol.fromCompositeValue(details.getChargeBox().getOcppProtocol()).getVersion();
+        log.info("Closing all WebSocket sessions of chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
+        sessionContextStoreHolder.getOrCreate(version).closeSessions(chargeBoxId);
     }
 
     // -------------------------------------------------------------------------

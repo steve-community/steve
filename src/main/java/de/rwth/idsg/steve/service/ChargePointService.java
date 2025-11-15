@@ -100,6 +100,10 @@ public class ChargePointService {
         return chargePointRepository.getNonZeroConnectorIds(chargeBoxId);
     }
 
+    public void updateCpoName(String chargeBoxId, String cpoName) {
+        chargePointRepository.updateCpoName(chargeBoxId, cpoName);
+    }
+
     public void addChargePointList(List<String> chargeBoxIdList) {
         chargePointRepository.addChargePointList(chargeBoxIdList);
     }
@@ -210,7 +214,7 @@ public class ChargePointService {
         try {
             this.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return Optional.of(ChargePointRegistration.withUnsecureDefaults());
+            return chargePointRepository.getRegistration(chargeBoxId);
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '{}'", chargeBoxId, e);
             return Optional.empty();

@@ -78,16 +78,24 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public Optional<ChargePointRegistration> getRegistration(String chargeBoxId) {
         var status = ctx.select(
+                            CHARGE_BOX.CHARGE_BOX_PK,
+                            CHARGE_BOX.CHARGE_BOX_ID,
                             CHARGE_BOX.REGISTRATION_STATUS,
                             CHARGE_BOX.SECURITY_PROFILE,
-                            CHARGE_BOX.AUTH_PASSWORD)
+                            CHARGE_BOX.AUTH_PASSWORD,
+                            CHARGE_BOX.CPO_NAME,
+                            CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER)
                         .from(CHARGE_BOX)
                         .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                         .fetch()
                         .map(rec -> new ChargePointRegistration(
                             rec.value1(),
-                            OcppSecurityProfile.fromValue(rec.value2()),
-                            rec.value3()
+                            rec.value2(),
+                            rec.value3(),
+                            OcppSecurityProfile.fromValue(rec.value4()),
+                            rec.value5(),
+                            rec.value6(),
+                            rec.value7()
                         ));
 
         return status.isEmpty()
@@ -96,11 +104,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public String getSerialNumber(String chargeBoxId) {
-        return ctx.select(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER)
-            .from(CHARGE_BOX)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-            .fetchOne(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER);
+    public void updateCpoName(String chargeBoxId, String cpoName) {
+        if (StringUtils.isEmpty(cpoName)) {
+            return;
+        }
+        ctx.update(CHARGE_BOX)
+            .set(CHARGE_BOX.CPO_NAME, cpoName)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+            .execute();
     }
 
     @Override

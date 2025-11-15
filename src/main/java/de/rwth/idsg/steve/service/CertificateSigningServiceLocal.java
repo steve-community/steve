@@ -76,6 +76,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     private final CertificateRepository securityRepository;
     private final ChargePointRepository chargePointRepository;
     private final ChargePointServiceClient chargePointServiceClient;
+    private final CertificateValidator certificateValidator;
 
     private final PrivateKey caPrivateKey;
     private final X509Certificate caCertificate;
@@ -87,11 +88,13 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
                                           SteveProperties steveProperties,
                                           CertificateRepository securityRepository,
                                           ChargePointRepository chargePointRepository,
-                                          ChargePointServiceClient chargePointServiceClient) throws Exception {
+                                          ChargePointServiceClient chargePointServiceClient,
+                                          CertificateValidator certificateValidator) throws Exception {
         this.securityProperties = steveProperties.getOcpp().getSecurity();
         this.securityRepository = securityRepository;
         this.chargePointRepository = chargePointRepository;
         this.chargePointServiceClient = chargePointServiceClient;
+        this.certificateValidator = certificateValidator;
 
         Ssl ssl = serverProperties.getSsl();
 
@@ -175,87 +178,15 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
         X500Name subject = csr.getSubject();
 
-        // A00.FR.404 :
-        // The Central System SHALL verify that the certificate is owned by the CPO (or an
-        // organization trusted by the CPO) by checking that the O (organizationName) RDN
-        // in the subject field of the certificate contains the CPO name.
-        {
-            String organizationName = CertificateUtils.getOrganization(subject);
-            String cpoName = getCpoName(chargeBoxId);
-            if (!cpoName.equals(organizationName)) {
-                throw new IllegalArgumentException("CSR signature validation failed: organizationName is not equal to CPO name");
-            }
+        var registration = chargePointRepository.getRegistration(chargeBoxId);
+        if (registration.isEmpty()) {
+            // should never happen actually
+            throw new IllegalArgumentException("Cannot find chargeBoxId=" + chargeBoxId + " in database");
         }
 
-        // A00.FR.405 :
-        // The Central System SHALL verify that the certificate belongs to this Charge Point by
-        // checking that the CN (commonName) RDN in the subject field of the certificate
-        // contains the unique Serial Number of the Charge Point
-        {
-            String commonName = CertificateUtils.getCommonName(subject);
-            String serialNumber = getSerialNumber(chargeBoxId);
-            if (!serialNumber.equals(commonName)) {
-                throw new IllegalArgumentException("CSR signature validation failed: commonName is not equal to Serial Number of the Charge Point");
-            }
-        }
+        certificateValidator.verifyOcppFields(registration.get(), subject);
 
         log.info("CSR validated for charge point '{}'", chargeBoxId);
-    }
-
-    private String getSerialNumber(String chargeBoxId) {
-        String val = chargePointRepository.getSerialNumber(chargeBoxId);
-        if (StringUtils.isEmpty(val)) {
-            throw new NullPointerException("Serial number is not set for chargeBoxId: " + chargeBoxId);
-        }
-        return val;
-    }
-
-    /**
-     * Fetches the CpoName config from the station by sending a GetConfigurationRequest and waiting for response.
-     */
-    private String getCpoName(String chargeBoxId) throws Exception {
-        var countDownLatch = new CountDownLatch(1);
-
-        var callback = new OcppCallback<GetConfigurationTask.ResponseWrapper>() {
-
-            private String cpoName = null;
-
-            @Override
-            public void success(String chargeBoxId, GetConfigurationTask.ResponseWrapper response) {
-                for (GetConfigurationTask.KeyValue conf : response.getConfigurationKeys()) {
-                    if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
-                        cpoName = conf.getValue();
-                        break;
-                    }
-                }
-                countDownLatch.countDown();
-            }
-
-            @Override
-            public void success(String chargeBoxId, OcppJsonError error) {
-                log.warn("Could not get configuration CpoName from charge point '{}', because: {}", chargeBoxId, error);
-                countDownLatch.countDown();
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                log.warn("Could not get configuration CpoName from charge point '{}'", chargeBoxId, e);
-                countDownLatch.countDown();
-            }
-        };
-
-        var params = new GetConfigurationParams();
-        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
-        params.setConfKeyList(List.of(ConfigurationKeyEnum.CpoName.name()));
-        chargePointServiceClient.getConfiguration(params, callback);
-
-        countDownLatch.await(30, TimeUnit.SECONDS);
-
-        if (callback.cpoName == null) {
-            throw new NullPointerException("CpoName is null");
-        }
-
-        return callback.cpoName;
     }
 
     private X509Certificate signCertificate(PKCS10CertificationRequest csr) throws Exception {

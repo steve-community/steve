@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.service.notification;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.Data;
 
 @Data
 public class OcppStationWebSocketDisconnected {
-
-  private final String chargeBoxId;
+    private final String chargeBoxId;
+    private final OcppVersion ocppVersion;
 }

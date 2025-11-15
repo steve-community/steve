@@ -84,7 +84,7 @@ public class SecurityProfileValidatorTest {
         form.setAuthPassword(authPassword);
 
         ChargePointRegistration toReturn = stationExistsInDB
-            ? new ChargePointRegistration("Accepted", securityProfile, authPasswordInDB)
+            ? new ChargePointRegistration(-1, "chargeBoxId", "Accepted", securityProfile, authPasswordInDB, "cpoName", "serialNumber")
             : null;
 
         when(chargePointRepository.getRegistration(any())).thenReturn(Optional.ofNullable(toReturn));

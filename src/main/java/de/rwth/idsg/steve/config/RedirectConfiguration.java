@@ -57,39 +57,149 @@ public class RedirectConfiguration implements WebMvcConfigurer {
                     // Handle RedirectView instances
                     if (view instanceof RedirectView) {
                         RedirectView redirectView = (RedirectView) view;
-                        configureRedirectView(redirectView);
+                        configureRedirectView(redirectView, request);
                     } 
                     // Handle string-based redirects (before view resolution)
                     else if (modelAndView.getViewName() != null 
                             && modelAndView.getViewName().startsWith("redirect:")) {
                         String redirectUrl = modelAndView.getViewName().substring("redirect:".length());
-                        RedirectView redirectView = new RedirectView(redirectUrl, false);
-                        configureRedirectView(redirectView);
-                        modelAndView.setView(redirectView);
+                        // Construct full URL with port if needed
+                        String fullUrl = constructFullUrl(redirectUrl, request);
+                        if (fullUrl != null) {
+                            // Use the full URL as the redirect target
+                            modelAndView.setViewName("redirect:" + fullUrl);
+                        } else {
+                            RedirectView redirectView = new RedirectView(redirectUrl, false);
+                            configureRedirectView(redirectView, request);
+                            modelAndView.setView(redirectView);
+                        }
                     }
                 }
             }
         }).order(Ordered.HIGHEST_PRECEDENCE);
     }
     
-    private void configureRedirectView(RedirectView redirectView) {
+    private void configureRedirectView(RedirectView redirectView, HttpServletRequest request) {
         // Always generate absolute URLs (not context-relative)
         redirectView.setContextRelative(false);
         
-        // If external hostname is explicitly configured, use it
-        // Otherwise, rely on X-Forwarded-* headers (via server.forward-headers-strategy = native)
-        if (externalHostname != null && !externalHostname.isEmpty()) {
-            String host = externalHostname;
+        // Get hostname and port from X-Forwarded-* headers or external hostname config
+        String host = null;
+        String port = null;
+        
+        // Check X-Forwarded-Port header first (most reliable when behind proxy)
+        String forwardedPort = request.getHeader("X-Forwarded-Port");
+        if (forwardedPort != null && !forwardedPort.isEmpty()) {
+            port = forwardedPort;
+        }
+        
+        // Get hostname from X-Forwarded-Host or external hostname config
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (forwardedHost != null && !forwardedHost.isEmpty()) {
+            // X-Forwarded-Host might include port, so extract just the hostname
+            if (forwardedHost.contains(":")) {
+                host = forwardedHost.split(":")[0];
+                // If port wasn't set from X-Forwarded-Port, try to get it from X-Forwarded-Host
+                if (port == null) {
+                    port = forwardedHost.substring(forwardedHost.indexOf(":") + 1);
+                }
+            } else {
+                host = forwardedHost;
+            }
+        }
+        
+        // Fallback to external hostname config if X-Forwarded-* headers not available
+        if (host == null && externalHostname != null && !externalHostname.isEmpty()) {
+            String hostname = externalHostname;
             // Remove protocol if present
-            if (host.startsWith("http://") || host.startsWith("https://")) {
-                host = host.replaceFirst("https?://", "");
+            if (hostname.startsWith("http://") || hostname.startsWith("https://")) {
+                hostname = hostname.replaceFirst("https?://", "");
             }
-            // Extract hostname (remove port if present - port comes from X-Forwarded-Port)
-            if (host.contains(":")) {
-                host = host.split(":")[0];
+            // Extract hostname and port
+            if (hostname.contains(":")) {
+                String[] parts = hostname.split(":", 2);
+                host = parts[0];
+                if (port == null) {
+                    port = parts[1];
+                }
+            } else {
+                host = hostname;
             }
+        }
+        
+        // Set hostname if we have it
+        if (host != null && !host.isEmpty()) {
             redirectView.setHosts(host);
         }
+        
+        // Note: RedirectView doesn't have a direct way to set the port
+        // The port should come from X-Forwarded-Port via server.forward-headers-strategy = native
+        // But if that's not working, we need to construct the full URL with port
+        // For now, we rely on Spring Boot's native forwarded headers support
+    }
+    
+    private String constructFullUrl(String redirectUrl, HttpServletRequest request) {
+        // Only construct full URL if redirectUrl is relative and we have forwarded headers
+        if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
+            return null; // Already absolute
+        }
+        
+        String host = null;
+        String port = null;
+        String scheme = request.getScheme();
+        
+        // Get scheme from X-Forwarded-Proto
+        if (request.getHeader("X-Forwarded-Proto") != null) {
+            scheme = request.getHeader("X-Forwarded-Proto");
+        }
+        
+        // Get hostname and port from X-Forwarded-* headers
+        String forwardedPort = request.getHeader("X-Forwarded-Port");
+        if (forwardedPort != null && !forwardedPort.isEmpty()) {
+            port = forwardedPort;
+        }
+        
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (forwardedHost != null && !forwardedHost.isEmpty()) {
+            if (forwardedHost.contains(":")) {
+                String[] parts = forwardedHost.split(":", 2);
+                host = parts[0];
+                if (port == null) {
+                    port = parts[1];
+                }
+            } else {
+                host = forwardedHost;
+            }
+        }
+        
+        // Fallback to external hostname config
+        if (host == null && externalHostname != null && !externalHostname.isEmpty()) {
+            String hostname = externalHostname;
+            if (hostname.startsWith("http://") || hostname.startsWith("https://")) {
+                scheme = hostname.startsWith("https://") ? "https" : "http";
+                hostname = hostname.replaceFirst("https?://", "");
+            }
+            if (hostname.contains(":")) {
+                String[] parts = hostname.split(":", 2);
+                host = parts[0];
+                if (port == null) {
+                    port = parts[1];
+                }
+            } else {
+                host = hostname;
+            }
+        }
+        
+        // Construct full URL if we have host and port
+        if (host != null && !host.isEmpty() && port != null && !port.isEmpty()) {
+            // Ensure redirectUrl starts with /
+            if (!redirectUrl.startsWith("/")) {
+                redirectUrl = "/" + redirectUrl;
+            }
+            return scheme + "://" + host + ":" + port + redirectUrl;
+        }
+        
+        return null; // Let RedirectView handle it
     }
 }
 

@@ -32,6 +32,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.session.InvalidSessionStrategy;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -76,7 +77,10 @@ public class SecurityConfiguration {
             // we need to disable CSRF for SOAP paths explicitly.
             .csrf(c -> c.ignoringRequestMatchers(SteveProperties.CXF_MAPPING + "/**"))
             .sessionManagement(req -> req
-                .invalidSessionUrl(prefix + "/signin")
+                .invalidSessionStrategy(new NoRedirectInvalidSessionStrategy(
+                    prefix + "/signin",
+                    prefix + "/signin"
+                ))
                 .sessionFixation().migrateSession() // Use migrateSession to avoid session issues behind proxy
             )
             .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())

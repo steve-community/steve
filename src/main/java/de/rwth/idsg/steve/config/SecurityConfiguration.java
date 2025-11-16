@@ -78,6 +78,13 @@ public class SecurityConfiguration {
             .sessionManagement(req -> req
                 .invalidSessionUrl(prefix + "/signin")
                 .sessionFixation().migrateSession() // Use migrateSession to avoid session issues behind proxy
+                // Configure session cookie to work correctly behind proxy
+                // Use context path (typically "/steve") so cookie is valid for all paths under context
+                // This prevents session cookie path mismatches that cause redirect loops
+                .sessionCookie(c -> c
+                    .path("/steve")
+                    .sameSite("Lax")
+                )
             )
             .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
             .logout(req -> req.logoutUrl(prefix + "/signout"))

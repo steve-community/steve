@@ -34,6 +34,9 @@ public class RootRedirectController {
 
     @GetMapping
     public String redirectToManager() {
+        // Redirect to /steve/manager (with context path)
+        // The ingress will rewrite / to /steve/, so when the app receives /steve/,
+        // we redirect to /steve/manager (relative to context path)
         // Return string redirect - RedirectConfiguration interceptor will convert to absolute URL
         // This respects X-Forwarded-* headers when server.forward-headers-strategy = native
         // Or uses server.external-hostname if configured

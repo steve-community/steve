@@ -52,7 +52,6 @@ public class RedirectConfiguration implements WebMvcConfigurer {
             public void postHandle(HttpServletRequest request, HttpServletResponse response, 
                                  Object handler, ModelAndView modelAndView) {
                 if (modelAndView != null) {
-                    // Skip processing if this is already an absolute URL redirect (Spring Security might generate these)
                     String currentPath = request.getRequestURI();
                     
                     View view = modelAndView.getView();
@@ -60,8 +59,13 @@ public class RedirectConfiguration implements WebMvcConfigurer {
                     // Handle RedirectView instances
                     if (view instanceof RedirectView) {
                         RedirectView redirectView = (RedirectView) view;
-                        // Only configure if it's not already redirecting to the same path (avoid loops)
                         String redirectUrl = redirectView.getUrl();
+                        // Skip all signin-related redirects to avoid loops with Spring Security
+                        if (redirectUrl != null && (redirectUrl.contains("/signin") || currentPath.contains("/signin"))) {
+                            // Don't modify Spring Security signin redirects
+                            return;
+                        }
+                        // Only configure if it's not already redirecting to the same path (avoid loops)
                         if (redirectUrl != null && !redirectUrl.equals(currentPath)) {
                             configureRedirectView(redirectView, request);
                         }
@@ -75,9 +79,18 @@ public class RedirectConfiguration implements WebMvcConfigurer {
                             // Already absolute, don't modify
                             return;
                         }
-                        // Skip if redirecting to the signin page from the signin page (avoid loops)
-                        if (redirectUrl.endsWith("/signin") && currentPath.endsWith("/signin")) {
-                            // Don't modify Spring Security redirects to signin page
+                        // Skip ALL signin-related redirects to avoid loops with Spring Security
+                        if (redirectUrl.contains("/signin") || currentPath.contains("/signin")) {
+                            // Don't modify Spring Security signin redirects - let Spring Security handle them
+                            return;
+                        }
+                        // Also skip if the redirect URL matches the current path (avoid self-redirects)
+                        String contextPath = request.getContextPath();
+                        String normalizedRedirect = redirectUrl.startsWith("/") ? redirectUrl : "/" + redirectUrl;
+                        String fullRedirectPath = contextPath + normalizedRedirect;
+                        String normalizedCurrent = currentPath.endsWith("/") ? currentPath.substring(0, currentPath.length() - 1) : currentPath;
+                        if (fullRedirectPath.equals(normalizedCurrent) || normalizedRedirect.equals(normalizedCurrent)) {
+                            // Redirecting to itself, don't modify
                             return;
                         }
                         // Construct full URL with port if needed

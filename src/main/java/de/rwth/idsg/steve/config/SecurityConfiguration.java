@@ -75,7 +75,10 @@ public class SecurityConfiguration {
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
             // we need to disable CSRF for SOAP paths explicitly.
             .csrf(c -> c.ignoringRequestMatchers(SteveProperties.CXF_MAPPING + "/**"))
-            .sessionManagement(req -> req.invalidSessionUrl(prefix + "/signin"))
+            .sessionManagement(req -> req
+                .invalidSessionUrl(prefix + "/signin")
+                .sessionFixation().migrateSession() // Use migrateSession to avoid session issues behind proxy
+            )
             .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
             .logout(req -> req.logoutUrl(prefix + "/signout"))
             .build();

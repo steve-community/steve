@@ -35,7 +35,10 @@ import org.springframework.web.servlet.view.RedirectView;
  * This is especially important when the application is behind a reverse proxy.
  * 
  * With server.forward-headers-strategy = native, Spring Boot should automatically use
- * X-Forwarded-* headers. This interceptor ensures all RedirectView instances generate absolute URLs.
+ * X-Forwarded-* headers. This interceptor is only needed if native support doesn't work.
+ * 
+ * DISABLED by default - Spring Boot's native forwarded headers support should handle redirects.
+ * Enable by setting steve.redirect-interceptor.enabled=true if needed.
  * 
  * @author Auto-generated
  */
@@ -44,9 +47,17 @@ public class RedirectConfiguration implements WebMvcConfigurer {
 
     @Value("${server.external-hostname:}")
     private String externalHostname;
+    
+    @Value("${steve.redirect-interceptor.enabled:false}")
+    private boolean enabled;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // Only register interceptor if explicitly enabled
+        // Spring Boot's native forwarded headers support should handle redirects automatically
+        if (!enabled) {
+            return;
+        }
         registry.addInterceptor(new HandlerInterceptor() {
             @Override
             public void postHandle(HttpServletRequest request, HttpServletResponse response, 
@@ -54,20 +65,46 @@ public class RedirectConfiguration implements WebMvcConfigurer {
                 if (modelAndView != null) {
                     String currentPath = request.getRequestURI();
                     
+                    // CRITICAL: Skip ALL processing if we're on the signin page to avoid Spring Security loops
+                    // This is the key difference between local (no proxy/context path issues) and Kubernetes
+                    if (currentPath != null && currentPath.toLowerCase().contains("/signin")) {
+                        // Don't modify anything on signin page - let Spring Security handle it natively
+                        return;
+                    }
+                    
                     View view = modelAndView.getView();
                     
                     // Handle RedirectView instances
                     if (view instanceof RedirectView) {
                         RedirectView redirectView = (RedirectView) view;
                         String redirectUrl = redirectView.getUrl();
-                        // Skip all signin-related redirects to avoid loops with Spring Security
-                        if (redirectUrl != null && (redirectUrl.contains("/signin") || currentPath.contains("/signin"))) {
-                            // Don't modify Spring Security signin redirects
-                            return;
-                        }
-                        // Only configure if it's not already redirecting to the same path (avoid loops)
-                        if (redirectUrl != null && !redirectUrl.equals(currentPath)) {
-                            configureRedirectView(redirectView, request);
+                        if (redirectUrl != null) {
+                            // Skip all signin-related redirects to avoid loops with Spring Security
+                            // Check both absolute and relative URLs
+                            String urlToCheck = redirectUrl.toLowerCase();
+                            if (urlToCheck.contains("/signin")) {
+                                // Don't modify Spring Security signin redirects - return immediately
+                                return;
+                            }
+                            // Skip if redirecting to an absolute URL that matches current path
+                            if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
+                                // Extract path from absolute URL
+                                try {
+                                    java.net.URL url = new java.net.URL(redirectUrl);
+                                    String redirectPath = url.getPath();
+                                    if (redirectPath.equals(currentPath) || redirectPath.equals(currentPath + "/")) {
+                                        // Redirecting to itself, don't modify
+                                        return;
+                                    }
+                                } catch (java.net.MalformedURLException e) {
+                                    // Invalid URL, skip modification
+                                    return;
+                                }
+                            }
+                            // Only configure if it's not already redirecting to the same path (avoid loops)
+                            if (!redirectUrl.equals(currentPath) && !redirectUrl.equals(request.getContextPath() + currentPath)) {
+                                configureRedirectView(redirectView, request);
+                            }
                         }
                     } 
                     // Handle string-based redirects (before view resolution)
@@ -174,6 +211,23 @@ public class RedirectConfiguration implements WebMvcConfigurer {
             return null; // Already absolute
         }
         
+        // Skip if redirecting to signin page (avoid loops)
+        if (redirectUrl.contains("/signin")) {
+            return null;
+        }
+        
+        String currentPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        
+        // Normalize redirect URL
+        String normalizedRedirect = redirectUrl.startsWith("/") ? redirectUrl : "/" + redirectUrl;
+        String fullRedirectPath = contextPath + normalizedRedirect;
+        
+        // Skip if redirecting to the same path (avoid self-redirects)
+        if (fullRedirectPath.equals(currentPath) || normalizedRedirect.equals(currentPath)) {
+            return null;
+        }
+        
         String host = null;
         String port = null;
         String scheme = request.getScheme();
@@ -222,11 +276,21 @@ public class RedirectConfiguration implements WebMvcConfigurer {
         
         // Construct full URL if we have host and port
         if (host != null && !host.isEmpty() && port != null && !port.isEmpty()) {
-            // Ensure redirectUrl starts with /
-            if (!redirectUrl.startsWith("/")) {
-                redirectUrl = "/" + redirectUrl;
+            String fullUrl = scheme + "://" + host + ":" + port + normalizedRedirect;
+            
+            // Double-check: if the constructed URL path matches current path, don't return it
+            try {
+                java.net.URL url = new java.net.URL(fullUrl);
+                String constructedPath = url.getPath();
+                if (constructedPath.equals(currentPath) || constructedPath.equals(currentPath + "/")) {
+                    return null; // Would redirect to itself
+                }
+            } catch (java.net.MalformedURLException e) {
+                // Invalid URL, return null
+                return null;
             }
-            return scheme + "://" + host + ":" + port + redirectUrl;
+            
+            return fullUrl;
         }
         
         return null; // Let RedirectView handle it

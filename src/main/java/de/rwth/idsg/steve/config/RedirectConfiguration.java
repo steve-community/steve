@@ -52,17 +52,34 @@ public class RedirectConfiguration implements WebMvcConfigurer {
             public void postHandle(HttpServletRequest request, HttpServletResponse response, 
                                  Object handler, ModelAndView modelAndView) {
                 if (modelAndView != null) {
+                    // Skip processing if this is already an absolute URL redirect (Spring Security might generate these)
+                    String currentPath = request.getRequestURI();
+                    
                     View view = modelAndView.getView();
                     
                     // Handle RedirectView instances
                     if (view instanceof RedirectView) {
                         RedirectView redirectView = (RedirectView) view;
-                        configureRedirectView(redirectView, request);
+                        // Only configure if it's not already redirecting to the same path (avoid loops)
+                        String redirectUrl = redirectView.getUrl();
+                        if (redirectUrl != null && !redirectUrl.equals(currentPath)) {
+                            configureRedirectView(redirectView, request);
+                        }
                     } 
                     // Handle string-based redirects (before view resolution)
                     else if (modelAndView.getViewName() != null 
                             && modelAndView.getViewName().startsWith("redirect:")) {
                         String redirectUrl = modelAndView.getViewName().substring("redirect:".length());
+                        // Skip if redirecting to an absolute URL (already handled)
+                        if (redirectUrl.startsWith("http://") || redirectUrl.startsWith("https://")) {
+                            // Already absolute, don't modify
+                            return;
+                        }
+                        // Skip if redirecting to the signin page from the signin page (avoid loops)
+                        if (redirectUrl.endsWith("/signin") && currentPath.endsWith("/signin")) {
+                            // Don't modify Spring Security redirects to signin page
+                            return;
+                        }
                         // Construct full URL with port if needed
                         String fullUrl = constructFullUrl(redirectUrl, request);
                         if (fullUrl != null) {

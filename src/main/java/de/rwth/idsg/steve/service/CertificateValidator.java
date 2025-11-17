@@ -18,18 +18,97 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.utils.CertificateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.jooq.tools.StringUtils;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import jakarta.annotation.Nullable;
 import java.security.cert.X509Certificate;
 
+/**
+ * The implementation of this validator ASSUMES external components to do the standard certificate validation already.
+ * We delegate and outsource this responsibility.
+ * <p>
+ * - When running the app standalone: Spring Boot needs proper and complete configuration regarding keystore and
+ * truststore. See <code>server.ssl</code> of application.yml
+ * <p>
+ * - When running the app in a setup with reverse proxy (or other components in front of the communication chain): These
+ * components need proper and complete configuration regarding mTLS. Moreover, they MUST be configured to forward the
+ * client cert as header to this app for us to do some other checks as well. The name of the header is configurable at
+ * <code>steve.ocpp.security.client-cert-header-from-proxy</code> of application.yml
+ * <p>
+ * In both cases, the management/update of certs in keystore and truststore is the concern of the operator.
+ */
 @Slf4j
 @Component
 public class CertificateValidator {
+
+    private final String clientCertHeaderFromProxy;
+
+    public CertificateValidator(SteveProperties steveProperties) {
+        clientCertHeaderFromProxy = steveProperties.getOcpp().getSecurity().getClientCertHeaderFromProxy();
+    }
+
+    /**
+     * We have multiple options to get cert:
+     * 1. Get from request header (if forwarded by a reverse proxy)
+     * 2. Get from spring security
+     * 3. Get from servlet request
+     */
+    @Nullable
+    public X509Certificate getCertificate(ServerHttpRequest request) {
+        if (!StringUtils.isEmpty(clientCertHeaderFromProxy)) {
+            String certPem = request.getHeaders().getFirst(clientCertHeaderFromProxy);
+            if (!StringUtils.isEmpty(certPem)) {
+                try {
+                    return CertificateUtils.parseCertificate(certPem);
+                } catch (Exception e) {
+                    log.warn("Failed parsing the certificate", e);
+                    return null;
+                }
+            }
+        }
+
+        // https://stackoverflow.com/a/26844985
+        Object credentialsObject = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        if (credentialsObject instanceof X509Certificate cert) {
+            return cert;
+        }
+
+        // https://stackoverflow.com/questions/39471044/spring-boot-reading-x509-client-certificate-from-http-request
+        {
+            ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+            X509Certificate[] certs = (X509Certificate[]) casted.getServletRequest().getAttribute("jakarta.servlet.request.X509Certificate");
+            if (certs != null) {
+                return certs[0];
+            }
+        }
+
+        return null;
+    }
+
+    public boolean validate(ChargePointRegistration chargePointRegistration, X509Certificate certificate) {
+        if (certificate == null) {
+            log.error("Certificate is null");
+            return false;
+        }
+
+        try {
+            // Do OCPP-specific checks
+            verifyOcppFields(chargePointRegistration, certificate);
+            return true;
+        } catch (Exception e) {
+            log.error("Certificate validation error", e);
+            return false;
+        }
+    }
 
     public void verifyOcppFields(ChargePointRegistration chargePointRegistration, X509Certificate cert) {
         var x500name = new X500Name(cert.getSubjectX500Principal().getName());

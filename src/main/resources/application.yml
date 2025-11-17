@@ -51,3 +51,4 @@ steve:
       # Profile 3: TLS with client-side certificate, TLS with server-side certificate -> mutual TLS (mTLS)
       profile: 0
       certificate-validity-years: 1
+      client-cert-header-from-proxy: "X-Client-Cert"

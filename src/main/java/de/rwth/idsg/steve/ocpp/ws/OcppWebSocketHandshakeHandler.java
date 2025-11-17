@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
+import de.rwth.idsg.steve.service.CertificateValidator;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointService chargePointService;
+    private final CertificateValidator certificateValidator;
 
     private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
 
@@ -97,11 +99,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         }
 
         // -------------------------------------------------------------------------
-        // 2. Check basic auth (if needed)
+        // 2. Check Ocpp security profiles (if needed)
         // -------------------------------------------------------------------------
 
         OcppSecurityProfile profile = registration.get().securityProfile();
 
+        // Basic auth for profiles 1 and 2
         if (profile.requiresBasicAuth()) {
             ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
 
@@ -115,6 +118,16 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             }
 
             boolean valid = chargePointService.validateBasicAuth(authentication, registration.get().hashedAuthPassword());
+            if (!valid) {
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+        }
+
+        // Client cert checks for profile 3
+        if (profile == OcppSecurityProfile.Profile_3) {
+            var cert = certificateValidator.getCertificate(request);
+            boolean valid = certificateValidator.validate(registration.get(), cert);
             if (!valid) {
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;

@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
+import de.rwth.idsg.steve.service.CertificateValidator;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final CertificateValidator certificateValidator;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
@@ -65,7 +67,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
             chargeBoxIdValidator,
             handshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointService
+            chargePointService,
+            certificateValidator
         );
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")

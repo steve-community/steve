@@ -31,9 +31,13 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -43,6 +47,27 @@ import java.security.spec.ECParameterSpec;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CertificateUtils {
+
+    private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
+    private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
+
+    public static X509Certificate parseCertificate(String certPem) throws Exception {
+        // Nginx sends URL-encoded PEM, decode it
+        String decoded = URLDecoder.decode(certPem, StandardCharsets.UTF_8);
+
+        // Remove URL encoding artifacts and normalize
+        decoded = decoded.replace("\t", "\n");
+
+        // Ensure proper PEM format
+        if (!decoded.contains(BEGIN_CERTIFICATE)) {
+            decoded = BEGIN_CERTIFICATE + "\n" + decoded + "\n" + END_CERTIFICATE;
+        }
+
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(decoded.getBytes(StandardCharsets.UTF_8))) {
+            return (X509Certificate) cf.generateCertificate(bais);
+        }
+    }
 
     public static PKCS10CertificationRequest parseCsr(String csrPem) throws Exception {
         try (var reader = new StringReader(csrPem);

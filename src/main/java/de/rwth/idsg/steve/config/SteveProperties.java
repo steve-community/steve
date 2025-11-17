@@ -72,6 +72,7 @@ public class SteveProperties {
         public static class Security {
             private int profile;
             private int certificateValidityYears;
+            private String clientCertHeaderFromProxy;
 
             public boolean requiresTls() {
                 return profile >= 2;

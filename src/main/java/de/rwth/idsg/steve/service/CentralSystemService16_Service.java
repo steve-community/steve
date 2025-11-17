@@ -346,16 +346,12 @@ public class CentralSystemService16_Service {
     public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
                                                                                      String chargeBoxIdentity) {
         try {
-            if (parameters.getRequestId() == null) {
-                log.warn("No requestId in {}", parameters);
-            } else {
-                eventRepository.insertFirmwareUpdateStatus(
-                    chargeBoxIdentity,
-                    parameters.getRequestId(),
-                    parameters.getStatus().value(),
-                    DateTime.now()
-                );
-            }
+            eventRepository.insertFirmwareUpdateStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
         } catch (Exception e) {
             log.error("Error processing firmware status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
         }
@@ -366,16 +362,12 @@ public class CentralSystemService16_Service {
     public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
                                                                String chargeBoxIdentity) {
         try {
-            if (parameters.getRequestId() == null) {
-                log.warn("No requestId in {}", parameters);
-            } else {
-                eventRepository.insertLogUploadStatus(
-                    chargeBoxIdentity,
-                    parameters.getRequestId(),
-                    parameters.getStatus().value(),
-                    DateTime.now()
-                );
-            }
+            eventRepository.insertLogUploadStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
         } catch (Exception e) {
             log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
         }

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS charge_box_firmware_update_job (
 );
 
 CREATE TABLE IF NOT EXISTS charge_box_firmware_update_event (
-    job_id INT NOT NULL,
+    job_id INT DEFAULT NULL,
     charge_box_pk INT NOT NULL,
 
     event_status VARCHAR(100) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS charge_box_log_upload_job (
 );
 
 CREATE TABLE IF NOT EXISTS charge_box_log_upload_event (
-    job_id INT NOT NULL,
+    job_id INT DEFAULT NULL,
     charge_box_pk INT NOT NULL,
 
     event_status VARCHAR(100) NOT NULL,

@@ -99,7 +99,11 @@ public class ChargePointService {
     }
 
     public void updateCpoName(String chargeBoxId, String cpoName) {
-        chargePointRepository.updateCpoName(chargeBoxId, cpoName);
+        try {
+            chargePointRepository.updateCpoName(chargeBoxId, cpoName);
+        } catch (Exception e) {
+            log.error("Failed during updateCpoName, because: {}", e.getMessage(), e);
+        }
     }
 
     public void addChargePointList(List<String> chargeBoxIdList) {

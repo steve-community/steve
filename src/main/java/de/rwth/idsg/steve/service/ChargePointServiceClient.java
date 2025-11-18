@@ -105,6 +105,7 @@ public class ChargePointServiceClient {
     private final ChargingProfileRepository chargingProfileRepository;
     private final ReservationRepository reservationRepository;
     private final OcppTagService ocppTagService;
+    private final ChargePointService chargePointService;
     private final CertificateRepository certificateRepository;
     private final EventRepository eventRepository;
 
@@ -135,7 +136,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int changeConfiguration(ChangeConfigurationParams params,
                                          OcppCallback<String>... callbacks) {
-        ChangeConfigurationTask task = new ChangeConfigurationTask(params);
+        ChangeConfigurationTask task = new ChangeConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -297,7 +298,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int getConfiguration(GetConfigurationParams params,
                                       OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
-        GetConfigurationTask task = new GetConfigurationTask(params);
+        GetConfigurationTask task = new GetConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);

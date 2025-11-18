@@ -2,7 +2,7 @@ START TRANSACTION;
 
 ALTER TABLE charge_box
     ADD COLUMN security_profile INT DEFAULT 0,
-    ADD COLUMN auth_password VARCHAR(500) DEFAULT NULL,
+    ADD COLUMN auth_password VARCHAR(255) DEFAULT NULL,
     ADD COLUMN cpo_name VARCHAR(255) DEFAULT NULL;
 
 CREATE TABLE IF NOT EXISTS charge_box_security_event (

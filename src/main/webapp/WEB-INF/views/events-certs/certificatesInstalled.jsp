@@ -88,12 +88,12 @@
         <c:forEach items="${certificates}" var="cert">
             <tr>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${cert.chargeBoxPk}">${cert.chargeBoxId}</a></td>
-                <td>${cert.certificateType}</td>
+                +<td><encode:forHtml value="${cert.certificateType}" /></td>
                 <td><encode:forHtml value="${cert.hashAlgorithm}" /></td>
                 <td><encode:forHtml value="${cert.issuerNameHash}" /></td>
                 <td><encode:forHtml value="${cert.issuerKeyHash}" /></td>
                 <td><encode:forHtml value="${cert.serialNumber}" /></td>
-                <td data-sort-value="${cert.respondedAt.millis}">${cert.respondedAt}</td>
+                <td data-sort-value="${cert.respondedAt.millis}"><encode:forHtml value="${cert.respondedAt}" /></td>
                 <td>
                     <form:form action="${ctxPath}/manager/certificates/installed/${cert.chargeBoxId}/delete/${cert.id}" method="post">
                         <input type="submit" class="redSubmit" value="Delete" onclick="return confirm('Are you sure you want to delete this certificate? It will delete the certificate at the station and then in database.');">

@@ -132,7 +132,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             setCommonAttributesForImprovedSecurity(model);
             return getPrefix() + GET_LOG_PATH;
         }
-        return GET_LOG_PATH + chargePointServiceClient.getLog(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getLog(params);
     }
 
     @RequestMapping(value = SIGNED_UPDATE_FIRMWARE_PATH, method = RequestMethod.POST)
@@ -142,7 +142,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             setCommonAttributesForImprovedSecurity(model);
             return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
         }
-        return GET_LOG_PATH + chargePointServiceClient.signedUpdateFirmware(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.signedUpdateFirmware(params);
     }
 
     @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.POST)
@@ -152,7 +152,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             setCommonAttributesForImprovedSecurity(model);
             return getPrefix() + INSTALL_CERTIFICATE_PATH;
         }
-        return GET_LOG_PATH + chargePointServiceClient.installCertificate(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.installCertificate(params);
     }
 
     @RequestMapping(value = GET_INSTALLED_CERTIFICATE_IDS_PATH, method = RequestMethod.POST)
@@ -162,7 +162,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             setCommonAttributesForImprovedSecurity(model);
             return getPrefix() + GET_INSTALLED_CERTIFICATE_IDS_PATH;
         }
-        return GET_LOG_PATH + chargePointServiceClient.getInstalledCertificateIds(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getInstalledCertificateIds(params);
     }
 
 }

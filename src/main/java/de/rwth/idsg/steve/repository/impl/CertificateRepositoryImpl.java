@@ -112,15 +112,15 @@ public class CertificateRepositoryImpl implements CertificateRepository {
         }
 
         if (form.getIssuerName() != null) {
-            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getIssuerName()));
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.ISSUER_NAME, form.getIssuerName()));
         }
 
         if (form.getSubjectName() != null) {
-            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getSubjectName()));
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SUBJECT_NAME, form.getSubjectName()));
         }
 
         if (form.getOrganizationName() != null) {
-            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.SERIAL_NUMBER, form.getOrganizationName()));
+            conditions.add(includes(CHARGE_BOX_CERTIFICATE_SIGNED_VIEW.ORGANIZATION_NAME, form.getOrganizationName()));
         }
 
         if (form.getAccepted() != BooleanType.ALL) {

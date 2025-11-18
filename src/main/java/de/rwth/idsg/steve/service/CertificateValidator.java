@@ -124,7 +124,7 @@ public class CertificateValidator {
             String organizationName = CertificateUtils.getOrganization(subject);
             String cpoName = chargePointRegistration.cpoName();
             if (StringUtils.isEmpty(cpoName)) {
-                throw new NullPointerException("CPO name is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
+                throw new IllegalArgumentException("CPO name is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
             }
             if (!cpoName.equals(organizationName)) {
                 throw new IllegalArgumentException("Validation failed: organizationName is not equal to CPO name");
@@ -139,7 +139,7 @@ public class CertificateValidator {
             String commonName = CertificateUtils.getCommonName(subject);
             String serialNumber = chargePointRegistration.serialNumber();
             if (StringUtils.isEmpty(serialNumber)) {
-                throw new NullPointerException("Serial number is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
+                throw new IllegalArgumentException("Serial number is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
             }
             if (!serialNumber.equals(commonName)) {
                 throw new IllegalArgumentException("Validation failed: commonName is not equal to Serial Number of the Charge Point");

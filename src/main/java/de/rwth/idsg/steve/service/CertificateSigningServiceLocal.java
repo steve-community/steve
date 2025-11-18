@@ -19,17 +19,11 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.config.SteveProperties;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.CertificateRepository;
+import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.utils.CertificateUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import jooq.steve.db.tables.records.CertificateRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -41,7 +35,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
-import org.jooq.tools.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.server.Ssl;
@@ -55,8 +48,6 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.certificatesToPEM;
 import static de.rwth.idsg.steve.utils.CertificateUtils.parseCsr;

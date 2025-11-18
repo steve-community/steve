@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import jakarta.validation.Valid;
@@ -75,6 +76,7 @@ public class ChargePointForm {
      * encoded password value, and sends it to repository layer.
      */
     @Schema(accessMode = Schema.AccessMode.WRITE_ONLY)
+    @Length(min = 32, max = 40, message = "The field must be between {min} and {max} characters")
     private String authPassword;
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)

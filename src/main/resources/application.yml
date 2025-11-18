@@ -43,7 +43,7 @@ steve:
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
 
     # OCPP 1.6 Security Profiles Configuration
-    # Other settings are inherited from server.ssl
+    # Other settings will be taken from server.ssl
     security:
       # Profile 0: No HTTP basic authentication, no TLS
       # Profile 1: HTTP basic authentication, no TLS
@@ -51,4 +51,5 @@ steve:
       # Profile 3: TLS with client-side certificate, TLS with server-side certificate -> mutual TLS (mTLS)
       profile: 0
       certificate-validity-years: 1
-      client-cert-header-from-proxy: "X-Client-Cert"
+      # See de.rwth.idsg.steve.service.CertificateValidator for documentation
+      client-cert-header-from-proxy:

@@ -42,7 +42,9 @@ import java.security.cert.X509Certificate;
  * - When running the app in a setup with reverse proxy (or other components in front of the communication chain): These
  * components need proper and complete configuration regarding mTLS. Moreover, they MUST be configured to forward the
  * client cert as header to this app for us to do some other checks as well. The name of the header is configurable at
- * <code>steve.ocpp.security.client-cert-header-from-proxy</code> of application.yml
+ * <code>steve.ocpp.security.client-cert-header-from-proxy</code> of application.yml. This option has precedence over
+ * the previous bullet point in the flow. If this config has a value, we consider this an active decision and will NOT
+ * fall back to previous bullet point, if we cannot find the cert in the header.
  * <p>
  * In both cases, the management/update of certs in keystore and truststore is the concern of the operator.
  */
@@ -59,8 +61,8 @@ public class CertificateValidator {
     /**
      * We have multiple options to get cert:
      * 1. Get from request header (if forwarded by a reverse proxy)
-     * 2. Get from spring security
-     * 3. Get from servlet request
+     * 2. Get from servlet request
+     * 3. Get from spring security
      */
     @Nullable
     public X509Certificate getCertificate(ServerHttpRequest request) {

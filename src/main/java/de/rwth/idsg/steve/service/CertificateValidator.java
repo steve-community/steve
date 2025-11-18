@@ -76,19 +76,17 @@ public class CertificateValidator {
             }
         }
 
+        // https://stackoverflow.com/questions/39471044/spring-boot-reading-x509-client-certificate-from-http-request
+        ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+        X509Certificate[] certs = (X509Certificate[]) casted.getServletRequest().getAttribute("jakarta.servlet.request.X509Certificate");
+        if (certs != null) {
+            return certs[0];
+        }
+
         // https://stackoverflow.com/a/26844985
         Object credentialsObject = SecurityContextHolder.getContext().getAuthentication().getCredentials();
         if (credentialsObject instanceof X509Certificate cert) {
             return cert;
-        }
-
-        // https://stackoverflow.com/questions/39471044/spring-boot-reading-x509-client-certificate-from-http-request
-        {
-            ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
-            X509Certificate[] certs = (X509Certificate[]) casted.getServletRequest().getAttribute("jakarta.servlet.request.X509Certificate");
-            if (certs != null) {
-                return certs[0];
-            }
         }
 
         return null;

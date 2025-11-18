@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.web.validation;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class SecurityProfileValidatorTest {
 
     @Mock
-    private ChargePointRepository chargePointRepository;
+    private ChargePointService chargePointService;
 
     @InjectMocks
     private SecurityProfileValidator securityProfileValidator;
@@ -87,7 +87,7 @@ public class SecurityProfileValidatorTest {
             ? new ChargePointRegistration(-1, "chargeBoxId", "Accepted", securityProfile, authPasswordInDB, "cpoName", "serialNumber")
             : null;
 
-        when(chargePointRepository.getRegistration(any())).thenReturn(Optional.ofNullable(toReturn));
+        when(chargePointService.getRegistrationDirect(any())).thenReturn(Optional.ofNullable(toReturn));
 
         boolean result = securityProfileValidator.isValid(form, null);
         Assertions.assertEquals(isValid, result);

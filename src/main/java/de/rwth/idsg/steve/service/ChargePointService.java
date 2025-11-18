@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
@@ -58,7 +57,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -177,6 +175,10 @@ public class ChargePointService {
             log.error("Exception while checking password for ChargeBoxId '{}'", chargeBoxId, e);
             return false;
         }
+    }
+
+    public Optional<ChargePointRegistration> getRegistrationDirect(String chargeBoxId) {
+        return chargePointRepository.getRegistration(chargeBoxId);
     }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {

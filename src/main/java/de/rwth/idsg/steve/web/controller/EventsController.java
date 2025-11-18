@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.EventRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.SecurityEventsQueryForm;
 import de.rwth.idsg.steve.web.dto.StatusEventType;
 import de.rwth.idsg.steve.web.dto.StatusEventsQueryForm;
@@ -45,7 +45,7 @@ import java.util.Collections;
 public class EventsController {
 
     private final EventRepository eventRepository;
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
 
     private static final String PARAMS = "params";
 
@@ -53,7 +53,7 @@ public class EventsController {
     public String getSecurityEvents(@Valid @ModelAttribute(PARAMS) SecurityEventsQueryForm params,
                                     BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
 
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());
@@ -68,7 +68,7 @@ public class EventsController {
     public String getStatusEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
                                   BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
 
         if (result.hasErrors()) {
             model.addAttribute("events", Collections.emptyList());

@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.CertificateRepository;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
 import jooq.steve.db.tables.records.CertificateRecord;
@@ -65,7 +64,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
     private final SteveProperties.Ocpp.Security securityProperties;
     private final CertificateRepository securityRepository;
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
     private final CertificateValidator certificateValidator;
 
@@ -78,12 +77,12 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
     public CertificateSigningServiceLocal(ServerProperties serverProperties,
                                           SteveProperties steveProperties,
                                           CertificateRepository securityRepository,
-                                          ChargePointRepository chargePointRepository,
+                                          ChargePointService chargePointService,
                                           ChargePointServiceClient chargePointServiceClient,
                                           CertificateValidator certificateValidator) throws Exception {
         this.securityProperties = steveProperties.getOcpp().getSecurity();
         this.securityRepository = securityRepository;
-        this.chargePointRepository = chargePointRepository;
+        this.chargePointService = chargePointService;
         this.chargePointServiceClient = chargePointServiceClient;
         this.certificateValidator = certificateValidator;
 
@@ -169,7 +168,7 @@ public class CertificateSigningServiceLocal extends CertificateSigningServiceAbs
 
         X500Name subject = csr.getSubject();
 
-        var registration = chargePointRepository.getRegistration(chargeBoxId);
+        var registration = chargePointService.getRegistrationDirect(chargeBoxId);
         if (registration.isEmpty()) {
             // should never happen actually
             throw new IllegalArgumentException("Cannot find chargeBoxId=" + chargeBoxId + " in database");

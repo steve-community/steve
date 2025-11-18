@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.web.dto.InstalledCertificateQueryForm;
 import de.rwth.idsg.steve.web.dto.SignedCertificateQueryForm;
@@ -49,7 +49,7 @@ import java.util.List;
 public class CertificatesController {
 
     private final CertificateRepository securityRepository;
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
 
     private static final String PARAMS = "params";
@@ -58,7 +58,7 @@ public class CertificatesController {
     public String getSignedCertificates(@Valid @ModelAttribute(PARAMS) SignedCertificateQueryForm params,
                                         BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
 
         if (result.hasErrors()) {
             model.addAttribute("certificates", Collections.emptyList());
@@ -73,7 +73,7 @@ public class CertificatesController {
     public String getInstalledCertificates(@Valid @ModelAttribute(PARAMS) InstalledCertificateQueryForm params,
                                            BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
 
         if (result.hasErrors()) {
             model.addAttribute("certificates", Collections.emptyList());

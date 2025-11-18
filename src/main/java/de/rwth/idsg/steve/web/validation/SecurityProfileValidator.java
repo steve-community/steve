@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.validation;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ import jakarta.validation.ConstraintValidatorContext;
 @RequiredArgsConstructor
 public class SecurityProfileValidator implements ConstraintValidator<SecurityProfileValid, ChargePointForm> {
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointService chargePointService;
 
     @Override
     public boolean isValid(ChargePointForm form, ConstraintValidatorContext context) {
@@ -54,7 +54,7 @@ public class SecurityProfileValidator implements ConstraintValidator<SecurityPro
         // from here on: station with profile 1 or 2 zone without Auth pwd in form
 
         // we do not require it to be set, if the DB already has it.
-        var optionalRegistration = chargePointRepository.getRegistration(form.getChargeBoxId());
+        var optionalRegistration = chargePointService.getRegistrationDirect(form.getChargeBoxId());
 
         // must be new station without pwd
         if (optionalRegistration.isEmpty()) {

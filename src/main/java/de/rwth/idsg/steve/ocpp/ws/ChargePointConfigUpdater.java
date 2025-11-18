@@ -57,12 +57,14 @@ public class ChargePointConfigUpdater {
             }
 
             var chargeBoxId = notification.getChargeBoxId();
-            var registration = chargePointService.getRegistration(chargeBoxId);
+            var registration = chargePointService.getRegistrationDirect(chargeBoxId);
             if (registration.isEmpty()) {
                 return;
             }
 
-            if (registration.get().securityProfile() != OcppSecurityProfile.Profile_3) {
+            // CpoName came with ocpp 1.6 security extension, which also introduced the security profiles. profile 0
+            // represents the old world before the security extension. since it is not relevant, skip this task.
+            if (registration.get().securityProfile() == OcppSecurityProfile.Profile_0) {
                 return;
             }
 

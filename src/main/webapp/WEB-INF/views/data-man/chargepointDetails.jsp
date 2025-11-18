@@ -99,6 +99,7 @@
                     <tr><td>Diagnostics Status:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsStatus}" /></td></tr>
                     <tr><td>Diagnostics Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsTimestamp}" /></td></tr>
                     <tr><td>Last Heartbeat Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.lastHeartbeatTimestamp}" /></td></tr>
+                    <tr><td>CPO Name:</td><td><encode:forHtml value="${cp.chargeBox.cpoName}" /></td></tr>
                     <tr>
                         <td>Insert connector status after start/stop transaction:
                         </td>

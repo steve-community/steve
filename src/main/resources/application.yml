@@ -6,6 +6,11 @@ spring:
     url: jdbc:mysql://${db.ip}:${db.port}/${db.schema}
     username: ${db.user}
     password: ${db.password}
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      file-size-threshold: 10GB
 
 server:
   address: ${server.host}

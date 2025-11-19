@@ -117,7 +117,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
                 return false;
             }
 
-            boolean valid = chargePointService.validateBasicAuth(authentication, registration.get().hashedAuthPassword());
+            boolean valid = chargePointService.validateBasicAuth(registration.get(), authentication);
             if (!valid) {
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;

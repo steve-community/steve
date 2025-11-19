@@ -148,18 +148,26 @@ public class ChargePointService {
     // Registration status
     // -------------------------------------------------------------------------
 
-    public boolean validateBasicAuth(Authentication authFromRequest, String encodedPassword) {
+    public boolean validateBasicAuth(ChargePointRegistration registration, Authentication authFromRequest) {
+        String chargeBoxId = registration.chargeBoxId();
+        String encodedPassword = registration.hashedAuthPassword();
+
         if (authFromRequest == null) {
-            log.warn("Failed to find username and password in Basic Authorization header");
+            log.warn("Failed to find username and password in Basic Authorization header for ChargeBoxId '{}'", chargeBoxId);
             return false;
         }
-
-        var chargeBoxId = (String) authFromRequest.getPrincipal();
-        var rawPassword = (String) authFromRequest.getCredentials();
 
         // if no password in DB, we have a big configuration problem.
         if (StringUtils.isEmpty(encodedPassword)) {
             log.error("No password configured for ChargeBoxId '{}' - authentication misconfiguration", chargeBoxId);
+            return false;
+        }
+
+        var username = (String) authFromRequest.getPrincipal();
+        var rawPassword = (String) authFromRequest.getCredentials();
+
+        if (!chargeBoxId.equals(username)) {
+            log.warn("The username '{}' (in Basic Auth) is not matching the ChargeBoxId '{}'", username, chargeBoxId);
             return false;
         }
 

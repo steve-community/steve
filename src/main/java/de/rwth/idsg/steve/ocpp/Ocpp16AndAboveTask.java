@@ -23,6 +23,7 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 
 import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,6 +33,10 @@ public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONS
 
     public Ocpp16AndAboveTask(S params) {
         super(params);
+    }
+
+    public Ocpp16AndAboveTask(S params, Map<String, String> customDetails) {
+        super(params, customDetails);
     }
 
     @Deprecated

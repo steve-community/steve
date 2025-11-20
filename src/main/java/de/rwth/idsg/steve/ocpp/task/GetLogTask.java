@@ -26,13 +26,14 @@ import ocpp._2022._02.security.GetLogResponse;
 import ocpp._2022._02.security.LogParametersType;
 
 import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
 public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
 
     private final int requestId;
 
     public GetLogTask(GetLogParams params, int requestId) {
-        super(params);
+        super(params, Map.of("Job/Request ID", String.valueOf(requestId)));
         this.requestId = requestId;
     }
 

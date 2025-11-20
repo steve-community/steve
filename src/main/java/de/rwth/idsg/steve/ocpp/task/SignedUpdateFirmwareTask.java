@@ -26,13 +26,14 @@ import ocpp._2022._02.security.SignedUpdateFirmware;
 import ocpp._2022._02.security.SignedUpdateFirmwareResponse;
 
 import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
 public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFirmwareParams, String> {
 
     private final int requestId;
 
     public SignedUpdateFirmwareTask(SignedUpdateFirmwareParams params, int requestId) {
-        super(params);
+        super(params, Map.of("Job/Request ID", String.valueOf(requestId)));
         this.requestId = requestId;
     }
 

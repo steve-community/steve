@@ -27,6 +27,7 @@
     You can view them <a href="${ctxPath}/manager/events/status?eventType=LogUpload">here</a>.
     </div>
     <table class="userInput">
+        <tr><td>Request ID:</td><td><i>Will be set automatically</i></td></tr>
         <tr>
             <td>Log Type:</td>
             <td>

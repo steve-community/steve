@@ -31,7 +31,7 @@
                 </form:select>
             </td>
         </tr>
-        <tr><td>Certificate:</td><td><form:textarea path="certificate" /></td></tr>
+        <tr><td>Certificate (PEM encoded, X.509):</td><td><form:textarea path="certificate" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

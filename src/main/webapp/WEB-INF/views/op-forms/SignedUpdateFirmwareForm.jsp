@@ -27,6 +27,7 @@
     You can view them <a href="${ctxPath}/manager/events/status?eventType=FirmwareUpdate">here</a>.
     </div>
     <table class="userInput">
+        <tr><td>Request ID:</td><td><i>Will be set automatically</i></td></tr>
         <tr><td>Location (directory URI):</td><td><form:input path="location" /></td></tr>
         <tr><td>Retries (integer):</td><td><form:input path="retries" placeholder="optional" /></td></tr>
         <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
@@ -40,8 +41,8 @@
                 <form:input path="installDateTime" cssClass="dateTimePicker" placeholder="optional"/>
             </td>
         </tr>
-        <tr><td>Signature:</td><td><form:textarea path="signature" /></td></tr>
-        <tr><td>Signing Certificate:</td><td><form:textarea path="signingCertificate" /></td></tr>
+        <tr><td>Signature (Base64 encoded):</td><td><form:textarea path="signature" /></td></tr>
+        <tr><td>Signing Certificate (PEM encoded, X.509):</td><td><form:textarea path="signingCertificate" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

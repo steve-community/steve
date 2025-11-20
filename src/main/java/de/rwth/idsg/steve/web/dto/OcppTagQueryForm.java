@@ -100,32 +100,6 @@ public class OcppTagQueryForm {
         return Objects.requireNonNullElse(blocked, BooleanType.ALL);
     }
 
-    @RequiredArgsConstructor
-    public enum BooleanType {
-        ALL("All", null),
-        TRUE("True", true),
-        FALSE("False", false);
-
-        @Getter private final String value;
-        private final Boolean boolValue;
-
-        public boolean getBoolValue() {
-            if (this.boolValue == null) {
-                throw new UnsupportedOperationException("This enum does not have any meaningful bool value set.");
-            }
-            return this.boolValue;
-        }
-
-        public static BooleanType fromValue(String v) {
-            for (BooleanType c: BooleanType.values()) {
-                if (c.value.equals(v)) {
-                    return c;
-                }
-            }
-            throw new IllegalArgumentException(v);
-        }
-    }
-
     public enum UserFilter {
         All,
         OnlyTagsWithUser,

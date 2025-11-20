@@ -23,6 +23,14 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -132,6 +140,25 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         return service.dataTransfer(parameters, chargeBoxIdentity);
+    }
+
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
+        return service.signCertificate(parameters, chargeBoxIdentity);
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
+                                                                       String chargeBoxIdentity) {
+        return service.securityEventNotification(parameters, chargeBoxIdentity);
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
+        return service.signedFirmwareStatusNotification(parameters, chargeBoxIdentity);
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
+        return service.logStatusNotification(parameters, chargeBoxIdentity);
     }
 
     // -------------------------------------------------------------------------

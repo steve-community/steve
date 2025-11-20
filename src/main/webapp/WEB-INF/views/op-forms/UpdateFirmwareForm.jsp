@@ -28,7 +28,7 @@
         <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
         <tr><td>Retrieve Date/Time:</td>
             <td>
-                <form:input path="retrieve" cssClass="dateTimePicker"/>
+                <form:input path="retrieveDateTime" cssClass="dateTimePicker"/>
             </td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>

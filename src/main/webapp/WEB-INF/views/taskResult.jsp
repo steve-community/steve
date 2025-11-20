@@ -33,6 +33,9 @@
         <table id='details' class='cpd'>
             <thead><tr><th>Task Details</th><th></th></tr></thead>
             <tr><td>Operation name</td><td>${task.operationName}</td></tr>
+            <c:forEach var="entry" items="${task.customDetails}">
+                <tr><td>${entry.key}</td><td>${entry.value}</td></tr>
+            </c:forEach>
             <tr><td>Origin</td><td>${task.origin} (${task.caller})</td></tr>
             <tr><td>Start timestamp</td><td>${task.startTimestamp}</td></tr>
             <tr><td>End timestamp</td><td>${task.endTimestamp}</td></tr>

@@ -47,14 +47,14 @@ import java.util.List;
 import java.util.Map;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.W;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.03.2018
  */
-@Controller
-@RequestMapping(value = "/manager/operations/v1.6")
+//@Controller
+//@RequestMapping(value = "/manager/operations/v1.6")
 public class Ocpp16Controller extends Ocpp15Controller {
 
     private final ChargingProfileRepository chargingProfileRepository;
@@ -107,14 +107,11 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @Override
     protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWriteEnum confEnum) {
-        switch (confEnum) {
-            case R:
-                return ConfigurationKeyEnum.OCPP_16_MAP_R;
-            case RW:
-                return ConfigurationKeyEnum.OCPP_16_MAP_RW;
-            default:
-                return Collections.emptyMap();
-        }
+        return switch (confEnum) {
+            case R -> ConfigurationKeyEnum.OCPP_16_MAP_R;
+            case W -> ConfigurationKeyEnum.OCPP_16_MAP_W;
+            case RW -> ConfigurationKeyEnum.OCPP_16_MAP_RW;
+        };
     }
 
     @Override
@@ -143,7 +140,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     public String getChangeConf(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new ChangeConfigurationParams());
-        model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
+        model.addAttribute("ocppConfKeys", getConfigurationKeys(W));
         return getPrefix() + CHANGE_CONF_PATH;
     }
 

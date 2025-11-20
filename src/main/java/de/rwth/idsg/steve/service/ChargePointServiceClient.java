@@ -22,15 +22,21 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.DeleteCertificateTask;
+import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetInstalledCertificateIdsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
+import de.rwth.idsg.steve.ocpp.task.GetLogTask;
+import de.rwth.idsg.steve.ocpp.task.InstallCertificateTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
@@ -38,10 +44,13 @@ import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskFromDB;
+import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -50,13 +59,19 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
+import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
@@ -64,6 +79,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
@@ -89,6 +105,9 @@ public class ChargePointServiceClient {
     private final ChargingProfileRepository chargingProfileRepository;
     private final ReservationRepository reservationRepository;
     private final OcppTagService ocppTagService;
+    private final ChargePointService chargePointService;
+    private final CertificateRepository certificateRepository;
+    private final EventRepository eventRepository;
 
     private final TaskExecutor taskExecutor;
     private final TaskStore taskStore;
@@ -117,7 +136,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int changeConfiguration(ChangeConfigurationParams params,
                                          OcppCallback<String>... callbacks) {
-        ChangeConfigurationTask task = new ChangeConfigurationTask(params);
+        ChangeConfigurationTask task = new ChangeConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -279,7 +298,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int getConfiguration(GetConfigurationParams params,
                                       OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
-        GetConfigurationTask task = new GetConfigurationTask(params);
+        GetConfigurationTask task = new GetConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -450,4 +469,123 @@ public class ChargePointServiceClient {
         return taskStore.add(task);
     }
 
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
+    @SafeVarargs
+    public final int extendedTriggerMessage(ExtendedTriggerMessageParams params,
+                                            OcppCallback<String>... callbacks) {
+        ExtendedTriggerMessageTask task = new ExtendedTriggerMessageTask(params);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.extendedTriggerMessage(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int getLog(GetLogParams params,
+                            OcppCallback<String>... callbacks) {
+        int requestId = eventRepository.insertLogUploadJob(params);
+
+        GetLogTask task = new GetLogTask(params, requestId);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.getLog(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int signedUpdateFirmware(SignedUpdateFirmwareParams params,
+                                          OcppCallback<String>... callbacks) {
+        int requestId = eventRepository.insertFirmwareUpdateJob(params);
+
+        SignedUpdateFirmwareTask task = new SignedUpdateFirmwareTask(params, requestId);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.signedUpdateFirmware(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int installCertificate(InstallCertificateParams params,
+                                        OcppCallback<String>... callbacks) {
+        InstallCertificateTask task = new InstallCertificateTask(params);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.installCertificate(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int deleteCertificate(DeleteCertificateParams params,
+                                       OcppCallback<String>... callbacks) {
+        DeleteCertificateTask task = new DeleteCertificateTask(params, certificateRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forFirst(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.deleteCertificate(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int certificateSigned(CertificateSignedParams params,
+                                       OcppCallback<String>... callbacks) {
+        CertificateSignedTask task = new CertificateSignedTask(params, certificateRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.certificateSigned(c, task));
+
+        return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int getInstalledCertificateIds(GetInstalledCertificateIdsParams params,
+                                                OcppCallback<String>... callbacks) {
+        GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(params, certificateRepository);
+
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        BackgroundService.with(taskExecutor)
+            .forEach(task.getParams().getChargePointSelectList())
+            .execute(c -> invoker.getInstalledCertificateIds(c, task));
+
+        return taskStore.add(task);
+    }
 }

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -36,20 +37,26 @@ import jakarta.validation.constraints.Pattern;
 @Setter
 public class GetDiagnosticsParams extends MultipleChargePointSelect {
 
+    @Schema(description = "The URL where charge point should upload the log file",
+            example = "ftp://user:pass@example.com/logs/")
     @NotBlank(message = "Location is required")
     @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")
     private String location;
 
     @Min(value = 1, message = "Retries must be at least {value}")
+    @Schema(description = "Number of times charge point should retry upload if it fails", minimum = "1")
     private Integer retries;
 
     @Min(value = 1, message = "Retry Interval must be at least {value}")
+    @Schema(description = "Interval in seconds between retry attempts", minimum = "1")
     private Integer retryInterval;
 
     @Past(message = "Start Date/Time must be in the past")
+    @Schema(description = "Oldest timestamp to include in log file")
     private DateTime start;
 
     @Past(message = "Stop Date/Time must be in the past")
+    @Schema(description = "Latest timestamp to include in log file")
     private DateTime stop;
 
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")

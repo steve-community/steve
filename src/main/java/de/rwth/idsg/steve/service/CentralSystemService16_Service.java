@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
@@ -33,6 +34,15 @@ import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignCertificateResponse.GenericStatusEnumType;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -60,8 +70,10 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -78,6 +90,9 @@ public class CentralSystemService16_Service {
     private final OcppTagService ocppTagService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ChargePointService chargePointService;
+    private final EventRepository eventRepository;
+    private final CertificateSigningService certificateSigningService;
+    private final TaskScheduler taskScheduler;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -274,6 +289,90 @@ public class CentralSystemService16_Service {
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
         // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
+        try {
+            if (!certificateSigningService.isEnabled()) {
+                log.error("Certificate signing service is not enabled.");
+                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+            }
+
+            var csr = parameters.getCsr();
+            if (csr == null || csr.trim().isEmpty()) {
+                log.error("Empty or null CSR received from '{}'", chargeBoxIdentity);
+                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+            }
+
+            /*
+             * Creating an artificial delay of a couple of seconds, such that the SignCertificateResponse is sent,
+             * and we start CSR processing only after that. Otherwise, for example in case of signing the certificates
+             * locally, there is a chance of SignCertificateResponse and CertificateSignedRequest arriving in wrong
+             * order: Ocpp specifies first SignCertificateResponse and later CertificateSignedRequest (in a decoupled
+             * subsequent process)
+             */
+            taskScheduler.schedule(
+                () -> certificateSigningService.processCSR(csr, chargeBoxIdentity),
+                Instant.now().plusSeconds(5)
+            );
+
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.ACCEPTED);
+        } catch (Exception e) {
+            log.error("Error processing SignCertificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+        }
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
+                                                                       String chargeBoxIdentity) {
+        try {
+            eventRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                parameters.getType(),
+                parameters.getTimestamp(),
+                parameters.getTechInfo()
+            );
+        } catch (Exception e) {
+            log.error("Error storing security event from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SecurityEventNotificationResponse();
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
+        try {
+            eventRepository.insertFirmwareUpdateStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
+        } catch (Exception e) {
+            log.error("Error processing firmware status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SignedFirmwareStatusNotificationResponse();
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
+        try {
+            eventRepository.insertLogUploadStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
+        } catch (Exception e) {
+            log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new LogStatusNotificationResponse();
     }
 
     // -------------------------------------------------------------------------

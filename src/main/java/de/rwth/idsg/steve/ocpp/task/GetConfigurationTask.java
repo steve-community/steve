@@ -22,6 +22,8 @@ import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.RequestResult;
+import de.rwth.idsg.steve.service.ChargePointService;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,6 @@ import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
 import jakarta.xml.ws.AsyncHandler;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +42,11 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     private static final Joiner JOINER = Joiner.on(", ");
 
-    public GetConfigurationTask(GetConfigurationParams params) {
+    private final ChargePointService chargePointService;
+
+    public GetConfigurationTask(GetConfigurationParams params, ChargePointService chargePointService) {
         super(params);
+        this.chargePointService = chargePointService;
     }
 
     @Override
@@ -91,6 +95,14 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         return res -> {
             try {
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
+
+                for (var conf : response.getConfigurationKey()) {
+                    if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
+                        chargePointService.updateCpoName(chargeBoxId, conf.getValue());
+                        break;
+                    }
+                }
+
                 List<KeyValue> keyValues = response.getConfigurationKey()
                                                    .stream()
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))

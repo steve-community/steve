@@ -62,6 +62,14 @@
                             <li><a href="${ctxPath}/manager/transactions">TRANSACTIONS</a></li>
                         </ul>
                     </li>
+                    <li><a>EVENTS AND CERTIFICATES &raquo;</a>
+                        <ul>
+                            <li><a href="${ctxPath}/manager/events/security">SECURITY EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/events/status">STATUS EVENTS</a></li>
+                            <li><a href="${ctxPath}/manager/certificates/installed">INSTALLED CERTIFICATES</a></li>
+                            <li><a href="${ctxPath}/manager/certificates/signed">SIGNED CERTIFICATES</a></li>
+                        </ul>
+                    </li>
                     <li><a>OPERATIONS &raquo;</a>
                         <ul>
                             <li><a href="${ctxPath}/manager/operations/v1.2">OCPP v1.2</a></li>

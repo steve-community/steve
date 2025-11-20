@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final String operationName;
     private final TaskOrigin origin;
     private final String caller;
+    private final Map<String, String> customDetails; // task-specific details
     protected final S params;
 
     private final Map<String, OcppVersion> versionMap;
@@ -70,19 +72,24 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
     public CommunicationTask(S params) {
-        this(params, TaskOrigin.INTERNAL, "SteVe");
+        this(params, Collections.emptyMap());
+    }
+
+    public CommunicationTask(S params, Map<String, String> customDetails) {
+        this(params, TaskOrigin.INTERNAL, "SteVe", customDetails);
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(S params, TaskOrigin origin, String caller) {
+    CommunicationTask(S params, TaskOrigin origin, String caller, Map<String, String> customDetails) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
         this.params = params;
+        this.customDetails = customDetails;
 
         resultMap = new HashMap<>(resultSize);
         versionMap = new HashMap<>(resultSize);

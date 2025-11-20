@@ -99,6 +99,7 @@
                     <tr><td>Diagnostics Status:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsStatus}" /></td></tr>
                     <tr><td>Diagnostics Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsTimestamp}" /></td></tr>
                     <tr><td>Last Heartbeat Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.lastHeartbeatTimestamp}" /></td></tr>
+                    <tr><td>CPO Name:</td><td><encode:forHtml value="${cp.chargeBox.cpoName}" /></td></tr>
                     <tr>
                         <td>Insert connector status after start/stop transaction:
                         </td>
@@ -112,6 +113,18 @@
                     <tr><td>Registration status:</td><td>
                         <form:select path="registrationStatus" items="${registrationStatusList}"/>
                     </td></tr>
+                    <tr>
+                        <td>Security Profile:</td>
+                        <td>
+                            <form:select path="securityProfile">
+                                <form:options items="${securityProfile}" itemLabel="description"/>
+                            </form:select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Basic Auth Password:</td>
+                        <td><form:input path="authPassword" type="password" placeholder="${chargePointForm.hasAuthPassword ? 'Enter new password' : 'Enter password'}" /></td>
+                    </tr>
                 </tbody>
             </table>
 

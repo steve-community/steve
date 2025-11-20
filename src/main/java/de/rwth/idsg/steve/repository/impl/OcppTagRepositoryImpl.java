@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
+import de.rwth.idsg.steve.web.dto.BooleanType;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.OcppTagActivity;
@@ -276,8 +277,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     private void processBooleanType(SelectQuery selectQuery,
                                     TableField<OcppTagActivityRecord, Boolean> field,
-                                    OcppTagQueryForm.BooleanType type) {
-        if (type != OcppTagQueryForm.BooleanType.ALL) {
+                                    BooleanType type) {
+        if (type != BooleanType.ALL) {
             selectQuery.addConditions(field.eq(type.getBoolValue()));
         }
     }

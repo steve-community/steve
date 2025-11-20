@@ -41,7 +41,7 @@ import jakarta.validation.Valid;
 
 import java.util.Map;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -128,7 +128,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String getGetConf(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
-        model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
+        model.addAttribute("ocppConfKeys", getConfigurationKeys(R));
         return getPrefix() + GET_CONF_PATH;
     }
 
@@ -187,7 +187,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
-            model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
+            model.addAttribute("ocppConfKeys", getConfigurationKeys(R));
             return getPrefix() + GET_CONF_PATH;
         }
         return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(params);

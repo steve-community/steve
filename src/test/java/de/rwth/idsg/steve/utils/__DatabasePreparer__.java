@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
-import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
@@ -53,6 +52,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED_VIEW;
+import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
@@ -156,7 +157,9 @@ public class __DatabasePreparer__ {
                 SchemaVersion.SCHEMA_VERSION,
                 Settings.SETTINGS,
                 OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
-                TRANSACTION // only a view
+                TRANSACTION, // only a view
+                CHARGE_BOX_STATUS_EVENT, // only a view
+                CHARGE_BOX_CERTIFICATE_SIGNED_VIEW // only a view
         );
 
         ctx.transaction(configuration -> {

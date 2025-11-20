@@ -27,13 +27,25 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.5S
 * OCPP1.5J
 * OCPP1.6S
-* OCPP1.6J
-
-⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
-Please, don't expose a Steve instance without knowing that risk.
+* OCPP1.6J (incl. _Security Extensions_)
 
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
+
+---
+
+#### OCPP 1.6J Security Extensions
+
+SteVe has a complete implementation of [OCPP 1.6 Security Whitepaper Edition 3](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip), providing:
+
+* **Security Profiles 0-3**: Unsecured, Basic Auth, Basic Auth with server TLS, and Mutual TLS (mTLS)
+* **Certificate Management**: Certificate signing, installation, and deletion
+* **Security Events**: Real-time security event logging and monitoring
+* **Signed Firmware Updates**: Cryptographically signed firmware updates with certificate validation
+* **Diagnostic Logs**: Secure log retrieval with configurable time ranges
+
+See [dedicated Wiki page](https://github.com/steve-community/steve/wiki/OCPP-1.6J-Security-Configuration) for detailed configuration guide.
+
 
 ### System Requirements
 
@@ -77,7 +89,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
       - You _must_ change [the host](src/main/resources/application-prod.properties) to the correct IP address of your server
       - You _must_ change [web interface credentials](src/main/resources/application-prod.properties)
       - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties)
-     
+
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
@@ -145,9 +157,8 @@ After SteVe has successfully started, you can access the web interface using the
     - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
     - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService`
 
-
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
- 
+
 *Have fun!*
 
 Screenshots

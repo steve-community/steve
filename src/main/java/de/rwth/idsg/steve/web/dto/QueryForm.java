@@ -23,9 +23,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.DateTime;
-
-import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,7 +32,7 @@ import jakarta.validation.constraints.AssertTrue;
 @Setter
 @NoArgsConstructor
 @ToString
-public abstract class QueryForm {
+public abstract class QueryForm extends QueryPeriodFromToFilter {
 
     @Schema(description = "The identifier of the chargebox (i.e. charging station)")
     private String chargeBoxId;
@@ -45,23 +42,6 @@ public abstract class QueryForm {
 
     @Schema(description = "The User ID")
     private Integer userId;
-
-    @Schema(description = "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
-    private DateTime from;
-
-    @Schema(description = "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
-    private DateTime to;
-
-    @Schema(hidden = true)
-    @AssertTrue(message = "'To' must be after 'From'")
-    public boolean isFromToValid() {
-        return !isFromToSet() || to.isAfter(from);
-    }
-
-    @Schema(hidden = true)
-    boolean isFromToSet() {
-        return from != null && to != null;
-    }
 
     @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {

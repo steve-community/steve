@@ -20,9 +20,13 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 
 import jakarta.xml.ws.AsyncHandler;
+
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
+import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -30,8 +34,11 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, String> {
 
-    public ChangeConfigurationTask(ChangeConfigurationParams params) {
+    private final ChargePointService chargePointService;
+
+    public ChangeConfigurationTask(ChangeConfigurationParams params, ChargePointService chargePointService) {
         super(params);
+        this.chargePointService = chargePointService;
     }
 
     @Override
@@ -86,7 +93,11 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                var status = res.get().getStatus();
+                if (status == ACCEPTED && CpoName.name().equals(params.getKey())) {
+                    chargePointService.updateCpoName(chargeBoxId, params.getValue());
+                }
+                success(chargeBoxId, status.value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

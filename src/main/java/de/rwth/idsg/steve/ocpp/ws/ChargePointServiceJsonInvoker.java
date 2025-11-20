@@ -65,6 +65,10 @@ public class ChargePointServiceJsonInvoker {
      * Actual processing
      */
     private void run(ChargePointSelect cps, CommunicationTask task) {
+        if (!cps.isJson()) {
+            throw new SteveException("Not a JSON charge point");
+        }
+
         var chargeBoxId = cps.getChargeBoxId();
 
         var sessionStore = sessionContextStoreHolder.getOrCreate(cps.getOcppProtocol().getVersion());

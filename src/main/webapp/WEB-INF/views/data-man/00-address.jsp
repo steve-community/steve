@@ -29,7 +29,7 @@
 	<tr><td>Latitude:</td><td><form:input path="address.latitude"/></td></tr>
 	<tr><td>Longitude:</td><td><form:input path="address.longitude"/></td></tr>
 
-    <!--
+    <%--
       Extract the address object using spring:bind to make it accessible for JSTL conditionals.
 
       Why: The form:input tag works with relative paths ("address.latitude"), but JSTL's c:if
@@ -39,7 +39,7 @@
       actual address object.
 
       See: https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/tags/BindTag.html
-    -->
+    --%>
     <spring:bind path="address">
         <c:set var="boundAddress" value="${status.value}" />
     </spring:bind>

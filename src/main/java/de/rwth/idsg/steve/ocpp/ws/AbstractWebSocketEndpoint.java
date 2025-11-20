@@ -80,8 +80,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
         this.sessionContextStore = sessionContextStoreHolder.getOrCreate(getVersion());
 
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, getVersion())));
+        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, getVersion())));
     }
 
     public abstract OcppVersion getVersion();

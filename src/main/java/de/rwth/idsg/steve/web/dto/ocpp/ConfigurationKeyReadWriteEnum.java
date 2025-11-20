@@ -27,5 +27,6 @@ package de.rwth.idsg.steve.web.dto.ocpp;
  */
 public enum ConfigurationKeyReadWriteEnum {
     R,
-    RW
+    W,
+    RW // this is a shortcut for R + W
 }

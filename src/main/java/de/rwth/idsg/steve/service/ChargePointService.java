@@ -23,12 +23,12 @@ import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
@@ -43,8 +43,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +57,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,6 +76,7 @@ public class ChargePointService {
     private final ChargePointRepository chargePointRepository;
     private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
+    private final PasswordEncoder passwordEncoder;
 
     // SOAP-based charge points are stored in DB with an endpoint address.
     // But, for WebSocket-based charge points, the active sessions are stored in memory.
@@ -95,15 +98,25 @@ public class ChargePointService {
         return chargePointRepository.getNonZeroConnectorIds(chargeBoxId);
     }
 
+    public void updateCpoName(String chargeBoxId, String cpoName) {
+        try {
+            chargePointRepository.updateCpoName(chargeBoxId, cpoName);
+        } catch (Exception e) {
+            log.error("Failed during updateCpoName, because: {}", e.getMessage(), e);
+        }
+    }
+
     public void addChargePointList(List<String> chargeBoxIdList) {
         chargePointRepository.addChargePointList(chargeBoxIdList);
     }
 
     public int addChargePoint(ChargePointForm form) {
+        encodePasswordIfNeeded(form);
         return chargePointRepository.addChargePoint(form);
     }
 
     public void updateChargePoint(ChargePointForm form) {
+        encodePasswordIfNeeded(form);
         chargePointRepository.updateChargePoint(form);
     }
 
@@ -118,6 +131,14 @@ public class ChargePointService {
         var version = OcppProtocol.fromCompositeValue(details.getChargeBox().getOcppProtocol()).getVersion();
         log.info("Closing all WebSocket sessions of chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
         sessionContextStoreHolder.getOrCreate(version).closeSessions(chargeBoxId);
+    }
+
+    private void encodePasswordIfNeeded(ChargePointForm form) {
+        String encodedPwd = StringUtils.isEmpty(form.getAuthPassword())
+            ? null
+            : passwordEncoder.encode(form.getAuthPassword());
+
+        form.setAuthPassword(encodedPwd);
     }
 
     // -------------------------------------------------------------------------
@@ -136,31 +157,75 @@ public class ChargePointService {
     // Registration status
     // -------------------------------------------------------------------------
 
+    public boolean validateBasicAuth(ChargePointRegistration registration, Authentication authFromRequest) {
+        String chargeBoxId = registration.chargeBoxId();
+        String encodedPassword = registration.hashedAuthPassword();
+
+        if (authFromRequest == null) {
+            log.warn("Failed to find username and password in Basic Authorization header for ChargeBoxId '{}'", chargeBoxId);
+            return false;
+        }
+
+        // if no password in DB, we have a big configuration problem.
+        if (StringUtils.isEmpty(encodedPassword)) {
+            log.error("No password configured for ChargeBoxId '{}' - authentication misconfiguration", chargeBoxId);
+            return false;
+        }
+
+        var username = (String) authFromRequest.getPrincipal();
+        var rawPassword = (String) authFromRequest.getCredentials();
+
+        if (!chargeBoxId.equals(username)) {
+            log.warn("The username '{}' (in Basic Auth) is not matching the ChargeBoxId '{}'", username, chargeBoxId);
+            return false;
+        }
+
+        // the station provided no password
+        if (StringUtils.isEmpty(rawPassword)) {
+            log.warn("Empty password provided for ChargeBoxId '{}'", chargeBoxId);
+            return false;
+        }
+
+        try {
+            var matches = passwordEncoder.matches(rawPassword, encodedPassword);
+            if (!matches) {
+                log.warn("Invalid password attempt for ChargeBoxId '{}'", chargeBoxId);
+            }
+            return matches;
+        } catch (Exception e) {
+            log.error("Exception while checking password for ChargeBoxId '{}'", chargeBoxId, e);
+            return false;
+        }
+    }
+
+    public Optional<ChargePointRegistration> getRegistrationDirect(String chargeBoxId) {
+        return chargePointRepository.getRegistration(chargeBoxId);
+    }
+
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
+        return chargePointRepository.getRegistration(chargeBoxId)
+            .map(it -> RegistrationStatus.fromValue(it.registrationStatus()));
+    }
+
+    public Optional<ChargePointRegistration> getRegistration(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
         try {
-            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
-            if (status.isEmpty()) {
+            Optional<ChargePointRegistration> entry = getRegistrationInternal(chargeBoxId);
+            if (entry.isEmpty()) {
                 unknownChargePointService.processNewUnidentified(chargeBoxId);
             }
-            return status;
+            return entry;
         } finally {
             l.unlock();
         }
     }
 
-    private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
+    private Optional<ChargePointRegistration> getRegistrationInternal(String chargeBoxId) {
         // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
-        if (status.isPresent()) {
-            try {
-                return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
-            } catch (Exception e) {
-                // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
-                log.error("Exception happened", e);
-                return Optional.empty();
-            }
+        var entry = chargePointRepository.getRegistration(chargeBoxId);
+        if (entry.isPresent()) {
+            return entry;
         }
 
         // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
@@ -172,7 +237,7 @@ public class ChargePointService {
         try {
             this.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
+            return chargePointRepository.getRegistration(chargeBoxId);
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '{}'", chargeBoxId, e);
             return Optional.empty();
@@ -189,14 +254,14 @@ public class ChargePointService {
         stats.setNumOcpp15JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getNumberOfChargeBoxes());
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(null);
+        var latestList = chargePointRepository.getChargePointConnectorStatus(null);
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
     }
 
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
-        Set<String> connectedJsonChargeBoxIds = Arrays.stream(OcppVersion.values())
+        var connectedJsonChargeBoxIds = Arrays.stream(OcppVersion.values())
             .map(version -> sessionContextStoreHolder.getOrCreate(version).getChargeBoxIdList())
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
@@ -206,8 +271,8 @@ public class ChargePointService {
         // iterate over JSON stations and mark disconnected ones
         // https://github.com/steve-community/steve/issues/355
         //
-        for (ConnectorStatus status : latestList) {
-            OcppProtocol protocol = status.getOcppProtocol();
+        for (var status : latestList) {
+            var protocol = status.getOcppProtocol();
             if (protocol != null && protocol.getTransport() == OcppTransport.JSON) {
                 status.setJsonAndDisconnected(!connectedJsonChargeBoxIds.contains(status.getChargeBoxId()));
             }
@@ -217,18 +282,18 @@ public class ChargePointService {
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        Map<String, Deque<SessionContext>> ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
-        Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
-        Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
+        var ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
+        var ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
+        var ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
 
-        List<String> connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
+        var connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
             .map(Map::keySet)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
-        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
+        var primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
 
-        DateTime now = DateTime.now();
+        var now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
         appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
@@ -249,45 +314,55 @@ public class ChargePointService {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
     }
 
-    private List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter,
+    public List<ChargePointSelect> getChargePoints(OcppProtocol protocol,
+                                                   List<RegistrationStatus> inStatusFilter,
+                                                   List<String> chargeBoxIdFilter) {
+        var version = protocol.getVersion();
+        var transport = protocol.getTransport();
+
+        switch (transport) {
+            case SOAP -> {
+                var statusFilter = inStatusFilter.stream()
+                    .map(RegistrationStatus::value)
+                    .collect(Collectors.toList());
+
+                var soapProtocol = version.toProtocol(OcppTransport.SOAP);
+                return chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter);
+            }
+            case JSON -> {
+                var sessionStore = sessionContextStoreHolder.getOrCreate(version);
+
+                var chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
+                    ? sessionStore.getChargeBoxIdList()
+                    : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
+
+                var jsonProtocol = version.toProtocol(OcppTransport.JSON);
+
+                return chargeBoxIdList.stream()
+                    .map(chargeBoxId -> new ChargePointSelect(jsonProtocol, chargeBoxId))
+                    .toList();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + transport);
+        }
+    }
+
+    private List<ChargePointSelect> getChargePoints(OcppVersion version,
+                                                    List<RegistrationStatus> inStatusFilter,
                                                     List<String> chargeBoxIdFilter) {
         List<ChargePointSelect> returnList =  new ArrayList<>();
-
-        // soap stations
-        {
-            List<String> statusFilter = inStatusFilter.stream()
-                .map(RegistrationStatus::value)
-                .collect(Collectors.toList());
-
-            var soapProtocol = version.toProtocol(OcppTransport.SOAP);
-
-            returnList.addAll(chargePointRepository.getChargePointSelect(soapProtocol, statusFilter, chargeBoxIdFilter));
-        }
-
-        // json stations
-        {
-            SessionContextStore sessionStore = sessionContextStoreHolder.getOrCreate(version);
-
-            List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
-                ? sessionStore.getChargeBoxIdList()
-                : sessionStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
-
-            var jsonProtocol = version.toProtocol(OcppTransport.JSON);
-
-            chargeBoxIdList.forEach(chargeBoxId -> returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId)));
-        }
-
+        returnList.addAll(getChargePoints(version.toProtocol(OcppTransport.SOAP), inStatusFilter, chargeBoxIdFilter));
+        returnList.addAll(getChargePoints(version.toProtocol(OcppTransport.JSON), inStatusFilter, chargeBoxIdFilter));
         return returnList;
     }
 
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
                                    DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
-        for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
-            String chargeBoxId = entry.getKey();
-            Deque<SessionContext> endpointDeque = entry.getValue();
+        for (var entry : map.entrySet()) {
+            var chargeBoxId = entry.getKey();
+            var endpointDeque = entry.getValue();
 
-            for (SessionContext ctx : endpointDeque) {
+            for (var ctx : endpointDeque) {
                 DateTime openSince = ctx.getOpenSince();
 
                 Integer chargeBoxPk = primaryKeyLookup.get(chargeBoxId);

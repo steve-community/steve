@@ -180,7 +180,7 @@ public class DataImportExportService {
                 return table;
             }
         }
-        throw new RuntimeException("Table with name " + tableName + " not found");
+        throw new RuntimeException("Database table for '" + fileName + "' not found");
     }
 
     private static List<Table<?>> getTables(ExportType exportType) {

@@ -65,9 +65,9 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
 
         try (Cursor<?> cursor = ctx.selectFrom(table).fetchSize(BATCH_SIZE).fetchLazy()) {
             while (cursor.hasNext()) {
-                var book = cursor.fetchNext();
-                if (book != null) {
-                    book.formatCSV(writer, csvFormatNoHeader);
+                var row = cursor.fetchNext();
+                if (row != null) {
+                    row.formatCSV(writer, csvFormatNoHeader);
                 }
             }
         }

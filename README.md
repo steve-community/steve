@@ -2,9 +2,6 @@
 
 [![build and run tests](https://github.com/steve-community/steve/actions/workflows/main.yml/badge.svg)](https://github.com/steve-community/steve/actions/workflows/main.yml)
 
-
-# Introduction
-
 SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827). 
 The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration). 
 The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. 
@@ -14,7 +11,7 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 The project is distributed under [GPL](LICENSE.txt) and is free to use. 
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
-## Relation to Powerfill
+### Relation to Powerfill
 
 [Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
 
@@ -32,9 +29,7 @@ Electric charge points using the following OCPP versions are supported:
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
----
-
-#### OCPP 1.6J Security Extensions
+### OCPP 1.6J Security Extensions
 
 SteVe has a complete implementation of [OCPP 1.6 Security Whitepaper Edition 3](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip), providing:
 

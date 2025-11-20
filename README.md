@@ -159,15 +159,21 @@ As soon as a heartbeat is received, you should see the status of the charge poin
 Screenshots
 -----
 1. [Home](website/screenshots/home.png)
-2. [Connector Status](website/screenshots/connector-status.png)
-3. [Data Management - Charge Points](website/screenshots/chargepoints.png)
-4. [Data Management - Users](website/screenshots/users.png)
-5. [Data Management - OCPP Tags](website/screenshots/ocpp-tags.png)
-6. [Data Management - Reservations](website/screenshots/reservations.png)
-7. [Data Management - Transactions](website/screenshots/transactions.png)
-8. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
-9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
-10. [Settings](website/screenshots/settings.png)
+1. [Connector Status](website/screenshots/connector-status.png)
+1. [Data Management - Charge Points](website/screenshots/chargepoints.png)
+1. [Data Management - OCPP Tags](website/screenshots/ocpp-tags.png)
+1. [Data Management - Users](website/screenshots/users.png)
+1. [Data Management - Charging Profiles](website/screenshots/charging-profiles.png)
+1. [Data Management - Reservations](website/screenshots/reservations.png)
+1. [Data Management - Transactions](website/screenshots/transactions.png)
+1. [Events and Certificates - Security Events](website/screenshots/events-security.png)
+1. [Events and Certificates - Status Events](website/screenshots/events-status.png)
+1. [Events and Certificates - Installed Certificates](website/screenshots/certiticates-installed.png)
+1. [Events and Certificates - Signed Certificates](website/screenshots/certiticates-signed.png)
+1. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
+1. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
+1. [Operations - OCPP v1.6](website/screenshots/ocpp16.png)
+1. [Settings](website/screenshots/settings.png)
 
 GDPR
 -----

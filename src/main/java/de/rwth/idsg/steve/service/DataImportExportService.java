@@ -140,6 +140,8 @@ public class DataImportExportService {
     }
 
     public void importZip(InputStream in) throws IOException {
+        dataImportExportRepository.beforeImport();
+
         try (ZipInputStream zipIn = new ZipInputStream(in)) {
             ZipEntry entry;
 
@@ -158,12 +160,16 @@ public class DataImportExportService {
                         };
 
                         dataImportExportRepository.importCsv(nonClosingStream, table);
+                    } catch (RuntimeException ex) {
+                        throw ex;
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
+                        throw new RuntimeException(e);
                     }
                 }
                 zipIn.closeEntry();
             }
+        } finally {
+            dataImportExportRepository.afterImport();
         }
     }
 

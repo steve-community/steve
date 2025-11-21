@@ -24,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.CSVFormat;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
+import org.jooq.LoaderError;
 import org.jooq.SQLDialect;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,6 +75,23 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
         }
     }
 
+    @Override
+    public void beforeImport() {
+        SQLDialect dialectFamily = ctx.configuration().dialect().family();
+
+        boolean isOk = dialectFamily == SQLDialect.MYSQL || dialectFamily == SQLDialect.MARIADB;
+        if (!isOk) {
+            throw new IllegalStateException("Unsupported dialect " + dialectFamily);
+        }
+
+        ctx.execute("set foreign_key_checks=0");
+    }
+
+    @Override
+    public void afterImport() {
+        ctx.execute("set foreign_key_checks=1");
+    }
+
     /**
      * https://www.jooq.org/doc/latest/manual/sql-execution/importing/importing-api/
      * https://www.jooq.org/doc/latest/manual/sql-execution/importing/importing-sources/importing-source-csv/
@@ -88,6 +107,13 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
             .loadCSV(in, StandardCharsets.UTF_8)
             .fieldsCorresponding()
             .execute();
+
+        if (!CollectionUtils.isEmpty(loader.errors())) {
+            for (LoaderError error : loader.errors()) {
+                log.error("Exception happened", error.exception());
+            }
+            throw new RuntimeException("There were errors loading data into table " + table.getName());
+        }
 
         int processed = loader.processed();
 
@@ -141,13 +167,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
 
         long nextVal = ((Number) maxId).longValue() + 1;
 
-        SQLDialect dialectFamily = ctx.configuration().dialect().family();
-
-        if (dialectFamily == SQLDialect.MYSQL || dialectFamily == SQLDialect.MARIADB) {
-            ctx.execute("ALTER TABLE " + table.getName() + " AUTO_INCREMENT = " + nextVal);
-        } else {
-            log.warn("Auto increment not supported for dialect family {}", dialectFamily);
-        }
+        ctx.execute(DSL.sql("ALTER TABLE {0} AUTO_INCREMENT = {1}", table, DSL.val(nextVal)));
     }
 
 }

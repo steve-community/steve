@@ -32,5 +32,7 @@ public interface DataImportExportRepository {
 
     void exportCsv(Writer writer, Table<?> table) throws IOException;
 
+    void beforeImport();
+    void afterImport();
     void importCsv(InputStream in, Table<?> table) throws IOException;
 }

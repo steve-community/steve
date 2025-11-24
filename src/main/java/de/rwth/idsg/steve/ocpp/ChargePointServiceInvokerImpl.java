@@ -247,30 +247,37 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     // "Improved security for OCPP 1.6-J" additions. Only for JSON
     // -------------------------------------------------------------------------
 
+    @Override
     public void extendedTriggerMessage(ChargePointSelect cp, ExtendedTriggerMessageTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void getLog(ChargePointSelect cp, GetLogTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void signedUpdateFirmware(ChargePointSelect cp, SignedUpdateFirmwareTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void installCertificate(ChargePointSelect cp, InstallCertificateTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void deleteCertificate(ChargePointSelect cp, DeleteCertificateTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void certificateSigned(ChargePointSelect cp, CertificateSignedTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }
 
+    @Override
     public void getInstalledCertificateIds(ChargePointSelect cp, GetInstalledCertificateIdsTask task) {
         chargePointServiceJsonInvoker.runPipeline(cp, task);
     }

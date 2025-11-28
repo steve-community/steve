@@ -18,12 +18,9 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
@@ -32,13 +29,10 @@ import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -68,56 +62,13 @@ public class ChargePointConfigUpdater {
                 return;
             }
 
-            var cpoName = getCpoName(chargeBoxId);
-            chargePointService.updateCpoName(chargeBoxId, cpoName);
+            // Send request to get CpoName. Default impl of GetConfigurationTask takes care of updating the database.
+            var params = new GetConfigurationParams();
+            params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
+            params.setConfKeyList(List.of(ConfigurationKeyEnum.CpoName.name()));
+            chargePointServiceClient.getConfiguration(params);
         } catch (Exception e) {
             log.error("Failed", e);
         }
-    }
-
-    /**
-     * Fetches the CpoName config from the station by sending a GetConfigurationRequest and waiting for response.
-     */
-    @Nullable
-    private String getCpoName(String chargeBoxId) throws Exception {
-        var countDownLatch = new CountDownLatch(1);
-
-        var callback = new OcppCallback<GetConfigurationTask.ResponseWrapper>() {
-
-            private String cpoName = null;
-
-            @Override
-            public void success(String chargeBoxId, GetConfigurationTask.ResponseWrapper response) {
-                for (GetConfigurationTask.KeyValue conf : response.getConfigurationKeys()) {
-                    if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
-                        cpoName = conf.getValue();
-                        log.info("Received CpoName={}", cpoName);
-                        break;
-                    }
-                }
-                countDownLatch.countDown();
-            }
-
-            @Override
-            public void success(String chargeBoxId, OcppJsonError error) {
-                log.warn("Could not get configuration CpoName from charge point '{}', because: {}", chargeBoxId, error);
-                countDownLatch.countDown();
-            }
-
-            @Override
-            public void failed(String chargeBoxId, Exception e) {
-                log.warn("Could not get configuration CpoName from charge point '{}'", chargeBoxId, e);
-                countDownLatch.countDown();
-            }
-        };
-
-        var params = new GetConfigurationParams();
-        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
-        params.setConfKeyList(List.of(ConfigurationKeyEnum.CpoName.name()));
-        chargePointServiceClient.getConfiguration(params, callback);
-
-        countDownLatch.await(30, TimeUnit.SECONDS);
-
-        return callback.cpoName;
     }
 }

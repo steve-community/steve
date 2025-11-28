@@ -107,7 +107,7 @@ public class TransactionsReservationsController {
         if (params.isReturnCSV()) {
             String fileName = "transactions.csv";
             String headerKey = "Content-Disposition";
-            String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+            String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
             transactionService.writeTransactionsCSV(params, response.getWriter());

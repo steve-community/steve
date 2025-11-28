@@ -146,7 +146,7 @@ public enum ConfigurationKeyEnum {
 
     ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
         this.value = this.name();
-        this.text = String.format("%s (%s)", value, valueType);
+        this.text = "%s (%s)".formatted(value, valueType);
         this.rw = rw;
         this.versions = versions;
     }

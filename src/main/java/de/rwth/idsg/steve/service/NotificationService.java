@@ -41,7 +41,6 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnect
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
-import static java.lang.String.format;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -60,12 +59,12 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Received boot notification from '%s'", notification.getChargeBoxId());
+        String subject = "Received boot notification from '%s'".formatted(notification.getChargeBoxId());
         String body;
         if (notification.getStatus().isPresent()) {
-            body = format("Charging station '%s' is in database and has registration status '%s'.", notification.getChargeBoxId(), notification.getStatus().get().value());
+            body = "Charging station '%s' is in database and has registration status '%s'.".formatted(notification.getChargeBoxId(), notification.getStatus().get().value());
         } else {
-            body = format("Charging station '%s' is NOT in database", notification.getChargeBoxId());
+            body = "Charging station '%s' is NOT in database".formatted(notification.getChargeBoxId());
         }
 
         mailService.sendAsync(subject, addTimestamp(body));
@@ -77,7 +76,7 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connected to JSON charging station '%s'", notification.getChargeBoxId());
+        String subject = "Connected to JSON charging station '%s'".formatted(notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
@@ -88,7 +87,7 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Disconnected from JSON charging station '%s'", notification.getChargeBoxId());
+        String subject = "Disconnected from JSON charging station '%s'".formatted(notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
@@ -99,8 +98,8 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", notification.getConnectorId(), notification.getChargeBoxId());
-        String body = format("Status Error Code: '%s'", notification.getErrorCode());
+        String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(notification.getConnectorId(), notification.getChargeBoxId());
+        String body = "Status Error Code: '%s'".formatted(notification.getErrorCode());
 
         mailService.sendAsync(subject, addTimestamp(body));
     }
@@ -111,7 +110,7 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", notification.getTransactionId(), notification.getParams().getChargeBoxId(), notification.getParams().getConnectorId());
+        String subject = "Transaction '%s' has started on charging station '%s' on connector '%s'".formatted(notification.getTransactionId(), notification.getParams().getChargeBoxId(), notification.getParams().getConnectorId());
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
@@ -122,7 +121,7 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
+        String subject = "Transaction '%s' has ended on charging station '%s'".formatted(notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }

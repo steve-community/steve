@@ -18,9 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -35,28 +33,24 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.format.support.FormattingConversionService;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.sql.DataSource;
-import java.util.List;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -66,7 +60,6 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-@EnableWebMvc
 @EnableScheduling
 @EnableAsync
 @ComponentScan("de.rwth.idsg.steve")
@@ -200,34 +193,15 @@ public class BeanConfiguration implements WebMvcConfigurer {
     // API config
     // -------------------------------------------------------------------------
 
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter conv) {
-                ObjectMapper objectMapper = conv.getObjectMapper();
-                objectMapper.findAndRegisterModules();
-                // if the client sends unknown props, just ignore them instead of failing
-                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                // default is true
-                objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
-     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
-     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
-     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
-     */
     @Bean
-    @Primary
-    public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
-        return requestMappingHandlerAdapter.getMessageConverters().stream()
-            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-            .findAny()
-            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
-            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
+        return builder -> {
+            // default is true
+            builder.featuresToDisable(WRITE_DATES_AS_TIMESTAMPS);
+            // if the client sends unknown props, just ignore them instead of failing
+            builder.featuresToDisable(FAIL_ON_UNKNOWN_PROPERTIES);
+            // we still use joda DateTime...
+            builder.modulesToInstall(new JodaModule());
+        };
     }
 }

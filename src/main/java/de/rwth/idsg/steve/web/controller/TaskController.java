@@ -87,10 +87,10 @@ public class TaskController {
 
         CommunicationTask r = taskStore.get(taskId);
 
-        if (r instanceof GetCompositeScheduleTask) {
-            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
-        } else if (r instanceof GetConfigurationTask) {
-            return processForGetConfigurationTask((GetConfigurationTask) r, chargeBoxId, model);
+        if (r instanceof GetCompositeScheduleTask scheduleTask) {
+            return processForGetCompositeScheduleTask(scheduleTask, chargeBoxId, model);
+        } else if (r instanceof GetConfigurationTask confTask) {
+            return processForGetConfigurationTask(confTask, chargeBoxId, model);
         } else {
             throw new SteveException("Task not found");
         }

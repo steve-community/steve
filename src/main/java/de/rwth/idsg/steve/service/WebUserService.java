@@ -18,8 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.config.SteveProperties;
@@ -44,6 +42,7 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -220,11 +219,7 @@ public class WebUserService implements UserDetailsManager {
     }
 
     private String[] fromJson(JSON jsonArray) {
-        try {
-            return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
     }
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
@@ -233,12 +228,8 @@ public class WebUserService implements UserDetailsManager {
             .sorted() // keep a stable order of entries
             .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
-        try {
-            String str = jacksonObjectMapper.writeValueAsString(auths);
-            return JSON.jsonOrNull(str);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String str = jacksonObjectMapper.writeValueAsString(auths);
+        return JSON.jsonOrNull(str);
     }
 
     /**

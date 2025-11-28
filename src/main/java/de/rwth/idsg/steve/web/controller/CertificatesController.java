@@ -30,10 +30,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class CertificatesController {
 
     private static final String PARAMS = "params";
 
-    @RequestMapping(value = "/signed", method = RequestMethod.GET)
+    @GetMapping("/signed")
     public String getSignedCertificates(@Valid @ModelAttribute(PARAMS) SignedCertificateQueryForm params,
                                         BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -69,7 +70,7 @@ public class CertificatesController {
         return "events-certs/certificatesSigned";
     }
 
-    @RequestMapping(value = "/installed", method = RequestMethod.GET)
+    @GetMapping("/installed")
     public String getInstalledCertificates(@Valid @ModelAttribute(PARAMS) InstalledCertificateQueryForm params,
                                            BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -84,7 +85,7 @@ public class CertificatesController {
         return "events-certs/certificatesInstalled";
     }
 
-    @RequestMapping(value = "/installed/{chargeBoxId}/delete/{installedCertificateId}", method = RequestMethod.POST)
+    @PostMapping("/installed/{chargeBoxId}/delete/{installedCertificateId}")
     public String deleteInstalledCertificate(@PathVariable("chargeBoxId") String chargeBoxId,
                                              @PathVariable("installedCertificateId") long installedCertificateId) {
         DeleteCertificateParams params = new DeleteCertificateParams();

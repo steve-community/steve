@@ -31,10 +31,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.Arrays;
@@ -88,13 +89,13 @@ public class ChargePointsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         initList(model, new ChargePointQueryForm());
         return "data-man/chargepoints";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) ChargePointQueryForm params, Model model) {
         initList(model, params);
         return "data-man/chargepoints";
@@ -106,7 +107,7 @@ public class ChargePointsController {
         model.addAttribute("unknownList", chargePointService.getUnknownChargePoints());
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
         ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
         ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
@@ -136,14 +137,14 @@ public class ChargePointsController {
         }
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
         model.addAttribute("chargePointForm", new ChargePointForm());
         setCommonAttributesForSingleAdd(model);
         return "data-man/chargepointAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_SINGLE_PATH)
     public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -156,7 +157,7 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
+    @PostMapping(ADD_BATCH_PATH)
     public String addBatchPost(@Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -169,7 +170,7 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -182,19 +183,19 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
         chargePointService.deleteChargePoint(chargeBoxPk);
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_ADD_PATH)
     public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
         add(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_REMOVE_PATH)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
         chargePointService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
@@ -208,12 +209,12 @@ public class ChargePointsController {
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_SINGLE_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }

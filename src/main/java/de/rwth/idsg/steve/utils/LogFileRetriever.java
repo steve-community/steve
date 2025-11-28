@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -97,7 +96,7 @@ public enum LogFileRetriever {
             var appender = appenderIterator.next();
             String fileName = extractFileName(appender);
             if (fileName != null) {
-                fileNameList.add(Paths.get(fileName));
+                fileNameList.add(Path.of(fileName));
             }
         }
         return fileNameList;

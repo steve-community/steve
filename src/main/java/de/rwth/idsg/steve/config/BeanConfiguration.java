@@ -203,8 +203,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
+            if (converter instanceof MappingJackson2HttpMessageConverter conv) {
                 ObjectMapper objectMapper = conv.getObjectMapper();
                 objectMapper.findAndRegisterModules();
                 // if the client sends unknown props, just ignore them instead of failing

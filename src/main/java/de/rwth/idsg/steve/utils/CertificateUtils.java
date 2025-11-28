@@ -74,8 +74,8 @@ public class CertificateUtils {
              var pemParser = new PEMParser(reader)) {
             var parsedObj = pemParser.readObject();
 
-            if (parsedObj instanceof PKCS10CertificationRequest) {
-                return (PKCS10CertificationRequest) parsedObj;
+            if (parsedObj instanceof PKCS10CertificationRequest request) {
+                return request;
             } else {
                 throw new IllegalArgumentException("Invalid CSR format. Expected PKCS10 certificate request.");
             }

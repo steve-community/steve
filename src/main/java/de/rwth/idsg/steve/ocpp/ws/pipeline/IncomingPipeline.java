@@ -62,13 +62,13 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
             serializer.accept(context);
             sender.accept(context);
 
-        } else if (msg instanceof OcppJsonResult) {
+        } else if (msg instanceof OcppJsonResult result) {
             context.getResultHandler()
-                   .accept((OcppJsonResult) msg);
+                   .accept(result);
 
-        } else if (msg instanceof OcppJsonError) {
+        } else if (msg instanceof OcppJsonError error) {
             context.getErrorHandler()
-                   .accept((OcppJsonError) msg);
+                   .accept(error);
         }
     }
 

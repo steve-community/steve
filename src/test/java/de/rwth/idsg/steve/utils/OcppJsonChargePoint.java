@@ -129,14 +129,14 @@ public class OcppJsonChargePoint {
         try {
             OcppJsonMessage ocppMsg = deserializer.extract(msg);
 
-            if (ocppMsg instanceof OcppJsonResult) {
+            if (ocppMsg instanceof OcppJsonResult result) {
                 ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
-                ctx.responseHandler.accept(((OcppJsonResult) ocppMsg).getPayload());
-            } else if (ocppMsg instanceof OcppJsonError) {
+                ctx.responseHandler.accept(result.getPayload());
+            } else if (ocppMsg instanceof OcppJsonError error) {
                 ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
-                ctx.errorHandler.accept((OcppJsonError) ocppMsg);
-            } else if (ocppMsg instanceof OcppJsonCallForTesting) {
-                handleCall((OcppJsonCallForTesting) ocppMsg);
+                ctx.errorHandler.accept(error);
+            } else if (ocppMsg instanceof OcppJsonCallForTesting testing) {
+                handleCall(testing);
             }
         } catch (Exception e) {
             log.error("Exception", e);

@@ -31,6 +31,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -81,7 +82,7 @@ public class TransactionsReservationsController {
         return "data-man/transactions";
     }
 
-    @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
+    @PostMapping(TRANSACTION_STOP_PATH)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
         transactionService.stop(transactionPk);
         return "redirect:/manager/transactions";
@@ -106,7 +107,7 @@ public class TransactionsReservationsController {
         if (params.isReturnCSV()) {
             String fileName = "transactions.csv";
             String headerKey = "Content-Disposition";
-            String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+            String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
             transactionService.writeTransactionsCSV(params, response.getWriter());

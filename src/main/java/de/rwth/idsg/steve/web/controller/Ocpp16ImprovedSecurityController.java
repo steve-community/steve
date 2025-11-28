@@ -32,9 +32,10 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.Arrays;
@@ -76,35 +77,35 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
     // Http methods (GET)
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = EXTENDED_TRIGGER_MESSAGE_PATH, method = RequestMethod.GET)
+    @GetMapping(EXTENDED_TRIGGER_MESSAGE_PATH)
     public String getExtendedTriggerMessage(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new ExtendedTriggerMessageParams());
         return getPrefix() + EXTENDED_TRIGGER_MESSAGE_PATH;
     }
 
-    @RequestMapping(value = GET_LOG_PATH, method = RequestMethod.GET)
+    @GetMapping(GET_LOG_PATH)
     public String getGetLog(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new GetLogParams());
         return getPrefix() + GET_LOG_PATH;
     }
 
-    @RequestMapping(value = SIGNED_UPDATE_FIRMWARE_PATH, method = RequestMethod.GET)
+    @GetMapping(SIGNED_UPDATE_FIRMWARE_PATH)
     public String getSignedUpdateFirmware(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new SignedUpdateFirmwareParams());
         return getPrefix() + SIGNED_UPDATE_FIRMWARE_PATH;
     }
 
-    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.GET)
+    @GetMapping(INSTALL_CERTIFICATE_PATH)
     public String getInstallCertificate(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new InstallCertificateParams());
         return getPrefix() + INSTALL_CERTIFICATE_PATH;
     }
 
-    @RequestMapping(value = GET_INSTALLED_CERTIFICATE_IDS_PATH, method = RequestMethod.GET)
+    @GetMapping(GET_INSTALLED_CERTIFICATE_IDS_PATH)
     public String getGetInstalledCertificateIds(Model model) {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new GetInstalledCertificateIdsParams());
@@ -115,7 +116,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
     // Http methods (POST)
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = EXTENDED_TRIGGER_MESSAGE_PATH, method = RequestMethod.POST)
+    @PostMapping(EXTENDED_TRIGGER_MESSAGE_PATH)
     public String postTriggerMessage(@Valid @ModelAttribute(PARAMS) ExtendedTriggerMessageParams params,
                                      BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -125,7 +126,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.extendedTriggerMessage(params);
     }
 
-    @RequestMapping(value = GET_LOG_PATH, method = RequestMethod.POST)
+    @PostMapping(GET_LOG_PATH)
     public String postGetLog(@Valid @ModelAttribute(PARAMS) GetLogParams params,
                              BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -135,7 +136,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.getLog(params);
     }
 
-    @RequestMapping(value = SIGNED_UPDATE_FIRMWARE_PATH, method = RequestMethod.POST)
+    @PostMapping(SIGNED_UPDATE_FIRMWARE_PATH)
     public String postSignedUpdateFirmware(@Valid @ModelAttribute(PARAMS) SignedUpdateFirmwareParams params,
                                            BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -145,7 +146,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.signedUpdateFirmware(params);
     }
 
-    @RequestMapping(value = INSTALL_CERTIFICATE_PATH, method = RequestMethod.POST)
+    @PostMapping(INSTALL_CERTIFICATE_PATH)
     public String postInstallCertificate(@Valid @ModelAttribute(PARAMS) InstallCertificateParams params,
                                          BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -155,7 +156,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.installCertificate(params);
     }
 
-    @RequestMapping(value = GET_INSTALLED_CERTIFICATE_IDS_PATH, method = RequestMethod.POST)
+    @PostMapping(GET_INSTALLED_CERTIFICATE_IDS_PATH)
     public String postGetInstalledCertificateIds(@Valid @ModelAttribute(PARAMS) GetInstalledCertificateIdsParams params,
                                          BindingResult result, Model model) {
         if (result.hasErrors()) {

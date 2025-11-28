@@ -30,10 +30,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -68,13 +69,13 @@ public class UsersController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         initList(model, new UserQueryForm());
         return "data-man/users";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) UserQueryForm params, Model model) {
         initList(model, params);
         return "data-man/users";
@@ -86,7 +87,7 @@ public class UsersController {
         model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
         User.Details details = userService.getDetails(userPk);
         UserForm form = UserFormMapper.toForm(details);
@@ -96,14 +97,14 @@ public class UsersController {
         return "data-man/userDetails";
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
         setTags(model, List.of());
         model.addAttribute("userForm", new UserForm());
         return "data-man/userAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_PATH)
     public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm,
                           BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -115,7 +116,7 @@ public class UsersController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("userForm") UserForm userForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -127,7 +128,7 @@ public class UsersController {
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("userPk") int userPk) {
         userService.delete(userPk);
         return toOverview();
@@ -150,12 +151,12 @@ public class UsersController {
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }

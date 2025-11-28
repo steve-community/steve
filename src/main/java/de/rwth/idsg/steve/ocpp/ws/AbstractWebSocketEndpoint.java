@@ -98,8 +98,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        if (message instanceof TextMessage) {
-            handleTextMessage(session, (TextMessage) message);
+        if (message instanceof TextMessage textMessage) {
+            handleTextMessage(session, textMessage);
 
         } else if (message instanceof PongMessage) {
             handlePongMessage(session);

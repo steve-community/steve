@@ -21,14 +21,19 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.repository.DataImportExportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.CSVFormat;
+import org.jooq.Converter;
 import org.jooq.Cursor;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.LoaderError;
 import org.jooq.SQLDialect;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.impl.AbstractConverter;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -36,6 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -52,7 +61,12 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
 
     private final CSVFormat csvFormatWithHeader = new CSVFormat();
     private final CSVFormat csvFormatNoHeader = csvFormatWithHeader.header(false);
+    private final Converter<String, Timestamp> isoTimestampConverter = new IsoTimestampConverter();
 
+    /**
+     * DateTime will be exported via its toString method in the else-block of {@link org.jooq.impl.AbstractResult#format0(Object, boolean, boolean)}
+     * because nothing else matches. The serialized values will be ISO8601 format.
+     */
     @Override
     public void exportCsv(Writer writer, Table<?> table) throws IOException {
         // write header line
@@ -105,7 +119,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
             .bulkAfter(BATCH_SIZE) // Put up to X rows in a single bulk statement.
             .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
             .loadCSV(in, StandardCharsets.UTF_8)
-            .fieldsCorresponding()
+            .fields(getTableFields(table))
             .execute();
 
         if (!CollectionUtils.isEmpty(loader.errors())) {
@@ -168,6 +182,45 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
         long nextVal = ((Number) maxId).longValue() + 1;
 
         ctx.execute(DSL.sql("ALTER TABLE {0} AUTO_INCREMENT = {1}", table, DSL.val(nextVal)));
+    }
+
+    // -------------------------------------------------------------------------
+    // Loader API cannot import temporal values in ISO8601 UTC format into a
+    // Timestamp. More context: https://groups.google.com/g/jooq-user/c/VzZdIT7Xdnc
+    //
+    // Because of this, we are overriding the default converter of TIMESTAMP
+    // table fields during the import.
+    // -------------------------------------------------------------------------
+
+    private List<Field<?>> getTableFields(Table<?> table) {
+        return Arrays.stream(table.fields())
+            .map(it -> {
+                if (it.getDataType().isTimestamp()) {
+                    return DSL.field(it.getName(), SQLDataType.VARCHAR(50)).convert(isoTimestampConverter);
+                } else {
+                    return it;
+                }
+            }).toList();
+    }
+
+    private static class IsoTimestampConverter extends AbstractConverter<String, Timestamp> {
+
+        private IsoTimestampConverter() {
+            super(String.class, Timestamp.class);
+        }
+
+        @Override
+        public Timestamp from(String str) {
+            if (StringUtils.isEmpty(str)) {
+                return null;
+            }
+            return Timestamp.from(Instant.parse(str));
+        }
+
+        @Override
+        public String to(Timestamp ts) {
+            return ts == null ? null : ts.toString();
+        }
     }
 
 }

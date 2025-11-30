@@ -47,5 +47,53 @@
     </tr>
     </tr>
 </table>
+
+<form:form action="${ctxPath}/manager/about/export" method="get" modelAttribute="exportForm">
+<section><span>Export Data</span></section>
+    <table class="userInput">
+        <tr>
+            <td>Export Type:</td>
+            <td><form:select path="exportType">
+                    <form:options items="${exportType}" itemLabel="text"/>
+                </form:select>
+            </td>
+        </tr>
+        <tr><td><i>
+            Master Data contains only the core business-related information.
+            Temporal data such as transactions, reservations, connector status values are omitted by design.
+            It will export the following tables: ${masterDataTableNames}.
+        </i></td><td></td></tr>
+        <tr>
+            <td></td>
+            <td id="add_space">
+                <input type="submit" value="Export ZIP">
+            </td>
+        </tr>
+    </table>
+</form:form>
+
+<form:form action="${ctxPath}/manager/about/import" method="post" enctype="multipart/form-data">
+<section><span>Import Data</span></section>
+    <table class="userInput">
+        <tr>
+            <tr>
+                <td>Select ZIP file:</td>
+                <td><input type="file" name="file" /></td>
+            </tr>
+            <tr><td><i>
+                The import function only supports what we exported. Therefore, the file and data structure must follow
+                a predetermined format. Arbitrary formats are not allowed. The import process will <b>delete all
+                existing data</b> in a table before importing data in order to prevent data conflict issues. Therefore,
+                we advise to use this function only with empty databases. Moreover, database version reconciliation is
+                not supported (i.e. you cannot import data from an earlier schema version).
+            </i></td><td></td></tr>
+            <td></td>
+            <td id="add_space">
+                <input type="submit" value="Import ZIP">
+            </td>
+        </tr>
+    </table>
+</form:form>
+
 </div>
 <%@ include file="00-footer.jsp" %>

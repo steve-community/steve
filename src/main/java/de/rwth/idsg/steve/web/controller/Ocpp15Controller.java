@@ -33,9 +33,10 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 
@@ -102,7 +103,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     // Http methods (GET)
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = RESERVE_PATH, method = RequestMethod.GET)
+    @GetMapping(RESERVE_PATH)
     public String getReserveNow(Model model) {
         setCommonAttributes(model);
         setActiveUserIdTagList(model);
@@ -110,21 +111,21 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return getPrefix() + RESERVE_PATH;
     }
 
-    @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.GET)
+    @GetMapping(CANCEL_RESERV_PATH)
     public String getCancelReserv(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new CancelReservationParams());
         return getPrefix() + CANCEL_RESERV_PATH;
     }
 
-    @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.GET)
+    @GetMapping(DATA_TRANSFER_PATH)
     public String getDataTransfer(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new DataTransferParams());
         return getPrefix() + DATA_TRANSFER_PATH;
     }
 
-    @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.GET)
+    @GetMapping(GET_CONF_PATH)
     public String getGetConf(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
@@ -132,14 +133,14 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return getPrefix() + GET_CONF_PATH;
     }
 
-    @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.GET)
+    @GetMapping(GET_LIST_VERSION_PATH)
     public String getListVersion(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new MultipleChargePointSelect());
         return getPrefix() + GET_LIST_VERSION_PATH;
     }
 
-    @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.GET)
+    @GetMapping(SEND_LIST_PATH)
     public String getSendList(Model model) {
         setCommonAttributes(model);
         setAllUserIdTagList(model);
@@ -151,7 +152,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     // Http methods (POST)
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = RESERVE_PATH, method = RequestMethod.POST)
+    @PostMapping(RESERVE_PATH)
     public String postReserveNow(@Valid @ModelAttribute(PARAMS) ReserveNowParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -162,7 +163,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.reserveNow(params);
     }
 
-    @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.POST)
+    @PostMapping(CANCEL_RESERV_PATH)
     public String postCancelReserv(@Valid @ModelAttribute(PARAMS) CancelReservationParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -172,7 +173,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.cancelReservation(params);
     }
 
-    @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.POST)
+    @PostMapping(DATA_TRANSFER_PATH)
     public String postDataTransfer(@Valid @ModelAttribute(PARAMS) DataTransferParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -182,7 +183,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.dataTransfer(params);
     }
 
-    @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.POST)
+    @PostMapping(GET_CONF_PATH)
     public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -193,7 +194,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(params);
     }
 
-    @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.POST)
+    @PostMapping(GET_LIST_VERSION_PATH)
     public String postListVersion(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -203,7 +204,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return REDIRECT_TASKS_PATH + chargePointServiceClient.getLocalListVersion(params);
     }
 
-    @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.POST)
+    @PostMapping(SEND_LIST_PATH)
     public String postSendList(@Valid @ModelAttribute(PARAMS) SendLocalListParams params,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {

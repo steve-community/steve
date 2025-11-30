@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
+@Slf4j
 public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
 
     private static final Joiner JOINER = Joiner.on(", ");
@@ -98,6 +100,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
                 for (var conf : response.getConfigurationKey()) {
                     if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
+                        log.info("Updating CpoName={} for chargeBoxId={}", conf.getValue(), chargeBoxId);
                         chargePointService.updateCpoName(chargeBoxId, conf.getValue());
                         break;
                     }

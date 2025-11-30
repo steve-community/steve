@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import org.owasp.encoder.Encode;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.lang.reflect.Type;
 
 /**
@@ -55,6 +56,7 @@ public class CustomStringModule extends SimpleModule {
      */
     private static class CustomStringSerializer extends StdScalarSerializer<Object> {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public CustomStringSerializer() {
@@ -95,6 +97,7 @@ public class CustomStringModule extends SimpleModule {
 
     private static class CustomStringDeserializer extends StringDeserializer {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         @Override

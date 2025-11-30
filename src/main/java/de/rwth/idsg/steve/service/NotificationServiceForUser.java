@@ -36,8 +36,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.lang.String.format;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.10.2025
@@ -66,19 +64,19 @@ public class NotificationServiceForUser {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED",
+        String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(
             event.getConnectorId(),
             event.getChargeBoxId()
         );
 
         // send email if user with eMail address found
         String bodyUserMail =
-                format("User: %s \n\n Connector %d of charging station %s notifies FAULTED! \n\n Error code: %s",
-                        user.getName(),
-                        event.getConnectorId(),
-                        event.getChargeBoxId(),
-                        event.getErrorCode()
-                );
+            "User: %s \n\n Connector %d of charging station %s notifies FAULTED! \n\n Error code: %s".formatted(
+                user.getName(),
+                event.getConnectorId(),
+                event.getChargeBoxId(),
+                event.getErrorCode()
+            );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
@@ -93,7 +91,7 @@ public class NotificationServiceForUser {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'",
+        String subject = "Transaction '%s' has started on charging station '%s' on connector '%s'".formatted(
             event.getTransactionId(),
             event.getParams().getChargeBoxId(),
             event.getParams().getConnectorId()
@@ -101,12 +99,12 @@ public class NotificationServiceForUser {
 
         // send email if user with eMail address found
         String bodyUserMail =
-                format("User: %s started transaction '%d' on connector '%s' of charging station '%s'",
-                        user.getName(),
-                        event.getTransactionId(),
-                        event.getParams().getConnectorId(),
-                        event.getParams().getChargeBoxId()
-                );
+            "User: %s started transaction '%d' on connector '%s' of charging station '%s'".formatted(
+                user.getName(),
+                event.getTransactionId(),
+                event.getParams().getConnectorId(),
+                event.getParams().getChargeBoxId()
+            );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
@@ -126,18 +124,18 @@ public class NotificationServiceForUser {
             return;
         }
 
-        String subject = format("EV stopped charging at charging station %s, Connector %d",
+        String subject = "EV stopped charging at charging station %s, Connector %d".formatted(
             event.getChargeBoxId(),
             event.getConnectorId()
         );
 
         // send email if user with eMail address found
         String bodyUserMail =
-                format("User: %s \n\n Connector %d of charging station %s notifies Suspended_EV",
-                        user.getName(),
-                        event.getConnectorId(),
-                        event.getChargeBoxId()
-                );
+            "User: %s \n\n Connector %d of charging station %s notifies Suspended_EV".formatted(
+                user.getName(),
+                event.getConnectorId(),
+                event.getChargeBoxId()
+            );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
     }
@@ -157,7 +155,7 @@ public class NotificationServiceForUser {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'",
+        String subject = "Transaction '%s' has ended on charging station '%s'".formatted(
             event.getParams().getTransactionId(),
             event.getParams().getChargeBoxId()
         );

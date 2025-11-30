@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
-import static java.lang.String.format;
+import java.io.Serial;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -26,6 +26,7 @@ import static java.lang.String.format;
  */
 public class SteveException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 3081743035434873349L;
 
     public SteveException(String message) {
@@ -41,19 +42,19 @@ public class SteveException extends RuntimeException {
     // -------------------------------------------------------------------------
 
     public SteveException(String template, Object arg1) {
-        this(format(template, arg1));
+        this(template.formatted(arg1));
     }
 
     public SteveException(String template, Object arg1, Throwable cause) {
-        this(format(template, arg1), cause);
+        this(template.formatted(arg1), cause);
     }
 
     public SteveException(String template, Object arg1, Object arg2) {
-        this(format(template, arg1, arg2));
+        this(template.formatted(arg1, arg2));
     }
 
     public SteveException(String template, Object arg1, Object arg2, Throwable cause) {
-        this(format(template, arg1, arg2), cause);
+        this(template.formatted(arg1, arg2), cause);
     }
 
     // -------------------------------------------------------------------------
@@ -63,7 +64,7 @@ public class SteveException extends RuntimeException {
     public static class AlreadyExists extends SteveException {
 
         public AlreadyExists(String template, Object arg1) {
-            super(format(template, arg1));
+            super(template.formatted(arg1));
         }
     }
 

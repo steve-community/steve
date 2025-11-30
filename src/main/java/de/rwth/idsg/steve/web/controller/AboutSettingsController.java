@@ -36,10 +36,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -77,7 +78,7 @@ public class AboutSettingsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
+    @GetMapping(ABOUT_PATH)
     public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
         String scheme = request.getScheme();
         String contextPath = request.getContextPath();
@@ -95,7 +96,7 @@ public class AboutSettingsController {
         return "about";
     }
 
-    @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
+    @GetMapping(SETTINGS_PATH)
     public String getSettings(Model model) {
         SettingsForm form = settingsRepository.getForm();
         model.addAttribute("features", NotificationFeature.values());
@@ -103,7 +104,7 @@ public class AboutSettingsController {
         return "settings";
     }
 
-    @RequestMapping(params = "change", value = SETTINGS_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "change", value = SETTINGS_PATH)
     public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -115,7 +116,7 @@ public class AboutSettingsController {
         return "redirect:/manager/settings";
     }
 
-    @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "testMail", value = SETTINGS_PATH)
     public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                            BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -129,7 +130,7 @@ public class AboutSettingsController {
         return "redirect:/manager/settings";
     }
 
-    @RequestMapping(value = ABOUT_PATH + "/export")
+    @GetMapping(value = ABOUT_PATH + "/export")
     public void exportZip(@ModelAttribute("exportForm") DataExportForm exportForm,
                           HttpServletResponse response) throws IOException {
         String fileName = "data-export_" + System.currentTimeMillis() + ".zip";
@@ -141,7 +142,7 @@ public class AboutSettingsController {
         dataImportExportService.exportZip(response.getOutputStream(), exportForm.getExportType());
     }
 
-    @RequestMapping(value = ABOUT_PATH + "/import", method = RequestMethod.POST)
+    @PostMapping(value = ABOUT_PATH + "/import")
     public String importZip(@RequestParam("file") MultipartFile file, Model model) throws IOException {
         if (file.isEmpty()) {
             throw new SteveException.BadRequest("File is empty");

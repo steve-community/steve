@@ -27,10 +27,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class EventsController {
 
     private static final String PARAMS = "params";
 
-    @RequestMapping(value = "/security", method = RequestMethod.GET)
+    @GetMapping("/security")
     public String getSecurityEvents(@Valid @ModelAttribute(PARAMS) SecurityEventsQueryForm params,
                                     BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -64,7 +64,7 @@ public class EventsController {
         return "events-certs/securityEvents";
     }
 
-    @RequestMapping(value = "/status", method = RequestMethod.GET)
+    @GetMapping("/status")
     public String getStatusEvents(@Valid @ModelAttribute(PARAMS) StatusEventsQueryForm params,
                                   BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
@@ -79,7 +79,7 @@ public class EventsController {
         return "events-certs/statusEvents";
     }
 
-    @RequestMapping(value = "/status/{eventType}/{jobId}", method = RequestMethod.GET)
+    @GetMapping("/status/{eventType}/{jobId}")
     public String getStatusEventJobDetails(@PathVariable("eventType") StatusEventType eventType,
                                            @PathVariable("jobId") int jobId,
                                            Model model) {

@@ -35,13 +35,15 @@ import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
@@ -94,7 +96,7 @@ public class Issue72LowLevelSoap extends StressTest {
         String body = buildRequest(chargeBoxId, transactionId, idTag, stopDateTime, meterStop);
         ContentType contentType = ContentType.create(MediaType.SOAP_XML_UTF_8.type(), MediaType.SOAP_XML_UTF_8.charset().orNull());
 
-        HttpUriRequest req = RequestBuilder.post(soapPath)
+        ClassicHttpRequest req = ClassicRequestBuilder.post(soapPath)
                                            .addHeader("SOAPAction", "urn://Ocpp/Cs/2015/10/StopTransaction")
                                            .setEntity(new StringEntity(body, contentType))
                                            .build();
@@ -131,7 +133,7 @@ public class Issue72LowLevelSoap extends StressTest {
 
                 try {
                     httpClient.execute(req, httpResponse -> {
-                        if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                        if (httpResponse.getCode() != HttpStatus.SC_OK) {
                             throw new RuntimeException("Not OK");
                         }
                         return null;

@@ -20,21 +20,28 @@ package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.DeleteCertificateTask;
+import de.rwth.idsg.steve.ocpp.task.ExtendedTriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetInstalledCertificateIdsTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
+import de.rwth.idsg.steve.ocpp.task.GetLogTask;
+import de.rwth.idsg.steve.ocpp.task.InstallCertificateTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
@@ -52,6 +59,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
 
     public static final Exception EXCEPTION_V12 = new IllegalArgumentException("This operation is not supported by this OCPP 1.2 station");
     public static final Exception EXCEPTION_V15 = new IllegalArgumentException("This operation is not supported by this OCPP 1.5 station");
+    public static final Exception EXCEPTION_NO_SOAP = new IllegalArgumentException("This operation is not supported by SOAP stations");
 
     private final ClientProviderWithCache<ocpp.cp._2010._08.ChargePointService> soapV12Helper;
     private final ClientProviderWithCache<ocpp.cp._2012._06.ChargePointService> soapV15Helper;
@@ -242,6 +250,45 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
             case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
             case V_16 -> createV16(cp).triggerMessageAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void extendedTriggerMessage(ChargePointSelect cp, ExtendedTriggerMessageTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void getLog(ChargePointSelect cp, GetLogTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void signedUpdateFirmware(ChargePointSelect cp, SignedUpdateFirmwareTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void installCertificate(ChargePointSelect cp, InstallCertificateTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void deleteCertificate(ChargePointSelect cp, DeleteCertificateTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void certificateSigned(ChargePointSelect cp, CertificateSignedTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
+    }
+
+    @Override
+    public void getInstalledCertificateIds(ChargePointSelect cp, GetInstalledCertificateIdsTask task) {
+        task.failed(cp.getChargeBoxId(), EXCEPTION_NO_SOAP);
     }
 
     // -------------------------------------------------------------------------

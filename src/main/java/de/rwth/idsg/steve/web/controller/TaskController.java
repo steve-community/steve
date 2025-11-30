@@ -28,9 +28,10 @@ import lombok.RequiredArgsConstructor;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -54,25 +55,25 @@ public class TaskController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         model.addAttribute("taskList", taskStore.getOverview());
         return "tasks";
     }
 
-    @RequestMapping(params = "finished", method = RequestMethod.POST)
+    @PostMapping(params = "finished")
     public String clearFinished(Model model) {
         taskStore.clearFinished();
         return getOverview(model);
     }
 
-    @RequestMapping(params = "unfinished", method = RequestMethod.POST)
+    @PostMapping(params = "unfinished")
     public String clearUnfinished(Model model) {
         taskStore.clearUnfinished();
         return getOverview(model);
     }
 
-    @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
+    @GetMapping(TASK_ID_PATH)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
         CommunicationTask r = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
@@ -80,17 +81,17 @@ public class TaskController {
         return "taskResult";
     }
 
-    @RequestMapping(value = TASK_DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(TASK_DETAILS_PATH)
     public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
                                          @PathVariable("chargeBoxId") String chargeBoxId,
                                          Model model) {
 
         CommunicationTask r = taskStore.get(taskId);
 
-        if (r instanceof GetCompositeScheduleTask) {
-            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
-        } else if (r instanceof GetConfigurationTask) {
-            return processForGetConfigurationTask((GetConfigurationTask) r, chargeBoxId, model);
+        if (r instanceof GetCompositeScheduleTask scheduleTask) {
+            return processForGetCompositeScheduleTask(scheduleTask, chargeBoxId, model);
+        } else if (r instanceof GetConfigurationTask confTask) {
+            return processForGetConfigurationTask(confTask, chargeBoxId, model);
         } else {
             throw new SteveException("Task not found");
         }

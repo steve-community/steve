@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.utils;
 import de.rwth.idsg.steve.config.SteveProperties;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 
 import jakarta.xml.ws.soap.SOAPBinding;
 

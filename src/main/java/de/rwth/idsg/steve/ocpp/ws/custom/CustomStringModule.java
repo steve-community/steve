@@ -18,24 +18,21 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.custom;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import org.owasp.encoder.Encode;
-
-import java.io.IOException;
-import java.io.Serial;
-import java.lang.reflect.Type;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.Version;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.deser.jdk.StringDeserializer;
+import tools.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.jdk.StringSerializer;
+import tools.jackson.databind.ser.std.StdScalarSerializer;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -51,42 +48,33 @@ public class CustomStringModule extends SimpleModule {
     }
 
     /**
-     * Since {@link com.fasterxml.jackson.databind.ser.std.StringSerializer} is marked as final, its contents are
-     * copied here (and adjusted as needed).
+     * Since {@link StringSerializer} is marked as final, its contents are copied here (and adjusted as needed).
      */
     private static class CustomStringSerializer extends StdScalarSerializer<Object> {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
 
         public CustomStringSerializer() {
             super(String.class, false);
         }
 
         @Override
-        public boolean isEmpty(SerializerProvider prov, Object value) {
+        public boolean isEmpty(SerializationContext prov, Object value) {
             String str = (String) value;
             return str.isEmpty();
         }
 
         @Override
-        public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        public void serialize(Object value, JsonGenerator gen, SerializationContext provider) throws JacksonException {
             gen.writeString(objectToString(value));
         }
 
         @Override
-        public final void serializeWithType(Object value, JsonGenerator gen, SerializerProvider provider,
-                                            TypeSerializer typeSer) throws IOException {
+        public final void serializeWithType(Object value, JsonGenerator gen, SerializationContext provider,
+                                            TypeSerializer typeSer) throws JacksonException {
             gen.writeString(objectToString(value));
         }
 
         @Override
-        public JsonNode getSchema(SerializerProvider provider, Type typeHint) {
-            return createSchemaNode("string", true);
-        }
-
-        @Override
-        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException {
+        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws DatabindException {
             visitStringFormat(visitor, typeHint);
         }
 
@@ -97,11 +85,8 @@ public class CustomStringModule extends SimpleModule {
 
     private static class CustomStringDeserializer extends StringDeserializer {
 
-        @Serial
-        private static final long serialVersionUID = 1L;
-
         @Override
-        public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        public String deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
             String val = super.deserialize(p, ctxt);
             return Encode.forHtml(val);
         }

@@ -26,7 +26,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -38,7 +37,7 @@ import java.util.TimeZone;
  * @since 19.09.2025
  */
 @Slf4j
-@SpringBootApplication(exclude = {JooqAutoConfiguration.class})
+@SpringBootApplication
 public class SteveApplication {
 
     static {

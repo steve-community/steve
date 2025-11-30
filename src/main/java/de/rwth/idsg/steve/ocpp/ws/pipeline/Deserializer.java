@@ -18,13 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
@@ -41,8 +34,15 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.TreeNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -66,14 +66,14 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     @Override
     public void accept(CommunicationContext context) {
-        try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
+        try (JsonParser parser = mapper.createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
             int messageTypeNr = parser.getIntValue();
 
             parser.nextToken();
-            String messageId = parser.getText();
+            String messageId = parser.getString();
 
             MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
             switch (messageType) {
@@ -92,7 +92,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 default:
                     throw new SteveException("Unknown enum type");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
         }
     }
@@ -109,8 +109,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
         String action;
         try {
             parser.nextToken();
-            action = parser.getText();
-        } catch (IOException e) {
+            action = parser.getString();
+        } catch (JacksonException e) {
             log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.genericDeserializeError(messageId, e.getMessage()));
             return;
@@ -135,7 +135,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
 
             req = mapper.treeToValue(requestPayload, clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));
             return;
@@ -167,7 +167,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             parser.nextToken();
             JsonNode responsePayload = parser.readValueAsTree();
             res = mapper.treeToValue(responsePayload, responseContext.getResponseClass());
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new SteveException("Deserialization of incoming response payload failed", e);
         }
 
@@ -197,10 +197,10 @@ public class Deserializer implements Consumer<CommunicationContext> {
         String details = null;
         try {
             parser.nextToken();
-            code = ErrorCode.fromValue(parser.getText());
+            code = ErrorCode.fromValue(parser.getString());
 
             parser.nextToken();
-            desc = parser.getText();
+            desc = parser.getString();
 
             // From spec:
             // ErrorDescription - Should be filled in if possible, otherwise a clear empty string "".
@@ -217,7 +217,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 details = mapper.writeValueAsString(detailsNode);
             }
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new SteveException("Deserialization of incoming error message failed", e);
         }
 

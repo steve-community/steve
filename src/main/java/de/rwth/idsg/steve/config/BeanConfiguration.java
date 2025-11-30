@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -33,8 +32,8 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,11 +45,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import tools.jackson.datatype.joda.JodaModule;
 
 import javax.sql.DataSource;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static tools.jackson.databind.cfg.DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -194,14 +194,14 @@ public class BeanConfiguration implements WebMvcConfigurer {
     // -------------------------------------------------------------------------
 
     @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
+    public JsonMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> {
             // default is true
-            builder.featuresToDisable(WRITE_DATES_AS_TIMESTAMPS);
+            builder.disable(WRITE_DATES_AS_TIMESTAMPS);
             // if the client sends unknown props, just ignore them instead of failing
-            builder.featuresToDisable(FAIL_ON_UNKNOWN_PROPERTIES);
+            builder.disable(FAIL_ON_UNKNOWN_PROPERTIES);
             // we still use joda DateTime...
-            builder.modulesToInstall(new JodaModule());
+            builder.addModule(new JodaModule());
         };
     }
 }

@@ -18,23 +18,15 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.joda.JodaModule;
 
 public class AbstractControllerTest {
 
-    ObjectMapper objectMapper;
+    JsonMapper objectMapper;
 
     AbstractControllerTest() {
-        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
-        objectMapper.findAndRegisterModules();
-        // if the client sends unknown props, just ignore them instead of failing
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // default is true
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-        this.objectMapper = objectMapper;
+        this.objectMapper = JsonMapper.builder().addModule(new JodaModule()).build();
     }
 }

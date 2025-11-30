@@ -18,15 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
@@ -48,14 +39,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.TreeNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,14 +148,14 @@ public class OcppJsonChargePoint {
 
     public void start() {
         try {
-            ClientUpgradeRequest request = new ClientUpgradeRequest();
+            ClientUpgradeRequest request = new ClientUpgradeRequest(new URI(connectionPath));
             if (version != null) {
                 request.setSubProtocols(version);
             }
 
             client.start();
 
-            Future<Session> connect = client.connect(this, new URI(connectionPath), request);
+            Future<Session> connect = client.connect(this, request);
             connect.get(); // block until session is created
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -194,7 +193,7 @@ public class OcppJsonChargePoint {
             ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
             requestPayload = mapper.writeValueAsString(expectedRequest);
             responsePayload = mapper.valueToTree(plannedResponse);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
 
@@ -307,14 +306,14 @@ public class OcppJsonChargePoint {
         private OcppJsonMessage extract(String msg) throws Exception {
             ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
-            try (JsonParser parser = mapper.getFactory().createParser(msg)) {
+            try (JsonParser parser = mapper.createParser(msg)) {
                 parser.nextToken(); // set cursor to '['
 
                 parser.nextToken();
                 int messageTypeNr = parser.getIntValue();
 
                 parser.nextToken();
-                String messageId = parser.getText();
+                String messageId = parser.getString();
 
                 MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
                 switch (messageType) {
@@ -344,10 +343,10 @@ public class OcppJsonChargePoint {
 
         private OcppJsonResponse handleError(String messageId, JsonParser parser) throws Exception {
             parser.nextToken();
-            ErrorCode code = ErrorCode.fromValue(parser.getText());
+            ErrorCode code = ErrorCode.fromValue(parser.getString());
 
             parser.nextToken();
-            String desc = parser.getText();
+            String desc = parser.getString();
             if ("".equals(desc)) {
                 desc = null;
             }
@@ -369,30 +368,19 @@ public class OcppJsonChargePoint {
 
         private OcppJsonCall handleCall(String messageId, JsonParser parser) {
             // parse action
-            String action;
-            try {
-                parser.nextToken();
-                action = parser.getText();
-            } catch (IOException e) {
-                throw new RuntimeException();
-            }
+            //
+            parser.nextToken();
+            String action = parser.getString();
 
             // parse request payload
-            String req;
-            try {
-                parser.nextToken();
-                JsonNode requestPayload = parser.readValueAsTree();
-
-                // https://github.com/steve-community/steve/issues/1109
-                if (requestPayload instanceof NullNode) {
-                    requestPayload = new ObjectNode(JsonNodeFactory.instance);
-                }
-
-                req = requestPayload.toString();
-            } catch (IOException e) {
-                log.error("Exception occurred", e);
-                throw new RuntimeException();
+            //
+            parser.nextToken();
+            JsonNode requestPayload = parser.readValueAsTree();
+            // https://github.com/steve-community/steve/issues/1109
+            if (requestPayload instanceof NullNode) {
+                requestPayload = new ObjectNode(JsonNodeFactory.instance);
             }
+            String req = requestPayload.toString();
 
             RequestContext context = requestContextMap.get(action);
             if (context == null) {

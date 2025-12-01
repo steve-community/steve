@@ -59,7 +59,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
 
     private final DSLContext ctx;
 
-    private final CSVFormat csvFormatWithHeader = new CSVFormat();
+    private final CSVFormat csvFormatWithHeader = new CSVFormat().nullString("");
     private final CSVFormat csvFormatNoHeader = csvFormatWithHeader.header(false);
     private final Converter<String, Timestamp> isoTimestampConverter = new IsoTimestampConverter();
 
@@ -120,6 +120,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
             .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
             .loadCSV(in, StandardCharsets.UTF_8)
             .fields(getTableFields(table))
+            .nullString("")
             .execute();
 
         if (!CollectionUtils.isEmpty(loader.errors())) {

@@ -112,44 +112,48 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
      * https://www.jooq.org/doc/latest/manual/sql-execution/importing/importing-options/importing-option-throttling/
      */
     @Override
-    public void importCsv(InputStream in, Table<?> table) throws IOException {
-        ctx.deleteFrom(table).execute();
+    public void importCsv(InputStream in, Table<?> table) {
+        ctx.transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-        var loader = ctx.loadInto(table)
-            .bulkAfter(BATCH_SIZE) // Put up to X rows in a single bulk statement.
-            .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
-            .loadCSV(in, StandardCharsets.UTF_8)
-            .fields(getTableFields(table))
-            .nullString("")
-            .execute();
+            ctx.deleteFrom(table).execute();
 
-        if (!CollectionUtils.isEmpty(loader.errors())) {
-            for (LoaderError error : loader.errors()) {
-                log.error("Exception happened", error.exception());
+            var loader = ctx.loadInto(table)
+                .bulkAfter(BATCH_SIZE) // Put up to X rows in a single bulk statement.
+                .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
+                .loadCSV(in, StandardCharsets.UTF_8)
+                .fields(getTableFields(table))
+                .nullString("")
+                .execute();
+
+            if (!CollectionUtils.isEmpty(loader.errors())) {
+                for (LoaderError error : loader.errors()) {
+                    log.error("Exception happened", error.exception());
+                }
+                throw new RuntimeException("There were errors loading data into table " + table.getName());
             }
-            throw new RuntimeException("There were errors loading data into table " + table.getName());
-        }
 
-        int processed = loader.processed();
+            int processed = loader.processed();
 
-        log.info("Imported '{}' with processedRows={}, storedRows={}, errorCount={}, errorMessages={}",
-            table.getName(),
-            loader.processed(),
-            loader.stored(),
-            loader.errors().size(),
-            loader.errors().stream().map(it -> it.exception().getMessage()).toList()
-        );
+            log.info("Imported '{}' with processedRows={}, storedRows={}, errorCount={}, errorMessages={}",
+                table.getName(),
+                loader.processed(),
+                loader.stored(),
+                loader.errors().size(),
+                loader.errors().stream().map(it -> it.exception().getMessage()).toList()
+            );
 
-        // Update the sequence/auto-increment after bulk insert
-        if (processed > 0) {
-            resetAutoIncrement(table);
-        }
+            // Update the sequence/auto-increment after bulk insert
+            if (processed > 0) {
+                resetAutoIncrement(ctx, table);
+            }
+        });
     }
 
     /**
      * Reset the auto-increment/sequence for a table to the max ID value + 1
      */
-    private void resetAutoIncrement(Table<?> table) {
+    private static void resetAutoIncrement(DSLContext ctx, Table<?> table) {
         var primaryKey = table.getPrimaryKey();
         if (primaryKey == null) {
             return;

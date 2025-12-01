@@ -34,5 +34,5 @@ public interface DataImportExportRepository {
 
     void beforeImport();
     void afterImport();
-    void importCsv(InputStream in, Table<?> table) throws IOException;
+    void importCsv(InputStream in, Table<?> table);
 }

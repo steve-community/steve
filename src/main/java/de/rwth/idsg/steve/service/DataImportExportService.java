@@ -18,14 +18,18 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.DataImportExportRepository;
 import de.rwth.idsg.steve.web.dto.DataExportForm.ExportType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Named;
 import org.jooq.Table;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +38,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -115,7 +120,37 @@ public class DataImportExportService {
         return MASTER_DATA_TABLES.stream().map(Named::getName).toList();
     }
 
-    public void exportZip(OutputStream out, ExportType exportType) throws IOException {
+    public void exportZip(HttpServletResponse response, ExportType exportType) throws IOException {
+        String fileName = "data-export_" + System.currentTimeMillis() + ".zip";
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
+        response.setHeader(headerKey, headerValue);
+        response.setContentType("application/zip");
+
+        exportZip(response.getOutputStream(), exportType);
+    }
+
+    public void importZip(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new SteveException.BadRequest("File is empty");
+        }
+
+        String fileName = file.getOriginalFilename();
+
+        if (StringUtils.isEmpty(fileName)) {
+            throw new SteveException.BadRequest("File name is empty");
+        }
+
+        if (!fileName.endsWith(".zip")) {
+            throw new SteveException.BadRequest("File must be a ZIP archive");
+        }
+
+        importZip(file.getInputStream());
+    }
+
+    private void exportZip(OutputStream out, ExportType exportType) throws IOException {
+        long start = System.currentTimeMillis();
+
         try (ZipOutputStream zipOut = new ZipOutputStream(out);
              OutputStreamWriter writer = new OutputStreamWriter(zipOut, StandardCharsets.UTF_8)) {
 
@@ -136,10 +171,17 @@ public class DataImportExportService {
                 }
             }
             zipOut.finish();
+
+        } finally {
+            long stop = System.currentTimeMillis();
+            long durationSeconds = TimeUnit.MILLISECONDS.toSeconds(stop - start);
+            log.info("Data export finished in {} seconds.", durationSeconds);
         }
     }
 
-    public void importZip(InputStream in) throws IOException {
+    private void importZip(InputStream in) throws IOException {
+        long start = System.currentTimeMillis();
+
         dataImportExportRepository.beforeImport();
 
         try (ZipInputStream zipIn = new ZipInputStream(in)) {
@@ -170,6 +212,10 @@ public class DataImportExportService {
             }
         } finally {
             dataImportExportRepository.afterImport();
+
+            long stop = System.currentTimeMillis();
+            long durationSeconds = TimeUnit.MILLISECONDS.toSeconds(stop - start);
+            log.info("Data import finished in {} seconds.", durationSeconds);
         }
     }
 

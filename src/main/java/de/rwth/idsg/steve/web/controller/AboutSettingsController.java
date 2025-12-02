@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
@@ -30,7 +29,6 @@ import de.rwth.idsg.steve.web.dto.DataExportForm;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.http.HttpHeaders;
@@ -134,32 +132,12 @@ public class AboutSettingsController {
     @GetMapping(value = ABOUT_PATH + "/export")
     public void exportZip(@ModelAttribute("exportForm") DataExportForm exportForm,
                           HttpServletResponse response) throws IOException {
-        String fileName = "data-export_" + System.currentTimeMillis() + ".zip";
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
-        response.setHeader(headerKey, headerValue);
-        response.setContentType("application/zip");
-
-        dataImportExportService.exportZip(response.getOutputStream(), exportForm.getExportType());
+        dataImportExportService.exportZip(response, exportForm.getExportType());
     }
 
     @PostMapping(value = ABOUT_PATH + "/import")
     public String importZip(@RequestParam("file") MultipartFile file, Model model) throws IOException {
-        if (file.isEmpty()) {
-            throw new SteveException.BadRequest("File is empty");
-        }
-
-        String fileName = file.getOriginalFilename();
-
-        if (StringUtils.isEmpty(fileName)) {
-            throw new SteveException.BadRequest("File name is empty");
-        }
-
-        if (!fileName.endsWith(".zip")) {
-            throw new SteveException.BadRequest("File must be a ZIP archive");
-        }
-
-        dataImportExportService.importZip(file.getInputStream());
+        dataImportExportService.importZip(file);
         return "redirect:/manager/home";
     }
 }

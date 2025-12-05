@@ -18,17 +18,16 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.custom;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.MeterValue;
 import org.joda.time.DateTime;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,13 +41,13 @@ import java.util.List;
  * @since 01.09.2015
  */
 @Slf4j
-public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>> {
+public class MeterValue15Deserializer extends ValueDeserializer<List<MeterValue>> {
 
     @Override
     public List<MeterValue> deserialize(JsonParser jp, DeserializationContext deserializationContext)
-            throws IOException, JsonProcessingException {
+            throws JacksonException {
 
-        ObjectMapper mapper = (ObjectMapper) jp.getCodec();
+        ObjectMapper mapper = (ObjectMapper) jp.objectReadContext();
         JsonNode node = mapper.readTree(jp);
         if (node == null) {
             return Collections.emptyList();
@@ -58,7 +57,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
     // List<MeterValue>
     private List<MeterValue> parseListMeterValue(ObjectMapper mapper, JsonNode listNode)
-            throws JsonProcessingException {
+            throws JacksonException {
 
         if (listNode.isMissingNode()) {
             return Collections.emptyList();
@@ -73,7 +72,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
     // MeterValue
     private MeterValue buildMeterValue(ObjectMapper mapper, JsonNode node)
-            throws JsonProcessingException {
+            throws JacksonException {
 
         MeterValue meterValue = new MeterValue();
         List<MeterValue.Value> list = meterValue.getValue();
@@ -87,7 +86,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
     // List<MeterValue.Value>
     private void parseValue(ObjectMapper mapper, List<MeterValue.Value> list, JsonNode listNode)
-            throws JsonProcessingException {
+            throws JacksonException {
 
         if (!listNode.isMissingNode()) {
             for (JsonNode node : listNode) {
@@ -98,7 +97,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
     private void parseDateTime(MeterValue meterValue, JsonNode node) {
         if (!node.isMissingNode()) {
-            meterValue.setTimestamp(new DateTime(node.asText()));
+            meterValue.setTimestamp(new DateTime(node.asString()));
         }
     }
 }

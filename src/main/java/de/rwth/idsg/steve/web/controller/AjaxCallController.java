@@ -19,8 +19,6 @@
 package de.rwth.idsg.steve.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.TransactionService;
@@ -32,6 +30,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -93,7 +94,7 @@ public class AjaxCallController {
     private String serializeArray(List<?> list) {
         try {
             return objectMapper.writeValueAsString(list);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             // As fallback return empty array, do not let the frontend hang
             log.error("Error occurred during serialization of response. Returning empty array instead!", e);
             return "[]";
@@ -113,9 +114,9 @@ public class AjaxCallController {
     }
 
     private static ObjectMapper createMapper() {
-        var objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        return objectMapper;
+        return JsonMapper.builder()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .build();
     }
 
 }

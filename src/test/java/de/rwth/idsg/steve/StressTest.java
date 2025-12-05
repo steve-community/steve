@@ -24,7 +24,7 @@ import ocpp.cs._2015._10.SampledValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 

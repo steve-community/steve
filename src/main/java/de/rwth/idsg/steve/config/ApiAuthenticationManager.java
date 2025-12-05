@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.service.WebUserService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;

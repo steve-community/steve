@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumMixin;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumProcessor;
+import tools.jackson.core.Version;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.util.Arrays;
 
@@ -44,7 +44,7 @@ public class Ocpp12JacksonModule extends SimpleModule {
                         ocpp.cs._2010._08.ObjectFactory.class.getPackage().getName(),
                         ocpp.cp._2010._08.ObjectFactory.class.getPackage().getName()
                 ),
-                clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)
+                clazz -> sc.setMixIn(clazz, EnumMixin.class)
         );
     }
 }

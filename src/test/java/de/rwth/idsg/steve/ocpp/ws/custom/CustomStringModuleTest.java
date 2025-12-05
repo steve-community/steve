@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.custom;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import lombok.Data;
 import org.junit.jupiter.api.Assertions;

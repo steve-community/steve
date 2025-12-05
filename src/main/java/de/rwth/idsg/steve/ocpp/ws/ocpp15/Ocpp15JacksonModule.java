@@ -18,13 +18,13 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.ocpp15;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumMixin;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumProcessor;
 import de.rwth.idsg.steve.ocpp.ws.custom.MeterValue15Mixin;
 import ocpp.cs._2012._06.MeterValuesRequest;
+import tools.jackson.core.Version;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.util.Arrays;
 
@@ -39,17 +39,17 @@ public class Ocpp15JacksonModule extends SimpleModule {
     }
 
     @Override
-    public void setupModule(Module.SetupContext sc) {
+    public void setupModule(JacksonModule.SetupContext sc) {
         super.setupModule(sc);
 
-        sc.setMixInAnnotations(MeterValuesRequest.class, MeterValue15Mixin.class);
+        sc.setMixIn(MeterValuesRequest.class, MeterValue15Mixin.class);
 
         EnumProcessor.apply(
                 Arrays.asList(
                         ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName(),
                         ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()
                 ),
-                clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)
+                clazz -> sc.setMixIn(clazz, EnumMixin.class)
         );
     }
 }

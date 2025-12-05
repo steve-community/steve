@@ -125,29 +125,21 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
+    /**
+     * ThreadPoolTaskScheduler is both a TaskScheduler and a TaskExecutor
+     * https://github.com/spring-projects/spring-boot/issues/20308
+     */
     @Bean
+    @Primary
     public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(5);
+        scheduler.setPoolSize(10);
         scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
 
         return scheduler;
-    }
-
-    @Bean
-    @Primary
-    public ThreadPoolTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setThreadNamePrefix("SteVe-TaskExecutor-");
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(30);
-        executor.initialize();
-
-        return executor;
     }
 
     /**

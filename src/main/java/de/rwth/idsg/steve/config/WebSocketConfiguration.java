@@ -18,14 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
-import de.rwth.idsg.steve.service.CertificateValidator;
-import de.rwth.idsg.steve.service.ChargePointService;
-import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
@@ -34,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -49,12 +43,7 @@ import java.time.Duration;
 @Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
-    private final ChargePointService chargePointService;
-    private final ChargeBoxIdValidator chargeBoxIdValidator;
-    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
-    private final CertificateValidator certificateValidator;
+    private final OcppWebSocketHandshakeHandler ocppWebSocketHandshakeHandler;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
@@ -63,16 +52,15 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
-            chargeBoxIdValidator,
-            handshakeHandler(),
-            Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointService,
-            certificateValidator
-        );
+        /*
+         * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
+         * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
+         * based on the selectedProtocol and replace the dummy one with the proper one in the subsequent call chain.
+         */
+        var dummyHandler = new TextWebSocketHandler();
 
-        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
-                .setHandshakeHandler(handshakeHandler)
+        registry.addHandler(dummyHandler, PATH_INFIX + "*")
+                .setHandshakeHandler(ocppWebSocketHandshakeHandler)
                 .setAllowedOrigins("*");
     }
 

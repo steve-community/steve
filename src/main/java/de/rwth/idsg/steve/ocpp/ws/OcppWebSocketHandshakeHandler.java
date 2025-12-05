@@ -31,10 +31,10 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
@@ -49,26 +49,18 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.03.2022
  */
+@Component
 @Slf4j
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
     private final ChargeBoxIdValidator chargeBoxIdValidator;
-    private final DefaultHandshakeHandler delegate;
+    private final DefaultHandshakeHandler handshakeHandler;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointService chargePointService;
     private final CertificateValidator certificateValidator;
 
     private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
-
-    /**
-     * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
-     * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
-     * based on the selectedProtocol and replace the dummy one with the proper one in the subsequent call chain.
-     */
-    public WebSocketHandler getDummyWebSocketHandler() {
-        return new TextWebSocketHandler();
-    }
 
     @Override
     public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -156,10 +148,10 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
         attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
-        return delegate.doHandshake(request, response, endpoint, attributes);
+        return handshakeHandler.doHandshake(request, response, endpoint, attributes);
     }
 
-    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
+    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols) {
         for (String requestedProtocol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
                 if (item.getVersion().getValue().equals(requestedProtocol)) {

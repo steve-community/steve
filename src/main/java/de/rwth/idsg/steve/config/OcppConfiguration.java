@@ -31,6 +31,7 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -69,16 +70,18 @@ public class OcppConfiguration {
 
     /**
      * Just a dummy service to route incoming messages to the appropriate service version.
+     * If there are no endpoints, we should not have any router endpoint either, and hence the ConditionalOnBean.
      */
     @Bean
+    @ConditionalOnBean(EndpointImpl.class)
     public EndpointImpl routerEndpoint(List<EndpointImpl> endpoints) {
         var mediator = new MediatorInInterceptor(endpoints);
 
         // get and use any existing implementor for this router endpoint. we will not use the implementor anyway.
-        var someService = endpoints.getFirst().getImplementor();
+        var implementor = endpoints.getFirst().getImplementor();
 
         return createEndpoint(
-            someService, SteveProperties.ROUTER_ENDPOINT_PATH, List.of(mediator), Collections.emptyList()
+            implementor, SteveProperties.ROUTER_ENDPOINT_PATH, List.of(mediator), Collections.emptyList()
         );
     }
 

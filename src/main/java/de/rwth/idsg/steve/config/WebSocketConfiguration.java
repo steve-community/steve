@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.collect.Lists;
+import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
@@ -38,6 +39,7 @@ import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -51,9 +53,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     private final ChargePointService chargePointService;
     private final ChargeBoxIdValidator chargeBoxIdValidator;
-    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final List<AbstractWebSocketEndpoint> endpoints;
     private final CertificateValidator certificateValidator;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
@@ -66,7 +66,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
             chargeBoxIdValidator,
             handshakeHandler(),
-            Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
+            endpoints,
             chargePointService,
             certificateValidator
         );

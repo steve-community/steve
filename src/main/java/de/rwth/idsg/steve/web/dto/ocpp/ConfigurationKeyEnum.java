@@ -113,7 +113,7 @@ public enum ConfigurationKeyEnum {
     // -------------------------------------------------------------------------
 
     AdditionalRootCertificateCheck("boolean", R, newHashSet(V_16)),
-    AuthorizationKey("string", W, newHashSet(V_16)),
+    AuthorizationKey("string; plain text", W, newHashSet(V_16)),
     CertificateSignedMaxChainSize("integer", R, newHashSet(V_16)),
     CertificateStoreMaxLength("integer", R, newHashSet(V_16)),
     CpoName("string", RW, newHashSet(V_16)),

@@ -24,7 +24,9 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 
 import jakarta.xml.ws.AsyncHandler;
+import java.util.HexFormat;
 
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
 import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
 
@@ -62,9 +64,16 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
 
     @Override
     public ocpp.cp._2015._10.ChangeConfigurationRequest getOcpp16Request() {
+        String value = params.getValue();
+
+        // https://github.com/steve-community/steve/issues/1895
+        if (AuthorizationKey.name().equals(params.getKey())) {
+            value = HexFormat.of().formatHex(value.getBytes());
+        }
+
         return new ocpp.cp._2015._10.ChangeConfigurationRequest()
                 .withKey(params.getKey())
-                .withValue(params.getValue());
+                .withValue(value);
     }
 
     @Override

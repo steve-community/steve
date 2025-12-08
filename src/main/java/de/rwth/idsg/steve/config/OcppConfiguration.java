@@ -18,6 +18,9 @@
  */
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
+import de.rwth.idsg.steve.ocpp.soap.CentralSystemService15_SoapServer;
+import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
@@ -45,25 +48,22 @@ import java.util.List;
 public class OcppConfiguration {
 
     private final Bus bus;
-    private final ocpp.cs._2010._08.CentralSystemService ocpp12Server;
-    private final ocpp.cs._2012._06.CentralSystemService ocpp15Server;
-    private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
     private final MessageHeaderInterceptor messageHeaderInterceptor;
 
     private final MessageIdInterceptor messageIdInterceptor = new MessageIdInterceptor();
 
     @Bean
-    public EndpointImpl ocpp12Endpoint() {
+    public EndpointImpl ocpp12Endpoint(CentralSystemService12_SoapServer ocpp12Server) {
         return createDefaultEndpoint(ocpp12Server, "/CentralSystemServiceOCPP12");
     }
 
     @Bean
-    public EndpointImpl ocpp15Endpoint() {
+    public EndpointImpl ocpp15Endpoint(CentralSystemService15_SoapServer ocpp15Server) {
         return createDefaultEndpoint(ocpp15Server, "/CentralSystemServiceOCPP15");
     }
 
     @Bean
-    public EndpointImpl ocpp16Endpoint() {
+    public EndpointImpl ocpp16Endpoint(CentralSystemService16_SoapServer ocpp16Server) {
         return createDefaultEndpoint(ocpp16Server, "/CentralSystemServiceOCPP16");
     }
 
@@ -71,12 +71,14 @@ public class OcppConfiguration {
      * Just a dummy service to route incoming messages to the appropriate service version.
      */
     @Bean
-    public EndpointImpl routerEndpoint(EndpointImpl ocpp12Endpoint,
-                                       EndpointImpl ocpp15Endpoint,
-                                       EndpointImpl ocpp16Endpoint) {
-        var mediator = new MediatorInInterceptor(List.of(ocpp12Endpoint, ocpp15Endpoint, ocpp16Endpoint));
+    public EndpointImpl routerEndpoint(List<EndpointImpl> endpoints) {
+        var mediator = new MediatorInInterceptor(endpoints);
+
+        // get and use any existing implementor for this router endpoint. we will not use the implementor anyway.
+        var someService = endpoints.getFirst().getImplementor();
+
         return createEndpoint(
-            ocpp12Server, SteveProperties.ROUTER_ENDPOINT_PATH, List.of(mediator), Collections.emptyList()
+            someService, SteveProperties.ROUTER_ENDPOINT_PATH, List.of(mediator), Collections.emptyList()
         );
     }
 

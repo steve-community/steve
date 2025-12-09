@@ -122,7 +122,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>Basic Auth Password:</td>
+                        <td>Basic Auth Password (plain text):</td>
                         <td><form:input path="authPassword" type="password" placeholder="${chargePointForm.hasAuthPassword ? 'Enter new password' : 'Enter password'}" /></td>
                     </tr>
                 </tbody>

@@ -93,7 +93,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     // -------------------------------------------------------------------------
 
     @RequiredArgsConstructor
-    private enum ConfigurationKeyType {
+    public enum ConfigurationKeyType {
         PREDEFINED("Predefined"),
         CUSTOM("Custom");
 

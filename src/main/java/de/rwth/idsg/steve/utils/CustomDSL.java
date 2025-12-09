@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.web.dto.QueryPeriodFromToFilter;
+import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.QueryPeriodTypeFilter;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -86,7 +88,13 @@ public final class CustomDSL {
 
     @Nullable
     public static Condition getTimeCondition(Field<DateTime> timestampField, QueryPeriodTypeFilter form) {
-        switch (form.getPeriodType()) {
+        return getTimeCondition(timestampField, form, form.getPeriodType());
+    }
+
+    @Nullable
+    public static Condition getTimeCondition(Field<DateTime> timestampField, QueryPeriodFromToFilter form,
+                                             QueryPeriodType periodType) {
+        switch (periodType) {
             case TODAY:
                 return date(timestampField).eq(date(DateTime.now()));
 
@@ -95,7 +103,7 @@ public final class CustomDSL {
             case LAST_90:
                 DateTime now = DateTime.now();
                 return date(timestampField).between(
-                    date(now.minusDays(form.getPeriodType().getInterval())),
+                    date(now.minusDays(periodType.getInterval())),
                     date(now)
                 );
 

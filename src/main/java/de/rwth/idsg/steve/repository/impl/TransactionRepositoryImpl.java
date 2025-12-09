@@ -46,6 +46,7 @@ import java.util.List;
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.DATE_TIME_TYPE;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -308,44 +309,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             conditions.add(TRANSACTION.STOP_TIMESTAMP.isNotNull());
         }
 
-        var timeCondition = getTimeCondition(form);
+        var timeCondition = getTimeCondition(TRANSACTION.START_TIMESTAMP, form, form.getPeriodType());
         if (timeCondition != null) {
             conditions.add(timeCondition);
         }
         return conditions;
-    }
-
-    @Nullable
-    private static Condition getTimeCondition(TransactionQueryForm form) {
-        switch (form.getPeriodType()) {
-            case TODAY:
-                return date(TRANSACTION.START_TIMESTAMP).eq(date(DateTime.now()));
-
-            case LAST_10:
-            case LAST_30:
-            case LAST_90:
-                DateTime now = DateTime.now();
-                return date(TRANSACTION.START_TIMESTAMP).between(
-                    date(now.minusDays(form.getPeriodType().getInterval())),
-                    date(now)
-                );
-
-            case ALL:
-                return null;
-
-            case FROM_TO:
-                DateTime from = form.getFrom();
-                DateTime to = form.getTo();
-
-                if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
-                    return TRANSACTION.START_TIMESTAMP.between(from, to);
-                } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
-                    return TRANSACTION.STOP_TIMESTAMP.between(from, to);
-                } else {
-                    return null;
-                }
-            default:
-                throw new SteveException("Unknown enum type");
-        }
     }
 }

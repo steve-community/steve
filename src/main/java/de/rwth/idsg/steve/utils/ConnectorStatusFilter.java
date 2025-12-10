@@ -89,7 +89,13 @@ public final class ConnectorStatusFilter {
 
         // decide what to return
         //
-        if (maxZero.isPresent()) {
+        if (maxZero.isPresent() && maxNonZero.isEmpty()) {
+            return zero;
+
+        } else if (maxZero.isEmpty() && maxNonZero.isPresent()) {
+            return nonZero;
+
+        } else if (maxZero.isPresent()) { // if both present
             Predicate<ConnectorStatus> pr = o -> maxZero.get().getStatusTimestamp().isAfter(o.getStatusTimestamp());
 
             if (maxNonZero.filter(pr).isPresent()) {
@@ -98,9 +104,6 @@ public final class ConnectorStatusFilter {
             } else {
                 return nonZero;
             }
-        } else if (maxNonZero.isPresent()) {
-            return nonZero;
-
         } else {
             return Collections.emptyList();
         }

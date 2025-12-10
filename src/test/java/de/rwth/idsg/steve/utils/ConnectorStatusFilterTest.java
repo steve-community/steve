@@ -28,6 +28,34 @@ import java.util.List;
 public class ConnectorStatusFilterTest {
 
     @Test
+    public void testZero_onlyZero() {
+        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(0).build();
+
+        List<ConnectorStatus> list = List.of(cs0);
+        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertTrue(result.contains(cs0));
+    }
+
+    @Test
+    public void testZero_noZero() {
+        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(2).build();
+
+        List<ConnectorStatus> list = List.of(cs1, cs2);
+        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertTrue(result.contains(cs1));
+        Assertions.assertTrue(result.contains(cs2));
+    }
+
+    @Test
     public void testZero_zeroIsEarlier() {
         DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 

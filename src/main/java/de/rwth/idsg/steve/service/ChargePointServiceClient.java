@@ -56,7 +56,6 @@ import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
-import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
@@ -363,8 +362,7 @@ public class ChargePointServiceClient {
         int reservationId = reservationRepository.insert(res);
         String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
 
-        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
-        ReserveNowTask task = new ReserveNowTask(enhancedParams, reservationRepository);
+        ReserveNowTask task = new ReserveNowTask(params, reservationId, parentIdTag, reservationRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);

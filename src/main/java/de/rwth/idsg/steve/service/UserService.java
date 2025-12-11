@@ -98,7 +98,7 @@ public class UserService {
      */
     private static boolean hasOcppTag(User.Overview user, String ocppIdTag) {
         for (User.OcppTagEntry ocppTagEntry : user.getOcppTagEntries()) {
-            if (ocppTagEntry.getIdTag().equals(ocppIdTag)) {
+            if (ocppTagEntry.getIdTag().equalsIgnoreCase(ocppIdTag)) {
                 return true;
             }
         }

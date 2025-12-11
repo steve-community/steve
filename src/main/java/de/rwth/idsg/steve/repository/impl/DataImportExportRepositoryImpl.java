@@ -120,8 +120,10 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
             ctx.deleteFrom(table).execute();
 
             var loader = ctx.loadInto(table)
-                .bulkAfter(BATCH_SIZE) // Put up to X rows in a single bulk statement.
-                .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
+                // Put up to X rows in a single bulk statement: X rows with bind values should be in 1 insert query
+                .bulkAfter(BATCH_SIZE)
+                // Leave committing to client code: We touch each table in 1 transaction that does a commit at the end
+                .commitNone()
                 .loadCSV(in, StandardCharsets.UTF_8)
                 .fields(getTableFields(table))
                 .nullString(NULL_STRING)

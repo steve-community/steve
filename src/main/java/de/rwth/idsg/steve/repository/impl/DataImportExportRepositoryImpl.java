@@ -56,10 +56,11 @@ import java.util.List;
 public class DataImportExportRepositoryImpl implements DataImportExportRepository {
 
     private static final int BATCH_SIZE = 1000;
+    private static final String NULL_STRING = "NULL";
 
     private final DSLContext ctx;
 
-    private final CSVFormat csvFormatWithHeader = new CSVFormat().nullString("");
+    private final CSVFormat csvFormatWithHeader = new CSVFormat().nullString(NULL_STRING);
     private final CSVFormat csvFormatNoHeader = csvFormatWithHeader.header(false);
     private final Converter<String, Timestamp> isoTimestampConverter = new IsoTimestampConverter();
 
@@ -123,7 +124,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
                 .batchAfter(BATCH_SIZE) // Put up to X statements (bulk or not) in a single statement batch.
                 .loadCSV(in, StandardCharsets.UTF_8)
                 .fields(getTableFields(table))
-                .nullString("")
+                .nullString(NULL_STRING)
                 .execute();
 
             if (!CollectionUtils.isEmpty(loader.errors())) {

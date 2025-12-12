@@ -19,16 +19,12 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.config.SteveProperties;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.logging.Slf4jLogger;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.EventListener;
 
 import java.util.TimeZone;
 
@@ -36,7 +32,6 @@ import java.util.TimeZone;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.09.2025
  */
-@Slf4j
 @SpringBootApplication
 public class SteveApplication {
 
@@ -51,17 +46,14 @@ public class SteveApplication {
         DateTimeZone.setDefault(DateTimeZone.forID(SteveProperties.TIME_ZONE_ID));
     }
 
-    @EventListener(ApplicationStartedEvent.class)
-    public void logStartup() {
-        log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveProperties.TIME_ZONE_ID, DateTime.now());
-    }
-
     public static void main(String[] args) throws Exception {
         start(args);
     }
 
     public static ConfigurableApplicationContext start(String... args) throws Exception {
-        return SpringApplication.run(SteveApplication.class, args);
+        SpringApplication application = new SpringApplication(SteveApplication.class);
+        application.addListeners(new SteveApplicationStartupListener());
+        return application.run(args);
     }
 
 }

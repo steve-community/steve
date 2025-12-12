@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Deque;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -52,5 +52,5 @@ public interface SessionContextStore {
 
     List<String> getChargeBoxIdList();
 
-    Map<String, Deque<SessionContext>> getACopy();
+    Map<String, Collection<SessionContext>> getReadOnlyMap();
 }

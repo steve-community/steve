@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -282,9 +281,9 @@ public class ChargePointService {
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        var ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getACopy();
-        var ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getACopy();
-        var ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getACopy();
+        var ocpp12Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getReadOnlyMap();
+        var ocpp15Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getReadOnlyMap();
+        var ocpp16Map = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getReadOnlyMap();
 
         var connectedJsonChargeBoxIds = Stream.of(ocpp12Map, ocpp15Map, ocpp16Map)
             .map(Map::keySet)
@@ -355,14 +354,14 @@ public class ChargePointService {
         return returnList;
     }
 
-    private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
+    private static void appendList(Map<String, Collection<SessionContext>> map, List<OcppJsonStatus> returnList,
                                    DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
         for (var entry : map.entrySet()) {
             var chargeBoxId = entry.getKey();
-            var endpointDeque = entry.getValue();
+            var sessionContexts = entry.getValue();
 
-            for (var ctx : endpointDeque) {
+            for (var ctx : sessionContexts) {
                 DateTime openSince = ctx.getOpenSince();
 
                 Integer chargeBoxPk = primaryKeyLookup.get(chargeBoxId);

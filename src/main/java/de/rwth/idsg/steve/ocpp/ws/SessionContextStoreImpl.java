@@ -29,6 +29,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
@@ -181,7 +182,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
-    public Map<String, Deque<SessionContext>> getACopy() {
+    public Map<String, Collection<SessionContext>> getReadOnlyMap() {
         // we just want an immutable view of the map without copying the underlying data
         return Collections.unmodifiableMap(lookupTable);
     }

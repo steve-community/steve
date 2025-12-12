@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.nio.channels.ClosedChannelException;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.05.2018
@@ -65,6 +67,15 @@ public final class WebSocketLogger {
     }
 
     public static void transportError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
+        // https://github.com/steve-community/steve/issues/1913
+        //
+        // Clients can disconnect abruptly at any moment without warning, especially in mobile environments or unstable
+        // networks. ClosedChannelException is Jetty's way of notifying that the connection ended unexpectedly. This can
+        // be seen as normal behavior in WebSocket applications. No need to print stacktrace (which is useless anyway).
+        if (t instanceof ClosedChannelException) {
+            log.warn("[chargeBoxId={}, sessionId={}] Connection ended unexpectedly", chargeBoxId, session.getId());
+        } else {
+            log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
+        }
     }
 }

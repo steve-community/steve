@@ -39,19 +39,16 @@ public class SessionContextStoreTest {
 
         // add first
         {
-            store.add("foo", new JettyWebSocketSession(Map.of()), noOpScheduledFuture());
-            int sizeAfterAdd = store.getSize("foo");
+            int sizeAfterAdd = store.add("foo", new JettyWebSocketSession(Map.of()), noOpScheduledFuture());
             Assertions.assertEquals(1, sizeAfterAdd);
         }
 
         // add second
         {
-            store.add("foo", new JettyWebSocketSession(Map.of()), noOpScheduledFuture());
-            int sizeAfterAdd = store.getSize("foo");
+            int sizeAfterAdd = store.add("foo", new JettyWebSocketSession(Map.of()), noOpScheduledFuture());
             Assertions.assertEquals(2, sizeAfterAdd);
         }
     }
-
 
     @Test
     public void testRemove() {
@@ -66,25 +63,28 @@ public class SessionContextStoreTest {
         // prepare with 2 sessions
         {
             store.add("foo", session1, noOpScheduledFuture());
-            store.add("foo", session2, noOpScheduledFuture());
+            int sizeAfterAdd = store.add("foo", session2, noOpScheduledFuture());
+
+            Assertions.assertEquals(2, sizeAfterAdd);
             Assertions.assertEquals(2, store.getSize("foo"));
         }
 
         // remove first
         {
-            store.remove("foo", session1);
-            Assertions.assertEquals(1, store.getSize("foo"));
+            int sizeAfterRemove = store.remove("foo", session1);
+            Assertions.assertEquals(1, sizeAfterRemove);
         }
 
         // remove second
         {
-            store.remove("foo", session2);
-            Assertions.assertEquals(0, store.getSize("foo"));
+            int sizeAfterRemove = store.remove("foo", session2);
+            Assertions.assertEquals(0, sizeAfterRemove);
         }
 
         // try removing another non-existing
         {
-            store.remove("foo", new JettyWebSocketSession(Map.of()));
+            int sizeAfterRemove = store.remove("foo", new JettyWebSocketSession(Map.of()));
+            Assertions.assertEquals(0, sizeAfterRemove);
             Assertions.assertEquals(0, store.getSize("foo"));
         }
     }

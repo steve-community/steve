@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
@@ -180,6 +179,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public Map<String, Deque<SessionContext>> getACopy() {
-        return ImmutableMap.copyOf(lookupTable);
+        // we just want an immutable view of the map without copying the underlying data
+        return Collections.unmodifiableMap(lookupTable);
     }
 }

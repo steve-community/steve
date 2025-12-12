@@ -32,9 +32,15 @@ import java.util.concurrent.ScheduledFuture;
  */
 public interface SessionContextStore {
 
-    void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
+    /**
+     * @return the number of sessions for this chargeBoxId after the add.
+     */
+    int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
 
-    void remove(String chargeBoxId, WebSocketSession session);
+    /**
+     * @return the number of sessions for this chargeBoxId after the remove.
+     */
+    int remove(String chargeBoxId, WebSocketSession session);
 
     WebSocketSession getSession(String chargeBoxId);
 

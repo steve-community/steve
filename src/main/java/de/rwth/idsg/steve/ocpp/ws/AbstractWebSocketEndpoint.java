@@ -66,7 +66,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
-    private final Object sessionContextLock = new Object();
 
     public AbstractWebSocketEndpoint(TaskScheduler taskScheduler,
                                      OcppServerRepository ocppServerRepository,
@@ -152,16 +151,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         futureResponseContextStore.addSession(session);
 
-        int sizeBeforeAdd;
-
-        synchronized (sessionContextLock) {
-            sizeBeforeAdd = sessionContextStore.getSize(chargeBoxId);
-            sessionContextStore.add(chargeBoxId, session, pingSchedule);
-        }
+        int sizeAfterAdd = sessionContextStore.add(chargeBoxId, session, pingSchedule);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
-        if (sizeBeforeAdd == 0) {
+        if (sizeAfterAdd == 1) {
             connectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
         }
     }
@@ -174,12 +168,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         futureResponseContextStore.removeSession(session);
 
-        int sizeAfterRemove;
-
-        synchronized (sessionContextLock) {
-            sessionContextStore.remove(chargeBoxId, session);
-            sizeAfterRemove = sessionContextStore.getSize(chargeBoxId);
-        }
+        int sizeAfterRemove = sessionContextStore.remove(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 1 -> 0.

@@ -57,7 +57,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
 
     @Override
-    public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
+    public int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
@@ -66,22 +66,23 @@ public class SessionContextStoreImpl implements SessionContextStore {
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
-            log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
-                    chargeBoxId, endpointDeque.size());
+            int size = endpointDeque.size();
+            log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}", chargeBoxId, size);
+            return size;
         } finally {
             l.unlock();
         }
     }
 
     @Override
-    public void remove(String chargeBoxId, WebSocketSession session) {
+    public int remove(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
             Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
-                return;
+                return 0;
             }
 
             // Prevent "java.util.ConcurrentModificationException: null"
@@ -110,6 +111,8 @@ public class SessionContextStoreImpl implements SessionContextStore {
                     lookupTable.remove(chargeBoxId);
                 }
             }
+
+            return endpointDeque.size();
         } finally {
             l.unlock();
         }

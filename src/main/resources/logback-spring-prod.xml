@@ -3,12 +3,6 @@
     <property name="LOG_DIR" value="${user.home}/logs" />
     <property name="LOG_PATTERN" value="[%-5level] %d %c \(%thread\) - %msg%n" />
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/steve.log</file>
 

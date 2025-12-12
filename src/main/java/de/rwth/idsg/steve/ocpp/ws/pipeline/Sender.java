@@ -45,13 +45,17 @@ public enum Sender implements Consumer<CommunicationContext> {
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();
 
-        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
+        // https://github.com/steve-community/steve/issues/1914
+        if (!session.isOpen()) {
+            WebSocketLogger.willNotSend(chargeBoxId, session, outgoingString);
+            return;
+        }
 
+        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
         TextMessage out = new TextMessage(outgoingString);
         try {
             session.sendMessage(out);
         } catch (IOException e) {
-
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
             if (context.getOutgoingMessage() instanceof OcppJsonCall) {
                 throw new SteveException(e.getMessage());

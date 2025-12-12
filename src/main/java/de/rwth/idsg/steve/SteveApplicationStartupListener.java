@@ -20,6 +20,7 @@ package de.rwth.idsg.steve;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.FileAppender;
+import com.google.common.collect.Streams;
 import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -28,6 +29,8 @@ import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEven
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.Ordered;
+
+import java.util.stream.Collectors;
 
 /**
  * https://github.com/steve-community/steve/issues/1910
@@ -46,19 +49,23 @@ public class SteveApplicationStartupListener implements Ordered, ApplicationList
 
     @Override
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-        log.info("------------------- Starting -------------------");
+        String startMsg = "------------------- Starting -------------------";
+
+        log.info(startMsg);
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", SteveProperties.TIME_ZONE_ID, DateTime.now());
 
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-        context.getLoggerList().forEach(logger -> {
-            logger.iteratorForAppenders().forEachRemaining(appender -> {
-                if (appender instanceof FileAppender<?> fileAppender) {
-                    String file = fileAppender.getFile();
-                    System.out.println("------------------- Starting -------------------");
-                    System.out.println("Log file location: " + file);
-                }
-            });
-        });
+        var logFiles = context.getLoggerList().stream()
+            .flatMap(logger -> Streams.stream(logger.iteratorForAppenders()))
+            .filter(appender -> appender instanceof FileAppender)
+            .map(appender -> (FileAppender<?>) appender)
+            .map(FileAppender::getFile)
+            .collect(Collectors.toSet());
+
+        if (!logFiles.isEmpty()) {
+            System.out.println(startMsg);
+            logFiles.forEach(logFile -> System.out.println("Log file location: " + logFile));
+        }
     }
 }

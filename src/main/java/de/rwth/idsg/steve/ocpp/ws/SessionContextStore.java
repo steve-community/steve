@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Deque;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -32,9 +32,15 @@ import java.util.concurrent.ScheduledFuture;
  */
 public interface SessionContextStore {
 
-    void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
+    /**
+     * @return the number of sessions for this chargeBoxId after the add.
+     */
+    int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
 
-    void remove(String chargeBoxId, WebSocketSession session);
+    /**
+     * @return the number of sessions for this chargeBoxId after the remove.
+     */
+    int remove(String chargeBoxId, WebSocketSession session);
 
     WebSocketSession getSession(String chargeBoxId);
 
@@ -46,5 +52,5 @@ public interface SessionContextStore {
 
     List<String> getChargeBoxIdList();
 
-    Map<String, Deque<SessionContext>> getACopy();
+    Map<String, Collection<SessionContext>> getReadOnlyMap();
 }

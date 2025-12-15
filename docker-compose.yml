@@ -3,7 +3,6 @@ volumes:
     external: false
 
 services:
-
   db:
     # Pinning MariaDB to point release 10.4.30 works around the issues with the
     # database migrations seen with 10.4.31 in issue #1212.
@@ -25,13 +24,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   app:
     restart: unless-stopped
     build: .
     links:
       - "db:mariadb"
-    volumes:
-      - .:/code
     ports:
       - "8180:8180"
       - "8443:8443"

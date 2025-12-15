@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
@@ -55,7 +56,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -278,6 +281,15 @@ public class ChargePointService {
         }
 
         return latestList;
+    }
+
+    public Set<String> getChargeBoxIdsOfConnectedJsonStations() {
+        return Arrays.stream(OcppVersion.values())
+            .map(sessionContextStoreHolder::getOrCreate)
+            .map(SessionContextStore::getChargeBoxIdList)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {

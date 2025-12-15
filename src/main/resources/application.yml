@@ -50,6 +50,8 @@ steve:
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
 
     # Which transport (SOAP and JSON-over-WebSocket) of which OCPP version (1.2, 1.5 and 1.6) should we enable?
+    # This configuration affects the endpoints we expose for station communication, but also the corresponding web page
+    # for OCPP operations (e.g. if soap and json both are disabled for v12, OCPP 1.2 Operations page will be disabled).
     enabled-protocols:
       v12: { soap: true, json: true }
       v15: { soap: true, json: true }

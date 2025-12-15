@@ -79,6 +79,10 @@ public class SteveProperties {
             public static class Transports {
                 boolean soap;
                 boolean json;
+
+                public boolean isEnabled() {
+                    return soap || json;
+                }
             }
         }
 

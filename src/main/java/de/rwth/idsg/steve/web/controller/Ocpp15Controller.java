@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,6 +51,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.5")
+@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v15.json:true} OR ${steve.ocpp.enabled-protocols.v15.soap:true}")
 public class Ocpp15Controller extends Ocpp12Controller {
 
     public Ocpp15Controller(OcppTagService ocppTagService,

@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import ocpp.cs._2015._10.RegistrationStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,6 +48,7 @@ import java.util.Collections;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.6")
+@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v16.json:true} OR ${steve.ocpp.enabled-protocols.v16.soap:true}")
 public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
 
     public Ocpp16ImprovedSecurityController(OcppTagService ocppTagService,

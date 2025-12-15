@@ -34,6 +34,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,6 +56,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.W;
 @Controller
 @RequestMapping(value = "/manager/operations/v1.2")
 @RequiredArgsConstructor
+@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v12.json:true} OR ${steve.ocpp.enabled-protocols.v12.soap:true}")
 public class Ocpp12Controller {
 
     protected final OcppTagService ocppTagService;

@@ -247,6 +247,16 @@ public class CertificateRepositoryImpl implements CertificateRepository {
             );
     }
 
+    @Override
+    public List<Long> getInstalledCertificateIds(String chargeBoxId) {
+        return ctx.select(CHARGE_BOX_CERTIFICATE_INSTALLED.ID)
+            .from(CHARGE_BOX_CERTIFICATE_INSTALLED)
+            .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+            .orderBy(CHARGE_BOX_CERTIFICATE_INSTALLED.ID.desc())
+            .fetch(CHARGE_BOX_CERTIFICATE_INSTALLED.ID);
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

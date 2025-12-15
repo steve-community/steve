@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.web.dto.ocpp.DeleteCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
@@ -59,6 +60,7 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
     private static final String GET_LOG_PATH = "/GetLog";
     private static final String SIGNED_UPDATE_FIRMWARE_PATH = "/SignedUpdateFirmware";
     private static final String INSTALL_CERTIFICATE_PATH = "/InstallCertificate";
+    private static final String DELETE_CERTIFICATE_PATH = "/DeleteCertificate";
     private static final String GET_INSTALLED_CERTIFICATE_IDS_PATH = "/GetInstalledCertificateIds";
 
     /**
@@ -103,6 +105,13 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
         setCommonAttributesForImprovedSecurity(model);
         model.addAttribute(PARAMS, new InstallCertificateParams());
         return getPrefix() + INSTALL_CERTIFICATE_PATH;
+    }
+
+    @GetMapping(DELETE_CERTIFICATE_PATH)
+    public String getDeleteCertificate(Model model) {
+        setCommonAttributesForImprovedSecurity(model);
+        model.addAttribute(PARAMS, new DeleteCertificateParams());
+        return getPrefix() + DELETE_CERTIFICATE_PATH;
     }
 
     @GetMapping(GET_INSTALLED_CERTIFICATE_IDS_PATH)
@@ -154,6 +163,16 @@ public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
             return getPrefix() + INSTALL_CERTIFICATE_PATH;
         }
         return REDIRECT_TASKS_PATH + chargePointServiceClient.installCertificate(params);
+    }
+
+    @PostMapping(DELETE_CERTIFICATE_PATH)
+    public String postDeleteCertificate(@Valid @ModelAttribute(PARAMS) DeleteCertificateParams params,
+                                        BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributesForImprovedSecurity(model);
+            return getPrefix() + DELETE_CERTIFICATE_PATH;
+        }
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.deleteCertificate(params);
     }
 
     @PostMapping(GET_INSTALLED_CERTIFICATE_IDS_PATH)

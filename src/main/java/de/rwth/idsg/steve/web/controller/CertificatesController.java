@@ -75,6 +75,7 @@ public class CertificatesController {
                                            BindingResult result, Model model) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointService.getChargeBoxIds());
+        model.addAttribute("connectedCpList", chargePointService.getChargeBoxIdsOfConnectedJsonStations());
 
         if (result.hasErrors()) {
             model.addAttribute("certificates", Collections.emptyList());

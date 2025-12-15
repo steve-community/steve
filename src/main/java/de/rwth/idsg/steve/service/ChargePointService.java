@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -278,6 +279,16 @@ public class ChargePointService {
         }
 
         return latestList;
+    }
+
+    public Set<String> getChargeBoxIdsOfConnectedJsonStations() {
+        var ocpp12 = sessionContextStoreHolder.getOrCreate(OcppVersion.V_12).getChargeBoxIdList();
+        var ocpp15 = sessionContextStoreHolder.getOrCreate(OcppVersion.V_15).getChargeBoxIdList();
+        var ocpp16 = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16).getChargeBoxIdList();
+
+        return Stream.of(ocpp12, ocpp15, ocpp16)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {

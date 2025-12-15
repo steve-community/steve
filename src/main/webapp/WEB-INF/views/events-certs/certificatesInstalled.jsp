@@ -96,8 +96,7 @@
                 <td data-sort-value="${cert.respondedAt.millis}"><encode:forHtml value="${cert.respondedAt}" /></td>
                 <td>
                     <form:form action="${ctxPath}/manager/certificates/installed/${cert.chargeBoxId}/delete/${cert.id}" method="post">
-                        <c:set var="isDisabled" value="${not connectedCpList.contains(cert.chargeBoxId)}" />
-                        <input <c:if test="${isDisabled}">disabled="disabled" title="This certificate cannot be deleted, because the station is not connected at the moment."</c:if>
+                        <input <c:if test="${not connectedCpList.contains(cert.chargeBoxId)}">disabled="disabled" title="This certificate cannot be deleted, because the station is not connected at the moment."</c:if>
                                type="submit"
                                class="redSubmit"
                                value="Delete"

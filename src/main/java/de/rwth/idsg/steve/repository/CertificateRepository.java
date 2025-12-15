@@ -48,5 +48,6 @@ public interface CertificateRepository {
     void deleteInstalledCertificates(String chargeBoxId, String certificateType);
     void insertInstalledCertificates(String chargeBoxId, String certificateType, List<CertificateHashData> certificateHashData);
     List<InstalledCertificate> getInstalledCertificates(InstalledCertificateQueryForm params);
+    List<Long> getInstalledCertificateIds(String chargeBoxId);
 
 }

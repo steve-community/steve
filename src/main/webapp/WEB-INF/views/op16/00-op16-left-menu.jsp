@@ -46,5 +46,6 @@
     <li><a ${activePage == 'SignedUpdateFirmware'       ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/SignedUpdateFirmware"><i>Signed Update Firmware</i></a></li>
     <li><a ${activePage == 'GetInstalledCertificateIds' ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/GetInstalledCertificateIds"><i>Get Installed Certificate Ids</i></a></li>
     <li><a ${activePage == 'InstallCertificate'         ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/InstallCertificate"><i>Install Certificate</i></a></li>
+    <li><a ${activePage == 'DeleteCertificate'          ? 'class="highlight"' : ''} href="${ctxPath}/manager/operations/${opVersion}/DeleteCertificate"><i>Delete Certificate</i></a></li>
 </ul>
 </div>

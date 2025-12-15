@@ -88,7 +88,7 @@
         <c:forEach items="${certificates}" var="cert">
             <tr>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${cert.chargeBoxPk}">${cert.chargeBoxId}</a></td>
-                +<td><encode:forHtml value="${cert.certificateType}" /></td>
+                <td><encode:forHtml value="${cert.certificateType}" /></td>
                 <td><encode:forHtml value="${cert.hashAlgorithm}" /></td>
                 <td><encode:forHtml value="${cert.issuerNameHash}" /></td>
                 <td><encode:forHtml value="${cert.issuerKeyHash}" /></td>

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.TransactionService;
@@ -57,6 +58,7 @@ public class AjaxCallController {
     private final ChargePointService chargePointService;
     private final TransactionService transactionService;
     private final ReservationRepository reservationRepository;
+    private final CertificateRepository certificateRepository;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -65,6 +67,7 @@ public class AjaxCallController {
     private static final String CONNECTOR_IDS_PATH      = "/connectorIds";
     private static final String TRANSACTION_IDS_PATH    = "/transactionIds";
     private static final String RESERVATION_IDS_PATH    = "/reservationIds";
+    private static final String CERTIFICATE_IDS_PATH    = "/certificateIds";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -88,6 +91,13 @@ public class AjaxCallController {
     public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
         String s = serializeArray(reservationRepository.getActiveReservationIds(chargeBoxId));
+        writeOutput(response, s);
+    }
+
+    @RequestMapping(value = CERTIFICATE_IDS_PATH)
+    public void getCertificateIds(@PathVariable("chargeBoxId") String chargeBoxId,
+                                  HttpServletResponse response) throws IOException {
+        String s = serializeArray(certificateRepository.getInstalledCertificateIds(chargeBoxId));
         writeOutput(response, s);
     }
 

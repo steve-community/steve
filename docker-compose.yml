@@ -1,5 +1,3 @@
-version: "3.0"
-
 volumes:
   db-data:
     external: false
@@ -21,6 +19,12 @@ services:
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: changeme
+    # https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/using-healthcheck-sh
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   app:
     restart: unless-stopped
     build: .
@@ -32,5 +36,5 @@ services:
       - "8180:8180"
       - "8443:8443"
     depends_on:
-      - db
-    
+      db:
+        condition: service_healthy

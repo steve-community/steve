@@ -48,7 +48,7 @@ import java.util.Collections;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.6")
-@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v16.json:true} OR ${steve.ocpp.enabled-protocols.v16.soap:true}")
+@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v16.json} OR ${steve.ocpp.enabled-protocols.v16.soap}")
 public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
 
     public Ocpp16ImprovedSecurityController(OcppTagService ocppTagService,

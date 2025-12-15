@@ -51,7 +51,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.5")
-@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v15.json:true} OR ${steve.ocpp.enabled-protocols.v15.soap:true}")
+@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v15.json} OR ${steve.ocpp.enabled-protocols.v15.soap}")
 public class Ocpp15Controller extends Ocpp12Controller {
 
     public Ocpp15Controller(OcppTagService ocppTagService,

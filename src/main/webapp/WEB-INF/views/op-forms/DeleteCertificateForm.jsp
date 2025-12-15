@@ -24,9 +24,9 @@
     <section><span>Parameters</span></section>
     <div class="info"><b>Info:</b>
     To delete a certificate, we first need to know about it.
-    Therefore, the station must send its certificates to us so we can store them in our database.
+    Therefore, the station must <a href="${ctxPath}/manager/operations/v1.6/GetInstalledCertificateIds">send its certificates</a> to us so we can store them in our database.
     You can view the stored certificates <a href="${ctxPath}/manager/certificates/installed">here</a>.
-    From that page, you can also delete a certificate from a station.
+    This page allows you to delete a certificate from a station as well.
     </div>
     <table class="userInput">
         <tr><td>ID of the Installed Certificate:</td><td><form:select path="installedCertificateId" disabled="true"/></td></tr>

@@ -23,10 +23,10 @@
     <%@ include file="../00-cp-single.jsp" %>
     <section><span>Parameters</span></section>
     <div class="info"><b>Info:</b>
-    In order to be able to delete a certificate, it first needs to be known by us.
-    So, the station needs to communicate its certificates to us such that we can store them in the database.
-    You can view them <a href="${ctxPath}/manager/certificates/installed">here</a>.
-    You can also trigger the operation to delete a certificate from that page.
+    To delete a certificate, we first need to know about it.
+    Therefore, the station must send its certificates to us so we can store them in our database.
+    You can view the stored certificates <a href="${ctxPath}/manager/certificates/installed">here</a>.
+    From that page, you can also delete a certificate from a station.
     </div>
     <table class="userInput">
         <tr><td>ID of the Installed Certificate:</td><td><form:select path="installedCertificateId" disabled="true"/></td></tr>

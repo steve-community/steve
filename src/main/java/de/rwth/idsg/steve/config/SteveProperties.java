@@ -66,7 +66,21 @@ public class SteveProperties {
         WsSessionSelectStrategyEnum wsSessionSelectStrategy;
         boolean autoRegisterUnknownStations;
         String chargeBoxIdValidationRegex;
+        Protocols enabledProtocols;
         Security security = new Security();
+
+        @Data
+        public static class Protocols {
+            Transports v12;
+            Transports v15;
+            Transports v16;
+
+            @Data
+            public static class Transports {
+                boolean soap;
+                boolean json;
+            }
+        }
 
         @Data
         public static class Security {

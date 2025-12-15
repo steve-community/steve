@@ -81,6 +81,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, getVersion())));
         disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, getVersion())));
+
+        log.info("Initialized");
     }
 
     public abstract OcppVersion getVersion();

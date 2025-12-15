@@ -49,6 +49,12 @@ steve:
     auto-register-unknown-stations: ${auto.register.unknown.stations}
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
 
+    # Which transport (SOAP and JSON-over-WebSocket) of which OCPP version (1.2, 1.5 and 1.6) should we enable?
+    enabled-protocols:
+      v12: { soap: true, json: true }
+      v15: { soap: true, json: true }
+      v16: { soap: true, json: true }
+
     # OCPP 1.6 Security Profiles Configuration
     # Other settings will be taken from server.ssl
     security:

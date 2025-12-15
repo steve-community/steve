@@ -36,6 +36,7 @@ import ocpp.cs._2010._08.MeterValuesRequest;
 import ocpp.cs._2010._08.StartTransactionRequest;
 import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StopTransactionRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Component;
  * @since 12.03.2015
  */
 @Component
+@ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.json", havingValue = "true")
 public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final CentralSystemService12_SoapServer server;

@@ -32,6 +32,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -54,16 +55,19 @@ public class OcppConfiguration {
     private final MessageIdInterceptor messageIdInterceptor = new MessageIdInterceptor();
 
     @Bean
+    @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.soap", havingValue = "true")
     public EndpointImpl ocpp12Endpoint(CentralSystemService12_SoapServer ocpp12Server) {
         return createDefaultEndpoint(ocpp12Server, "/CentralSystemServiceOCPP12");
     }
 
     @Bean
+    @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v15.soap", havingValue = "true")
     public EndpointImpl ocpp15Endpoint(CentralSystemService15_SoapServer ocpp15Server) {
         return createDefaultEndpoint(ocpp15Server, "/CentralSystemServiceOCPP15");
     }
 
     @Bean
+    @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v16.soap", havingValue = "true")
     public EndpointImpl ocpp16Endpoint(CentralSystemService16_SoapServer ocpp16Server) {
         return createDefaultEndpoint(ocpp16Server, "/CentralSystemServiceOCPP16");
     }

@@ -1,26 +1,35 @@
-FROM eclipse-temurin:21-jdk
-
+# Build stage
+FROM eclipse-temurin:21-jdk AS builder
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-MAINTAINER Ling Li
+WORKDIR /code
 
-# Download and install dockerize.
-# Needed so the web container will wait for MariaDB to start.
-ENV DOCKERIZE_VERSION v0.19.0
-RUN curl -sfL https://github.com/powerman/dockerize/releases/download/"$DOCKERIZE_VERSION"/dockerize-`uname -s`-`uname -m` | install /dev/stdin /usr/local/bin/dockerize
+# Copy relevant project files to the build stage
+ADD /src /code/src
+ADD /pom.xml /code/pom.xml
+ADD mvnw /code/mvnw
+ADD .mvn /code/.mvn
+
+# Build the app
+RUN ./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1.2,TLSv1.3"
+
+# Runtime stage
+FROM eclipse-temurin:21-jre
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+# Create a non-root user and group
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
+
+WORKDIR /code
+
+# Copy only the built WAR from builder stage and set ownership
+COPY --chown=appuser:appgroup --from=builder /code/target/steve.war ./steve.war
 
 EXPOSE 8180
 EXPOSE 8443
-WORKDIR /code
 
-VOLUME ["/code"]
+# Switch to the non-root user
+USER appuser
 
-# Copy the application's code
-COPY . /code
-
-# Wait for the db to startup(via dockerize), then 
-# Build and run steve, requires a db to be available on port 3306
-CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -XX:MaxRAMPercentage=85 -jar target/steve.war
-
+# Run the app
+CMD ["java", "-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3", "-XX:MaxRAMPercentage=85", "-jar", "steve.war"]

@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.ocpp;
 
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.context.annotation.ConfigurationCondition;
 
 /**
@@ -32,28 +32,28 @@ public class OcppVersionEnabledCondition {
 
     public static class V12 extends BeanCondition {
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.soap", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v12.soap")
         static class SoapEnabled { }
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.json", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v12.json")
         static class JsonEnabled { }
     }
 
     public static class V15 extends BeanCondition {
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v15.soap", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v15.soap")
         static class SoapEnabled { }
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v15.json", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v15.json")
         static class JsonEnabled { }
     }
 
     public static class V16 extends BeanCondition {
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v16.soap", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v16.soap")
         static class SoapEnabled { }
 
-        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v16.json", havingValue = "true")
+        @ConditionalOnBooleanProperty("steve.ocpp.enabled-protocols.v16.json")
         static class JsonEnabled { }
     }
 

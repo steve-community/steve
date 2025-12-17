@@ -22,6 +22,7 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
@@ -42,6 +43,7 @@ import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +52,7 @@ import org.springframework.stereotype.Component;
  * @since 13.03.2018
  */
 @Component
+@Conditional(OcppEnabledCondition.V16.Json.class)
 public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final CentralSystemService16_SoapServer server;

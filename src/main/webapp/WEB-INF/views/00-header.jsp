@@ -72,9 +72,9 @@
                     </li>
                     <li><a>OPERATIONS &raquo;</a>
                         <ul>
-                            <li><a href="${ctxPath}/manager/operations/v1.2">OCPP v1.2</a></li>
-                            <li><a href="${ctxPath}/manager/operations/v1.5">OCPP v1.5</a></li>
-                            <li><a href="${ctxPath}/manager/operations/v1.6">OCPP v1.6</a></li>
+                            <c:if test="${ocpp12Enabled}"><li><a href="${ctxPath}/manager/operations/v1.2">OCPP v1.2</a></li></c:if>
+                            <c:if test="${ocpp15Enabled}"><li><a href="${ctxPath}/manager/operations/v1.5">OCPP v1.5</a></li></c:if>
+                            <c:if test="${ocpp16Enabled}"><li><a href="${ctxPath}/manager/operations/v1.6">OCPP v1.6</a></li></c:if>
                             <li><a href="${ctxPath}/manager/operations/tasks">Tasks</a></li>
                         </ul>
                     </li>

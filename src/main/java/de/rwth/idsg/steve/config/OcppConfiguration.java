@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService15_SoapServer;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
@@ -33,6 +34,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
@@ -54,16 +56,19 @@ public class OcppConfiguration {
     private final MessageIdInterceptor messageIdInterceptor = new MessageIdInterceptor();
 
     @Bean
+    @Conditional(OcppEnabledCondition.V12.Soap.class)
     public EndpointImpl ocpp12Endpoint(CentralSystemService12_SoapServer ocpp12Server) {
         return createDefaultEndpoint(ocpp12Server, "/CentralSystemServiceOCPP12");
     }
 
     @Bean
+    @Conditional(OcppEnabledCondition.V15.Soap.class)
     public EndpointImpl ocpp15Endpoint(CentralSystemService15_SoapServer ocpp15Server) {
         return createDefaultEndpoint(ocpp15Server, "/CentralSystemServiceOCPP15");
     }
 
     @Bean
+    @Conditional(OcppEnabledCondition.V16.Soap.class)
     public EndpointImpl ocpp16Endpoint(CentralSystemService16_SoapServer ocpp16Server) {
         return createDefaultEndpoint(ocpp16Server, "/CentralSystemServiceOCPP16");
     }

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppVersionEnabledCondition;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
@@ -30,7 +31,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -48,7 +49,7 @@ import java.util.Collections;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.6")
-@ConditionalOnExpression("${steve.ocpp.enabled-protocols.v16.json} OR ${steve.ocpp.enabled-protocols.v16.soap}")
+@Conditional(OcppVersionEnabledCondition.V16.class)
 public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
 
     public Ocpp16ImprovedSecurityController(OcppTagService ocppTagService,

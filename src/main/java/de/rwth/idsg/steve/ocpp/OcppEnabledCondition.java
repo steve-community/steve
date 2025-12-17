@@ -44,16 +44,14 @@ public class OcppEnabledCondition {
         public static class Soap implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v12.soap", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v12.soap");
             }
         }
 
         public static class Json implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v12.json", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v12.json");
             }
         }
     }
@@ -69,16 +67,14 @@ public class OcppEnabledCondition {
         public static class Soap implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v15.soap", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v15.soap");
             }
         }
 
         public static class Json implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v15.json", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v15.json");
             }
         }
     }
@@ -94,16 +90,14 @@ public class OcppEnabledCondition {
         public static class Soap implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v16.soap", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v16.soap");
             }
         }
 
         public static class Json implements Condition {
             @Override
             public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-                var env = context.getEnvironment();
-                return env.getProperty("steve.ocpp.enabled-protocols.v16.json", Boolean.class, false);
+                return isEnabled(context, "steve.ocpp.enabled-protocols.v16.json");
             }
         }
     }
@@ -113,6 +107,10 @@ public class OcppEnabledCondition {
         public BeanCondition() {
             super(ConfigurationCondition.ConfigurationPhase.REGISTER_BEAN);
         }
+    }
+
+    private static boolean isEnabled(ConditionContext context, String property) {
+        return context.getEnvironment().getProperty(property, Boolean.class, false);
     }
 }
 

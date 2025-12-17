@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppVersionEnabledCondition;
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
@@ -49,7 +49,7 @@ import java.util.Collections;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.6")
-@Conditional(OcppVersionEnabledCondition.V16.class)
+@Conditional(OcppEnabledCondition.V16.class)
 public class Ocpp16ImprovedSecurityController extends Ocpp16Controller {
 
     public Ocpp16ImprovedSecurityController(OcppTagService ocppTagService,

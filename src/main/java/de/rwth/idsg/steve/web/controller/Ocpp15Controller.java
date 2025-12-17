@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.OcppVersionEnabledCondition;
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
@@ -51,7 +51,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/v1.5")
-@Conditional(OcppVersionEnabledCondition.V15.class)
+@Conditional(OcppEnabledCondition.V15.class)
 public class Ocpp15Controller extends Ocpp12Controller {
 
     public Ocpp15Controller(OcppTagService ocppTagService,

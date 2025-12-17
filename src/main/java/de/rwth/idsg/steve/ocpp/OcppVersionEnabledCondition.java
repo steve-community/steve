@@ -18,54 +18,50 @@
  */
 package de.rwth.idsg.steve.ocpp;
 
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ConfigurationCondition;
 
 /**
+ * The JSON and SOAP conditions are OR'ed
+ *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.12.2025
  */
 public class OcppVersionEnabledCondition {
 
-    public static class V12 implements Condition {
-        @Override
-        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return isEnabled(
-                context,
-                "steve.ocpp.enabled-protocols.v12.json",
-                "steve.ocpp.enabled-protocols.v12.soap"
-            );
-        }
+    public static class V12 extends BeanCondition {
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.soap", havingValue = "true")
+        static class SoapEnabled { }
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v12.json", havingValue = "true")
+        static class JsonEnabled { }
     }
 
-    public static class V15 implements Condition {
-        @Override
-        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return isEnabled(
-                context,
-                "steve.ocpp.enabled-protocols.v15.json",
-                "steve.ocpp.enabled-protocols.v15.soap"
-            );
-        }
+    public static class V15 extends BeanCondition {
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v15.soap", havingValue = "true")
+        static class SoapEnabled { }
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v15.json", havingValue = "true")
+        static class JsonEnabled { }
     }
 
-    public static class V16 implements Condition {
-        @Override
-        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return isEnabled(
-                context,
-                "steve.ocpp.enabled-protocols.v16.json",
-                "steve.ocpp.enabled-protocols.v16.soap"
-            );
-        }
+    public static class V16 extends BeanCondition {
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v16.soap", havingValue = "true")
+        static class SoapEnabled { }
+
+        @ConditionalOnProperty(name = "steve.ocpp.enabled-protocols.v16.json", havingValue = "true")
+        static class JsonEnabled { }
     }
 
-    private static boolean isEnabled(ConditionContext context, String jsonKey, String soapKey) {
-        var env = context.getEnvironment();
-        boolean json = env.getProperty(jsonKey, Boolean.class, false);
-        boolean soap = env.getProperty(soapKey, Boolean.class, false);
-        return json || soap;
+    public static abstract class BeanCondition extends AnyNestedCondition {
+
+        public BeanCondition() {
+            super(ConfigurationCondition.ConfigurationPhase.REGISTER_BEAN);
+        }
     }
 }
 

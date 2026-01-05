@@ -55,7 +55,7 @@ public class UserForm {
     private UserSex sex = UserSex.OTHER;
 
     @Email(message = "Not a valid e-mail address")
-    private String eMail;
+    private String email;
 
     private List<NotificationFeature> notificationFeatures;
 

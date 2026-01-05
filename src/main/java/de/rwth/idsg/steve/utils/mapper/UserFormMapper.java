@@ -43,7 +43,7 @@ public final class UserFormMapper {
         form.setBirthDay(userRecord.getBirthDay());
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
-        form.setEMail(userRecord.getEMail());
+        form.setEmail(userRecord.getEMail());
         form.setNotificationFeatures(NotificationFeature.splitFeatures(userRecord.getNotificationFeatures()));
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));

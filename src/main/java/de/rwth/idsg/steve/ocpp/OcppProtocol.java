@@ -18,8 +18,13 @@
  */
 package de.rwth.idsg.steve.ocpp;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -73,5 +78,25 @@ public enum OcppProtocol {
             }
         }
         throw new IllegalArgumentException("Could not find OcppProtocol for " + version + " and " + transport);
+    }
+
+    public static List<String> getCompositeValuesOfEnabledOcppProtocols(SteveProperties.Ocpp.Protocols protocolsFromConfig) {
+        return Arrays.stream(OcppProtocol.values())
+            .filter(value -> value.isEnabled(protocolsFromConfig))
+            .map(OcppProtocol::getCompositeValue)
+            .collect(Collectors.toList());
+    }
+
+    public boolean isEnabled(SteveProperties.Ocpp.Protocols protocolsFromConfig) {
+        var enabledVersion = switch (version) {
+            case V_12 -> protocolsFromConfig.getV12();
+            case V_15 -> protocolsFromConfig.getV15();
+            case V_16 -> protocolsFromConfig.getV16();
+        };
+
+        return switch (transport) {
+            case SOAP -> enabledVersion.isSoap();
+            case JSON -> enabledVersion.isJson();
+        };
     }
 }

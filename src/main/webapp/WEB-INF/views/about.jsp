@@ -39,12 +39,16 @@
 <section><span>Endpoint Info</span></section>
 <table class="userInputFullPage">
     <tr>
+        <td>Enabled OCPP Protocols:</td>
+        <td>${enabledOcppProtocols}</td>
+    </tr>
+    <tr>
         <td>SOAP endpoint for OCPP:</td>
         <td>${endpointInfo.ocppSoap}</td>
+    </tr>
     <tr>
         <td>WebSocket/JSON endpoint for OCPP:</td>
         <td>${endpointInfo.ocppWebSocket}</td>
-    </tr>
     </tr>
 </table>
 

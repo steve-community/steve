@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.config.SteveProperties;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.DataImportExportService;
@@ -89,6 +90,10 @@ public class AboutSettingsController {
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
         model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host, contextPath));
+
+        var enabledProtocols = steveProperties.getOcpp().getEnabledProtocols();
+        var vals = OcppProtocol.getCompositeValuesOfEnabledOcppProtocols(enabledProtocols);
+        model.addAttribute("enabledOcppProtocols", String.join(", ", vals));
 
         model.addAttribute("exportForm", new DataExportForm());
         model.addAttribute("masterDataTableNames", String.join(", ", dataImportExportService.getMasterDataTableNames()));

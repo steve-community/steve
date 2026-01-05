@@ -32,7 +32,7 @@
 		</td>
 	</tr>
 	<tr><td>Phone:</td><td><form:input path="phone"/></td></tr>
-	<tr><td>E-mail:</td><td><form:input path="eMail"/></td></tr>
+	<tr><td>E-mail:</td><td><form:input path="email"/></td></tr>
         <tr>
             <td>Notify when... </td>
             <td><form:checkboxes items="${features}" path="notificationFeatures"

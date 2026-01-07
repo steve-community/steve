@@ -38,6 +38,8 @@ public class ReservationQueryForm extends QueryForm {
 
     private Integer reservationId;
 
+    private Integer transactionId;
+
     private ReservationStatus status;
 
     private QueryPeriodType periodType;
@@ -57,6 +59,11 @@ public class ReservationQueryForm extends QueryForm {
     @Schema(hidden = true)
     public boolean isReservationIdSet() {
         return reservationId != null;
+    }
+
+    @Schema(hidden = true)
+    public boolean isTransactionIdSet() {
+        return transactionId != null;
     }
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")

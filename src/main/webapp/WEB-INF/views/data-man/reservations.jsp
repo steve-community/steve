@@ -47,6 +47,10 @@
 				<td><form:input path="reservationId"/></td>
 			</tr>
 			<tr>
+				<td>Transaction ID:</td>
+				<td><form:input path="transactionId"/></td>
+			</tr>
+			<tr>
 				<td>ChargeBox ID:</td>
 				<td><form:select path="chargeBoxId">
 						<option value="" selected>All</option>

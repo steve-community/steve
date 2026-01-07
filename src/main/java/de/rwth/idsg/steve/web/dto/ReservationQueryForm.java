@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.repository.ReservationStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,8 @@ import jakarta.validation.constraints.AssertTrue;
 @ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
+    private Integer reservationId;
+
     private ReservationStatus status;
 
     private QueryPeriodType periodType;
@@ -46,8 +49,14 @@ public class ReservationQueryForm extends QueryForm {
         periodType = QueryPeriodType.ACTIVE;
     }
 
+    @Schema(hidden = true)
     public boolean isStatusSet() {
         return status != null;
+    }
+
+    @Schema(hidden = true)
+    public boolean isReservationIdSet() {
+        return reservationId != null;
     }
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")

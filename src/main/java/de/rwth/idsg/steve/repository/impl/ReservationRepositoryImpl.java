@@ -80,6 +80,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 CONNECTOR.CONNECTOR_ID
         );
 
+        if (form.isReservationIdSet()) {
+            selectQuery.addConditions(RESERVATION.RESERVATION_PK.eq(form.getReservationId()));
+        }
+
         if (form.isChargeBoxIdSet()) {
             selectQuery.addConditions(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }

@@ -43,6 +43,10 @@
 	<form:form action="${ctxPath}/manager/reservations/query" method="get" modelAttribute="params">
 		<table class="userInput">
 			<tr>
+				<td>Reservation ID:</td>
+				<td><form:input path="reservationId"/></td>
+			</tr>
+			<tr>
 				<td>ChargeBox ID:</td>
 				<td><form:select path="chargeBoxId">
 						<option value="" selected>All</option>

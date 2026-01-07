@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import jakarta.validation.constraints.Positive;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 31.08.2015
@@ -41,6 +43,7 @@ public abstract class QueryForm extends QueryPeriodFromToFilter {
     private String ocppIdTag;
 
     @Schema(description = "The User ID")
+    @Positive(message = "userId has to be a positive number")
     private Integer userId;
 
     @Schema(hidden = true)

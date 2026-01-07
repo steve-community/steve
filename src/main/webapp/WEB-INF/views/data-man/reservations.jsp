@@ -44,11 +44,11 @@
 		<table class="userInput">
 			<tr>
 				<td>Reservation ID:</td>
-				<td><form:input path="reservationId"/></td>
+				<td><form:input path="reservationId" type="number" min="1"/></td>
 			</tr>
 			<tr>
 				<td>Transaction ID:</td>
-				<td><form:input path="transactionId"/></td>
+				<td><form:input path="transactionId" type="number" min="1"/></td>
 			</tr>
 			<tr>
 				<td>ChargeBox ID:</td>
@@ -68,7 +68,7 @@
 			</tr>
 			<tr>
 				<td>User ID:</td>
-				<td><form:input path="userId"/></td>
+				<td><form:input path="userId" type="number" min="1"/></td>
 			</tr>
             <tr>
                 <td>Reservation Status:</td>

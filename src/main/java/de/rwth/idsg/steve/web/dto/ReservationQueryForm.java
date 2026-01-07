@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,8 +37,10 @@ import jakarta.validation.constraints.AssertTrue;
 @ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
+    @Positive(message = "reservationId has to be a positive number")
     private Integer reservationId;
 
+    @Positive(message = "transactionId has to be a positive number")
     private Integer transactionId;
 
     private ReservationStatus status;

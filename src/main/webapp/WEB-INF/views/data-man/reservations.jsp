@@ -43,6 +43,14 @@
 	<form:form action="${ctxPath}/manager/reservations/query" method="get" modelAttribute="params">
 		<table class="userInput">
 			<tr>
+				<td>Reservation ID:</td>
+				<td><form:input path="reservationId" type="number" min="1"/></td>
+			</tr>
+			<tr>
+				<td>Transaction ID:</td>
+				<td><form:input path="transactionId" type="number" min="1"/></td>
+			</tr>
+			<tr>
 				<td>ChargeBox ID:</td>
 				<td><form:select path="chargeBoxId">
 						<option value="" selected>All</option>
@@ -60,7 +68,7 @@
 			</tr>
 			<tr>
 				<td>User ID:</td>
-				<td><form:input path="userId"/></td>
+				<td><form:input path="userId" type="number" min="1"/></td>
 			</tr>
             <tr>
                 <td>Reservation Status:</td>

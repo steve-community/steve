@@ -98,6 +98,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
+        // original value in the connection URL provided by the station might have a different uppercase/lowercase
+        // configuration than the one from database. functionally this is not an issue, since the entries in the
+        // database are case-insensitive. but still, let's use the value from DB from here on (and also reference it in
+        // sessions) to prevent confusion.
+        chargeBoxId = registration.get().chargeBoxId();
+
         // -------------------------------------------------------------------------
         // 2. Check Ocpp security profiles (if needed)
         // -------------------------------------------------------------------------

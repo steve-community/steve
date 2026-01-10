@@ -33,6 +33,13 @@ services:
     ports:
       - "8180:8180"
       - "8443:8443"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8180/steve" ] # /steve because context.path is set for docker profile
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s # Initial grace period where failures don't count toward retries (useful for slow-starting apps)
+      start_interval: 5s # More frequent checks during the start_period
     depends_on:
       db:
         condition: service_healthy

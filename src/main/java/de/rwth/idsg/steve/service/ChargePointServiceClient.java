@@ -280,7 +280,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int dataTransfer(DataTransferParams params,
-                                  OcppCallback<DataTransferTask.ResponseWrapper>... callbacks) {
+                                  OcppCallback<ocpp.cp._2015._10.DataTransferResponse>... callbacks) {
         DataTransferTask task = new DataTransferTask(params);
 
         for (var callback : callbacks) {
@@ -296,7 +296,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getConfiguration(GetConfigurationParams params,
-                                      OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
+                                      OcppCallback<GetConfigurationTask.ConfigurationKeyValues>... callbacks) {
         GetConfigurationTask task = new GetConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {

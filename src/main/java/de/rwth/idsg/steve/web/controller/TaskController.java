@@ -108,7 +108,7 @@ public class TaskController {
 
     private String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
-        GetConfigurationTask.ResponseWrapper response = result.getDetails();
+        GetConfigurationTask.ConfigurationKeyValues response = result.getDetails();
 
         model.addAttribute("chargeBoxId", chargeBoxId);
         model.addAttribute("response", response);

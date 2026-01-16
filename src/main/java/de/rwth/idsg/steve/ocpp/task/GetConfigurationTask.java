@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.RequestResult;
@@ -40,9 +39,7 @@ import java.util.stream.Collectors;
  * @since 09.03.2018
  */
 @Slf4j
-public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
-
-    private static final Joiner JOINER = Joiner.on(", ");
+public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ConfigurationKeyValues> {
 
     private final ChargePointService chargePointService;
 
@@ -52,10 +49,10 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
     }
 
     @Override
-    public OcppCallback<ResponseWrapper> defaultCallback() {
-        return new DefaultOcppCallback<ResponseWrapper>() {
+    public OcppCallback<ConfigurationKeyValues> defaultCallback() {
+        return new DefaultOcppCallback<ConfigurationKeyValues>() {
             @Override
-            public void success(String chargeBoxId, ResponseWrapper response) {
+            public void success(String chargeBoxId, ConfigurationKeyValues response) {
                 addNewResponse(chargeBoxId, "OK");
 
                 RequestResult result = getResultMap().get(chargeBoxId);
@@ -85,7 +82,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
+                success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -111,22 +108,18 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
+                success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
     }
 
+    @RequiredArgsConstructor
     @Getter
-    public static class ResponseWrapper {
+    public static class ConfigurationKeyValues {
         private final List<KeyValue> configurationKeys;
-        private final String unknownKeys;
-
-        private ResponseWrapper(List<KeyValue> configurationKeys, List<String> unknownKeys) {
-            this.configurationKeys = configurationKeys;
-            this.unknownKeys = JOINER.join(unknownKeys);
-        }
+        private final List<String> unknownKeys;
     }
 
     @Getter

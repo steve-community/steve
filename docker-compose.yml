@@ -11,13 +11,13 @@ services:
     # MariaDB 10.4.
     image: mariadb:10.4.30
     restart: unless-stopped
-    ports:
-      - 3306:3306
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: stevedb
-      MYSQL_USER: steve
-      MYSQL_PASSWORD: changeme
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-stevedb}"
+      MYSQL_USER: "${MYSQL_USER:-steve}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-changeMe!}"
+    volumes:
+      - db-data:/var/lib/mysql
     # https://mariadb.com/docs/server/server-management/automated-mariadb-deployment-and-administration/docker-and-mariadb/using-healthcheck-sh
     healthcheck:
       test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]

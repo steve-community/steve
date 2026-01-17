@@ -445,9 +445,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.steve-community</groupId>
+            <groupId>com.github.steve-community.ocpp-jaxb</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.13</version>
+            <version>0.0.14</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

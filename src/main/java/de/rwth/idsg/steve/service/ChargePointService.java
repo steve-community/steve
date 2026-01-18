@@ -177,8 +177,8 @@ public class ChargePointService {
         var username = (String) authFromRequest.getPrincipal();
         var rawPassword = (String) authFromRequest.getCredentials();
 
-        if (!chargeBoxId.equals(username)) {
-            log.warn("The username '{}' (in Basic Auth) is not matching the ChargeBoxId '{}'", username, chargeBoxId);
+        if (!chargeBoxId.equalsIgnoreCase(username)) {
+            log.warn("Case-insensitive validation failed: Basic Auth username '{}' does not match ChargeBoxId '{}'", username, chargeBoxId);
             return false;
         }
 

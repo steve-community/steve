@@ -48,11 +48,7 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
      * Not for a specific connector, when frontend sends the value 0.
      * This corresponds to not to include the connector id parameter in OCPP request.
      */
-    public void setConnectorId(Integer connectorId) {
-        if (connectorId == 0) {
-            this.connectorId = null;
-        } else {
-            this.connectorId = connectorId;
-        }
+    public Integer getConnectorId() {
+        return (connectorId == null || connectorId == 0) ? null : connectorId;
     }
 }

@@ -30,18 +30,19 @@ import java.util.Objects;
  * @since 08.03.2018
  */
 @Getter
+@Setter
 public class ChangeAvailabilityParams extends MultipleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
     @NotNull(message = "Availability Type is required")
-    @Setter private AvailabilityType availType;
+    private AvailabilityType availType;
 
     /**
      * if empty, 0 = charge point as a whole
      */
-    public void setConnectorId(Integer connectorId) {
-        this.connectorId = Objects.requireNonNullElse(connectorId, 0);
+    public Integer getConnectorId() {
+        return Objects.requireNonNullElse(connectorId, 0);
     }
 }

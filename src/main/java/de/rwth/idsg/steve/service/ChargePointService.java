@@ -130,9 +130,12 @@ public class ChargePointService {
         log.info("Deleted charge point with chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
 
         // https://github.com/steve-community/steve/issues/1871
-        var version = OcppProtocol.fromCompositeValue(details.getChargeBox().getOcppProtocol()).getVersion();
-        log.info("Closing all WebSocket sessions of chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
-        sessionContextStoreHolder.getOrCreate(version).closeSessions(chargeBoxId);
+        String ocppProtocol = details.getChargeBox().getOcppProtocol();
+        if (!StringUtils.isEmpty(ocppProtocol)) {
+            var version = OcppProtocol.fromCompositeValue(ocppProtocol).getVersion();
+            log.info("Closing all WebSocket sessions of chargeBoxPk={} and chargeBoxId={}", chargeBoxPk, chargeBoxId);
+            sessionContextStoreHolder.getOrCreate(version).closeSessions(chargeBoxId);
+        }
     }
 
     private void encodePasswordIfNeeded(ChargePointForm form) {

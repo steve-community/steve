@@ -152,6 +152,20 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
+    /**
+     * Relevant to WebSocket/JSON transport: Handle OCPP error responses (e.g., NotImplemented, NotSupported)
+     * from charging stations. This iterates through all registered callbacks, not just the default one.
+     */
+    public void success(String chargeBoxId, OcppJsonError error) {
+        for (OcppCallback<RESPONSE> c : callbackList) {
+            try {
+                c.success(chargeBoxId, error);
+            } catch (Exception e) {
+                log.error("Exception occurred in OcppCallback", e);
+            }
+        }
+    }
+
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
         return switch (versionMap.get(chargeBoxId)) {
             case V_12 -> getOcpp12Handler(chargeBoxId);

@@ -75,22 +75,11 @@ public class Deserializer implements Consumer<CommunicationContext> {
             parser.nextToken();
             String messageId = parser.getString();
 
-            MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
-            switch (messageType) {
-                case CALL:
-                    handleCall(context, messageId, parser);
-                    break;
-
-                case CALL_RESULT:
-                    handleResult(context, messageId, parser);
-                    break;
-
-                case CALL_ERROR:
-                    handleError(context, messageId, parser);
-                    break;
-
-                default:
-                    throw new SteveException("Unknown enum type");
+            switch (MessageType.fromTypeNr(messageTypeNr)) {
+                case CALL -> handleCall(context, messageId, parser);
+                case CALL_RESULT -> handleResult(context, messageId, parser);
+                case CALL_ERROR -> handleError(context, messageId, parser);
+                default -> throw new SteveException("Unknown enum type");
             }
         } catch (Exception e) {
             throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);

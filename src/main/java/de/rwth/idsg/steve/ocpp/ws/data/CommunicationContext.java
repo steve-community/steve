@@ -18,18 +18,10 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.data;
 
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
-
-import jakarta.xml.ws.Response;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * Default holder/context of incoming and outgoing messages.
@@ -50,59 +42,14 @@ public class CommunicationContext {
     @Setter private OcppJsonMessage incomingMessage;
     @Setter private OcppJsonMessage outgoingMessage;
 
+    /**
+     * This is only relevant for requests CSMS sends.
+     * During the outgoing pipeline, we create an instance of this and store it.
+     * During the incoming pipeline (response from station to request), we restore and reference it.
+     */
     @Setter private FutureResponseContext futureResponseContext;
-
-    // for incoming responses to previously sent requests
-    private Consumer<OcppJsonResult> resultHandler;
-    private Consumer<OcppJsonError> errorHandler;
 
     public boolean isSetOutgoingError() {
         return (outgoingMessage != null) && (outgoingMessage instanceof OcppJsonError);
-    }
-
-    @SuppressWarnings("unchecked")
-    public void createResultHandler(CommunicationTask task) {
-        // TODO: not so sure about this
-        resultHandler = result -> task.getHandler(chargeBoxId)
-                                      .handleResponse(new DummyResponse(result.getPayload()));
-    }
-
-    public void createErrorHandler(CommunicationTask task) {
-        errorHandler = result -> task.success(chargeBoxId, result);
-    }
-
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class DummyResponse implements Response<ResponseType> {
-        private final ResponseType payload;
-
-        @Override
-        public Map<String, Object> getContext() {
-            return null;
-        }
-
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
-        public boolean isDone() {
-            return true;
-        }
-
-        @Override
-        public ResponseType get() {
-            return payload;
-        }
-
-        @Override
-        public ResponseType get(long timeout, TimeUnit unit) {
-            return payload;
-        }
     }
 }

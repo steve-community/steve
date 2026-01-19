@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,10 +86,7 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
             .success(context.getChargeBoxId(), error);
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class DummyResponse implements Response<ResponseType> {
-        private final ResponseType payload;
-
+    private record DummyResponse(ResponseType payload) implements Response<ResponseType> {
         @Override
         public Map<String, Object> getContext() {
             return null;

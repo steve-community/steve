@@ -54,10 +54,11 @@ public enum Serializer implements Consumer<CommunicationContext> {
     public void accept(CommunicationContext context) {
         OcppJsonMessage message = context.getOutgoingMessage();
 
-        ArrayNode str = switch (message.getMessageType()) {
-            case CALL -> handleCall((OcppJsonCall) message);
-            case CALL_RESULT -> handleResult((OcppJsonResult) message);
-            case CALL_ERROR -> handleError((OcppJsonError) message);
+        ArrayNode str = switch (message) {
+            case OcppJsonCall call -> handleCall(call);
+            case OcppJsonResult result -> handleResult(result);
+            case OcppJsonError error -> handleError(error);
+            default -> throw new SteveException("Unknown message type: " + message.getClass().getName());
         };
 
         try {

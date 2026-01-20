@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import org.apache.commons.lang3.StringUtils;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -73,7 +74,7 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + res.get().getFileName());
+                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -84,7 +85,7 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2012._06.GetDiagnosticsResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + res.get().getFileName());
+                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -95,7 +96,7 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + res.get().getFileName());
+                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

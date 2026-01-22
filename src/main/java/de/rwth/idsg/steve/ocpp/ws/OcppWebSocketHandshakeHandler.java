@@ -90,7 +90,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         Optional<ChargePointRegistration> registration = chargePointService.getRegistration(chargeBoxId);
 
         // Allow connections, if station is in DB and its registration_status is not Rejected
-        boolean allowConnection = registration.isPresent() && registration.get().registrationStatus() != RegistrationStatus.REJECTED;
+        boolean allowConnection = registration.isPresent() && RegistrationStatus.REJECTED != registration.get().registrationStatus();
 
         // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {

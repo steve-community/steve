@@ -209,7 +209,7 @@ public class ChargePointService {
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         return chargePointRepository.getRegistration(chargeBoxId)
-            .map(it -> RegistrationStatus.fromValue(it.registrationStatus()));
+            .map(ChargePointRegistration::registrationStatus);
     }
 
     public Optional<ChargePointRegistration> getRegistration(String chargeBoxId) {

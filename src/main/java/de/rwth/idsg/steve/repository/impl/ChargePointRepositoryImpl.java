@@ -91,7 +91,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                         .map(rec -> new ChargePointRegistration(
                             rec.value1(),
                             rec.value2(),
-                            rec.value3(),
+                            RegistrationStatus.fromValue(rec.value3()),
                             OcppSecurityProfile.fromValue(rec.value4()),
                             rec.value5(),
                             rec.value6(),

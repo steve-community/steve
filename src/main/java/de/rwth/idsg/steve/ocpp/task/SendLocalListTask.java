@@ -22,11 +22,9 @@ import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
 
 import jakarta.xml.ws.AsyncHandler;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +91,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
     private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagService ocppTagService) {
         // DIFFERENTIAL update
-        if (params.getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
+        if (params.getUpdateType() == ocpp.cp._2015._10.UpdateType.DIFFERENTIAL) {
             List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();
 
             // Step 1: For the idTags to be deleted, insert only the idTag
@@ -106,7 +104,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
-                    .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
+                    .withUpdateType(params.getUpdateType())
                     .withLocalAuthorizationList(auths);
 
             // FULL update
@@ -119,7 +117,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
-                    .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
+                    .withUpdateType(params.getUpdateType())
                     .withLocalAuthorizationList(values);
         }
     }

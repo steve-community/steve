@@ -57,6 +57,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiFunction;
 
 @Slf4j
 @Service
@@ -68,125 +69,44 @@ public class OcppOperationsService {
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
 
-    /**
-     * TODO: Improve this method. We make multiple calls to the database to get charge points for each version.
-     */
-    private List<ChargePointSelect> fetchChargePoints(List<String> chargeBoxIdList) {
-        List<ChargePointSelect> returnList = new ArrayList<>();
-
-        for (OcppVersion version : OcppVersion.values()) {
-            var temp = chargePointService.getChargePointsWithIds(version, chargeBoxIdList);
-            returnList.addAll(temp);
-        }
-
-        return returnList;
-    }
-
-    private <T> RestCallback<T> createCallback(ChargePointSelection chargePointSelection) {
-        return new RestCallback<>(STATION_RESPONSE_TIMEOUT, new CountDownLatch(chargePointSelection.getChargePointSelectList().size()));
-    }
-
     // -------------------------------------------------------------------------
     // Since Ocpp 1.2
     // -------------------------------------------------------------------------
 
     public RestCallback<String> changeAvailability(ChangeAvailabilityParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.changeAvailability(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::changeAvailability);
     }
 
     public RestCallback<String> changeConfiguration(ChangeConfigurationParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.changeConfiguration(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::changeConfiguration);
     }
 
     public RestCallback<String> clearCache(MultipleChargePointSelect params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.clearCache(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::clearCache);
     }
 
     public RestCallback<String> getDiagnostics(GetDiagnosticsParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getDiagnostics(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::getDiagnostics);
     }
 
     public RestCallback<String> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.remoteStartTransaction(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
 
     public RestCallback<String> remoteStopTransaction(RemoteStopTransactionParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.remoteStopTransaction(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::remoteStopTransaction);
     }
 
     public RestCallback<String> reset(ResetParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.reset(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::reset);
     }
 
     public RestCallback<String> unlockConnector(UnlockConnectorParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.unlockConnector(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::unlockConnector);
     }
 
     public RestCallback<String> updateFirmware(UpdateFirmwareParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.updateFirmware(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::updateFirmware);
     }
 
     // -------------------------------------------------------------------------
@@ -194,69 +114,27 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<String> reserveNow(ReserveNowParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.reserveNow(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::reserveNow);
     }
 
     public RestCallback<String> cancelReservation(CancelReservationParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.cancelReservation(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::cancelReservation);
     }
 
     public RestCallback<ocpp.cp._2015._10.DataTransferResponse> dataTransfer(DataTransferParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<ocpp.cp._2015._10.DataTransferResponse> callback = createCallback(params);
-        int taskId = chargePointServiceClient.dataTransfer(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::dataTransfer);
     }
 
     public RestCallback<GetConfigurationTask.ConfigurationKeyValues> getConfiguration(GetConfigurationParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<GetConfigurationTask.ConfigurationKeyValues> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getConfiguration(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::getConfiguration);
     }
 
     public RestCallback<String> getLocalListVersion(MultipleChargePointSelect params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getLocalListVersion(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::getLocalListVersion);
     }
 
     public RestCallback<String> sendLocalList(SendLocalListParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.sendLocalList(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::sendLocalList);
     }
 
     // -------------------------------------------------------------------------
@@ -264,47 +142,19 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<String> triggerMessage(TriggerMessageParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.triggerMessage(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::triggerMessage);
     }
 
     public RestCallback<GetCompositeScheduleResponse> getCompositeSchedule(GetCompositeScheduleParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<GetCompositeScheduleResponse> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getCompositeSchedule(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::getCompositeSchedule);
     }
 
     public RestCallback<String> clearChargingProfile(ClearChargingProfileParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.clearChargingProfile(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::clearChargingProfile);
     }
 
     public RestCallback<String> setChargingProfile(SetChargingProfileParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.setChargingProfile(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::setChargingProfile);
     }
 
     public RestCallback<String> setChargingProfile(SetChargingProfileParams params,
@@ -324,65 +174,59 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<String> extendedTriggerMessage(ExtendedTriggerMessageParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.extendedTriggerMessage(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::extendedTriggerMessage);
     }
 
     public RestCallback<String> getLog(GetLogParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getLog(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::getLog);
     }
 
     public RestCallback<String> signedUpdateFirmware(SignedUpdateFirmwareParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.signedUpdateFirmware(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::signedUpdateFirmware);
     }
 
     public RestCallback<String> installCertificate(InstallCertificateParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.installCertificate(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::installCertificate);
     }
 
     public RestCallback<String> deleteCertificate(DeleteCertificateParams params) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.deleteCertificate(params, callback);
-
-        callback.setTaskId(taskId);
-        callback.waitForResponses();
-        return callback;
+        return execute(params, chargePointServiceClient::deleteCertificate);
     }
 
     public RestCallback<String> getInstalledCertificateIds(GetInstalledCertificateIdsParams params) throws Exception {
+        return execute(params, chargePointServiceClient::getInstalledCertificateIds);
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * TODO: Improve this method. We make multiple calls to the database to get charge points for each version.
+     */
+    private List<ChargePointSelect> fetchChargePoints(List<String> chargeBoxIdList) {
+        List<ChargePointSelect> returnList = new ArrayList<>();
+
+        for (OcppVersion version : OcppVersion.values()) {
+            var temp = chargePointService.getChargePointsWithIds(version, chargeBoxIdList);
+            returnList.addAll(temp);
+        }
+
+        return returnList;
+    }
+
+    private <T> RestCallback<T> createCallback(ChargePointSelection chargePointSelection) {
+        return new RestCallback<>(STATION_RESPONSE_TIMEOUT, new CountDownLatch(chargePointSelection.getChargePointSelectList().size()));
+    }
+
+    private <P extends ChargePointSelection, T> RestCallback<T> execute(
+        P params,
+        BiFunction<P, RestCallback<T>, Integer> function
+    ) throws Exception {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
-        RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getInstalledCertificateIds(params, callback);
+        RestCallback<T> callback = createCallback(params);
+        int taskId = function.apply(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();

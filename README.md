@@ -13,7 +13,9 @@ If you are going to deploy it we are happy to see the [logo](website/logo/manage
 
 ### Relation to Powerfill
 
-[Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
+[Powerfill](https://powerfill.io/) is a SaaS company to expand beyond the basics of SteVe. 
+While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. 
+Read more in [the company announcement](https://github.com/steve-community/steve/issues/1643) and [the public launch post](https://powerfill.io/blog/from-university-project-to-enterprise-platform).
 
 ### Charge Point Support
 

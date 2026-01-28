@@ -1,5 +1,7 @@
-# Build stage
-FROM eclipse-temurin:21-jdk AS builder
+FROM eclipse-temurin:21-jdk AS base
+MAINTAINER daynnnnn
+
+# Setting environment variables
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Arguments for database configuration
@@ -9,10 +11,15 @@ ARG DB_PASSWORD
 ARG DB_DATABASE
 ARG DB_PORT
 
+# Build Stage
+FROM base as build
+
+# Set the working directory for the build stage
 WORKDIR /code
 
-# Copy relevant project files to the build stage
+# Copy project files to the build stage
 ADD /src /code/src
+ADD /website /code/website
 ADD /pom.xml /code/pom.xml
 ADD mvnw /code/mvnw
 ADD .mvn /code/.mvn
@@ -28,26 +35,18 @@ RUN sed -i 's|${server.host}|${env.SERVER_HOST}|g' pom.xml
 # Make the Maven wrapper executable
 RUN chmod +x mvnw
 
-# Build the app
-RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1.2,TLSv1.3"
+# Build the project
+RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
-# Runtime stage
-FROM eclipse-temurin:21-jre
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+# Release Stage
+FROM base AS release
 
-# Create a non-root user and group
-RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
-
-WORKDIR /code
-
-# Copy only the built WAR from builder stage and set ownership
-COPY --chown=appuser:appgroup --from=builder /code/target/steve.war ./steve.war
+# Copy relevant files from the build stage
+COPY --from=build /code/target/steve.jar /app/steve.war
+COPY --from=build /code/target/libs /app/libs
 
 # Expose any necessary ports (example: 8080)
 EXPOSE 8080
 
-# Switch to the non-root user
-USER appuser
-
-# Run the app
-CMD ["java", "-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3", "-jar", "steve.war"]
+# Define the entrypoint for the release stage
+CMD ["java", "-jar", "/app/steve.war"]

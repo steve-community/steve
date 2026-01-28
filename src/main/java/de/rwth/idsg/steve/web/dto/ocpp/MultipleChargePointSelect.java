@@ -18,12 +18,16 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.CollectionUtils;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.AssertTrue;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +39,46 @@ import java.util.List;
 @Setter
 public class MultipleChargePointSelect implements ChargePointSelection {
 
-    @NotNull(message = "Charge point selection is required")
-    @Size(min = 1, message = "Please select at least {min} charge point")
+    /**
+     * Only for the Web pages
+     */
+    @Schema(hidden = true)
     private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
+
+    /**
+     * Only for the APIs
+     */
+    @ArraySchema(
+        // Schema for the ARRAY itself
+        arraySchema = @Schema(
+            description = "Should contain at least 1 element",
+            requiredMode = Schema.RequiredMode.REQUIRED
+        ),
+        // Schema for the ITEMS inside the array
+        schema = @Schema(
+            description = "The identifier of the chargebox (i.e. charging station)"
+        ),
+        minItems = 1
+    )
+    private List<String> chargeBoxIdList = Collections.emptyList();
+
+    @JsonIgnore
+    @AssertTrue(message = "Please select at least 1 charge point")
+    public boolean isValidChargePointSelectList() {
+        if (!CollectionUtils.isEmpty(chargeBoxIdList)) {
+            return true;
+        }
+
+        return !CollectionUtils.isEmpty(chargePointSelectList);
+    }
+
+    @JsonIgnore
+    @AssertTrue(message = "Charge Box ID list should contain at least 1 element")
+    public boolean isValidChargeBoxIdList() {
+        if (!CollectionUtils.isEmpty(chargePointSelectList)) {
+            return true;
+        }
+
+        return !CollectionUtils.isEmpty(chargeBoxIdList);
+    }
 }

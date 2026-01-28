@@ -54,7 +54,7 @@ public class ResetTask extends CommunicationTask<ResetParams, String> {
     @Override
     public ocpp.cp._2015._10.ResetRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ResetRequest()
-                .withType(ocpp.cp._2015._10.ResetType.fromValue(params.getResetType().value()));
+                .withType(params.getResetType());
     }
 
     @Override

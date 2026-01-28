@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
+import ocpp.cp._2015._10.AvailabilityType;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

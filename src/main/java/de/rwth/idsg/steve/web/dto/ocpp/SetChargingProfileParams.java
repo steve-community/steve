@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +42,10 @@ public class SetChargingProfileParams extends MultipleChargePointSelect {
     @Positive
     private Integer chargingProfilePk;
 
+    @Schema(description = """
+    Apply the profile to the transaction with this ID.
+    <code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.
+    """)
     @Positive
     private Integer transactionId;
 }

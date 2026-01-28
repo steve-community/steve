@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
+import ocpp.cp._2015._10.ResetType;
 
 import jakarta.validation.constraints.NotNull;
 

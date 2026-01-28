@@ -159,7 +159,6 @@ public class OcppOperationsService {
     public RestCallback<String> reset(ResetParams params) throws Exception {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
-
         RestCallback<String> callback = createCallback(params);
         int taskId = chargePointServiceClient.reset(params, callback);
 
@@ -328,7 +327,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.extendedTriggerMessage(params);
+        int taskId = chargePointServiceClient.extendedTriggerMessage(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();
@@ -339,7 +338,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getLog(params);
+        int taskId = chargePointServiceClient.getLog(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();
@@ -350,7 +349,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.signedUpdateFirmware(params);
+        int taskId = chargePointServiceClient.signedUpdateFirmware(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();
@@ -361,7 +360,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.installCertificate(params);
+        int taskId = chargePointServiceClient.installCertificate(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();
@@ -372,7 +371,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.deleteCertificate(params);
+        int taskId = chargePointServiceClient.deleteCertificate(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();
@@ -383,7 +382,7 @@ public class OcppOperationsService {
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<String> callback = createCallback(params);
-        int taskId = chargePointServiceClient.getInstalledCertificateIds(params);
+        int taskId = chargePointServiceClient.getInstalledCertificateIds(params, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();

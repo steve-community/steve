@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +42,10 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
     @IdTag
     private String idTag;
 
+    @Schema(description = """
+    PK of the charging profile to be used for the transaction.
+    <code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.
+    """)
     @Positive
     private Integer chargingProfilePk;
 

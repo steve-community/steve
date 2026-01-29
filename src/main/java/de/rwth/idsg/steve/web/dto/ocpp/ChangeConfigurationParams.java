@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,6 +29,8 @@ import lombok.Setter;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+
+import static de.rwth.idsg.steve.config.ApiDocsConfiguration.ConfigurationKeyEnum_Write_Keys;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,8 +40,13 @@ import java.util.Objects;
 @Setter
 public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
+    @Schema(
+        ref = ConfigurationKeyEnum_Write_Keys,
+        description = "Configuration Key predefined by Ocpp"
+    )
     private String confKey;
 
+    @Schema(description = "Custom Configuration Key")
     private String customConfKey;
 
     @NotNull(message = "Key type is required")
@@ -50,6 +59,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
+    @JsonIgnore
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")
     public boolean isValidCustom() {
         if (keyType == ConfigurationKeyType.CUSTOM) {
@@ -59,6 +69,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
     }
 
+    @JsonIgnore
     @AssertTrue(message = "Configuration Key is required")
     public boolean isValidPredefined() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
@@ -68,6 +79,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
     }
 
+    @JsonIgnore
     public String getKey() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
             return confKey;

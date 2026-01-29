@@ -18,16 +18,25 @@
  */
 package de.rwth.idsg.steve.config;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +47,9 @@ import java.util.List;
  */
 @Configuration
 public class ApiDocsConfiguration {
+
+    public static final String ConfigurationKeyEnum_Read_Keys = "ConfigurationKeyEnum_Read_Keys";
+    public static final String ConfigurationKeyEnum_Write_Keys = "ConfigurationKeyEnum_Write_Keys";
 
     static {
         // Set the path with prefix /manager to protect the documentation behind regular sign-in
@@ -82,5 +94,40 @@ public class ApiDocsConfiguration {
             .components(new Components().addSecuritySchemes(securityName, securityScheme))
             // and activate it for all endpoints
             .addSecurityItem(new SecurityRequirement().addList(securityName));
+    }
+
+    /**
+     * 1. Some OCPP operations' API payloads (e.g. {@link de.rwth.idsg.steve.web.dto.ocpp.ResetParams} are directly
+     * referencing OCPP enums (e.g. {@link ocpp.cp._2015._10.ResetType} that come with XML annotations. In order
+     * for Swagger/OpenAPI properly derive the correct enum values, we need to add XML binding introspector.
+     *
+     * 2. OCPP operations Get- and Change-Configuration allow different sets of keys. Not all keys are readable and
+     * writable. In order for OpenAPI spec to be correct in that regard, we specify them here.
+     */
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public OpenApiCustomizer openApiCustomizer(ObjectMapperProvider objectMapperProvider) {
+        {
+            var mapper = objectMapperProvider.jsonMapper();
+            var existing = mapper.getSerializationConfig().getAnnotationIntrospector();
+            var xmlBindAnnotationIntrospector = new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory());
+            mapper.setAnnotationIntrospector(AnnotationIntrospector.pair(existing, xmlBindAnnotationIntrospector));
+        }
+
+        return openApi -> {
+            Components components = openApi.getComponents();
+
+            {
+                var schema = new StringSchema();
+                schema.setEnum(new ArrayList<>(ConfigurationKeyEnum.READ));
+                components.addSchemas(ConfigurationKeyEnum_Read_Keys, schema);
+            }
+
+            {
+                var schema = new StringSchema();
+                schema.setEnum(new ArrayList<>(ConfigurationKeyEnum.WRITE));
+                components.addSchemas(ConfigurationKeyEnum_Write_Keys, schema);
+            }
+        };
     }
 }

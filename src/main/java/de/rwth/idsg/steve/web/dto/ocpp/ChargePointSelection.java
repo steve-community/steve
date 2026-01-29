@@ -27,5 +27,10 @@ import java.util.List;
  * @since 09.03.2018
  */
 public interface ChargePointSelection {
+
     List<ChargePointSelect> getChargePointSelectList();
+
+    void setChargePointSelectList(List<ChargePointSelect> chargePointSelectList);
+
+    List<String> getChargeBoxIdList();
 }

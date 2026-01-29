@@ -143,6 +143,8 @@ public enum ConfigurationKeyEnum {
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
     public static final Map<String, String> OCPP_16_MAP_W = asMap(OcppVersion.V_16, W);
 
+    public static final Set<String> READ = asMap(null, R).keySet();
+    public static final Set<String> WRITE = asMap(null, W).keySet();
 
     ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
         this.value = this.name();
@@ -167,7 +169,7 @@ public enum ConfigurationKeyEnum {
     private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWriteEnum requestedType) {
         Map<String, String> map = new TreeMap<>();
         for (ConfigurationKeyEnum confType : ConfigurationKeyEnum.values()) {
-            if (!confType.versions.contains(version)) {
+            if (version != null && !confType.versions.contains(version)) {
                 continue;
             }
 

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
@@ -50,6 +51,7 @@ public class ClearChargingProfileParams extends MultipleChargePointSelect {
 
     private Integer stackLevel;
 
+    @JsonIgnore
     @AssertTrue(message = "When filtering by id, charging profile id must be set")
     public boolean isValidWhenFilterById() {
         return filterType != ClearChargingProfileFilterType.ChargingProfileId || chargingProfilePk != null;

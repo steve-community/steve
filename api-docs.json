@@ -1,0 +1,3969 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"description": "SteVe REST API Documentation",
+		"license": {
+			"name": "GPL-3.0",
+			"url": "https://github.com/steve-community/steve/blob/master/LICENSE.txt"
+		},
+		"title": "SteVe REST API Documentation",
+		"version": "3.11.0-SNAPSHOT"
+	},
+	"servers": [
+		{
+			"url": "/",
+			"description": "Default Server URL"
+		}
+	],
+	"security": [
+		{
+			"basicAuth": []
+		}
+	],
+	"tags": [
+		{
+			"description": "Operations that can be initiated by the Central System at the Charge Points.\nSome of these operations allows multiple Charge Points to be selected, whereas others are specific to a single Charge Point.\nFor the detailed information on the parameters, please refer to the OCPP specification.\n",
+			"name": "ocpp-operations-controller"
+		},
+		{
+			"description": "Operations related to querying transactions.\nA transaction represents a charging session at a charge box (i.e. charging station. The notions 'charge box' and 'charging station' are being used interchangeably).\n",
+			"name": "transaction-controller"
+		},
+		{
+			"description": "Operations related to managing Ocpp Tags.\nAn Ocpp Tag is the identifier of the actor that interacts with the charge box.\nIt can be used for authorization, but also to start and stop charging sessions.\nAn RFID card is an example of an Ocpp Tag.\n",
+			"name": "ocpp-tag-controller"
+		}
+	],
+	"paths": {
+		"/api/v1/ocppTags": {
+			"get": {
+				"description": "Returns a list of Ocpp Tags based on the query parameters.\nThe query parameters can be used to filter the Ocpp Tags.\n",
+				"operationId": "get",
+				"parameters": [
+					{
+						"description": "Database primary key of the OCPP tag",
+						"in": "query",
+						"name": "ocppTagPk",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"description": "Database primary key of the OCPP tag"
+						}
+					},
+					{
+						"description": "The OCPP tag",
+						"in": "query",
+						"name": "idTag",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "The OCPP tag"
+						}
+					},
+					{
+						"description": "The parent OCPP tag of this OCPP tag",
+						"in": "query",
+						"name": "parentIdTag",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "The parent OCPP tag of this OCPP tag"
+						}
+					},
+					{
+						"description": "The User ID",
+						"in": "query",
+						"name": "userId",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"description": "The User ID"
+						}
+					},
+					{
+						"description": "Return expired, not expired, or all Ocpp tags? Defaults to ALL",
+						"in": "query",
+						"name": "expired",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Return expired, not expired, or all Ocpp tags? Defaults to ALL",
+							"enum": [
+								"ALL",
+								"TRUE",
+								"FALSE"
+							]
+						}
+					},
+					{
+						"description": "Return in-transaction, not in-transaction, or all Ocpp tags? Defaults to ALL",
+						"in": "query",
+						"name": "inTransaction",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Return in-transaction, not in-transaction, or all Ocpp tags? Defaults to ALL",
+							"enum": [
+								"ALL",
+								"TRUE",
+								"FALSE"
+							]
+						}
+					},
+					{
+						"description": "Return blocked, not blocked, or all Ocpp tags? Defaults to ALL",
+						"in": "query",
+						"name": "blocked",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Return blocked, not blocked, or all Ocpp tags? Defaults to ALL",
+							"enum": [
+								"ALL",
+								"TRUE",
+								"FALSE"
+							]
+						}
+					},
+					{
+						"description": "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.",
+						"in": "query",
+						"name": "note",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted."
+						}
+					},
+					{
+						"description": "Filter by whether the OCPP tag is associated with a user or not. Defaults to All",
+						"in": "query",
+						"name": "userFilter",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Filter by whether the OCPP tag is associated with a user or not. Defaults to All",
+							"enum": [
+								"All",
+								"OnlyTagsWithUser",
+								"OnlyTagsWithoutUser"
+							]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/OcppTagOverview"
+									}
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			},
+			"post": {
+				"description": "Creates a new Ocpp Tag with the provided parameters.\nThe request body should contain the necessary information.\n",
+				"operationId": "create",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/OcppTagForm"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppTagOverview"
+								}
+							}
+						},
+						"description": "Created"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Entity"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			}
+		},
+		"/api/v1/ocppTags/{ocppTagPk}": {
+			"delete": {
+				"description": "Deletes an existing Ocpp Tag based on the ocppTagPk.\nReturns the deleted Ocpp Tag.\n",
+				"operationId": "delete",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "ocppTagPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppTagOverview"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			},
+			"get": {
+				"description": "Returns a single Ocpp Tag based on the ocppTagPk.\n",
+				"operationId": "getOne",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "ocppTagPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppTagOverview"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			},
+			"put": {
+				"description": "Updates an existing Ocpp Tag with the provided parameters.\n",
+				"operationId": "update",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "ocppTagPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/OcppTagForm"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppTagOverview"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			}
+		},
+		"/api/v1/operations/CancelReservation": {
+			"post": {
+				"description": "Only 1 charge point can be selected.\n",
+				"operationId": "cancelReservation",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CancelReservationParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ChangeAvailability": {
+			"post": {
+				"operationId": "changeAvailability",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ChangeAvailabilityParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ChangeConfiguration": {
+			"post": {
+				"operationId": "changeConfiguration",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ChangeConfigurationParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ClearCache": {
+			"post": {
+				"operationId": "clearCache",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MultipleChargePointSelect"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ClearChargingProfile": {
+			"post": {
+				"operationId": "clearChargingProfile",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ClearChargingProfileParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/DataTransfer": {
+			"post": {
+				"operationId": "dataTransfer",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DataTransferParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseDataTransferResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/DeleteCertificate": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\n<code>installedCertificateId</code> in payload is the database ID.\nOnly 1 charge point can be selected.\n",
+				"operationId": "deleteCertificate",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DeleteCertificateParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ExtendedTriggerMessage": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\n",
+				"operationId": "extendedTriggerMessage",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ExtendedTriggerMessageParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetCompositeSchedule": {
+			"post": {
+				"operationId": "getCompositeSchedule",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetCompositeScheduleParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseGetCompositeScheduleResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetConfiguration": {
+			"post": {
+				"operationId": "getConfiguration",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetConfigurationParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseConfigurationKeyValues"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetDiagnostics": {
+			"post": {
+				"operationId": "getDiagnostics",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetDiagnosticsParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetInstalledCertificateIds": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\nThe certificates sent by the station will be stored in database.\n",
+				"operationId": "getInstalledCertificateIds",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetInstalledCertificateIdsParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetLocalListVersion": {
+			"post": {
+				"operationId": "getLocalListVersion",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MultipleChargePointSelect"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/GetLog": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\nRequest ID will be set automatically by backend.\nOnce this operation is triggered at a station, it will send status notifications about the progress and result.\n",
+				"operationId": "getLog",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/GetLogParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/InstallCertificate": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\n",
+				"operationId": "installCertificate",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/InstallCertificateParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/RemoteStartTransaction": {
+			"post": {
+				"description": "Only 1 charge point can be selected.\n",
+				"operationId": "remoteStartTransaction",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RemoteStartTransactionParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/RemoteStopTransaction": {
+			"post": {
+				"description": "Only 1 charge point can be selected.\n",
+				"operationId": "remoteStopTransaction",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RemoteStopTransactionParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/ReserveNow": {
+			"post": {
+				"description": "Only 1 charge point can be selected.\n",
+				"operationId": "reserveNow",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ReserveNowParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/Reset": {
+			"post": {
+				"operationId": "reset",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ResetParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/SendLocalList": {
+			"post": {
+				"operationId": "sendLocalList",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SendLocalListParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/SetChargingProfile": {
+			"post": {
+				"operationId": "setChargingProfile",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetChargingProfileParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/SignedUpdateFirmware": {
+			"post": {
+				"description": "As specified in <i>Improved security for OCPP 1.6-J</i> white paper.\nRequest ID will be set automatically by backend.\nOnce this operation is triggered at a station, it will send status notifications about the progress and result.\n",
+				"operationId": "signedUpdateFirmware",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignedUpdateFirmwareParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/TriggerMessage": {
+			"post": {
+				"operationId": "triggerMessage",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TriggerMessageParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/UnlockConnector": {
+			"post": {
+				"description": "Only 1 charge point can be selected.\n",
+				"operationId": "unlockConnector",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UnlockConnectorParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/operations/UpdateFirmware": {
+			"post": {
+				"operationId": "updateFirmware",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateFirmwareParams"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppOperationResponseString"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-operations-controller"
+				]
+			}
+		},
+		"/api/v1/transactions": {
+			"get": {
+				"description": "Returns a list of transactions based on the query parameters.\nThe query parameters can be used to filter the transactions.\n",
+				"operationId": "get_1",
+				"parameters": [
+					{
+						"description": "Database primary key of the transaction",
+						"in": "query",
+						"name": "transactionPk",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"description": "Database primary key of the transaction"
+						}
+					},
+					{
+						"description": "ID of the connector",
+						"in": "query",
+						"name": "connectorId",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"description": "ID of the connector"
+						}
+					},
+					{
+						"description": "Return active or all transactions? Defaults to ALL",
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Return active or all transactions? Defaults to ALL",
+							"enum": [
+								"ALL",
+								"ACTIVE",
+								"STOPPED"
+							]
+						}
+					},
+					{
+						"description": "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL",
+						"in": "query",
+						"name": "periodType",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL",
+							"enum": [
+								"ALL",
+								"TODAY",
+								"LAST_10",
+								"LAST_30",
+								"LAST_90",
+								"FROM_TO"
+							]
+						}
+					},
+					{
+						"description": "The identifier of the chargebox (i.e. charging station)",
+						"in": "query",
+						"name": "chargeBoxId",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						}
+					},
+					{
+						"description": "The OCPP tag",
+						"in": "query",
+						"name": "ocppIdTag",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"description": "The OCPP tag"
+						}
+					},
+					{
+						"description": "The User ID",
+						"in": "query",
+						"name": "userId",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"description": "The User ID",
+							"exclusiveMinimum": 0
+						}
+					},
+					{
+						"description": "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`",
+						"in": "query",
+						"name": "from",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"description": "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`"
+						}
+					},
+					{
+						"description": "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`",
+						"in": "query",
+						"name": "to",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"description": "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									}
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"transaction-controller"
+				]
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"ApiErrorResponse": {
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"path": {
+						"type": "string"
+					},
+					"status": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CallException": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"exceptionMessage": {
+						"type": "string"
+					}
+				}
+			},
+			"CancelReservationParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"reservationId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"reservationId"
+				]
+			},
+			"ChangeAvailabilityParams": {
+				"type": "object",
+				"properties": {
+					"availType": {
+						"type": "string",
+						"enum": [
+							"Inoperative",
+							"Operative"
+						]
+					},
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"availType",
+					"chargeBoxIdList"
+				]
+			},
+			"ChangeConfigurationParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"confKey": {
+						"type": "string",
+						"$ref": "#/components/schemas/ConfigurationKeyEnum_Write_Keys",
+						"description": "Configuration Key predefined by Ocpp"
+					},
+					"customConfKey": {
+						"type": "string",
+						"description": "Custom Configuration Key"
+					},
+					"keyType": {
+						"type": "string",
+						"enum": [
+							"PREDEFINED",
+							"CUSTOM"
+						]
+					},
+					"value": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"keyType"
+				]
+			},
+			"ChargingSchedule": {
+				"type": "object",
+				"properties": {
+					"chargingRateUnit": {
+						"type": "string",
+						"enum": [
+							"W",
+							"A"
+						]
+					},
+					"chargingSchedulePeriod": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ChargingSchedulePeriod"
+						}
+					},
+					"duration": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"minChargingRate": {
+						"type": "number"
+					},
+					"startSchedule": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"chargingRateUnit",
+					"chargingSchedulePeriod"
+				]
+			},
+			"ChargingSchedulePeriod": {
+				"type": "object",
+				"properties": {
+					"limit": {
+						"type": "number"
+					},
+					"numberPhases": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"startPeriod": {
+						"type": "integer",
+						"format": "int32"
+					}
+				},
+				"required": [
+					"limit"
+				]
+			},
+			"ClearChargingProfileParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"chargingProfilePk": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"chargingProfilePurpose": {
+						"type": "string",
+						"enum": [
+							"ChargePointMaxProfile",
+							"TxDefaultProfile",
+							"TxProfile"
+						]
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					},
+					"filterType": {
+						"type": "string",
+						"enum": [
+							"ChargingProfileId",
+							"OtherParameters"
+						]
+					},
+					"stackLevel": {
+						"type": "integer",
+						"format": "int32"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"filterType"
+				]
+			},
+			"ConfigurationKeyEnum_Read_Keys": {
+				"type": "string",
+				"enum": [
+					"AdditionalRootCertificateCheck",
+					"AllowOfflineTxForUnknownId",
+					"AuthorizationCacheEnabled",
+					"AuthorizeRemoteTxRequests",
+					"BlinkRepeat",
+					"CertificateSignedMaxChainSize",
+					"CertificateStoreMaxLength",
+					"ChargePointId",
+					"ChargeProfileMaxStackLevel",
+					"ChargingScheduleAllowedChargingRateUnit",
+					"ChargingScheduleMaxPeriods",
+					"ClockAlignedDataInterval",
+					"ConnectionTimeOut",
+					"ConnectorPhaseRotation",
+					"ConnectorPhaseRotationMaxLength",
+					"ConnectorSwitch3to1PhaseSupported",
+					"CpoName",
+					"GetConfigurationMaxKeys",
+					"HeartBeatInterval",
+					"HeartbeatInterval",
+					"LightIntensity",
+					"LocalAuthListEnabled",
+					"LocalAuthListMaxLength",
+					"LocalAuthorizeOffline",
+					"LocalPreAuthorize",
+					"MaxChargingProfilesInstalled",
+					"MaxEnergyOnInvalidId",
+					"MeterValueSampleInterval",
+					"MeterValuesAlignedData",
+					"MeterValuesAlignedDataMaxLength",
+					"MeterValuesSampledData",
+					"MeterValuesSampledDataMaxLength",
+					"MeterValuesSignatureContexts",
+					"MinimumStatusDuration",
+					"NumberOfConnectors",
+					"ProximityContactRetries",
+					"ProximityLockRetries",
+					"ReserveConnectorZeroSupported",
+					"ResetRetries",
+					"SecurityProfile",
+					"SendLocalListMaxLength",
+					"StopTransactionOnEVSideDisconnect",
+					"StopTransactionOnInvalidId",
+					"StopTransactionSignatureContexts",
+					"StopTransactionSignatureFormat",
+					"StopTxnAlignedData",
+					"StopTxnAlignedDataMaxLength",
+					"StopTxnSampledData",
+					"StopTxnSampledDataMaxLength",
+					"SupportedFeatureProfiles",
+					"SupportedFeatureProfilesMaxLength",
+					"SupportedFileTransferProtocols",
+					"TransactionMessageAttempts",
+					"TransactionMessageRetryInterval",
+					"UnlockConnectorOnEVSideDisconnect",
+					"WebSocketPingInterval"
+				]
+			},
+			"ConfigurationKeyEnum_Write_Keys": {
+				"type": "string",
+				"enum": [
+					"AllowOfflineTxForUnknownId",
+					"AuthorizationCacheEnabled",
+					"AuthorizationKey",
+					"AuthorizeRemoteTxRequests",
+					"BlinkRepeat",
+					"ChargePointId",
+					"ClockAlignedDataInterval",
+					"ConnectionTimeOut",
+					"ConnectorPhaseRotation",
+					"CpoName",
+					"HeartBeatInterval",
+					"HeartbeatInterval",
+					"LightIntensity",
+					"LocalAuthListEnabled",
+					"LocalAuthorizeOffline",
+					"LocalPreAuthorize",
+					"MaxEnergyOnInvalidId",
+					"MeterValueSampleInterval",
+					"MeterValuesAlignedData",
+					"MeterValuesSampledData",
+					"MeterValuesSignatureContexts",
+					"MinimumStatusDuration",
+					"ProximityContactRetries",
+					"ProximityLockRetries",
+					"ResetRetries",
+					"SecurityProfile",
+					"StopTransactionOnEVSideDisconnect",
+					"StopTransactionOnInvalidId",
+					"StopTransactionSignatureContexts",
+					"StopTransactionSignatureFormat",
+					"StopTxnAlignedData",
+					"StopTxnSampledData",
+					"TransactionMessageAttempts",
+					"TransactionMessageRetryInterval",
+					"UnlockConnectorOnEVSideDisconnect",
+					"WebSocketPingInterval"
+				]
+			},
+			"ConfigurationKeyValues": {
+				"type": "object",
+				"properties": {
+					"configurationKeys": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/KeyValue"
+						}
+					},
+					"unknownKeys": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"DataTransferParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"data": {
+						"type": "string"
+					},
+					"messageId": {
+						"type": "string"
+					},
+					"vendorId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"vendorId"
+				]
+			},
+			"DataTransferResponse": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"UnknownMessageId",
+							"UnknownVendorId"
+						]
+					}
+				},
+				"required": [
+					"status"
+				]
+			},
+			"DeleteCertificateParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"installedCertificateId": {
+						"type": "integer",
+						"format": "int64"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"installedCertificateId"
+				]
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"errorCode": {
+						"type": "string",
+						"enum": [
+							"NotImplemented",
+							"NotSupported",
+							"InternalError",
+							"ProtocolError",
+							"SecurityError",
+							"FormationViolation",
+							"PropertyConstraintViolation",
+							"OccurenceConstraintViolation",
+							"TypeConstraintViolation",
+							"GenericError"
+						]
+					},
+					"errorDescription": {
+						"type": "string"
+					},
+					"errorDetails": {
+						"type": "string"
+					}
+				}
+			},
+			"ExtendedTriggerMessageParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					},
+					"triggerMessage": {
+						"type": "string",
+						"enum": [
+							"BootNotification",
+							"LogStatusNotification",
+							"FirmwareStatusNotification",
+							"Heartbeat",
+							"MeterValues",
+							"SignChargePointCertificate",
+							"StatusNotification"
+						]
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"triggerMessage"
+				]
+			},
+			"GetCompositeScheduleParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"chargingRateUnit": {
+						"type": "string",
+						"enum": [
+							"W",
+							"A"
+						]
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					},
+					"durationInSeconds": {
+						"type": "integer",
+						"format": "int32"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"connectorId",
+					"durationInSeconds"
+				]
+			},
+			"GetCompositeScheduleResponse": {
+				"type": "object",
+				"properties": {
+					"chargingSchedule": {
+						"$ref": "#/components/schemas/ChargingSchedule"
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"scheduleStart": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected"
+						]
+					}
+				},
+				"required": [
+					"status"
+				]
+			},
+			"GetConfigurationParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"commaSeparatedCustomConfKeys": {
+						"type": "string",
+						"description": "Comma separated sequence of Custom Configuration Keys"
+					},
+					"confKeyList": {
+						"type": "array",
+						"$ref": "#/components/schemas/ConfigurationKeyEnum_Read_Keys",
+						"description": "List of Configuration Keys predefined by Ocpp.\nThe documented keys are the superset of all keys defined in Ocpp versions 1.2, 1.5 and 1.6.\nTherefore, not all possible keys apply to all Ocpp versions.\n",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"chargeBoxIdList"
+				]
+			},
+			"GetDiagnosticsParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"location": {
+						"type": "string",
+						"description": "The URL where charge point should upload the log file",
+						"example": "ftp://user:pass@example.com/logs/",
+						"minLength": 1,
+						"pattern": "\\S+"
+					},
+					"retries": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of times charge point should retry upload if it fails",
+						"minimum": 1
+					},
+					"retryInterval": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Interval in seconds between retry attempts",
+						"minimum": 1
+					},
+					"start": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Oldest timestamp to include in log file"
+					},
+					"stop": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Latest timestamp to include in log file"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"location"
+				]
+			},
+			"GetInstalledCertificateIdsParams": {
+				"type": "object",
+				"description": "Parameters for retrieving installed certificate IDs from charge points",
+				"properties": {
+					"certificateType": {
+						"type": "string",
+						"description": "Filter by certificate type.",
+						"enum": [
+							"CentralSystemRootCertificate",
+							"ManufacturerRootCertificate"
+						]
+					},
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					}
+				},
+				"required": [
+					"certificateType",
+					"chargeBoxIdList"
+				]
+			},
+			"GetLogParams": {
+				"type": "object",
+				"description": "Parameters for requesting diagnostic or security logs from charge points",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"location": {
+						"type": "string",
+						"description": "The URL where charge point should upload the log file",
+						"example": "ftp://user:pass@example.com/logs/",
+						"minLength": 1,
+						"pattern": "\\S+"
+					},
+					"logType": {
+						"type": "string",
+						"description": "Type of log to retrieve",
+						"enum": [
+							"DiagnosticsLog",
+							"SecurityLog"
+						]
+					},
+					"retries": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of times charge point should retry upload if it fails",
+						"minimum": 1
+					},
+					"retryInterval": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Interval in seconds between retry attempts",
+						"minimum": 1
+					},
+					"start": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Oldest timestamp to include in log file"
+					},
+					"stop": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Latest timestamp to include in log file"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"location",
+					"logType"
+				]
+			},
+			"InstallCertificateParams": {
+				"type": "object",
+				"description": "Parameters for installing a certificate on charge points",
+				"properties": {
+					"certificate": {
+						"type": "string",
+						"description": "PEM-encoded X.509 certificate",
+						"maxLength": 5500,
+						"minLength": 0
+					},
+					"certificateType": {
+						"type": "string",
+						"description": "Type of certificate to install",
+						"enum": [
+							"CentralSystemRootCertificate",
+							"ManufacturerRootCertificate"
+						]
+					},
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					}
+				},
+				"required": [
+					"certificate",
+					"certificateType",
+					"chargeBoxIdList"
+				]
+			},
+			"KeyValue": {
+				"type": "object",
+				"properties": {
+					"key": {
+						"type": "string"
+					},
+					"readonly": {
+						"type": "boolean"
+					},
+					"value": {
+						"type": "string"
+					}
+				}
+			},
+			"MultipleChargePointSelect": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					}
+				},
+				"required": [
+					"chargeBoxIdList"
+				]
+			},
+			"OcppOperationResponseConfigurationKeyValues": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseConfigurationKeyValues"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseDataTransferResponse": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseDataTransferResponse"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseGetCompositeScheduleResponse": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseGetCompositeScheduleResponse"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseString": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseString"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppTagForm": {
+				"type": "object",
+				"properties": {
+					"expiryDate": {
+						"type": "string",
+						"format": "date-time",
+						"description": "ISO 8601 date/time with timezone. Example: `2024-08-25T14:30:00.000Z`"
+					},
+					"idTag": {
+						"type": "string",
+						"description": "Will be used in create/insert flows. Will be ignored in update flows.",
+						"minLength": 1
+					},
+					"maxActiveTransactionCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"note": {
+						"type": "string"
+					},
+					"parentIdTag": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"idTag"
+				]
+			},
+			"OcppTagOverview": {
+				"type": "object",
+				"properties": {
+					"activeTransactionCount": {
+						"type": "integer",
+						"format": "int64",
+						"description": "The number of currently active transactions for this OCPP tag"
+					},
+					"blocked": {
+						"type": "boolean",
+						"description": "Is the OCPP tag blocked?"
+					},
+					"expiryDate": {
+						"type": "string",
+						"format": "date-time",
+						"description": "The date/time at which the OCPP tag will expire (if set)"
+					},
+					"idTag": {
+						"type": "string",
+						"description": "The OCPP tag"
+					},
+					"inTransaction": {
+						"type": "boolean",
+						"description": "Has the OCPP tag active transactions (i.e. ongoing charging sessions)?"
+					},
+					"maxActiveTransactionCount": {
+						"type": "integer",
+						"format": "int32",
+						"description": "The maximum number of active transactions allowed for this OCPP tag"
+					},
+					"note": {
+						"type": "string",
+						"description": "An additional note"
+					},
+					"ocppTagPk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the OCPP tag"
+					},
+					"parentIdTag": {
+						"type": "string",
+						"description": "The parent OCPP tag of this OCPP tag"
+					},
+					"parentOcppTagPk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the parent OCPP tag of this OCPP tag"
+					},
+					"userPk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the user this OCPP tag belongs to (if any)"
+					}
+				}
+			},
+			"RemoteStartTransactionParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"chargingProfilePk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the charging profile to be used for the transaction.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n"
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					},
+					"idTag": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"idTag"
+				]
+			},
+			"RemoteStopTransactionParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"transactionId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"transactionId"
+				]
+			},
+			"ReserveNowParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"expiry": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"idTag": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"connectorId",
+					"expiry",
+					"idTag"
+				]
+			},
+			"ResetParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"resetType": {
+						"type": "string",
+						"enum": [
+							"Hard",
+							"Soft"
+						]
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"resetType"
+				]
+			},
+			"SendLocalListParams": {
+				"type": "object",
+				"properties": {
+					"addUpdateList": {
+						"type": "array",
+						"description": "User ID Tags to be added or updated",
+						"items": {
+							"type": "string"
+						}
+					},
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"deleteList": {
+						"type": "array",
+						"description": "User ID Tags to be deleted",
+						"items": {
+							"type": "string"
+						}
+					},
+					"listVersion": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"sendEmptyListWhenFull": {
+						"type": "boolean",
+						"description": "If set to <code>true</code> and the update type is FULL, an empty list will be sent.\nAs a result, the charge point will remove all ID Tags from its list.\n"
+					},
+					"updateType": {
+						"type": "string",
+						"enum": [
+							"Differential",
+							"Full"
+						]
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"listVersion",
+					"sendEmptyListWhenFull",
+					"updateType"
+				]
+			},
+			"SetChargingProfileParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"chargingProfilePk": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 0
+					},
+					"transactionId": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Apply the profile to the transaction with this ID.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n"
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"chargingProfilePk",
+					"connectorId"
+				]
+			},
+			"SignedUpdateFirmwareParams": {
+				"type": "object",
+				"description": "Parameters for signed firmware update with cryptographic verification",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"installDateTime": {
+						"type": "string",
+						"format": "date-time",
+						"description": "When charge point should install the downloaded firmware"
+					},
+					"location": {
+						"type": "string",
+						"description": "URL where charge point can download the firmware",
+						"example": "https://firmware.example.com/v2.3.bin",
+						"minLength": 1,
+						"pattern": "\\S+"
+					},
+					"retries": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of download retry attempts",
+						"minimum": 1
+					},
+					"retrieveDateTime": {
+						"type": "string",
+						"format": "date-time",
+						"description": "When charge point should start downloading firmware"
+					},
+					"retryInterval": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Interval in seconds between retry attempts",
+						"minimum": 1
+					},
+					"signature": {
+						"type": "string",
+						"description": "Cryptographic signature of the firmware file",
+						"maxLength": 800,
+						"minLength": 0
+					},
+					"signingCertificate": {
+						"type": "string",
+						"description": "PEM-encoded certificate used to sign the firmware",
+						"maxLength": 5500,
+						"minLength": 0
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"location",
+					"retrieveDateTime",
+					"signature",
+					"signingCertificate"
+				]
+			},
+			"SuccessResponseConfigurationKeyValues": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"$ref": "#/components/schemas/ConfigurationKeyValues"
+					}
+				}
+			},
+			"SuccessResponseDataTransferResponse": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"$ref": "#/components/schemas/DataTransferResponse"
+					}
+				}
+			},
+			"SuccessResponseGetCompositeScheduleResponse": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"$ref": "#/components/schemas/GetCompositeScheduleResponse"
+					}
+				}
+			},
+			"SuccessResponseString": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string"
+					}
+				}
+			},
+			"Transaction": {
+				"type": "object",
+				"description": "For active transactions, all 'stop'-prefixed fields would be null.\nThe energy consumed during the transaction can be calculated by subtracting the 'startValue' from the 'stopValue'.\nThe unit of the 'startValue' and 'stopValue' is watt-hours (Wh).\n",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string",
+						"description": "The identifier of the charge box at which the transaction took place"
+					},
+					"chargeBoxPk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the charge box at which the transaction took place"
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Connector ID of the charge box at which the transaction took place"
+					},
+					"id": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the transaction"
+					},
+					"ocppIdTag": {
+						"type": "string",
+						"description": "The Ocpp Tag used in the transaction"
+					},
+					"ocppTagPk": {
+						"type": "integer",
+						"format": "int32",
+						"description": "PK of the OCPP tag used in the transaction"
+					},
+					"startTimestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "The timestamp at which the transaction started"
+					},
+					"startValue": {
+						"type": "string",
+						"description": "The meter value reading at the start of the transaction"
+					},
+					"stopEventActor": {
+						"type": "string",
+						"description": "The actor who stopped the transaction",
+						"enum": [
+							"station",
+							"manual"
+						]
+					},
+					"stopReason": {
+						"type": "string",
+						"description": "The reason for the transaction being stopped"
+					},
+					"stopTimestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "The timestamp at which the transaction ended"
+					},
+					"stopValue": {
+						"type": "string",
+						"description": "The meter value reading at the end of the transaction"
+					},
+					"userId": {
+						"type": "integer",
+						"format": "int32",
+						"description": "The ID of the user who owns the Ocpp Tag associated with this transaction"
+					}
+				}
+			},
+			"TriggerMessageParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					},
+					"triggerMessage": {
+						"type": "string",
+						"enum": [
+							"BootNotification",
+							"DiagnosticsStatusNotification",
+							"FirmwareStatusNotification",
+							"Heartbeat",
+							"MeterValues",
+							"StatusNotification"
+						]
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"triggerMessage"
+				]
+			},
+			"UnlockConnectorParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain exactly 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"maxItems": 1,
+						"minItems": 1
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32",
+						"minimum": 1
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"connectorId"
+				]
+			},
+			"UpdateFirmwareParams": {
+				"type": "object",
+				"properties": {
+					"chargeBoxIdList": {
+						"type": "array",
+						"description": "Should contain at least 1 element",
+						"items": {
+							"type": "string",
+							"description": "The identifier of the chargebox (i.e. charging station)"
+						},
+						"minItems": 1
+					},
+					"location": {
+						"type": "string",
+						"description": "URL where charge point can download the firmware",
+						"example": "https://firmware.example.com/v2.3.bin",
+						"minLength": 1,
+						"pattern": "\\S+"
+					},
+					"retries": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of download retry attempts",
+						"minimum": 1
+					},
+					"retrieveDateTime": {
+						"type": "string",
+						"format": "date-time",
+						"description": "When charge point should start downloading firmware"
+					},
+					"retryInterval": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Interval in seconds between retry attempts",
+						"minimum": 1
+					}
+				},
+				"required": [
+					"chargeBoxIdList",
+					"location",
+					"retrieveDateTime"
+				]
+			}
+		},
+		"securitySchemes": {
+			"basicAuth": {
+				"name": "basicAuth",
+				"scheme": "basic",
+				"type": "http"
+			}
+		}
+	}
+}

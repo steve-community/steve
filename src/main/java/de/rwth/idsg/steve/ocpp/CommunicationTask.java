@@ -202,12 +202,4 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
             addNewError(chargeBoxId, e.getMessage());
         }
     }
-
-    public class StringOcppCallback extends DefaultOcppCallback<String> {
-
-        @Override
-        public void success(String chargeBoxId, String response) {
-            addNewResponse(chargeBoxId, response);
-        }
-    }
 }

@@ -573,7 +573,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseCancelReservationStatus"
 								}
 							}
 						},
@@ -643,7 +643,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseAvailabilityStatus"
 								}
 							}
 						},
@@ -713,7 +713,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseConfigurationStatus"
 								}
 							}
 						},
@@ -783,7 +783,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseClearCacheStatus"
 								}
 							}
 						},
@@ -853,7 +853,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseClearChargingProfileStatus"
 								}
 							}
 						},
@@ -994,7 +994,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseDeleteCertificateStatusEnumType"
 								}
 							}
 						},
@@ -1065,7 +1065,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseTriggerMessageStatusEnumType"
 								}
 							}
 						},
@@ -1275,7 +1275,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseGetDiagnosticsResponse"
 								}
 							}
 						},
@@ -1346,7 +1346,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseGetInstalledCertificateIdsResponse"
 								}
 							}
 						},
@@ -1416,7 +1416,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseInteger"
 								}
 							}
 						},
@@ -1487,7 +1487,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseGetLogResponse"
 								}
 							}
 						},
@@ -1558,7 +1558,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseInstallCertificateStatusEnumType"
 								}
 							}
 						},
@@ -1629,7 +1629,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseRemoteStartStopStatus"
 								}
 							}
 						},
@@ -1700,7 +1700,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseRemoteStartStopStatus"
 								}
 							}
 						},
@@ -1771,7 +1771,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseReservationStatus"
 								}
 							}
 						},
@@ -1841,7 +1841,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseResetStatus"
 								}
 							}
 						},
@@ -1911,7 +1911,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseUpdateStatus"
 								}
 							}
 						},
@@ -1981,7 +1981,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseChargingProfileStatus"
 								}
 							}
 						},
@@ -2052,7 +2052,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseUpdateFirmwareStatusEnumType"
 								}
 							}
 						},
@@ -2122,7 +2122,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseTriggerMessageStatus"
 								}
 							}
 						},
@@ -2193,7 +2193,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseUnlockStatus"
 								}
 							}
 						},
@@ -2263,7 +2263,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OcppOperationResponseString"
+									"$ref": "#/components/schemas/OcppOperationResponseUpdateFirmwareResponseStatus"
 								}
 							}
 						},
@@ -2558,6 +2558,40 @@
 				"required": [
 					"chargeBoxIdList",
 					"reservationId"
+				]
+			},
+			"CertificateHashData": {
+				"type": "object",
+				"properties": {
+					"hashAlgorithm": {
+						"type": "string",
+						"enum": [
+							"SHA256",
+							"SHA384",
+							"SHA512"
+						]
+					},
+					"issuerKeyHash": {
+						"type": "string",
+						"maxLength": 128,
+						"minLength": 0
+					},
+					"issuerNameHash": {
+						"type": "string",
+						"maxLength": 128,
+						"minLength": 0
+					},
+					"serialNumber": {
+						"type": "string",
+						"maxLength": 40,
+						"minLength": 0
+					}
+				},
+				"required": [
+					"hashAlgorithm",
+					"issuerKeyHash",
+					"issuerNameHash",
+					"serialNumber"
 				]
 			},
 			"ChangeAvailabilityParams": {
@@ -3115,6 +3149,14 @@
 					"location"
 				]
 			},
+			"GetDiagnosticsResponse": {
+				"type": "object",
+				"properties": {
+					"fileName": {
+						"type": "string"
+					}
+				}
+			},
 			"GetInstalledCertificateIdsParams": {
 				"type": "object",
 				"description": "Parameters for retrieving installed certificate IDs from charge points",
@@ -3140,6 +3182,29 @@
 				"required": [
 					"certificateType",
 					"chargeBoxIdList"
+				]
+			},
+			"GetInstalledCertificateIdsResponse": {
+				"type": "object",
+				"properties": {
+					"certificateHashData": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CertificateHashData"
+						},
+						"maxItems": 2147483647,
+						"minItems": 1
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"NotFound"
+						]
+					}
+				},
+				"required": [
+					"status"
 				]
 			},
 			"GetLogParams": {
@@ -3197,6 +3262,27 @@
 					"chargeBoxIdList",
 					"location",
 					"logType"
+				]
+			},
+			"GetLogResponse": {
+				"type": "object",
+				"properties": {
+					"filename": {
+						"type": "string",
+						"maxLength": 255,
+						"minLength": 0
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"AcceptedCanceled"
+						]
+					}
+				},
+				"required": [
+					"status"
 				]
 			},
 			"InstallCertificateParams": {
@@ -3264,6 +3350,176 @@
 					"chargeBoxIdList"
 				]
 			},
+			"OcppOperationResponseAvailabilityStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseAvailabilityStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseCancelReservationStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseCancelReservationStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseChargingProfileStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseChargingProfileStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseClearCacheStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseClearCacheStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseClearChargingProfileStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseClearChargingProfileStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
 			"OcppOperationResponseConfigurationKeyValues": {
 				"type": "object",
 				"properties": {
@@ -3286,6 +3542,40 @@
 						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
 						"items": {
 							"$ref": "#/components/schemas/SuccessResponseConfigurationKeyValues"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseConfigurationStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseConfigurationStatus"
 						}
 					},
 					"taskFinished": {
@@ -3332,6 +3622,40 @@
 					}
 				}
 			},
+			"OcppOperationResponseDeleteCertificateStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseDeleteCertificateStatusEnumType"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
 			"OcppOperationResponseGetCompositeScheduleResponse": {
 				"type": "object",
 				"properties": {
@@ -3366,7 +3690,7 @@
 					}
 				}
 			},
-			"OcppOperationResponseString": {
+			"OcppOperationResponseGetDiagnosticsResponse": {
 				"type": "object",
 				"properties": {
 					"errorResponses": {
@@ -3387,7 +3711,449 @@
 						"type": "array",
 						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
 						"items": {
-							"$ref": "#/components/schemas/SuccessResponseString"
+							"$ref": "#/components/schemas/SuccessResponseGetDiagnosticsResponse"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseGetInstalledCertificateIdsResponse": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseGetInstalledCertificateIdsResponse"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseGetLogResponse": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseGetLogResponse"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseInstallCertificateStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseInstallCertificateStatusEnumType"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseInteger": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseInteger"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseRemoteStartStopStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseRemoteStartStopStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseReservationStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseReservationStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseResetStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseResetStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseTriggerMessageStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseTriggerMessageStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseTriggerMessageStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseTriggerMessageStatusEnumType"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseUnlockStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseUnlockStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseUpdateFirmwareResponseStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseUpdateFirmwareResponseStatus"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseUpdateFirmwareStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseUpdateFirmwareStatusEnumType"
+						}
+					},
+					"taskFinished": {
+						"type": "boolean",
+						"description": "True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.\nIf timeout occurs before completion, this will be false and only partial results will be available.\n"
+					},
+					"taskId": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"OcppOperationResponseUpdateStatus": {
+				"type": "object",
+				"properties": {
+					"errorResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/ErrorResponse"
+						}
+					},
+					"exceptions": {
+						"type": "array",
+						"description": "Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.\n",
+						"items": {
+							"$ref": "#/components/schemas/CallException"
+						}
+					},
+					"successResponses": {
+						"type": "array",
+						"description": "Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.\n",
+						"items": {
+							"$ref": "#/components/schemas/SuccessResponseUpdateStatus"
 						}
 					},
 					"taskFinished": {
@@ -3743,6 +4509,83 @@
 					"signingCertificate"
 				]
 			},
+			"SuccessResponseAvailabilityStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"Scheduled"
+						]
+					}
+				}
+			},
+			"SuccessResponseCancelReservationStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected"
+						]
+					}
+				}
+			},
+			"SuccessResponseChargingProfileStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"NotSupported"
+						]
+					}
+				}
+			},
+			"SuccessResponseClearCacheStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected"
+						]
+					}
+				}
+			},
+			"SuccessResponseClearChargingProfileStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Unknown"
+						]
+					}
+				}
+			},
 			"SuccessResponseConfigurationKeyValues": {
 				"type": "object",
 				"properties": {
@@ -3751,6 +4594,23 @@
 					},
 					"response": {
 						"$ref": "#/components/schemas/ConfigurationKeyValues"
+					}
+				}
+			},
+			"SuccessResponseConfigurationStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"NotSupported",
+							"RebootRequired",
+							"Rejected"
+						]
 					}
 				}
 			},
@@ -3765,6 +4625,22 @@
 					}
 				}
 			},
+			"SuccessResponseDeleteCertificateStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Failed",
+							"NotFound"
+						]
+					}
+				}
+			},
 			"SuccessResponseGetCompositeScheduleResponse": {
 				"type": "object",
 				"properties": {
@@ -3776,14 +4652,209 @@
 					}
 				}
 			},
-			"SuccessResponseString": {
+			"SuccessResponseGetDiagnosticsResponse": {
 				"type": "object",
 				"properties": {
 					"chargeBoxId": {
 						"type": "string"
 					},
 					"response": {
+						"$ref": "#/components/schemas/GetDiagnosticsResponse"
+					}
+				}
+			},
+			"SuccessResponseGetInstalledCertificateIdsResponse": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
 						"type": "string"
+					},
+					"response": {
+						"$ref": "#/components/schemas/GetInstalledCertificateIdsResponse"
+					}
+				}
+			},
+			"SuccessResponseGetLogResponse": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"$ref": "#/components/schemas/GetLogResponse"
+					}
+				}
+			},
+			"SuccessResponseInstallCertificateStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Failed",
+							"Rejected"
+						]
+					}
+				}
+			},
+			"SuccessResponseInteger": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"SuccessResponseRemoteStartStopStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected"
+						]
+					}
+				}
+			},
+			"SuccessResponseReservationStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Faulted",
+							"Occupied",
+							"Rejected",
+							"Unavailable"
+						]
+					}
+				}
+			},
+			"SuccessResponseResetStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected"
+						]
+					}
+				}
+			},
+			"SuccessResponseTriggerMessageStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"NotImplemented"
+						]
+					}
+				}
+			},
+			"SuccessResponseTriggerMessageStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"NotImplemented"
+						]
+					}
+				}
+			},
+			"SuccessResponseUnlockStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Unlocked",
+							"UnlockFailed",
+							"NotSupported"
+						]
+					}
+				}
+			},
+			"SuccessResponseUpdateFirmwareResponseStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"OK"
+						]
+					}
+				}
+			},
+			"SuccessResponseUpdateFirmwareStatusEnumType": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Rejected",
+							"AcceptedCanceled",
+							"InvalidCertificate",
+							"RevokedCertificate"
+						]
+					}
+				}
+			},
+			"SuccessResponseUpdateStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"response": {
+						"type": "string",
+						"enum": [
+							"Accepted",
+							"Failed",
+							"NotSupported",
+							"VersionMismatch"
+						]
 					}
 				}
 			},

@@ -19,14 +19,32 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 public record OcppOperationResponse<T>(
     int taskId,
+
+    @Schema(description = """
+        True when all stations have completed communication (either with a <i>CallResult</i>, <i>CallError</i>, or exception) before the platform timeout.
+        If timeout occurs before completion, this will be false and only partial results will be available.
+        """)
     boolean taskFinished,
+
+    @Schema(description = """
+        Responses where the station successfully received and processed the request, returning a <i>CallResult</i> without any communication errors.
+        """)
     List<SuccessResponse<T>> successResponses,
+
+    @Schema(description = """
+        Responses where the station successfully received the request, but responded with a <i>CallError</i> without any communication errors.
+        """)
     List<ErrorResponse> errorResponses,
+
+    @Schema(description = """
+        Exceptions encountered when this platform failed to send the request to the station or failed to process the station's response.
+        """)
     List<CallException> exceptions
 ) {
     public record SuccessResponse<T>(

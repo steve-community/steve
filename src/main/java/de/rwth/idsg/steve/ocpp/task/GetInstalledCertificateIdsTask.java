@@ -69,10 +69,14 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
         return res -> {
             try {
                 var response = res.get();
+                String certType = params.getCertificateType().value();
+
+                // Always delete existing certificates to reflect the current state on the charge point.
+                // - if certificateHashData null/empty -> station has no certs -> delete if we have some leftovers
+                // - if certificateHashData has certs -> delete anyway, since we will re-insert current snapshot
+                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
 
                 if (!CollectionUtils.isEmpty(response.getCertificateHashData())) {
-                    String certType = params.getCertificateType().value();
-                    certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
                     certificateRepository.insertInstalledCertificates(chargeBoxId, certType, response.getCertificateHashData());
                 }
 

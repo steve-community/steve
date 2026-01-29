@@ -174,6 +174,12 @@ Screenshots
 1. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 1. [Operations - OCPP v1.6](website/screenshots/ocpp16.png)
 1. [Settings](website/screenshots/settings.png)
+1. [APIs](website/screenshots/apis.png)
+
+OpenAPI spec
+-----
+An export of the actual OpenAPI spec for APIs is available [here](api-docs.json).
+To explore it interactively, open it in the [Live Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/steve-community/steve/refs/heads/master/api-docs.json).
 
 GDPR
 -----

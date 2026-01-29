@@ -28,7 +28,7 @@ import ocpp._2022._02.security.LogParametersType;
 import jakarta.xml.ws.AsyncHandler;
 import java.util.Map;
 
-public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
+public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, GetLogResponse> {
 
     private final int requestId;
 
@@ -38,8 +38,19 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<GetLogResponse> defaultCallback() {
+        return new DefaultOcppCallback<GetLogResponse>() {
+            @Override
+            public void success(String chargeBoxId, GetLogResponse response) {
+                var status = response.getStatus().value();
+
+                String responseMessage = (response.getFilename() == null)
+                    ? status
+                    : status + " (filename: " + response.getFilename() + ")";
+
+                addNewResponse(chargeBoxId, responseMessage);
+            }
+        };
     }
 
     @Override
@@ -62,14 +73,7 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
     public AsyncHandler<GetLogResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                var status = response.getStatus().value();
-
-                String responseMessage = (response.getFilename() == null)
-                    ? status
-                    : status + " (filename: " + response.getFilename() + ")";
-
-                success(chargeBoxId, responseMessage);
+                success(chargeBoxId, res.get());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -31,7 +31,7 @@ import ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatus
 import jakarta.xml.ws.AsyncHandler;
 
 @Slf4j
-public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, String> {
+public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, DeleteCertificateStatusEnumType> {
 
     private final CertificateRepository certificateRepository;
 
@@ -42,8 +42,13 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<DeleteCertificateStatusEnumType> defaultCallback() {
+        return new DefaultOcppCallback<DeleteCertificateStatusEnumType>() {
+            @Override
+            public void success(String chargeBoxId, DeleteCertificateStatusEnumType response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -66,12 +71,13 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
         return res -> {
             try {
                 var status = res.get().getStatus();
-                success(chargeBoxId, status.value());
 
                 if (status == DeleteCertificateStatusEnumType.ACCEPTED) {
                     log.info("Request accepted. Deleting from database...");
                     certificateRepository.deleteInstalledCertificate(params.getInstalledCertificateId());
                 }
+
+                success(chargeBoxId, status);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

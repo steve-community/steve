@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
+import ocpp.cp._2015._10.ReservationStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -30,7 +31,7 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, String> {
+public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, ReservationStatus> {
 
     private final int reservationId;
     private final String parentIdTag;
@@ -45,13 +46,13 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, String>
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback() {
+    public OcppCallback<ReservationStatus> defaultCallback() {
+        return new DefaultOcppCallback<ReservationStatus>() {
             @Override
-            public void success(String chargeBoxId, String responseStatus) {
-                addNewResponse(chargeBoxId, responseStatus);
+            public void success(String chargeBoxId, ReservationStatus response) {
+                addNewResponse(chargeBoxId, response.value());
 
-                if ("Accepted".equalsIgnoreCase(responseStatus)) {
+                if (ReservationStatus.ACCEPTED == response) {
                     reservationRepository.accepted(reservationId);
                 } else {
                     delete();
@@ -96,7 +97,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, String>
     public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, ReservationStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -107,7 +108,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, String>
     public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

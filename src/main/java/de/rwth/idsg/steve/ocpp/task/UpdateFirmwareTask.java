@@ -24,19 +24,26 @@ import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 
 import jakarta.xml.ws.AsyncHandler;
 
+import static de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask.UpdateFirmwareResponseStatus;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, String> {
+public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, UpdateFirmwareResponseStatus> {
 
     public UpdateFirmwareTask(UpdateFirmwareParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<UpdateFirmwareResponseStatus> defaultCallback() {
+        return new DefaultOcppCallback<UpdateFirmwareResponseStatus>() {
+            @Override
+            public void success(String chargeBoxId, UpdateFirmwareResponseStatus response) {
+                addNewResponse(chargeBoxId, response.name());
+            }
+        };
     }
 
     @Override
@@ -70,7 +77,7 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, UpdateFirmwareResponseStatus.OK);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -81,7 +88,7 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, UpdateFirmwareResponseStatus.OK);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -92,11 +99,15 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, UpdateFirmwareResponseStatus.OK);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
+    }
+
+    public enum UpdateFirmwareResponseStatus {
+        OK
     }
 
 }

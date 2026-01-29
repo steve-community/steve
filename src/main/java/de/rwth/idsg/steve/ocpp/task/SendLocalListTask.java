@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import ocpp.cp._2015._10.AuthorizationData;
+import ocpp.cp._2015._10.UpdateStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, String> {
+public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, UpdateStatus> {
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
@@ -44,8 +45,13 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<UpdateStatus> defaultCallback() {
+        return new DefaultOcppCallback<UpdateStatus>() {
+            @Override
+            public void success(String chargeBoxId, UpdateStatus response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -67,7 +73,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     public AsyncHandler<ocpp.cp._2012._06.SendLocalListResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, UpdateStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -78,7 +84,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     public AsyncHandler<ocpp.cp._2015._10.SendLocalListResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

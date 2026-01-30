@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
@@ -231,6 +232,10 @@ public class OcppOperationsService {
         for (OcppVersion version : OcppVersion.values()) {
             var temp = chargePointService.getChargePointsWithIds(version, chargeBoxIdList);
             returnList.addAll(temp);
+        }
+
+        if (returnList.isEmpty()) {
+            throw new SteveException.BadRequest("No stations are eligible for communication. Ensure that the chargeBox IDs are correct and the stations are online.");
         }
 
         return returnList;

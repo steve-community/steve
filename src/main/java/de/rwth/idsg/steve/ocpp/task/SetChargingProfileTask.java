@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import ocpp.cp._2015._10.ChargingProfileStatus;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 import ocpp.cp._2015._10.SetChargingProfileResponse;
 
@@ -31,7 +32,7 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 06.02.2025
  */
-public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<MultipleChargePointSelect, String> {
+public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<MultipleChargePointSelect, ChargingProfileStatus> {
 
     public SetChargingProfileTask(MultipleChargePointSelect params) {
         super(params);
@@ -43,7 +44,7 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<Multiple
     public AsyncHandler<SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import ocpp.cp._2015._10.RemoteStartStopStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -28,15 +29,20 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, String> {
+public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, RemoteStartStopStatus> {
 
     public RemoteStopTransactionTask(RemoteStopTransactionParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<RemoteStartStopStatus> defaultCallback() {
+        return new DefaultOcppCallback<RemoteStartStopStatus>() {
+            @Override
+            public void success(String chargeBoxId, RemoteStartStopStatus response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -61,7 +67,7 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     public AsyncHandler<ocpp.cp._2010._08.RemoteStopTransactionResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, RemoteStartStopStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -72,7 +78,7 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     public AsyncHandler<ocpp.cp._2012._06.RemoteStopTransactionResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, RemoteStartStopStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -83,7 +89,7 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     public AsyncHandler<ocpp.cp._2015._10.RemoteStopTransactionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -49,7 +49,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatusEnumType;
+import ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
+import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
+import ocpp._2022._02.security.GetLogResponse;
+import ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType;
+import ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
+import ocpp.cp._2015._10.AvailabilityStatus;
+import ocpp.cp._2015._10.CancelReservationStatus;
+import ocpp.cp._2015._10.ChargingProfileStatus;
+import ocpp.cp._2015._10.ClearCacheStatus;
+import ocpp.cp._2015._10.ClearChargingProfileStatus;
+import ocpp.cp._2015._10.ConfigurationStatus;
+import ocpp.cp._2015._10.DataTransferResponse;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
+import ocpp.cp._2015._10.GetDiagnosticsResponse;
+import ocpp.cp._2015._10.RemoteStartStopStatus;
+import ocpp.cp._2015._10.ReservationStatus;
+import ocpp.cp._2015._10.ResetStatus;
+import ocpp.cp._2015._10.TriggerMessageStatus;
+import ocpp.cp._2015._10.UnlockStatus;
+import ocpp.cp._2015._10.UpdateStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,6 +77,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+
+import static de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask.UpdateFirmwareResponseStatus;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -82,25 +104,25 @@ public class OcppOperationsController {
     // -------------------------------------------------------------------------
 
     @PostMapping(value = "/ChangeAvailability")
-    public OcppOperationResponse<String> changeAvailability(@RequestBody @Valid ChangeAvailabilityParams params) throws Exception {
+    public OcppOperationResponse<AvailabilityStatus> changeAvailability(@RequestBody @Valid ChangeAvailabilityParams params) throws Exception {
         var callback = operationsService.changeAvailability(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/ChangeConfiguration")
-    public OcppOperationResponse<String> changeConfiguration(@RequestBody @Valid ChangeConfigurationParams params) throws Exception {
+    public OcppOperationResponse<ConfigurationStatus> changeConfiguration(@RequestBody @Valid ChangeConfigurationParams params) throws Exception {
         var callback = operationsService.changeConfiguration(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/ClearCache")
-    public OcppOperationResponse<String> clearCache(@RequestBody @Valid MultipleChargePointSelect params) throws Exception {
+    public OcppOperationResponse<ClearCacheStatus> clearCache(@RequestBody @Valid MultipleChargePointSelect params) throws Exception {
         var callback = operationsService.clearCache(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/GetDiagnostics")
-    public OcppOperationResponse<String> getDiagnostics(@RequestBody @Valid GetDiagnosticsParams params) throws Exception {
+    public OcppOperationResponse<GetDiagnosticsResponse> getDiagnostics(@RequestBody @Valid GetDiagnosticsParams params) throws Exception {
         var callback = operationsService.getDiagnostics(params);
         return OcppOperationResponse.from(callback);
     }
@@ -109,7 +131,7 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/RemoteStartTransaction")
-    public OcppOperationResponse<String> remoteStartTransaction(@RequestBody @Valid RemoteStartTransactionParams params) throws Exception {
+    public OcppOperationResponse<RemoteStartStopStatus> remoteStartTransaction(@RequestBody @Valid RemoteStartTransactionParams params) throws Exception {
         var callback = operationsService.remoteStartTransaction(params);
         return OcppOperationResponse.from(callback);
     }
@@ -118,13 +140,13 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/RemoteStopTransaction")
-    public OcppOperationResponse<String> remoteStopTransaction(@RequestBody @Valid RemoteStopTransactionParams params) throws Exception {
+    public OcppOperationResponse<RemoteStartStopStatus> remoteStopTransaction(@RequestBody @Valid RemoteStopTransactionParams params) throws Exception {
         var callback = operationsService.remoteStopTransaction(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/Reset")
-    public OcppOperationResponse<String> reset(@RequestBody @Valid ResetParams params) throws Exception {
+    public OcppOperationResponse<ResetStatus> reset(@RequestBody @Valid ResetParams params) throws Exception {
         var callback = operationsService.reset(params);
         return OcppOperationResponse.from(callback);
     }
@@ -133,13 +155,13 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/UnlockConnector")
-    public OcppOperationResponse<String> unlockConnector(@RequestBody @Valid UnlockConnectorParams params) throws Exception {
+    public OcppOperationResponse<UnlockStatus> unlockConnector(@RequestBody @Valid UnlockConnectorParams params) throws Exception {
         var callback = operationsService.unlockConnector(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/UpdateFirmware")
-    public OcppOperationResponse<String> updateFirmware(@RequestBody @Valid UpdateFirmwareParams params) throws Exception {
+    public OcppOperationResponse<UpdateFirmwareResponseStatus> updateFirmware(@RequestBody @Valid UpdateFirmwareParams params) throws Exception {
         var callback = operationsService.updateFirmware(params);
         return OcppOperationResponse.from(callback);
     }
@@ -152,7 +174,7 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/ReserveNow")
-    public OcppOperationResponse<String> reserveNow(@RequestBody @Valid ReserveNowParams params) throws Exception {
+    public OcppOperationResponse<ReservationStatus> reserveNow(@RequestBody @Valid ReserveNowParams params) throws Exception {
         var callback = operationsService.reserveNow(params);
         return OcppOperationResponse.from(callback);
     }
@@ -161,13 +183,13 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/CancelReservation")
-    public OcppOperationResponse<String> cancelReservation(@RequestBody @Valid CancelReservationParams params) throws Exception {
+    public OcppOperationResponse<CancelReservationStatus> cancelReservation(@RequestBody @Valid CancelReservationParams params) throws Exception {
         var callback = operationsService.cancelReservation(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/DataTransfer")
-    public OcppOperationResponse<ocpp.cp._2015._10.DataTransferResponse> dataTransfer(@RequestBody @Valid DataTransferParams params) throws Exception {
+    public OcppOperationResponse<DataTransferResponse> dataTransfer(@RequestBody @Valid DataTransferParams params) throws Exception {
         var callback = operationsService.dataTransfer(params);
         return OcppOperationResponse.from(callback);
     }
@@ -179,13 +201,13 @@ public class OcppOperationsController {
     }
 
     @PostMapping(value = "/GetLocalListVersion")
-    public OcppOperationResponse<String> getLocalListVersion(@RequestBody @Valid MultipleChargePointSelect params) throws Exception {
+    public OcppOperationResponse<Integer> getLocalListVersion(@RequestBody @Valid MultipleChargePointSelect params) throws Exception {
         var callback = operationsService.getLocalListVersion(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/SendLocalList")
-    public OcppOperationResponse<String> sendLocalList(@RequestBody @Valid SendLocalListParams params) throws Exception {
+    public OcppOperationResponse<UpdateStatus> sendLocalList(@RequestBody @Valid SendLocalListParams params) throws Exception {
         var callback = operationsService.sendLocalList(params);
         return OcppOperationResponse.from(callback);
     }
@@ -195,7 +217,7 @@ public class OcppOperationsController {
     // -------------------------------------------------------------------------
 
     @PostMapping(value = "/TriggerMessage")
-    public OcppOperationResponse<String> triggerMessage(@RequestBody @Valid TriggerMessageParams params) throws Exception {
+    public OcppOperationResponse<TriggerMessageStatus> triggerMessage(@RequestBody @Valid TriggerMessageParams params) throws Exception {
         var callback = operationsService.triggerMessage(params);
         return OcppOperationResponse.from(callback);
     }
@@ -207,13 +229,13 @@ public class OcppOperationsController {
     }
 
     @PostMapping(value = "/ClearChargingProfile")
-    public OcppOperationResponse<String> clearChargingProfile(@RequestBody @Valid ClearChargingProfileParams params) throws Exception {
+    public OcppOperationResponse<ClearChargingProfileStatus> clearChargingProfile(@RequestBody @Valid ClearChargingProfileParams params) throws Exception {
         var callback = operationsService.clearChargingProfile(params);
         return OcppOperationResponse.from(callback);
     }
 
     @PostMapping(value = "/SetChargingProfile")
-    public OcppOperationResponse<String> setChargingProfile(@RequestBody @Valid SetChargingProfileParams params) throws Exception {
+    public OcppOperationResponse<ChargingProfileStatus> setChargingProfile(@RequestBody @Valid SetChargingProfileParams params) throws Exception {
         var callback = operationsService.setChargingProfile(params);
         return OcppOperationResponse.from(callback);
     }
@@ -226,7 +248,7 @@ public class OcppOperationsController {
         As specified in <i>Improved security for OCPP 1.6-J</i> white paper.
         """)
     @PostMapping(value = "/ExtendedTriggerMessage")
-    public OcppOperationResponse<String> extendedTriggerMessage(@RequestBody @Valid ExtendedTriggerMessageParams params) throws Exception {
+    public OcppOperationResponse<TriggerMessageStatusEnumType> extendedTriggerMessage(@RequestBody @Valid ExtendedTriggerMessageParams params) throws Exception {
         var callback = operationsService.extendedTriggerMessage(params);
         return OcppOperationResponse.from(callback);
     }
@@ -237,7 +259,7 @@ public class OcppOperationsController {
         Once this operation is triggered at a station, it will send status notifications about the progress and result.
         """)
     @PostMapping(value = "/GetLog")
-    public OcppOperationResponse<String> getLog(@RequestBody @Valid GetLogParams params) throws Exception {
+    public OcppOperationResponse<GetLogResponse> getLog(@RequestBody @Valid GetLogParams params) throws Exception {
         var callback = operationsService.getLog(params);
         return OcppOperationResponse.from(callback);
     }
@@ -248,7 +270,7 @@ public class OcppOperationsController {
         Once this operation is triggered at a station, it will send status notifications about the progress and result.
         """)
     @PostMapping(value = "/SignedUpdateFirmware")
-    public OcppOperationResponse<String> signedUpdateFirmware(@RequestBody @Valid SignedUpdateFirmwareParams params) throws Exception {
+    public OcppOperationResponse<UpdateFirmwareStatusEnumType> signedUpdateFirmware(@RequestBody @Valid SignedUpdateFirmwareParams params) throws Exception {
         var callback = operationsService.signedUpdateFirmware(params);
         return OcppOperationResponse.from(callback);
     }
@@ -258,7 +280,7 @@ public class OcppOperationsController {
         The certificates sent by the station will be stored in database.
         """)
     @PostMapping(value = "/GetInstalledCertificateIds")
-    public OcppOperationResponse<String> getInstalledCertificateIds(@RequestBody @Valid GetInstalledCertificateIdsParams params) throws Exception {
+    public OcppOperationResponse<GetInstalledCertificateIdsResponse> getInstalledCertificateIds(@RequestBody @Valid GetInstalledCertificateIdsParams params) throws Exception {
         var callback = operationsService.getInstalledCertificateIds(params);
         return OcppOperationResponse.from(callback);
     }
@@ -267,7 +289,7 @@ public class OcppOperationsController {
         As specified in <i>Improved security for OCPP 1.6-J</i> white paper.
         """)
     @PostMapping(value = "/InstallCertificate")
-    public OcppOperationResponse<String> installCertificate(@RequestBody @Valid InstallCertificateParams params) throws Exception {
+    public OcppOperationResponse<InstallCertificateStatusEnumType> installCertificate(@RequestBody @Valid InstallCertificateParams params) throws Exception {
         var callback = operationsService.installCertificate(params);
         return OcppOperationResponse.from(callback);
     }
@@ -278,7 +300,7 @@ public class OcppOperationsController {
         Only 1 charge point can be selected.
         """)
     @PostMapping(value = "/DeleteCertificate")
-    public OcppOperationResponse<String> deleteCertificate(@RequestBody @Valid DeleteCertificateParams params) throws Exception {
+    public OcppOperationResponse<DeleteCertificateStatusEnumType> deleteCertificate(@RequestBody @Valid DeleteCertificateParams params) throws Exception {
         var callback = operationsService.deleteCertificate(params);
         return OcppOperationResponse.from(callback);
     }

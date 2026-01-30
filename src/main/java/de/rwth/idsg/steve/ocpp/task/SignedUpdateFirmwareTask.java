@@ -24,11 +24,12 @@ import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import ocpp._2022._02.security.FirmwareType;
 import ocpp._2022._02.security.SignedUpdateFirmware;
 import ocpp._2022._02.security.SignedUpdateFirmwareResponse;
+import ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.Map;
 
-public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFirmwareParams, String> {
+public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFirmwareParams, UpdateFirmwareStatusEnumType> {
 
     private final int requestId;
 
@@ -38,8 +39,13 @@ public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFir
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<UpdateFirmwareStatusEnumType> defaultCallback() {
+        return new DefaultOcppCallback<UpdateFirmwareStatusEnumType>() {
+            @Override
+            public void success(String chargeBoxId, UpdateFirmwareStatusEnumType response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -63,7 +69,7 @@ public class SignedUpdateFirmwareTask extends Ocpp16AndAboveTask<SignedUpdateFir
     public AsyncHandler<SignedUpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

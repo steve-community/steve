@@ -28,15 +28,20 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, String> {
+public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, Integer> {
 
     public GetLocalListVersionTask(MultipleChargePointSelect params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<Integer> defaultCallback() {
+        return new DefaultOcppCallback<Integer>() {
+            @Override
+            public void success(String chargeBoxId, Integer response) {
+                addNewResponse(chargeBoxId, String.valueOf(response));
+            }
+        };
     }
 
     @Override
@@ -53,7 +58,7 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     public AsyncHandler<ocpp.cp._2012._06.GetLocalListVersionResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
+                success(chargeBoxId, res.get().getListVersion());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -64,7 +69,7 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     public AsyncHandler<ocpp.cp._2015._10.GetLocalListVersionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
+                success(chargeBoxId, res.get().getListVersion());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

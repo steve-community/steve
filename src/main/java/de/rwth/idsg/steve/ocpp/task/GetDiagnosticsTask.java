@@ -29,15 +29,20 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, String> {
+public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, ocpp.cp._2015._10.GetDiagnosticsResponse> {
 
     public GetDiagnosticsTask(GetDiagnosticsParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<ocpp.cp._2015._10.GetDiagnosticsResponse> defaultCallback() {
+        return new DefaultOcppCallback<ocpp.cp._2015._10.GetDiagnosticsResponse>() {
+            @Override
+            public void success(String chargeBoxId, ocpp.cp._2015._10.GetDiagnosticsResponse response) {
+                addNewResponse(chargeBoxId, "filename: " + StringUtils.defaultString(response.getFileName()));
+            }
+        };
     }
 
     @Override
@@ -74,7 +79,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
+                var data = new ocpp.cp._2015._10.GetDiagnosticsResponse().withFileName(res.get().getFileName());
+                success(chargeBoxId, data);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -85,7 +91,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2012._06.GetDiagnosticsResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
+                var data = new ocpp.cp._2015._10.GetDiagnosticsResponse().withFileName(res.get().getFileName());
+                success(chargeBoxId, data);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -96,7 +103,7 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, "filename:" + StringUtils.defaultString(res.get().getFileName()));
+                success(chargeBoxId, res.get());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -451,7 +451,7 @@
         <dependency>
             <groupId>com.github.steve-community.ocpp-jaxb</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.14</version>
+            <version>0.0.15</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

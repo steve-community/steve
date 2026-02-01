@@ -23,18 +23,24 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import ocpp._2022._02.security.ExtendedTriggerMessage;
 import ocpp._2022._02.security.ExtendedTriggerMessageResponse;
+import ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
 
-public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, String> {
+public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, TriggerMessageStatusEnumType> {
 
     public ExtendedTriggerMessageTask(ExtendedTriggerMessageParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<TriggerMessageStatusEnumType> defaultCallback() {
+        return new DefaultOcppCallback<TriggerMessageStatusEnumType>() {
+            @Override
+            public void success(String chargeBoxId, TriggerMessageStatusEnumType response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -49,7 +55,7 @@ public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTrigg
     public AsyncHandler<ExtendedTriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

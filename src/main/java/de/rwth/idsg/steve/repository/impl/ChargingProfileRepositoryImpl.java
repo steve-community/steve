@@ -271,6 +271,15 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     @Override
+    public boolean exists(int chargingProfilePk) {
+        return ctx.selectOne()
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+            .fetchOptional()
+            .isPresent();
+    }
+
+    @Override
     public int add(ChargingProfileForm form) {
         return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);

@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import ocpp.cp._2015._10.ChargingProfileStatus;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 
 /**
@@ -38,8 +39,13 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<ChargingProfileStatus> defaultCallback() {
+        return new DefaultOcppCallback<ChargingProfileStatus>() {
+            @Override
+            public void success(String chargeBoxId, ChargingProfileStatus response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override

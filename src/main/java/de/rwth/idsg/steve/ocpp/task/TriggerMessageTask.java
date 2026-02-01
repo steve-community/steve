@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cp._2015._10.MessageTrigger;
+import ocpp.cp._2015._10.TriggerMessageStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -29,15 +30,20 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, String> {
+public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, TriggerMessageStatus> {
 
     public TriggerMessageTask(TriggerMessageParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<TriggerMessageStatus> defaultCallback() {
+        return new DefaultOcppCallback<TriggerMessageStatus>() {
+            @Override
+            public void success(String chargeBoxId, TriggerMessageStatus response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -51,7 +57,7 @@ public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams,
     public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

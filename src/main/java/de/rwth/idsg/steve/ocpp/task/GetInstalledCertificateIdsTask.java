@@ -25,12 +25,13 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 import ocpp._2022._02.security.CertificateHashData;
 import ocpp._2022._02.security.GetInstalledCertificateIds;
 import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.Collections;
 import java.util.List;
 
-public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, String> {
+public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, GetInstalledCertificateIdsResponse> {
 
     private final CertificateRepository certificateRepository;
 
@@ -41,8 +42,19 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<GetInstalledCertificateIdsResponse> defaultCallback() {
+        return new DefaultOcppCallback<GetInstalledCertificateIdsResponse>() {
+            @Override
+            public void success(String chargeBoxId, GetInstalledCertificateIdsResponse response) {
+                var status = response.getStatus().value();
+
+                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
+                    ? Collections.emptyList()
+                    : response.getCertificateHashData();
+
+                addNewResponse(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
+            }
+        };
     }
 
     @Override
@@ -57,22 +69,18 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
         return res -> {
             try {
                 var response = res.get();
-                var status = response.getStatus().value();
+                String certType = params.getCertificateType().value();
 
-                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
-                    ? Collections.emptyList()
-                    : response.getCertificateHashData();
+                // Always delete existing certificates to reflect the current state on the charge point.
+                // - if certificateHashData null/empty -> station has no certs -> delete if we have some leftovers
+                // - if certificateHashData has certs -> delete anyway, since we will re-insert current snapshot
+                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
 
-                success(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
-
-                if (certificateHashData.isEmpty()) {
-                    return;
+                if (!CollectionUtils.isEmpty(response.getCertificateHashData())) {
+                    certificateRepository.insertInstalledCertificates(chargeBoxId, certType, response.getCertificateHashData());
                 }
 
-                String certType = params.getCertificateType().value();
-                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
-                certificateRepository.insertInstalledCertificates(chargeBoxId, certType, certificateHashData);
-
+                success(chargeBoxId, response);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

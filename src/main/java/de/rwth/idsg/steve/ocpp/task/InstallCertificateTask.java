@@ -23,18 +23,24 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import ocpp._2022._02.security.InstallCertificate;
 import ocpp._2022._02.security.InstallCertificateResponse;
+import ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
 
-public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, String> {
+public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, InstallCertificateStatusEnumType> {
 
     public InstallCertificateTask(InstallCertificateParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<InstallCertificateStatusEnumType> defaultCallback() {
+        return new DefaultOcppCallback<InstallCertificateStatusEnumType>() {
+            @Override
+            public void success(String chargeBoxId, InstallCertificateStatusEnumType response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -49,8 +55,7 @@ public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificat
     public AsyncHandler<InstallCertificateResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                var response = res.get();
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

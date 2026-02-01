@@ -149,6 +149,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                     context.getIncomingString()
             );
         }
+        context.setFutureResponseContext(responseContext);
 
         ResponseType res;
         try {
@@ -164,7 +165,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.setFutureResponseContext(responseContext);
     }
 
     /**
@@ -179,6 +179,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                     context.getIncomingString()
             );
         }
+        context.setFutureResponseContext(responseContext);
 
         ErrorCode code;
         String desc;
@@ -216,7 +217,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.setFutureResponseContext(responseContext);
     }
 
 }

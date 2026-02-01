@@ -31,6 +31,7 @@ import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record11;
@@ -40,8 +41,11 @@ import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -178,6 +182,17 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
+    public List<String> getIdTags(List<String> idTagList) {
+        if (CollectionUtils.isEmpty(idTagList)) {
+            return Collections.emptyList();
+        }
+        return ctx.select(OCPP_TAG.ID_TAG)
+                  .from(OCPP_TAG)
+                  .where(OCPP_TAG.ID_TAG.in(idTagList))
+                  .fetch(OCPP_TAG.ID_TAG);
+    }
+
+    @Override
     public List<String> getIdTagsWithoutUser() {
         return ctx.select(OCPP_TAG.ID_TAG)
             .from(OCPP_TAG)
@@ -189,15 +204,24 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public List<String> getActiveIdTags() {
+        List<Condition> conditions = getConditionsForActive();
+
         return ctx.select(OCPP_TAG_ACTIVITY.ID_TAG)
                   .from(OCPP_TAG_ACTIVITY)
-                  .where(OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT
-                          .lessThan(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.cast(Long.class))
-                          .or(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.lessThan(0)))
-                    .and(OCPP_TAG_ACTIVITY.BLOCKED.isFalse())
-                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull()
-                            .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
+                  .where(conditions)
                   .fetch(OCPP_TAG_ACTIVITY.ID_TAG);
+    }
+
+    @Override
+    public boolean isActive(String idTag) {
+        List<Condition> conditions = getConditionsForActive();
+        conditions.add(OCPP_TAG_ACTIVITY.ID_TAG.eq(idTag));
+
+        return ctx.selectOne()
+                  .from(OCPP_TAG_ACTIVITY)
+                  .where(conditions)
+                  .fetchOptional()
+                  .isPresent();
     }
 
     @Override
@@ -281,6 +305,18 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         if (type != BooleanType.ALL) {
             selectQuery.addConditions(field.eq(type.getBoolValue()));
         }
+    }
+
+    private static List<Condition> getConditionsForActive() {
+        var activeTxCondition = OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT.lessThan(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.cast(Long.class))
+            .or(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.lessThan(0));
+
+        var blockedCondition = OCPP_TAG_ACTIVITY.BLOCKED.isFalse();
+
+        var expiryCondition = OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull()
+            .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now()));
+
+        return new ArrayList<>(List.of(activeTxCondition, blockedCondition, expiryCondition));
     }
 
     private static class UserMapper

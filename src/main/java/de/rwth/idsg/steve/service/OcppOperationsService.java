@@ -18,9 +18,13 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
+import de.rwth.idsg.steve.repository.CertificateRepository;
+import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -50,14 +54,36 @@ import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.DeleteCertificateResponse;
+import ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
+import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
+import ocpp._2022._02.security.GetLogResponse;
+import ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType;
+import ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
+import ocpp.cp._2015._10.AvailabilityStatus;
+import ocpp.cp._2015._10.CancelReservationStatus;
+import ocpp.cp._2015._10.ChargingProfileStatus;
+import ocpp.cp._2015._10.ClearCacheStatus;
+import ocpp.cp._2015._10.ClearChargingProfileStatus;
+import ocpp.cp._2015._10.ConfigurationStatus;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
+import ocpp.cp._2015._10.GetDiagnosticsResponse;
+import ocpp.cp._2015._10.RemoteStartStopStatus;
+import ocpp.cp._2015._10.ReservationStatus;
+import ocpp.cp._2015._10.ResetStatus;
+import ocpp.cp._2015._10.TriggerMessageStatus;
+import ocpp.cp._2015._10.UnlockStatus;
+import ocpp.cp._2015._10.UpdateStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
+
+import static de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask.UpdateFirmwareResponseStatus;
 
 @Slf4j
 @Service
@@ -68,44 +94,52 @@ public class OcppOperationsService {
 
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
+    private final OcppTagService ocppTagService;
+    private final TransactionService transactionService;
+    private final ReservationRepository reservationRepository;
+    private final ChargingProfileRepository chargingProfileRepository;
+    private final CertificateRepository certificateRepository;
 
     // -------------------------------------------------------------------------
     // Since Ocpp 1.2
     // -------------------------------------------------------------------------
 
-    public RestCallback<String> changeAvailability(ChangeAvailabilityParams params) throws Exception {
+    public RestCallback<AvailabilityStatus> changeAvailability(ChangeAvailabilityParams params) throws Exception {
         return execute(params, chargePointServiceClient::changeAvailability);
     }
 
-    public RestCallback<String> changeConfiguration(ChangeConfigurationParams params) throws Exception {
+    public RestCallback<ConfigurationStatus> changeConfiguration(ChangeConfigurationParams params) throws Exception {
         return execute(params, chargePointServiceClient::changeConfiguration);
     }
 
-    public RestCallback<String> clearCache(MultipleChargePointSelect params) throws Exception {
+    public RestCallback<ClearCacheStatus> clearCache(MultipleChargePointSelect params) throws Exception {
         return execute(params, chargePointServiceClient::clearCache);
     }
 
-    public RestCallback<String> getDiagnostics(GetDiagnosticsParams params) throws Exception {
+    public RestCallback<GetDiagnosticsResponse> getDiagnostics(GetDiagnosticsParams params) throws Exception {
         return execute(params, chargePointServiceClient::getDiagnostics);
     }
 
-    public RestCallback<String> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
+    public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
+        validateIdTag(params.getIdTag());
+        validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
 
-    public RestCallback<String> remoteStopTransaction(RemoteStopTransactionParams params) throws Exception {
+    public RestCallback<RemoteStartStopStatus> remoteStopTransaction(RemoteStopTransactionParams params) throws Exception {
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::remoteStopTransaction);
     }
 
-    public RestCallback<String> reset(ResetParams params) throws Exception {
+    public RestCallback<ResetStatus> reset(ResetParams params) throws Exception {
         return execute(params, chargePointServiceClient::reset);
     }
 
-    public RestCallback<String> unlockConnector(UnlockConnectorParams params) throws Exception {
+    public RestCallback<UnlockStatus> unlockConnector(UnlockConnectorParams params) throws Exception {
         return execute(params, chargePointServiceClient::unlockConnector);
     }
 
-    public RestCallback<String> updateFirmware(UpdateFirmwareParams params) throws Exception {
+    public RestCallback<UpdateFirmwareResponseStatus> updateFirmware(UpdateFirmwareParams params) throws Exception {
         return execute(params, chargePointServiceClient::updateFirmware);
     }
 
@@ -113,11 +147,13 @@ public class OcppOperationsService {
     // Since Ocpp 1.5
     // -------------------------------------------------------------------------
 
-    public RestCallback<String> reserveNow(ReserveNowParams params) throws Exception {
+    public RestCallback<ReservationStatus> reserveNow(ReserveNowParams params) throws Exception {
+        validateIdTag(params.getIdTag());
         return execute(params, chargePointServiceClient::reserveNow);
     }
 
-    public RestCallback<String> cancelReservation(CancelReservationParams params) throws Exception {
+    public RestCallback<CancelReservationStatus> cancelReservation(CancelReservationParams params) throws Exception {
+        validateReservationId(params.getReservationId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::cancelReservation);
     }
 
@@ -129,11 +165,13 @@ public class OcppOperationsService {
         return execute(params, chargePointServiceClient::getConfiguration);
     }
 
-    public RestCallback<String> getLocalListVersion(MultipleChargePointSelect params) throws Exception {
+    public RestCallback<Integer> getLocalListVersion(MultipleChargePointSelect params) throws Exception {
         return execute(params, chargePointServiceClient::getLocalListVersion);
     }
 
-    public RestCallback<String> sendLocalList(SendLocalListParams params) throws Exception {
+    public RestCallback<UpdateStatus> sendLocalList(SendLocalListParams params) throws Exception {
+        validateIdTags(params.getAddUpdateList());
+        validateIdTags(params.getDeleteList());
         return execute(params, chargePointServiceClient::sendLocalList);
     }
 
@@ -141,7 +179,7 @@ public class OcppOperationsService {
     // Since Ocpp 1.6
     // -------------------------------------------------------------------------
 
-    public RestCallback<String> triggerMessage(TriggerMessageParams params) throws Exception {
+    public RestCallback<TriggerMessageStatus> triggerMessage(TriggerMessageParams params) throws Exception {
         return execute(params, chargePointServiceClient::triggerMessage);
     }
 
@@ -149,19 +187,25 @@ public class OcppOperationsService {
         return execute(params, chargePointServiceClient::getCompositeSchedule);
     }
 
-    public RestCallback<String> clearChargingProfile(ClearChargingProfileParams params) throws Exception {
+    public RestCallback<ClearChargingProfileStatus> clearChargingProfile(ClearChargingProfileParams params) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::clearChargingProfile);
     }
 
-    public RestCallback<String> setChargingProfile(SetChargingProfileParams params) throws Exception {
+    public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::setChargingProfile);
     }
 
-    public RestCallback<String> setChargingProfile(SetChargingProfileParams params,
-                                                   SetChargingProfileTaskAdhoc task) throws Exception {
+    public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params,
+                                                                  SetChargingProfileTaskAdhoc task) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
+
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
-        RestCallback<String> callback = createCallback(params);
+        RestCallback<ChargingProfileStatus> callback = createCallback(params);
         int taskId = chargePointServiceClient.setChargingProfile(task, callback);
 
         callback.setTaskId(taskId);
@@ -173,27 +217,28 @@ public class OcppOperationsService {
     // "Improved security for OCPP 1.6-J" additions
     // -------------------------------------------------------------------------
 
-    public RestCallback<String> extendedTriggerMessage(ExtendedTriggerMessageParams params) throws Exception {
+    public RestCallback<TriggerMessageStatusEnumType> extendedTriggerMessage(ExtendedTriggerMessageParams params) throws Exception {
         return execute(params, chargePointServiceClient::extendedTriggerMessage);
     }
 
-    public RestCallback<String> getLog(GetLogParams params) throws Exception {
+    public RestCallback<GetLogResponse> getLog(GetLogParams params) throws Exception {
         return execute(params, chargePointServiceClient::getLog);
     }
 
-    public RestCallback<String> signedUpdateFirmware(SignedUpdateFirmwareParams params) throws Exception {
+    public RestCallback<UpdateFirmwareStatusEnumType> signedUpdateFirmware(SignedUpdateFirmwareParams params) throws Exception {
         return execute(params, chargePointServiceClient::signedUpdateFirmware);
     }
 
-    public RestCallback<String> installCertificate(InstallCertificateParams params) throws Exception {
+    public RestCallback<InstallCertificateStatusEnumType> installCertificate(InstallCertificateParams params) throws Exception {
         return execute(params, chargePointServiceClient::installCertificate);
     }
 
-    public RestCallback<String> deleteCertificate(DeleteCertificateParams params) throws Exception {
+    public RestCallback<DeleteCertificateResponse.DeleteCertificateStatusEnumType> deleteCertificate(DeleteCertificateParams params) throws Exception {
+        validateCertificateId(params.getInstalledCertificateId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::deleteCertificate);
     }
 
-    public RestCallback<String> getInstalledCertificateIds(GetInstalledCertificateIdsParams params) throws Exception {
+    public RestCallback<GetInstalledCertificateIdsResponse> getInstalledCertificateIds(GetInstalledCertificateIdsParams params) throws Exception {
         return execute(params, chargePointServiceClient::getInstalledCertificateIds);
     }
 
@@ -212,7 +257,80 @@ public class OcppOperationsService {
             returnList.addAll(temp);
         }
 
+        if (returnList.isEmpty()) {
+            throw new SteveException.BadRequest("No stations are eligible for communication. Ensure that the chargeBox IDs are correct and the stations are online.");
+        }
+
         return returnList;
+    }
+
+    private void validateIdTags(List<String> idTagList) {
+        if (CollectionUtils.isEmpty(idTagList)) {
+            return;
+        }
+
+        List<String> idTagListFromDB = ocppTagService.getIdTags(idTagList);
+        if (idTagList.size() != idTagListFromDB.size()) {
+            throw new SteveException.BadRequest("Some OCPP Tags are unknown. Cannot continue with this operation.");
+        }
+    }
+
+    private void validateIdTag(String idTag) {
+        if (!ocppTagService.isActive(idTag)) {
+            throw new SteveException.BadRequest("Requested OCPP Tag is not eligible for this operation. Ensure that the OCPP Tag is registered and active.");
+        }
+    }
+
+    private void validateChargingProfile(Integer chargingProfilePk) {
+        if (chargingProfilePk == null) {
+            return; // ClearChargingProfile allows chargingProfilePk to be optional.
+        }
+
+        if (!chargingProfileRepository.exists(chargingProfilePk)) {
+            throw new SteveException.BadRequest("chargingProfilePk is unknown.");
+        }
+    }
+
+    private void validateTransactionId(Integer transactionId, List<String> chargeBoxIdList) {
+        if (transactionId == null) {
+            return; // not this method's responsibility
+        }
+
+        // if transactionId is non-null, there must be only one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Integer> activeTransactionIds = transactionService.getActiveTransactionIds(chargeBoxId);
+        if (!activeTransactionIds.contains(transactionId)) {
+            throw new SteveException.BadRequest("This transaction is not active at this station.");
+        }
+    }
+
+    private void validateReservationId(Integer reservationId, List<String> chargeBoxIdList) {
+        if (reservationId == null) {
+            return; // not this method's responsibility
+        }
+
+        // a reservation can only be at one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Integer> activeReservationIds = reservationRepository.getActiveReservationIds(chargeBoxId);
+        if (!activeReservationIds.contains(reservationId)) {
+            throw new SteveException.BadRequest("This reservation is not active at this station.");
+        }
+    }
+
+    private void validateCertificateId(Long installedCertificateId, List<String> chargeBoxIdList) {
+        if (installedCertificateId == null) {
+            return; // not this method's responsibility
+        }
+
+        // an "installedCertificateId" can only be at one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Long> installedCertificateIds = certificateRepository.getInstalledCertificateIds(chargeBoxId);
+        if (!installedCertificateIds.contains(installedCertificateId)) {
+            throw new SteveException.BadRequest("This certificate is not installed at this station.");
+        }
     }
 
     private <T> RestCallback<T> createCallback(ChargePointSelection chargePointSelection) {

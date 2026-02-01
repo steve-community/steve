@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
@@ -49,7 +50,16 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
 
     @Override
     public void accept(CommunicationContext context) {
-        deserializer.accept(context);
+        try {
+            deserializer.accept(context);
+        } catch (SteveException e) {
+            // do not let OcppCallbacks hang. try to inform them when the response from the station cannot be parsed.
+            var frc = context.getFutureResponseContext();
+            if (frc != null) {
+                frc.getTask().failed(context.getChargeBoxId(), e);
+            }
+            throw e;
+        }
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {

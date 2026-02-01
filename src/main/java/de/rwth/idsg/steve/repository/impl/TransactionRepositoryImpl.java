@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jakarta.annotation.Nullable;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +42,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.DATE_TIME_TYPE;
-import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;

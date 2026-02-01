@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
+import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -76,7 +77,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
@@ -93,6 +93,7 @@ public class OcppOperationsService {
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
     private final OcppTagService ocppTagService;
+    private final ChargingProfileRepository chargingProfileRepository;
 
     // -------------------------------------------------------------------------
     // Since Ocpp 1.2
@@ -116,6 +117,7 @@ public class OcppOperationsService {
 
     public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
         validateIdTag(params.getIdTag());
+        validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
 
@@ -179,10 +181,12 @@ public class OcppOperationsService {
     }
 
     public RestCallback<ClearChargingProfileStatus> clearChargingProfile(ClearChargingProfileParams params) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::clearChargingProfile);
     }
 
     public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::setChargingProfile);
     }
 
@@ -262,6 +266,16 @@ public class OcppOperationsService {
     private void validateIdTag(String idTag) {
         if (!ocppTagService.isActive(idTag)) {
             throw new SteveException.BadRequest("Requested OCPP Tag is not eligible for this operation. Ensure that the OCPP Tag is registered and active.");
+        }
+    }
+
+    private void validateChargingProfile(Integer chargingProfilePk) {
+        if (chargingProfilePk == null) {
+            return; // ClearChargingProfile allows chargingProfilePk to be optional.
+        }
+
+        if (!chargingProfileRepository.exists(chargingProfilePk)) {
+            throw new SteveException.BadRequest("chargingProfilePk is unknown.");
         }
     }
 

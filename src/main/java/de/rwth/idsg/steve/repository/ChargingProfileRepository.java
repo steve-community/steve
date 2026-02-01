@@ -60,6 +60,8 @@ public interface ChargingProfileRepository {
 
     ChargingProfile.Details getDetails(int chargingProfilePk);
 
+    boolean exists(int chargingProfilePk);
+
     int add(ChargingProfileForm form);
 
     void update(ChargingProfileForm form);

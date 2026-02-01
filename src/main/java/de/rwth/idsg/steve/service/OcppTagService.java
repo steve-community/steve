@@ -75,6 +75,10 @@ public class OcppTagService {
         return ocppTagRepository.getActiveIdTags();
     }
 
+    public boolean isActive(String idTag) {
+        return ocppTagRepository.isActive(idTag);
+    }
+
     public List<String> getParentIdTags() {
         return ocppTagRepository.getParentIdTags();
     }

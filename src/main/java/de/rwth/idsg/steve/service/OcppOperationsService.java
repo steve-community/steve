@@ -90,6 +90,7 @@ public class OcppOperationsService {
 
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
+    private final OcppTagService ocppTagService;
 
     // -------------------------------------------------------------------------
     // Since Ocpp 1.2
@@ -112,6 +113,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
+        validateIdTag(params.getIdTag());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
 
@@ -136,6 +138,7 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<ReservationStatus> reserveNow(ReserveNowParams params) throws Exception {
+        validateIdTag(params.getIdTag());
         return execute(params, chargePointServiceClient::reserveNow);
     }
 
@@ -239,6 +242,12 @@ public class OcppOperationsService {
         }
 
         return returnList;
+    }
+
+    private void validateIdTag(String idTag) {
+        if (!ocppTagService.isActive(idTag)) {
+            throw new SteveException.BadRequest("Requested OCPP Tag is not eligible for this operation. Ensure that the OCPP Tag is registered and active.");
+        }
     }
 
     private <T> RestCallback<T> createCallback(ChargePointSelection chargePointSelection) {

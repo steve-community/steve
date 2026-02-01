@@ -42,6 +42,7 @@ public interface OcppTagRepository {
     List<String> getIdTags();
     List<String> getIdTagsWithoutUser();
     List<String> getActiveIdTags();
+    boolean isActive(String idTag);
 
     List<String> getParentIdTags();
     String getParentIdtag(String idTag);

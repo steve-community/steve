@@ -72,9 +72,11 @@ import ocpp.cp._2015._10.TriggerMessageStatus;
 import ocpp.cp._2015._10.UnlockStatus;
 import ocpp.cp._2015._10.UpdateStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
@@ -159,6 +161,8 @@ public class OcppOperationsService {
     }
 
     public RestCallback<UpdateStatus> sendLocalList(SendLocalListParams params) throws Exception {
+        validateIdTags(params.getAddUpdateList());
+        validateIdTags(params.getDeleteList());
         return execute(params, chargePointServiceClient::sendLocalList);
     }
 
@@ -242,6 +246,17 @@ public class OcppOperationsService {
         }
 
         return returnList;
+    }
+
+    private void validateIdTags(List<String> idTagList) {
+        if (CollectionUtils.isEmpty(idTagList)) {
+            return;
+        }
+
+        List<String> idTagListFromDB = ocppTagService.getIdTags(idTagList);
+        if (idTagList.size() != idTagListFromDB.size()) {
+            throw new SteveException.BadRequest("Some OCPP Tags are unknown. Cannot continue with this operation.");
+        }
     }
 
     private void validateIdTag(String idTag) {

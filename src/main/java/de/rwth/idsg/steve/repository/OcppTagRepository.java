@@ -40,6 +40,7 @@ public interface OcppTagRepository {
     OcppTagActivityRecord getRecord(int ocppTagPk);
 
     List<String> getIdTags();
+    List<String> getIdTags(List<String> idTagList);
     List<String> getIdTagsWithoutUser();
     List<String> getActiveIdTags();
     boolean isActive(String idTag);

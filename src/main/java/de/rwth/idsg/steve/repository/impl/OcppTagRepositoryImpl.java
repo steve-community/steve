@@ -41,9 +41,11 @@ import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -176,6 +178,17 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     public List<String> getIdTags() {
         return ctx.select(OCPP_TAG.ID_TAG)
                   .from(OCPP_TAG)
+                  .fetch(OCPP_TAG.ID_TAG);
+    }
+
+    @Override
+    public List<String> getIdTags(List<String> idTagList) {
+        if (CollectionUtils.isEmpty(idTagList)) {
+            return Collections.emptyList();
+        }
+        return ctx.select(OCPP_TAG.ID_TAG)
+                  .from(OCPP_TAG)
+                  .where(OCPP_TAG.ID_TAG.in(idTagList))
                   .fetch(OCPP_TAG.ID_TAG);
     }
 

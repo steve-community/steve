@@ -93,6 +93,7 @@ public class OcppOperationsService {
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
     private final OcppTagService ocppTagService;
+    private final TransactionService transactionService;
     private final ChargingProfileRepository chargingProfileRepository;
 
     // -------------------------------------------------------------------------
@@ -122,6 +123,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<RemoteStartStopStatus> remoteStopTransaction(RemoteStopTransactionParams params) throws Exception {
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::remoteStopTransaction);
     }
 
@@ -187,11 +189,15 @@ public class OcppOperationsService {
 
     public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params) throws Exception {
         validateChargingProfile(params.getChargingProfilePk());
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::setChargingProfile);
     }
 
     public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params,
                                                                   SetChargingProfileTaskAdhoc task) throws Exception {
+        validateChargingProfile(params.getChargingProfilePk());
+        validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
+
         params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
 
         RestCallback<ChargingProfileStatus> callback = createCallback(params);
@@ -276,6 +282,20 @@ public class OcppOperationsService {
 
         if (!chargingProfileRepository.exists(chargingProfilePk)) {
             throw new SteveException.BadRequest("chargingProfilePk is unknown.");
+        }
+    }
+
+    private void validateTransactionId(Integer transactionId, List<String> chargeBoxIdList) {
+        if (transactionId == null) {
+            return; // not this method's responsibility
+        }
+
+        // if transactionId is non-null, there must be only one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Integer> activeTransactionIds = transactionService.getActiveTransactionIds(chargeBoxId);
+        if (!activeTransactionIds.contains(transactionId)) {
+            throw new SteveException.BadRequest("This transaction is not active at this station.");
         }
     }
 

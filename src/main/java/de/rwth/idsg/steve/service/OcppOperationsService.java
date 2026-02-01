@@ -22,7 +22,9 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
+import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -94,7 +96,9 @@ public class OcppOperationsService {
     private final ChargePointServiceClient chargePointServiceClient;
     private final OcppTagService ocppTagService;
     private final TransactionService transactionService;
+    private final ReservationRepository reservationRepository;
     private final ChargingProfileRepository chargingProfileRepository;
+    private final CertificateRepository certificateRepository;
 
     // -------------------------------------------------------------------------
     // Since Ocpp 1.2
@@ -149,6 +153,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<CancelReservationStatus> cancelReservation(CancelReservationParams params) throws Exception {
+        validateReservationId(params.getReservationId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::cancelReservation);
     }
 
@@ -229,6 +234,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<DeleteCertificateResponse.DeleteCertificateStatusEnumType> deleteCertificate(DeleteCertificateParams params) throws Exception {
+        validateCertificateId(params.getInstalledCertificateId(), params.getChargeBoxIdList());
         return execute(params, chargePointServiceClient::deleteCertificate);
     }
 
@@ -296,6 +302,34 @@ public class OcppOperationsService {
         List<Integer> activeTransactionIds = transactionService.getActiveTransactionIds(chargeBoxId);
         if (!activeTransactionIds.contains(transactionId)) {
             throw new SteveException.BadRequest("This transaction is not active at this station.");
+        }
+    }
+
+    private void validateReservationId(Integer reservationId, List<String> chargeBoxIdList) {
+        if (reservationId == null) {
+            return; // not this method's responsibility
+        }
+
+        // a reservation can only be at one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Integer> activeReservationIds = reservationRepository.getActiveReservationIds(chargeBoxId);
+        if (!activeReservationIds.contains(reservationId)) {
+            throw new SteveException.BadRequest("This reservation is not active at this station.");
+        }
+    }
+
+    private void validateCertificateId(Long installedCertificateId, List<String> chargeBoxIdList) {
+        if (installedCertificateId == null) {
+            return; // not this method's responsibility
+        }
+
+        // an "installedCertificateId" can only be at one station
+        String chargeBoxId = chargeBoxIdList.getFirst();
+
+        List<Long> installedCertificateIds = certificateRepository.getInstalledCertificateIds(chargeBoxId);
+        if (!installedCertificateIds.contains(installedCertificateId)) {
+            throw new SteveException.BadRequest("This certificate is not installed at this station.");
         }
     }
 

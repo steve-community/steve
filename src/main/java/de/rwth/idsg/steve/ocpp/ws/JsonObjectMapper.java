@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.rwth.idsg.ocpp.jaxb.validation.BeanValidationModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
@@ -63,6 +64,8 @@ public enum JsonObjectMapper {
             .addModule(new Ocpp15JacksonModule())
             .addModule(new Ocpp16JacksonModule())
             .addModule(new JodaModule())
+            // https://github.com/steve-community/ocpp-jaxb/pull/25
+            .addModule(BeanValidationModule.forReading(null))
             .annotationIntrospector(
                 AnnotationIntrospector.pair(
                     new JacksonAnnotationIntrospector(),

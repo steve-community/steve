@@ -137,8 +137,9 @@ public class OcppJsonChargePoint {
             } else if (ocppMsg instanceof OcppJsonCallForTesting testing) {
                 handleCall(testing);
             }
-        } catch (Exception e) {
-            log.error("Exception", e);
+        } catch (Throwable e) {
+            testerThreadInterruptReason = new RuntimeException(e);
+            testerThread.interrupt();
         } finally {
             if (receivedMessagesSignal != null) {
                 receivedMessagesSignal.countDown();

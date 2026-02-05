@@ -31,6 +31,11 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 public final class ErrorFactory {
     private ErrorFactory() { }
 
+    public static OcppJsonError propertyConstraintViolation(String messageId, String details) {
+        return setFields(messageId, ErrorCode.PropertyConstraintViolation,
+            "Message validation failed", details);
+    }
+
     public static OcppJsonError genericDeserializeError(String messageId, String details) {
         return setFields(messageId, ErrorCode.GenericError,
                 "The incoming string could not be parsed into an array. Is the JSON syntactically correct?", details);

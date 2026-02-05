@@ -37,12 +37,14 @@ import lombok.extern.slf4j.Slf4j;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.TreeNode;
+import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
 
+import jakarta.validation.ConstraintViolationException;
 import java.util.function.Consumer;
 
 /**
@@ -123,6 +125,14 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
 
             req = mapper.treeToValue(requestPayload, clazz);
+        } catch (ConstraintViolationException e) {
+            log.error("Exception occurred", e);
+            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getMessage()));
+            return;
+        } catch (DatabindException e) {
+            log.error("Exception occurred", e);
+            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getCause().getMessage()));
+            return;
         } catch (JacksonException e) {
             log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));

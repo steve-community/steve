@@ -36,7 +36,7 @@ import java.util.UUID;
 public class Helpers {
 
     public static String getRandomString() {
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID().toString().substring(0, 20);
     }
 
     public static List<String> getRandomStrings(int size) {

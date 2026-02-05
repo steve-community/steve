@@ -82,4 +82,12 @@ public final class WebSocketLogger {
             log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
         }
     }
+
+    public static void closingDangling(String chargeBoxId, WebSocketSession session) {
+        log.warn("[chargeBoxId={}, sessionId={}] Closing a dangling WebSocketSession", chargeBoxId, session.getId());
+    }
+
+    public static void closingDanglingError(String chargeBoxId, WebSocketSession session, Throwable t) {
+        log.error("[chargeBoxId={}, sessionId={}] Error while trying to close the WebSocketSession", chargeBoxId, session.getId(), t);
+    }
 }

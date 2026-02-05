@@ -25,6 +25,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -47,7 +48,26 @@ public class PingTask implements Runnable {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
             WebSocketLogger.pingError(chargeBoxId, session, e);
-            // TODO: Do something about this
+            tryClosingSession(e);
+        }
+    }
+
+    /**
+     * If the session is not open, and we just had a ClosedChannelException, the websocket connection probably went away
+     * without proper closing steps, and we have a dangling reference.
+     */
+    private void tryClosingSession(IOException e) {
+        if (session.isOpen()) {
+            return;
+        }
+
+        try {
+            if (e instanceof ClosedChannelException) {
+                log.warn("Trying to close a dangling WebSocketSession");
+                session.close();
+            }
+        } catch (IOException ex) {
+            log.error("Error while trying to close the WebSocketSession");
         }
     }
 }

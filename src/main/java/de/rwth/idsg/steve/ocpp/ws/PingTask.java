@@ -42,12 +42,30 @@ public class PingTask implements Runnable {
 
     @Override
     public void run() {
+        if (!session.isOpen()) {
+            closeSession();
+            return;
+        }
+
         WebSocketLogger.sendingPing(chargeBoxId, session);
         try {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
             WebSocketLogger.pingError(chargeBoxId, session, e);
             // TODO: Do something about this
+        }
+    }
+
+    /**
+     * If the session is not open, the websocket connection probably went away without proper closing steps,
+     * and we have a dangling reference.
+     */
+    private void closeSession() {
+        WebSocketLogger.closingDangling(chargeBoxId, session);
+        try {
+            session.close();
+        } catch (Exception e) {
+            WebSocketLogger.closingDanglingError(chargeBoxId, session, e);
         }
     }
 }

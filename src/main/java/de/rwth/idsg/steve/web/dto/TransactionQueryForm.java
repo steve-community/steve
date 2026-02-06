@@ -26,6 +26,7 @@ import lombok.ToString;
 import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
     @Schema(description = "Database primary keys of the transactions")
-    private List<Integer> transactionPk;
+    private List<@NotNull(message = "transactionPk must not be null") Integer> transactionPk;
     
     @Schema(description = "ID of the connector")
     private Integer connectorId;

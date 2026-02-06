@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.web.validation.ChargeBoxId;
+import de.rwth.idsg.steve.web.validation.IdTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.util.CollectionUtils;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 
@@ -39,13 +42,16 @@ import java.util.List;
 public abstract class QueryForm extends QueryPeriodFromToFilter {
 
     @Schema(description = "The identifiers of the chargebox (i.e. charging station)")
+    @ChargeBoxId
     private List<String> chargeBoxId;
 
     @Schema(description = "The OCPP tags")
+    @IdTag
     private List<String> ocppIdTag;
 
     @Schema(description = "The User IDs")
-    private List<@Positive(message = "userId has to be a positive number") Integer> userId;
+    private List<@NotNull(message = "userId must not be null")
+                 @Positive(message = "userId has to be a positive number") Integer> userId;
 
     @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {

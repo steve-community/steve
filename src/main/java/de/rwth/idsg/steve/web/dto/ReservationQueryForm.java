@@ -27,6 +27,7 @@ import lombok.ToString;
 import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 
@@ -39,9 +40,11 @@ import java.util.List;
 @ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
-    private List<@Positive(message = "reservationId has to be a positive number") Integer> reservationId;
+    private List<@NotNull(message = "reservationId must not be null")
+                 @Positive(message = "reservationId has to be a positive number") Integer> reservationId;
 
-    private List<@Positive(message = "transactionId has to be a positive number") Integer> transactionId;
+    private List<@NotNull(message = "transactionId must not be null")
+                 @Positive(message = "transactionId has to be a positive number") Integer> transactionId;
 
     private ReservationStatus status;
 

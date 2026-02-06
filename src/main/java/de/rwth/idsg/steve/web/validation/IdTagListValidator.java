@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import org.springframework.util.CollectionUtils;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -37,6 +39,10 @@ public class IdTagListValidator implements ConstraintValidator<IdTag, List<Strin
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+        if (CollectionUtils.isEmpty(value)) {
+            return true; // null or empty is valid, because it is another constraint's responsibility
+        }
+
         for (String s : value) {
             if (!VALIDATOR.isValid(s, context)) {
                 return false;

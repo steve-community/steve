@@ -23,8 +23,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,28 +38,27 @@ import jakarta.validation.constraints.Positive;
 @ToString
 public abstract class QueryForm extends QueryPeriodFromToFilter {
 
-    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
-    private String chargeBoxId;
+    @Schema(description = "The identifiers of the chargebox (i.e. charging station)")
+    private List<String> chargeBoxId;
 
-    @Schema(description = "The OCPP tag")
-    private String ocppIdTag;
+    @Schema(description = "The OCPP tags")
+    private List<String> ocppIdTag;
 
-    @Schema(description = "The User ID")
-    @Positive(message = "userId has to be a positive number")
-    private Integer userId;
+    @Schema(description = "The User IDs")
+    private List<@Positive(message = "userId has to be a positive number") Integer> userId;
 
     @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {
-        return chargeBoxId != null;
+        return !CollectionUtils.isEmpty(chargeBoxId);
     }
 
     @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
-        return ocppIdTag != null;
+        return !CollectionUtils.isEmpty(ocppIdTag);
     }
 
     @Schema(hidden = true)
     public boolean isUserIdSet() {
-        return userId != null;
+        return !CollectionUtils.isEmpty(userId);
     }
 }

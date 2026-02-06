@@ -52,7 +52,7 @@
 			</tr>
 			<tr>
 				<td>ChargeBox ID:</td>
-				<td><form:select path="chargeBoxId">
+				<td><form:select path="chargeBoxId" multiple="false">
 						<option value="" selected>All</option>
 						<form:options items="${cpList}"/>
 					</form:select>
@@ -60,7 +60,7 @@
 			</tr>
 			<tr>
 				<td>OCPP ID Tag:</td>
-				<td><form:select path="ocppIdTag">
+				<td><form:select path="ocppIdTag" multiple="false">
 					    <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>

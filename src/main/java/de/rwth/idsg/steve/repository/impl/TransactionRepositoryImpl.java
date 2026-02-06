@@ -156,7 +156,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // -------------------------------------------------------------------------
 
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setTransactionPk(transactionPk);
+        form.setTransactionPk(List.of(transactionPk));
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(QueryPeriodType.ALL);
 
@@ -281,11 +281,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         List<Condition> conditions = new ArrayList<>();
 
         if (form.isTransactionPkSet()) {
-            conditions.add(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
+            conditions.add(TRANSACTION.TRANSACTION_PK.in(form.getTransactionPk()));
         }
 
         if (form.isChargeBoxIdSet()) {
-            conditions.add(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+            conditions.add(CONNECTOR.CHARGE_BOX_ID.in(form.getChargeBoxId()));
         }
 
         if (form.isConnectorIdSet()) {
@@ -293,11 +293,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         if (form.isOcppIdTagSet()) {
-            conditions.add(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
+            conditions.add(TRANSACTION.ID_TAG.in(form.getOcppIdTag()));
         }
 
         if (form.isUserIdSet()) {
-            conditions.add(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
+            conditions.add(USER_OCPP_TAG.USER_PK.in(form.getUserId()));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

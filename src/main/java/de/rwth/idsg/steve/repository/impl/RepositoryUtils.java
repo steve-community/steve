@@ -24,6 +24,8 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 
+import java.util.List;
+
 import static jooq.steve.db.Tables.OCPP_TAG;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 
@@ -34,10 +36,10 @@ import static jooq.steve.db.Tables.USER_OCPP_TAG;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RepositoryUtils {
 
-    public static Select<Record1<String>> ocppTagByUserIdQuery(DSLContext ctx, int userId) {
+    public static Select<Record1<String>> ocppTagByUserIdQuery(DSLContext ctx, List<Integer> userIds) {
         return ctx.select(OCPP_TAG.ID_TAG)
             .from(OCPP_TAG)
             .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-            .where(USER_OCPP_TAG.USER_PK.eq(userId));
+            .where(USER_OCPP_TAG.USER_PK.in(userIds));
     }
 }

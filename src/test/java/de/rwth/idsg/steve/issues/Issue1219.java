@@ -110,7 +110,7 @@ public class Issue1219 {
             }
 
             TransactionQueryForm form = new TransactionQueryForm();
-            form.setTransactionPk(transactionId);
+            form.setTransactionPk(List.of(transactionId));
             Transaction transaction = transactionRepository.getTransactions(form).get(0);
 
             DateTime stopTimestamp = transaction.getStartTimestamp().plusHours(1);

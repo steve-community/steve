@@ -74,7 +74,7 @@ public class TransactionService {
 
     public Transaction getTransaction(int transactionPk) {
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setTransactionPk(transactionPk);
+        form.setTransactionPk(List.of(transactionPk));
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ALL);
 
@@ -87,7 +87,7 @@ public class TransactionService {
 
     public Transaction getLatestActiveTransaction(String chargeBoxId, Integer connectorId) {
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setChargeBoxId(chargeBoxId);
+        form.setChargeBoxId(List.of(chargeBoxId));
         form.setConnectorId(connectorId);
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ACTIVE);

@@ -23,8 +23,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -37,8 +39,8 @@ import java.util.Objects;
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
-    @Schema(description = "Database primary key of the transaction")
-    private Integer transactionPk;
+    @Schema(description = "Database primary keys of the transactions")
+    private List<Integer> transactionPk;
     
     @Schema(description = "ID of the connector")
     private Integer connectorId;
@@ -60,7 +62,7 @@ public class TransactionQueryForm extends QueryForm {
 
     @Schema(hidden = true)
     public boolean isTransactionPkSet() {
-        return transactionPk != null;
+        return !CollectionUtils.isEmpty(transactionPk);
     }
     
     @Schema(hidden = true)

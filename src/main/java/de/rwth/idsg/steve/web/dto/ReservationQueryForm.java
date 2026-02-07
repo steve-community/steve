@@ -24,9 +24,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,11 +40,11 @@ import jakarta.validation.constraints.Positive;
 @ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
-    @Positive(message = "reservationId has to be a positive number")
-    private Integer reservationId;
+    private List<@NotNull(message = "reservationId must not be null")
+                 @Positive(message = "reservationId has to be a positive number") Integer> reservationId;
 
-    @Positive(message = "transactionId has to be a positive number")
-    private Integer transactionId;
+    private List<@NotNull(message = "transactionId must not be null")
+                 @Positive(message = "transactionId has to be a positive number") Integer> transactionId;
 
     private ReservationStatus status;
 
@@ -61,12 +64,12 @@ public class ReservationQueryForm extends QueryForm {
 
     @Schema(hidden = true)
     public boolean isReservationIdSet() {
-        return reservationId != null;
+        return !CollectionUtils.isEmpty(reservationId);
     }
 
     @Schema(hidden = true)
     public boolean isTransactionIdSet() {
-        return transactionId != null;
+        return !CollectionUtils.isEmpty(transactionId);
     }
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")

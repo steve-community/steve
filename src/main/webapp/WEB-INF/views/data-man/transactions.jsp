@@ -39,11 +39,11 @@ Transactions
         <table class="userInput">
             <tr>
                 <td>Transaction ID:</td>
-                <td><form:input path="transactionPk"/></td>
+                <td><form:input path="transactionPk" type="number" min="1"/></td>
             </tr>
             <tr>
                 <td>ChargeBox ID:</td>
-                <td><form:select path="chargeBoxId">
+                <td><form:select path="chargeBoxId" multiple="false">
                         <option value="" selected>All</option>
                         <form:options items="${cpList}"/>
                     </form:select>
@@ -51,7 +51,7 @@ Transactions
             </tr>
             <tr>
                 <td>OCPP ID Tag:</td>
-                <td><form:select path="ocppIdTag">
+                <td><form:select path="ocppIdTag" multiple="false">
                         <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>
@@ -59,7 +59,7 @@ Transactions
             </tr>
             <tr>
                 <td>User ID:</td>
-                <td><form:input path="userId"/></td>
+                <td><form:input path="userId" type="number" min="1"/></td>
             </tr>
             <tr>
                 <td>Transaction Type:</td>

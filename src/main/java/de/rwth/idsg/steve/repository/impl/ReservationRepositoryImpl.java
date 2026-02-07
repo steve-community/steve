@@ -81,19 +81,19 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         );
 
         if (form.isReservationIdSet()) {
-            selectQuery.addConditions(RESERVATION.RESERVATION_PK.eq(form.getReservationId()));
+            selectQuery.addConditions(RESERVATION.RESERVATION_PK.in(form.getReservationId()));
         }
 
         if (form.isTransactionIdSet()) {
-            selectQuery.addConditions(RESERVATION.TRANSACTION_PK.eq(form.getTransactionId()));
+            selectQuery.addConditions(RESERVATION.TRANSACTION_PK.in(form.getTransactionId()));
         }
 
         if (form.isChargeBoxIdSet()) {
-            selectQuery.addConditions(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+            selectQuery.addConditions(CHARGE_BOX.CHARGE_BOX_ID.in(form.getChargeBoxId()));
         }
 
         if (form.isOcppIdTagSet()) {
-            selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getOcppIdTag()));
+            selectQuery.addConditions(RESERVATION.ID_TAG.in(form.getOcppIdTag()));
         }
 
         if (form.isUserIdSet()) {

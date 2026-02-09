@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,7 +85,7 @@ public class SecurityProfileValidatorTest {
         form.setAuthPassword(authPassword);
 
         ChargePointRegistration toReturn = stationExistsInDB
-            ? new ChargePointRegistration(-1, "chargeBoxId", "Accepted", securityProfile, authPasswordInDB, "cpoName", "serialNumber")
+            ? new ChargePointRegistration(-1, "chargeBoxId", RegistrationStatus.ACCEPTED, securityProfile, authPasswordInDB, "cpoName", "serialNumber")
             : null;
 
         when(chargePointService.getRegistrationDirect(any())).thenReturn(Optional.ofNullable(toReturn));

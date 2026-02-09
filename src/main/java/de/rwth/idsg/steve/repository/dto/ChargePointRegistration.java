@@ -19,11 +19,12 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import ocpp.cs._2015._10.RegistrationStatus;
 
 public record ChargePointRegistration(
     int chargeBoxPk,
     String chargeBoxId,
-    String registrationStatus,
+    RegistrationStatus registrationStatus,
     OcppSecurityProfile securityProfile,
     String hashedAuthPassword,
     String cpoName,

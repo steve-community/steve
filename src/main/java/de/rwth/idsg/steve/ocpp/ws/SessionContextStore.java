@@ -35,7 +35,7 @@ public interface SessionContextStore {
     /**
      * @return the number of sessions for this chargeBoxId after the add.
      */
-    int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
+    int add(String chargeBoxId, WebSocketSession session);
 
     /**
      * @return the number of sessions for this chargeBoxId after the remove.

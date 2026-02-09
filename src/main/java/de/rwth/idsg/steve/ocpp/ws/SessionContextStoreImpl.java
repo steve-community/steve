@@ -20,14 +20,17 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,11 +60,27 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
 
+    private final TaskScheduler taskScheduler;
+
     @Override
-    public int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
+    public int add(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
+            if (!session.isOpen()) {
+                log.warn("Session closed. Skipping add for chargeBoxId '{}' and session '{}'", chargeBoxId, session.getId());
+                Deque<SessionContext> existing = lookupTable.get(chargeBoxId);
+                return existing == null ? 0 : existing.size();
+            }
+
+            // Just to keep the connection alive, such that the servers do not close
+            // the connection because of a idle timeout, we ping-pong at fixed intervals.
+            ScheduledFuture pingSchedule = taskScheduler.scheduleAtFixedRate(
+                new PingTask(chargeBoxId, session),
+                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
+                WebSocketConfiguration.PING_INTERVAL
+            );
+
             SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());

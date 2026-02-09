@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -42,11 +41,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 /**
@@ -57,7 +54,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final TaskScheduler taskScheduler;
     private final OcppServerRepository ocppServerRepository;
     private final FutureResponseContextStore futureResponseContextStore;
     private final IncomingPipeline pipeline;
@@ -73,7 +69,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
                                      ApplicationEventPublisher applicationEventPublisher,
                                      SessionContextStoreHolder sessionContextStoreHolder,
                                      AbstractTypeStore typeStore) {
-        this.taskScheduler = taskScheduler;
         this.ocppServerRepository = ocppServerRepository;
         this.futureResponseContextStore = futureResponseContextStore;
         this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
@@ -143,17 +138,9 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         WebSocketLogger.connected(chargeBoxId, session);
         ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
-        // Just to keep the connection alive, such that the servers do not close
-        // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = taskScheduler.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
-                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
-                WebSocketConfiguration.PING_INTERVAL
-        );
-
         futureResponseContextStore.addSession(session);
 
-        int sizeAfterAdd = sessionContextStore.add(chargeBoxId, session, pingSchedule);
+        int sizeAfterAdd = sessionContextStore.add(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.

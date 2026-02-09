@@ -32,7 +32,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -63,8 +62,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
 
-    public AbstractWebSocketEndpoint(TaskScheduler taskScheduler,
-                                     OcppServerRepository ocppServerRepository,
+    public AbstractWebSocketEndpoint(OcppServerRepository ocppServerRepository,
                                      FutureResponseContextStore futureResponseContextStore,
                                      ApplicationEventPublisher applicationEventPublisher,
                                      SessionContextStoreHolder sessionContextStoreHolder,

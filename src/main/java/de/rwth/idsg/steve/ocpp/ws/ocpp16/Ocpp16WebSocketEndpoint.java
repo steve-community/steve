@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
@@ -44,7 +44,6 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,13 +56,12 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final CentralSystemService16_SoapServer server;
 
-    public Ocpp16WebSocketEndpoint(TaskScheduler taskScheduler,
-                                   OcppServerRepository ocppServerRepository,
+    public Ocpp16WebSocketEndpoint(OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService16_SoapServer server,
                                    SessionContextStoreHolder sessionContextStoreHolder) {
-        super(taskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp16TypeStore.INSTANCE);
+        super(ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp16TypeStore.INSTANCE);
         this.server = server;
     }
 

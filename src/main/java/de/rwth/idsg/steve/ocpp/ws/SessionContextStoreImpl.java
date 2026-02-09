@@ -59,18 +59,17 @@ public class SessionContextStoreImpl implements SessionContextStore {
     private final Striped<Lock> locks = Striped.lock(16);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
-
     private final TaskScheduler taskScheduler;
+    private final FutureResponseContextStore futureResponseContextStore;
 
     @Override
-    public int add(String chargeBoxId, WebSocketSession session) {
+    public boolean add(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
             if (!session.isOpen()) {
                 log.warn("Session closed. Skipping add for chargeBoxId '{}' and session '{}'", chargeBoxId, session.getId());
-                Deque<SessionContext> existing = lookupTable.get(chargeBoxId);
-                return existing == null ? 0 : existing.size();
+                return false; // we dont want to trigger any action based on this 'bad' session which we did not process anyway
             }
 
             // Just to keep the connection alive, such that the servers do not close
@@ -86,23 +85,25 @@ public class SessionContextStoreImpl implements SessionContextStore {
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
+            futureResponseContextStore.addSession(session);
+
             int size = endpointDeque.size();
             log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}", chargeBoxId, size);
-            return size;
+            return size == 1;
         } finally {
             l.unlock();
         }
     }
 
     @Override
-    public int remove(String chargeBoxId, WebSocketSession session) {
+    public boolean remove(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
             Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
-                return 0;
+                return false; // we did not have any session anyway
             }
 
             // Prevent "java.util.ConcurrentModificationException: null"
@@ -132,7 +133,9 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 }
             }
 
-            return endpointDeque.size();
+            futureResponseContextStore.removeSession(session);
+
+            return endpointDeque.isEmpty();
         } finally {
             l.unlock();
         }

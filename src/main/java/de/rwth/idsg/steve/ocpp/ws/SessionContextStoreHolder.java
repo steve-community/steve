@@ -37,13 +37,17 @@ public class SessionContextStoreHolder {
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
     private final TaskScheduler taskScheduler;
+    private final FutureResponseContextStore futureResponseContextStore;
 
-    public SessionContextStoreHolder(SteveProperties steveProperties, TaskScheduler taskScheduler) {
+    public SessionContextStoreHolder(SteveProperties steveProperties,
+                                     TaskScheduler taskScheduler,
+                                     FutureResponseContextStore futureResponseContextStore) {
         wsSessionSelectStrategy = steveProperties.getOcpp().getWsSessionSelectStrategy();
         this.taskScheduler = taskScheduler;
+        this.futureResponseContextStore = futureResponseContextStore;
     }
 
     public SessionContextStore getOrCreate(OcppVersion version) {
-        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy, taskScheduler));
+        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy, taskScheduler, futureResponseContextStore));
     }
 }

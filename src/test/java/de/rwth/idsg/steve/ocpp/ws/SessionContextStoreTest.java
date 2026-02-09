@@ -25,10 +25,7 @@ import org.mockito.Mockito;
 import org.springframework.scheduling.support.NoOpTaskScheduler;
 import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
-import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ScheduledFuture;
 
 import static org.mockito.Mockito.when;
 
@@ -36,27 +33,37 @@ public class SessionContextStoreTest {
 
     @Test
     public void testAdd() {
-        var store = new SessionContextStoreImpl(WsSessionSelectStrategyEnum.ALWAYS_LAST, new NoOpTaskScheduler());
+        var store = new SessionContextStoreImpl(
+            WsSessionSelectStrategyEnum.ALWAYS_LAST,
+            new NoOpTaskScheduler(),
+            new FutureResponseContextStoreImpl()
+        );
 
         int sizeBeforeAdd = store.getSize("foo");
         Assertions.assertEquals(0, sizeBeforeAdd);
 
         // add first
         {
-            int sizeAfterAdd = store.add("foo", getMockSession());
+            store.add("foo", getMockSession());
+            int sizeAfterAdd =  store.getSize("foo");
             Assertions.assertEquals(1, sizeAfterAdd);
         }
 
         // add second
         {
-            int sizeAfterAdd = store.add("foo", getMockSession());
+            store.add("foo", getMockSession());
+            int sizeAfterAdd =  store.getSize("foo");
             Assertions.assertEquals(2, sizeAfterAdd);
         }
     }
 
     @Test
     public void testRemove() {
-        var store = new SessionContextStoreImpl(WsSessionSelectStrategyEnum.ALWAYS_LAST, new NoOpTaskScheduler());
+        var store = new SessionContextStoreImpl(
+            WsSessionSelectStrategyEnum.ALWAYS_LAST,
+            new NoOpTaskScheduler(),
+            new FutureResponseContextStoreImpl()
+        );
 
         int sizeBeforeAdd = store.getSize("foo");
         Assertions.assertEquals(0, sizeBeforeAdd);
@@ -67,7 +74,8 @@ public class SessionContextStoreTest {
         // prepare with 2 sessions
         {
             store.add("foo", session1);
-            int sizeAfterAdd = store.add("foo", session2);
+            store.add("foo", session2);
+            int sizeAfterAdd = store.getSize("foo");
 
             Assertions.assertEquals(2, sizeAfterAdd);
             Assertions.assertEquals(2, store.getSize("foo"));
@@ -75,19 +83,22 @@ public class SessionContextStoreTest {
 
         // remove first
         {
-            int sizeAfterRemove = store.remove("foo", session1);
+            store.remove("foo", session1);
+            int sizeAfterRemove = store.getSize("foo");
             Assertions.assertEquals(1, sizeAfterRemove);
         }
 
         // remove second
         {
-            int sizeAfterRemove = store.remove("foo", session2);
+            store.remove("foo", session2);
+            int sizeAfterRemove = store.getSize("foo");
             Assertions.assertEquals(0, sizeAfterRemove);
         }
 
         // try removing another non-existing
         {
-            int sizeAfterRemove = store.remove("foo", getMockSession());
+            store.remove("foo", getMockSession());
+            int sizeAfterRemove = store.getSize("foo");
             Assertions.assertEquals(0, sizeAfterRemove);
             Assertions.assertEquals(0, store.getSize("foo"));
         }

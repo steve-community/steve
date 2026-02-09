@@ -54,7 +54,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
     private final OcppServerRepository ocppServerRepository;
-    private final FutureResponseContextStore futureResponseContextStore;
     private final IncomingPipeline pipeline;
     private final SessionContextStore sessionContextStore;
 
@@ -68,7 +67,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
                                      SessionContextStoreHolder sessionContextStoreHolder,
                                      AbstractTypeStore typeStore) {
         this.ocppServerRepository = ocppServerRepository;
-        this.futureResponseContextStore = futureResponseContextStore;
         this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
         this.sessionContextStore = sessionContextStoreHolder.getOrCreate(getVersion());
 
@@ -136,13 +134,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         WebSocketLogger.connected(chargeBoxId, session);
         ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
-        futureResponseContextStore.addSession(session);
-
-        int sizeAfterAdd = sessionContextStore.add(chargeBoxId, session);
+        boolean stationConnected = sessionContextStore.add(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
-        if (sizeAfterAdd == 1) {
+        if (stationConnected) {
             connectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
         }
     }
@@ -153,13 +149,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
-        futureResponseContextStore.removeSession(session);
-
-        int sizeAfterRemove = sessionContextStore.remove(chargeBoxId, session);
+        boolean stationDisconnected = sessionContextStore.remove(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 1 -> 0.
-        if (sizeAfterRemove == 0) {
+        if (stationDisconnected) {
             disconnectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
         }
     }

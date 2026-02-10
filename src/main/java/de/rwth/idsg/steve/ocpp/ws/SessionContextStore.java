@@ -24,7 +24,6 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,14 +32,14 @@ import java.util.concurrent.ScheduledFuture;
 public interface SessionContextStore {
 
     /**
-     * @return the number of sessions for this chargeBoxId after the add.
+     * @return whether this is the first session for this chargeBoxId.
      */
-    int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
+    boolean add(String chargeBoxId, WebSocketSession session);
 
     /**
-     * @return the number of sessions for this chargeBoxId after the remove.
+     * @return whether this was the last session for this chargeBoxId.
      */
-    int remove(String chargeBoxId, WebSocketSession session);
+    boolean remove(String chargeBoxId, WebSocketSession session);
 
     WebSocketSession getSession(String chargeBoxId);
 

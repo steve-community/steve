@@ -20,14 +20,17 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,34 +59,51 @@ public class SessionContextStoreImpl implements SessionContextStore {
     private final Striped<Lock> locks = Striped.lock(16);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
+    private final TaskScheduler taskScheduler;
+    private final FutureResponseContextStore futureResponseContextStore;
 
     @Override
-    public int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
+    public boolean add(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
+            if (!session.isOpen()) {
+                log.warn("Session closed. Skipping add for chargeBoxId '{}' and session '{}'", chargeBoxId, session.getId());
+                return false; // we dont want to trigger any action based on this 'bad' session which we did not process anyway
+            }
+
+            // Just to keep the connection alive, such that the servers do not close
+            // the connection because of a idle timeout, we ping-pong at fixed intervals.
+            ScheduledFuture pingSchedule = taskScheduler.scheduleAtFixedRate(
+                new PingTask(chargeBoxId, session),
+                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
+                WebSocketConfiguration.PING_INTERVAL
+            );
+
             SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
+            futureResponseContextStore.addSession(session);
+
             int size = endpointDeque.size();
             log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}", chargeBoxId, size);
-            return size;
+            return size == 1;
         } finally {
             l.unlock();
         }
     }
 
     @Override
-    public int remove(String chargeBoxId, WebSocketSession session) {
+    public boolean remove(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
             Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
-                return 0;
+                return false; // we did not have any session anyway
             }
 
             // Prevent "java.util.ConcurrentModificationException: null"
@@ -113,7 +133,9 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 }
             }
 
-            return endpointDeque.size();
+            futureResponseContextStore.removeSession(session);
+
+            return endpointDeque.isEmpty();
         } finally {
             l.unlock();
         }

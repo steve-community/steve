@@ -130,11 +130,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Override
     public void onOpen(WebSocketSession session) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
-
         WebSocketLogger.connected(chargeBoxId, session);
-        ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         boolean stationConnected = sessionContextStore.add(chargeBoxId, session);
+
+        ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
@@ -146,7 +146,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Override
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
-
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
         boolean stationDisconnected = sessionContextStore.remove(chargeBoxId, session);

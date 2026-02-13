@@ -131,7 +131,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return;
         } catch (DatabindException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getCause().getMessage()));
+            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getOriginalMessage()));
             return;
         } catch (JacksonException e) {
             log.error("Exception occurred", e);

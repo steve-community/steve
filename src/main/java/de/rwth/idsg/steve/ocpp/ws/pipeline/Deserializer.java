@@ -125,17 +125,13 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
 
             req = mapper.treeToValue(requestPayload, clazz);
-        } catch (ConstraintViolationException e) {
+        } catch (ConstraintViolationException | DatabindException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getMessage()));
-            return;
-        } catch (DatabindException e) {
-            log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, e.getOriginalMessage()));
+            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, getDetails(e)));
             return;
         } catch (JacksonException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));
+            context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, null));
             return;
         }
 
@@ -229,4 +225,13 @@ public class Deserializer implements Consumer<CommunicationContext> {
         context.setIncomingMessage(error);
     }
 
+    private static String getDetails(Exception e) {
+        if (e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) {
+            return "Violation of field constraints";
+        }
+        if (e instanceof DatabindException) {
+            return "Invalid payload value (cannot understand one field)";
+        }
+        return null;
+    }
 }

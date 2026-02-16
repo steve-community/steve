@@ -64,7 +64,7 @@ public class SteveException extends RuntimeException {
     public static class AlreadyExists extends SteveException {
 
         public AlreadyExists(String template, Object arg1) {
-            super(template.formatted(arg1));
+            super(template, arg1);
         }
     }
 

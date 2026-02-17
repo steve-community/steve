@@ -139,8 +139,8 @@ public class CentralSystemService16ServiceValidatorTest {
     }
 
     private static TransactionRecord tx(String startValue, DateTime startTimestamp,
-                                                String stopValue, DateTime stopTimestamp,
-                                                TransactionStopEventActor stopActor) {
+                                        String stopValue, DateTime stopTimestamp,
+                                        TransactionStopEventActor stopActor) {
         TransactionRecord tx = Mockito.mock(TransactionRecord.class);
         Mockito.when(tx.getStartValue()).thenReturn(startValue);
         Mockito.when(tx.getStartTimestamp()).thenReturn(startTimestamp);

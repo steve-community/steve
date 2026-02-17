@@ -254,6 +254,7 @@ public class CentralSystemService16_Service {
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
             applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
         } else {
+            log.warn("StopTransaction validation failed", exception);
             ocppServerRepository.updateTransactionAsFailed(params, exception);
             // TODO: we need to handle meter values of invalid stops differently. will come later.
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);

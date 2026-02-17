@@ -324,7 +324,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 .execute();
         } catch (Exception ex) {
             // This is where we give up and just log
-            log.error("Exception occurred", e);
+            log.error("Exception occurred", ex);
+            log.error("Original exception", e);
         }
     }
 

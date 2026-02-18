@@ -93,6 +93,7 @@ public class CentralSystemService16_Service {
     private final EventRepository eventRepository;
     private final CertificateSigningService certificateSigningService;
     private final TaskScheduler taskScheduler;
+    private final CentralSystemService16_ServiceValidator serviceValidator;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -245,11 +246,19 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        ocppServerRepository.updateTransaction(params);
+        var transaction = ocppServerRepository.getTransaction(params.getTransactionId());
+        var exception = serviceValidator.validateStop(transaction, params);
 
-        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
-
-        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
+        if (exception == null) {
+            ocppServerRepository.updateTransaction(params);
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+            applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
+        } else {
+            log.warn("StopTransaction validation failed", exception);
+            ocppServerRepository.updateTransactionAsFailed(params, exception);
+            // TODO: we need to handle meter values of invalid stops differently. will come later.
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        }
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

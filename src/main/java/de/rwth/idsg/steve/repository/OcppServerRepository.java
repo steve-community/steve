@@ -23,7 +23,9 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -46,6 +48,8 @@ public interface OcppServerRepository {
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId);
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId);
 
+    @Nullable TransactionRecord getTransaction(int transactionId);
     int insertTransaction(InsertTransactionParams params);
     void updateTransaction(UpdateTransactionParams params);
+    void updateTransactionAsFailed(UpdateTransactionParams params, Exception exception);
 }

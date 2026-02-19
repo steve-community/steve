@@ -74,7 +74,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
             // Just to keep the connection alive, such that the servers do not close
             // the connection because of a idle timeout, we ping-pong at fixed intervals.
-            ScheduledFuture pingSchedule = taskScheduler.scheduleAtFixedRate(
+            ScheduledFuture<?> pingSchedule = taskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
                 Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
                 WebSocketConfiguration.PING_INTERVAL
@@ -106,31 +106,20 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 return false; // we did not have any session anyway
             }
 
-            // Prevent "java.util.ConcurrentModificationException: null"
-            // Reason: Cannot modify the set (remove the item) we are iterating
-            // Solution: Iterate the set, find the item, remove the item after the for-loop
-            //
-            SessionContext toRemove = null;
-            for (SessionContext context : endpointDeque) {
+            for (var it = endpointDeque.iterator(); it.hasNext();) {
+                SessionContext context = it.next();
                 if (context.getSession().getId().equals(session.getId())) {
-                    toRemove = context;
+                    context.getPingSchedule().cancel(true);
+                    it.remove();
+                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}", chargeBoxId, endpointDeque.size());
                     break;
                 }
             }
 
-            if (toRemove != null) {
-                // 1. Cancel the ping task
-                toRemove.getPingSchedule().cancel(true);
-                // 2. Delete from collection
-                if (endpointDeque.remove(toRemove)) {
-                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
-                            chargeBoxId, endpointDeque.size());
-                }
-                // 3. Delete empty collection from lookup table in order to correctly calculate
-                // the number of connected chargeboxes with getNumberOfChargeBoxes()
-                if (endpointDeque.size() == 0) {
-                    lookupTable.remove(chargeBoxId);
-                }
+            // Delete empty collection from lookup table in order to correctly calculate
+            // the number of connected chargeboxes with getNumberOfChargeBoxes()
+            if (endpointDeque.isEmpty()) {
+                lookupTable.remove(chargeBoxId);
             }
 
             futureResponseContextStore.removeSession(session);
@@ -186,11 +175,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     @Override
     public int getSize(String chargeBoxId) {
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-        if (endpointDeque == null) {
-            return 0;
-        } else {
-            return endpointDeque.size();
-        }
+        return endpointDeque == null ? 0 : endpointDeque.size();
     }
 
     @Override

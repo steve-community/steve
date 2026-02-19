@@ -56,7 +56,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
 
-    private final Striped<Lock> locks = Striped.lock(16);
+    private final Striped<Lock> locks = Striped.lock(128);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
     private final TaskScheduler taskScheduler;

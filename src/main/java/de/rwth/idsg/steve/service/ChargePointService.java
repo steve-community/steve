@@ -73,7 +73,7 @@ import java.util.stream.Stream;
 public class ChargePointService {
 
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
-    private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
+    private final Striped<Lock> isRegisteredLocks = Striped.lock(128);
 
     private final ChargePointRepository chargePointRepository;
     private final GenericRepository genericRepository;

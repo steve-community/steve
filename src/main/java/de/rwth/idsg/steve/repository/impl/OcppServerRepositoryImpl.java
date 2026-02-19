@@ -76,7 +76,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     private final DSLContext ctx;
     private final ReservationRepository reservationRepository;
 
-    private final Striped<Lock> transactionTableLocks = Striped.lock(16);
+    private final Striped<Lock> transactionTableLocks = Striped.lock(128);
 
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {

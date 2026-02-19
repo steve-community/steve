@@ -34,5 +34,5 @@ public interface FutureResponseContextStore {
 
     void add(WebSocketSession session, String messageId, FutureResponseContext context);
 
-    @Nullable FutureResponseContext get(WebSocketSession session, String messageId);
+    @Nullable FutureResponseContext poll(WebSocketSession session, String messageId);
 }

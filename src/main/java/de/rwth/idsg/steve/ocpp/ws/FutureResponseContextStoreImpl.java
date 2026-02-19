@@ -61,7 +61,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
     @Nullable
     @Override
-    public FutureResponseContext get(WebSocketSession session, String messageId) {
+    public FutureResponseContext poll(WebSocketSession session, String messageId) {
         var map = lookupTable.get(session);
         if (map == null) {
             return null;

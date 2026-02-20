@@ -19,16 +19,14 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 /**
  * Presumption: The responses must be sent using the same connection as the requests!
@@ -55,19 +53,27 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         lookupTable.remove(session);
     }
 
+    /**
+     * Adds/updates a correlation entry and performs opportunistic stale-entry cleanup on the write path.
+     */
     @Override
     public void add(WebSocketSession session, String messageId, FutureResponseContext context) {
-        Map<String, FutureResponseContext> map = addIfAbsent(session);
+        var map = addIfAbsent(session);
+        evictTimedOutEntries(map);
         map.put(messageId, context);
         log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
     }
 
     @Nullable
     @Override
-    public FutureResponseContext get(WebSocketSession session, String messageId) {
-        RemoveFunction removeFunction = new RemoveFunction(messageId);
-        lookupTable.computeIfPresent(session, removeFunction);
-        return removeFunction.removedContext;
+    public FutureResponseContext poll(WebSocketSession session, String messageId) {
+        var map = lookupTable.get(session);
+        if (map == null) {
+            return null;
+        }
+        FutureResponseContext removedContext = map.remove(messageId);
+        log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
+        return removedContext;
     }
 
     private Map<String, FutureResponseContext> addIfAbsent(WebSocketSession session) {
@@ -77,19 +83,11 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         });
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class RemoveFunction implements
-            BiFunction<WebSocketSession, Map<String, FutureResponseContext>, Map<String, FutureResponseContext>> {
-
-        private final String messageId;
-        @Nullable private FutureResponseContext removedContext;
-
-        @Override
-        public Map<String, FutureResponseContext> apply(WebSocketSession session,
-                                                        Map<String, FutureResponseContext> map) {
-            removedContext = map.remove(messageId);
-            log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
-            return map;
-        }
+    /**
+     * Removes stale correlation entries to keep the lookup bounded when peers stop responding.
+     */
+    private static void evictTimedOutEntries(Map<String, FutureResponseContext> map) {
+        Instant now = Instant.now();
+        map.entrySet().removeIf(entry -> entry.getValue().hasTimedOut(now));
     }
 }

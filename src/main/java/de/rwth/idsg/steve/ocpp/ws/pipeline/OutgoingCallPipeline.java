@@ -37,19 +37,30 @@ public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
 
     private final FutureResponseContextStore store;
 
+    /**
+     * Uses a store-before-send strategy to close response-correlation races.
+     * If transport sending fails, the stored context is rolled back immediately.
+     */
     @Override
     public void accept(CommunicationContext ctx) {
         // 1. Create the payload to send
         Serializer.INSTANCE.accept(ctx);
 
-        // 2. Send the payload via WebSocket
-        Sender.INSTANCE.accept(ctx);
-
-        // 3. All went well, and the call is sent. Store the response context for later lookup.
+        // 2. Store the response context for later lookup.
         store.add(
             ctx.getSession(),
             ctx.getOutgoingMessage().getMessageId(),
             ctx.getFutureResponseContext()
         );
+
+        // 3. Send the payload via WebSocket
+        try {
+            if (!Sender.INSTANCE.accept(ctx)) {
+                store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
+            }
+        } catch (Exception e) {
+            store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
+            throw e;
+        }
     }
 }

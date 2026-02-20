@@ -45,6 +45,7 @@ import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.ConstraintViolationException;
+import java.time.Instant;
 import java.util.function.Consumer;
 
 /**
@@ -148,14 +149,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
-        context.setFutureResponseContext(responseContext);
+        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
+        validate(context, responseContext);
 
         ResponseType res;
         try {
@@ -178,14 +173,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
-        context.setFutureResponseContext(responseContext);
+        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
+        validate(context, responseContext);
 
         ErrorCode code;
         String desc;
@@ -233,5 +222,22 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return "Invalid payload value (cannot understand one field)";
         }
         return null;
+    }
+
+    /**
+     * Ensures incoming responses map only to active, non-stale calls.
+     * Unknown or expired correlations are rejected to prevent accidental matching.
+     */
+    private static void validate(CommunicationContext cc, FutureResponseContext frc) {
+        if (frc == null) {
+            throw new SteveException("A response message was received to a not-sent call");
+        }
+
+        // set this before throwing the next exception, because IncomingPipeline will need it to handle and propagate.
+        cc.setFutureResponseContext(frc);
+
+        if (frc.hasTimedOut(Instant.now())) {
+            throw new SteveException("A response message was received to an expired call");
+        }
     }
 }

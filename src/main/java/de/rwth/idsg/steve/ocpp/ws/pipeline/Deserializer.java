@@ -151,7 +151,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
         validate(context, responseContext);
-        context.setFutureResponseContext(responseContext);
 
         ResponseType res;
         try {
@@ -176,7 +175,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
         validate(context, responseContext);
-        context.setFutureResponseContext(responseContext);
 
         ErrorCode code;
         String desc;
@@ -232,11 +230,14 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     private static void validate(CommunicationContext cc, FutureResponseContext frc) {
         if (frc == null) {
-            throw new SteveException("A response message was received to a not-sent call. The message was: %s", cc.getIncomingString());
+            throw new SteveException("A response message was received to a not-sent call");
         }
 
+        // set this before throwing the next exception, because IncomingPipeline will need it to handle and propagate.
+        cc.setFutureResponseContext(frc);
+
         if (frc.hasTimedOut(Instant.now())) {
-            throw new SteveException("A response message was received to an expired call. The message was: %s", cc.getIncomingString());
+            throw new SteveException("A response message was received to an expired call");
         }
     }
 }

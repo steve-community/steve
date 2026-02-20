@@ -27,7 +27,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * This class should remain stateless.
@@ -64,7 +63,7 @@ public enum Sender {
         } catch (IOException e) {
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
             if (context.getOutgoingMessage() instanceof OcppJsonCall) {
-                throw new SteveException(e.getMessage());
+                throw new SteveException("OCPP CALL failed", e);
             } else {
                 log.error("Could not send the outgoing message", e);
                 return false;

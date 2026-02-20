@@ -76,10 +76,15 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                                                      .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
                                                                      .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
 
-        ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
-           .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
-           .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
-           .execute();
+        int count = ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
+                       .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
+                       .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
+                       .onDuplicateKeyIgnore()
+                       .execute();
+
+        if (count == 0) {
+            log.warn("Could not insert charging profile assignment (maybe duplicate?). chargeBoxId={}, connectorId={}, chargingProfilePk={}", chargeBoxId, connectorId, chargingProfilePk);
+        }
     }
 
     @Override

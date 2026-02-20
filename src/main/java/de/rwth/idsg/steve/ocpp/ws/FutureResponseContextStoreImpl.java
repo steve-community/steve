@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,9 +53,13 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         lookupTable.remove(session);
     }
 
+    /**
+     * Adds/updates a correlation entry and performs opportunistic stale-entry cleanup on the write path.
+     */
     @Override
     public void add(WebSocketSession session, String messageId, FutureResponseContext context) {
         var map = addIfAbsent(session);
+        evictTimedOutEntries(map);
         map.put(messageId, context);
         log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
     }
@@ -76,5 +81,13 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
             log.debug("Creating new store for sessionId '{}'", innerSession.getId());
             return new ConcurrentHashMap<>();
         });
+    }
+
+    /**
+     * Removes stale correlation entries to keep the lookup bounded when peers stop responding.
+     */
+    private static void evictTimedOutEntries(Map<String, FutureResponseContext> map) {
+        Instant now = Instant.now();
+        map.entrySet().removeIf(entry -> entry.getValue().hasTimedOut(now));
     }
 }

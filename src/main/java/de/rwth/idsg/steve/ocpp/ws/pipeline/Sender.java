@@ -36,11 +36,16 @@ import java.util.function.Consumer;
  * @since 12.03.2015
  */
 @Slf4j
-public enum Sender implements Consumer<CommunicationContext> {
+public enum Sender {
     INSTANCE;
 
-    @Override
-    public void accept(CommunicationContext context) {
+    /**
+     * Return value is used by callers to decide whether they must rollback any pre-send bookkeeping.
+     * Outgoing CALL failures are surfaced as exceptions to avoid silently keeping invalid correlation state.
+     *
+     * @return whether the message was actually sent or not
+     */
+    public boolean accept(CommunicationContext context) {
         String outgoingString = context.getOutgoingString();
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();
@@ -48,19 +53,21 @@ public enum Sender implements Consumer<CommunicationContext> {
         // https://github.com/steve-community/steve/issues/1914
         if (!session.isOpen()) {
             WebSocketLogger.willNotSend(chargeBoxId, session, outgoingString);
-            return;
+            return false;
         }
 
         WebSocketLogger.sending(chargeBoxId, session, outgoingString);
         TextMessage out = new TextMessage(outgoingString);
         try {
             session.sendMessage(out);
+            return true;
         } catch (IOException e) {
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
             if (context.getOutgoingMessage() instanceof OcppJsonCall) {
                 throw new SteveException(e.getMessage());
             } else {
                 log.error("Could not send the outgoing message", e);
+                return false;
             }
         }
     }

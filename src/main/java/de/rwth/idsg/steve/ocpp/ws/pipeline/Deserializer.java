@@ -45,6 +45,7 @@ import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.ConstraintViolationException;
+import java.time.Instant;
 import java.util.function.Consumer;
 
 /**
@@ -149,12 +150,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
+        validate(context, responseContext);
         context.setFutureResponseContext(responseContext);
 
         ResponseType res;
@@ -179,12 +175,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
+        validate(context, responseContext);
         context.setFutureResponseContext(responseContext);
 
         ErrorCode code;
@@ -233,5 +224,19 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return "Invalid payload value (cannot understand one field)";
         }
         return null;
+    }
+
+    /**
+     * Ensures incoming responses map only to active, non-stale calls.
+     * Unknown or expired correlations are rejected to prevent accidental matching.
+     */
+    private static void validate(CommunicationContext cc, FutureResponseContext frc) {
+        if (frc == null) {
+            throw new SteveException("A response message was received to a not-sent call. The message was: %s", cc.getIncomingString());
+        }
+
+        if (frc.hasTimedOut(Instant.now())) {
+            throw new SteveException("A response message was received to an expired call. The message was: %s", cc.getIncomingString());
+        }
     }
 }

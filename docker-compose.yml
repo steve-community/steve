@@ -19,17 +19,19 @@ services:
     image: mariadb:10.4.30
     container_name: steve-mariadb
     restart: unless-stopped
-    ports:
-      - "${DB_PORT:-3306}:3306"
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: ${DB_NAME:-stevedb}
-      MYSQL_USER: ${DB_USER:-steve}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
+      MYSQL_DATABASE: stevedb
+      MYSQL_USER: steve
+      MYSQL_PASSWORD: changeme
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - steve-network
+      steve-network:
+        # Preserve 'mariadb' hostname that the Dockerfile and
+        # application-docker.properties expect (dockerize -wait tcp://mariadb:3306)
+        aliases:
+          - mariadb
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -49,20 +51,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_NAME=${DB_NAME:-stevedb}
-      - DB_USER=${DB_USER:-steve}
-      - DB_PASSWORD=${DB_PASSWORD:-changeme}
-      - JAVA_OPTS=${JAVA_OPTS:--XX:MaxRAMPercentage=85}
     volumes:
-      # Only mount necessary directories, not the entire project
-      - ./src:/code/src:ro
-      - ./pom.xml:/code/pom.xml:ro
-      - ./mvnw:/code/mvnw:ro
-      - ./mvnw.cmd:/code/mvnw.cmd:ro
-      - ./.mvn:/code/.mvn:ro
+      - .:/code
     ports:
       - "${HTTP_PORT:-8180}:8180"
       - "${HTTPS_PORT:-8443}:8443"
@@ -71,12 +61,6 @@ services:
         condition: service_healthy
     networks:
       - steve-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8180/steve/manager/signin"] 
-      timeout: 30s
-      retries: 5
-      interval: 30s
-      start_period: 120s
     deploy:
       resources:
         limits:

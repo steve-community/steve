@@ -579,6 +579,11 @@
             <version>33.4.0-jre</version>
         </dependency>
         <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>8.5.18</version>
+        </dependency>
+        <dependency>
             <groupId>org.owasp.encoder</groupId>
             <artifactId>encoder-jakarta-jsp</artifactId>
             <version>1.4.0</version>

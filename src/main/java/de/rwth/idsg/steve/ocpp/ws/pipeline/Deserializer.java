@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -61,6 +62,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
     private final FutureResponseContextStore futureResponseContextStore;
+    private final SessionContextStore sessionContextStore;
     private final TypeStore typeStore;
 
     /**
@@ -96,6 +98,16 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs.
      */
     private void handleCall(CommunicationContext context, String messageId, JsonParser parser) {
+        Boolean success = sessionContextStore.registerIncomingCallId(context.getChargeBoxId(), context.getSession(), messageId);
+        if (success == null) {
+            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, context.getSession().getId());
+            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
+            return;
+        } else if (!success) {
+            context.setOutgoingMessage(ErrorFactory.duplicateCallMessageId(messageId));
+            return;
+        }
+
         // parse action
         String action;
         try {

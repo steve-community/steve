@@ -19,15 +19,25 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStoreImpl;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreImpl;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.scheduling.support.NoOpTaskScheduler;
+import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
+
+import java.util.UUID;
 
 import static de.rwth.idsg.steve.ocpp.ws.data.ErrorCode.FormationViolation;
 import static de.rwth.idsg.steve.ocpp.ws.data.ErrorCode.PropertyConstraintViolation;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,9 +47,9 @@ public class DeserializerTest {
 
     @Test
     public void testValidation_Ocpp16TypoInEnum() {
-        Deserializer des = new Deserializer(new FutureResponseContextStoreImpl(), Ocpp16TypeStore.INSTANCE);
+        Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(null, "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
         context.setIncomingString("""
             [2, "abc1","StatusNotification",{"connectorId":1,"status":"Faultd","errorCode":"NoError","info":"","timestamp":"2026-01-01T07:00:00.000Z","vendorId":"","vendorErrorCode":""}]
             """);
@@ -57,9 +67,9 @@ public class DeserializerTest {
 
     @Test
     public void testValidation_Ocpp16MeterValueCascade() {
-        Deserializer des = new Deserializer(new FutureResponseContextStoreImpl(), Ocpp16TypeStore.INSTANCE);
+        Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(null, "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
         context.setIncomingString("""
             [2,"abc2","MeterValues",{"connectorId":1,"meterValue":[{"timestamp":"2026-02-13T15:17:02.501+01:00"}]}]
             """);
@@ -77,9 +87,9 @@ public class DeserializerTest {
 
     @Test
     public void testValidation_Ocpp16IdTagMissing() {
-        Deserializer des = new Deserializer(new FutureResponseContextStoreImpl(), Ocpp16TypeStore.INSTANCE);
+        Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(null, "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
         context.setIncomingString("""
             [2,"abc3","Authorize",{"idTag":null}]
             """);
@@ -97,9 +107,9 @@ public class DeserializerTest {
 
     @Test
     public void testValidation_BrokenPayload() {
-        Deserializer des = new Deserializer(new FutureResponseContextStoreImpl(), Ocpp16TypeStore.INSTANCE);
+        Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(null, "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
         context.setIncomingString("""
             [2,"abc4","Authorize",{"idTag":"A1B.....]
             """);
@@ -115,4 +125,19 @@ public class DeserializerTest {
         Assertions.assertNull(error.getErrorDetails());
     }
 
+    private static JettyWebSocketSession getMockSession() {
+        JettyWebSocketSession session = Mockito.mock(JettyWebSocketSession.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getId()).thenReturn(UUID.randomUUID().toString());
+        return session;
+    }
+
+    private static Deserializer createDeserializer() {
+        var futureResponseContextStore = new FutureResponseContextStoreImpl();
+
+        SessionContextStore store = Mockito.mock(SessionContextStore.class);
+        when(store.registerIncomingCallId(any(), any(), any())).thenReturn(true);
+
+        return new Deserializer(futureResponseContextStore, store, Ocpp16TypeStore.INSTANCE);
+    }
 }

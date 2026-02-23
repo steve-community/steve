@@ -181,6 +181,46 @@ public class DeserializerTest {
         Assertions.assertInstanceOf(OcppJsonCall.class, context.getIncomingMessage());
     }
 
+    @Test
+    public void testValidation_EmptyMessageIdRejected() {
+        Deserializer des = createDeserializer();
+
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        context.setIncomingString("""
+            [2,"","Heartbeat",{}]
+            """);
+
+        des.accept(context);
+
+        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
+        Assertions.assertNotNull(outgoingMessage);
+        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
+
+        OcppJsonError error = (OcppJsonError) outgoingMessage;
+        Assertions.assertEquals(FormationViolation, error.getErrorCode());
+        Assertions.assertEquals("", error.getMessageId());
+    }
+
+    @Test
+    public void testValidation_NullMessageIdRejected() {
+        Deserializer des = createDeserializer();
+
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        context.setIncomingString("""
+            [2,null,"Heartbeat",{}]
+            """);
+
+        des.accept(context);
+
+        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
+        Assertions.assertNotNull(outgoingMessage);
+        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
+
+        OcppJsonError error = (OcppJsonError) outgoingMessage;
+        Assertions.assertEquals(FormationViolation, error.getErrorCode());
+        Assertions.assertNull(error.getMessageId());
+    }
+
     private static Deserializer createDeserializer() {
         return createDeserializer(true);
     }

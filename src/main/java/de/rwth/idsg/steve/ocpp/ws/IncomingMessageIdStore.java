@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import de.rwth.idsg.steve.SteveException;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
@@ -48,6 +49,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * because calls are serialized by the outer per-chargeBox {@code Striped<Lock>} in
  * {@link SessionContextStoreImpl}.
  *
+ * <p> Capacity boundary:
+ * this store can enforce an optional per-session upper bound for unique incoming CALL messageIds.
+ * When the limit is exceeded, it throws an exception. This is intentional and causes the WebSocket session to be
+ * closed by the framework error handling path, avoiding unbounded growth for long-lived or misbehaving sessions.
+ * Regular charging stations should reconnect which will create a fresh session, effectively resetting duplicate-call-id
+ * tracking.
+ *
  * <p> Collision risk (birthday approximation, 64-bit stored key space):
  * p ~= n(n-1)/(2*2^64), where n is the number of messageIds in one session.
  * This is very small for practical values:
@@ -63,6 +71,16 @@ public class IncomingMessageIdStore {
     private static final HashFunction MURMUR3_128 = Hashing.murmur3_128();
 
     private final ConcurrentHashMap<String, LongOpenHashSet> lookupBySessionId = new ConcurrentHashMap<>();
+    private final Integer maxTrackedMessageIdsPerSession;
+
+    /**
+     * @param maxTrackedMessageIdsPerSession positive value enables bounded mode; {@code null} or non-positive value
+     *                                       disables the cap (unbounded mode).
+     */
+    IncomingMessageIdStore(Integer maxTrackedMessageIdsPerSession) {
+        boolean disable = (maxTrackedMessageIdsPerSession == null || maxTrackedMessageIdsPerSession <= 0);
+        this.maxTrackedMessageIdsPerSession = disable ? null : maxTrackedMessageIdsPerSession;
+    }
 
     void addSession(WebSocketSession session) {
         lookupBySessionId.computeIfAbsent(session.getId(), innerSession -> new LongOpenHashSet());
@@ -79,7 +97,19 @@ public class IncomingMessageIdStore {
             // session. it might imply some add/remove race or some other unexpected edge case.
             return null;
         }
+
         long fingerprint = MURMUR3_128.hashString(messageId, StandardCharsets.UTF_8).asLong();
-        return set.add(fingerprint);
+        boolean success = set.add(fingerprint);
+        if (!success) {
+            return false;
+        }
+
+        if (maxTrackedMessageIdsPerSession != null && set.size() > maxTrackedMessageIdsPerSession) {
+            throw new SteveException(
+                "Incoming CALL messageId limit of %s exceeded for session '%s'",
+                maxTrackedMessageIdsPerSession, session.getId()
+            );
+        }
+        return true;
     }
 }

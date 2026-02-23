@@ -56,7 +56,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
      * Value (Deque<SessionContext>) = WebSocket session contexts
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
-    private final IncomingMessageIdStore messageIdStore = new IncomingMessageIdStore();
+    private final IncomingMessageIdStore messageIdStore = new IncomingMessageIdStore(1_000_000);
 
     private final Striped<Lock> locks = Striped.lock(128);
 

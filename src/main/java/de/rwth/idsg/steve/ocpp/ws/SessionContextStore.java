@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Collection;
@@ -43,7 +44,7 @@ public interface SessionContextStore {
 
     WebSocketSession getSession(String chargeBoxId);
 
-    Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, String messageId);
+    Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId);
 
     void closeSessions(String chargeBoxId);
 

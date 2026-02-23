@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.charset.StandardCharsets;
@@ -71,7 +72,7 @@ public class IncomingMessageIdStore {
         lookupBySessionId.remove(session.getId());
     }
 
-    Boolean registerIncomingCallId(WebSocketSession session, String messageId) {
+    Boolean registerIncomingCallId(WebSocketSession session, @NotNull String messageId) {
         LongOpenHashSet set = lookupBySessionId.get(session.getId());
         if (set == null) {
             // return null in order to stop processing this message. if the set is null, we clearly don't know this

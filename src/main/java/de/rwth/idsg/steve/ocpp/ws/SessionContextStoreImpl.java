@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
@@ -151,7 +152,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
-    public Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, String messageId) {
+    public Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {

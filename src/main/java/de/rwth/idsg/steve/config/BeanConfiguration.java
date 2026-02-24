@@ -173,10 +173,12 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * and forward to JSP files for rendering.
      */
     @Bean
-    public InternalResourceViewResolver urlBasedViewResolver() {
+    public InternalResourceViewResolver jspViewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
         resolver.setPrefix("/WEB-INF/views/");
         resolver.setSuffix(".jsp");
+        // FIXME: Remove this resolver after all pages are migrated to Thymeleaf. Keep JSP fallback until then.
+        resolver.setOrder(2);
         return resolver;
     }
 

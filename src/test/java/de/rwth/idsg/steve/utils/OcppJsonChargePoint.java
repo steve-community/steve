@@ -45,6 +45,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.TreeNode;
@@ -177,8 +178,10 @@ public class OcppJsonChargePoint {
         call.setPayload(payload);
         call.setAction(action);
 
-        // session is null, because we do not need org.springframework.web.socket.WebSocketSession
-        CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
+        JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
+        webSocketSession.initializeNativeSession(session);
+
+        CommunicationContext ctx = new CommunicationContext(webSocketSession, chargeBoxId);
         ctx.setOutgoingMessage(call);
 
         Serializer.INSTANCE.accept(ctx);

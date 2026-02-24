@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -33,8 +34,8 @@ import org.springframework.web.socket.WebSocketSession;
 @Getter
 public class CommunicationContext {
 
-    private final WebSocketSession session;
-    private final String chargeBoxId;
+    @NotNull private final WebSocketSession session;
+    @NotNull private final String chargeBoxId;
 
     @Setter private String incomingString;
     @Setter private String outgoingString;

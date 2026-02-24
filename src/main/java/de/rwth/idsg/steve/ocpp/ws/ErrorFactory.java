@@ -61,6 +61,16 @@ public final class ErrorFactory {
                 "Internal services failed while processing of the payload", details);
     }
 
+    public static OcppJsonError duplicateCallMessageId(String messageId) {
+        return setFields(messageId, ErrorCode.ProtocolError,
+                "A CALL with this messageId was already received on this WebSocket connection", null);
+    }
+
+    public static OcppJsonError invalidMessageId(String messageId) {
+        return setFields(messageId, ErrorCode.FormationViolation,
+                "The messageId of CALL must be a non-empty string", null);
+    }
+
     private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, String details) {
         OcppJsonError error = new OcppJsonError();
         error.setMessageId(messageId);

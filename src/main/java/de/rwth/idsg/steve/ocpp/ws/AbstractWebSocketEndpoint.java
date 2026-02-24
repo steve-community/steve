@@ -67,8 +67,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
                                      SessionContextStoreHolder sessionContextStoreHolder,
                                      AbstractTypeStore typeStore) {
         this.ocppServerRepository = ocppServerRepository;
-        this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, typeStore), this);
         this.sessionContextStore = sessionContextStoreHolder.getOrCreate(getVersion());
+        this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, sessionContextStore, typeStore), this);
 
         connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, getVersion())));
         disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, getVersion())));

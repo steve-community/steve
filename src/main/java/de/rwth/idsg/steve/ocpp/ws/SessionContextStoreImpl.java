@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
@@ -55,6 +56,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
      * Value (Deque<SessionContext>) = WebSocket session contexts
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
+    private final IncomingMessageIdStore messageIdStore = new IncomingMessageIdStore(1_000_000);
 
     private final Striped<Lock> locks = Striped.lock(128);
 
@@ -85,6 +87,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
+            messageIdStore.addSession(session);
             futureResponseContextStore.addSession(session);
 
             int size = endpointDeque.size();
@@ -122,6 +125,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 lookupTable.remove(chargeBoxId);
             }
 
+            messageIdStore.removeSession(session);
             futureResponseContextStore.removeSession(session);
 
             return endpointDeque.isEmpty();
@@ -142,6 +146,17 @@ public class SessionContextStoreImpl implements SessionContextStore {
             return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
+        } finally {
+            l.unlock();
+        }
+    }
+
+    @Override
+    public Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId) {
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            return messageIdStore.registerIncomingCallId(session, messageId);
         } finally {
             l.unlock();
         }

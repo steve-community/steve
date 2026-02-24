@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -34,8 +35,10 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
 import tools.jackson.core.TreeNode;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.JsonNode;
@@ -61,6 +64,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
     private final FutureResponseContextStore futureResponseContextStore;
+    private final SessionContextStore sessionContextStore;
     private final TypeStore typeStore;
 
     /**
@@ -96,6 +100,25 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs.
      */
     private void handleCall(CommunicationContext context, String messageId, JsonParser parser) {
+        // Enforce OCPP CALL messageId as a non-empty JSON string.
+        // messageId must be a usable request identifier, so null or empty should be treated as invalid.
+        // Token-type check avoids accepting VALUE_NULL cases that can be exposed as text like "null" by streaming accessors.
+        JsonToken messageIdToken = parser.currentToken();
+        if (messageIdToken != JsonToken.VALUE_STRING || StringUtils.isEmpty(messageId)) {
+            context.setOutgoingMessage(ErrorFactory.invalidMessageId(messageIdToken == JsonToken.VALUE_STRING ? messageId : null));
+            return;
+        }
+
+        Boolean success = sessionContextStore.registerIncomingCallId(context.getChargeBoxId(), context.getSession(), messageId);
+        if (success == null) {
+            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, context.getSession().getId());
+            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
+            return;
+        } else if (!success) {
+            context.setOutgoingMessage(ErrorFactory.duplicateCallMessageId(messageId));
+            return;
+        }
+
         // parse action
         String action;
         try {

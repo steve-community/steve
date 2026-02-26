@@ -188,38 +188,44 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
+    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, @Nullable TransactionRecord transaction) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
 
-        ctx.transaction(configuration -> {
-            try {
-                DSLContext ctx = DSL.using(configuration);
+        if (transaction == null) {
+            log.warn("Will not insert MeterValues: Transaction for chargeBoxId '{}' is null", chargeBoxIdentity);
+            return;
+        }
 
-                // First, get connector primary key from transaction table
-                int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
-                                     .from(TRANSACTION_START)
-                                     .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
-                                     .fetchOne()
-                                     .value1();
-
-                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
-            } catch (Exception e) {
-                log.error("Exception occurred", e);
-            }
-        });
+        try {
+            batchInsertMeterValues(ctx, list, transaction.getConnectorPk(), transaction.getTransactionPk());
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
+        }
     }
 
     @Nullable
     @Override
     public TransactionRecord getTransaction(String chargeBoxId, int transactionId) {
-        return ctx.select(TRANSACTION.fields())
+        var records = ctx.select(TRANSACTION.fields())
             .from(TRANSACTION)
             .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
             .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
             .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-            .fetchOneInto(TRANSACTION);
+            .orderBy(TRANSACTION.START_TIMESTAMP.desc())
+            .fetchInto(TRANSACTION);
+
+        if (records.isEmpty()) {
+            log.warn("No row found for chargeBoxId '{}' and transactionId '{}'", chargeBoxId, transactionId);
+            return null;
+        }
+
+        if (records.size() > 1) {
+            log.warn("Found multiple rows for chargeBoxId '{}' and transactionId '{}'. Returning the most recent one.", chargeBoxId, transactionId);
+        }
+
+        return records.get(0);
     }
 
     @Override

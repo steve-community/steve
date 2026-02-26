@@ -37,6 +37,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -97,7 +98,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateOcppProtocol(String chargeBoxIdentity, OcppProtocol protocol) {
+    public void updateOcppProtocol(@NotNull String chargeBoxIdentity, @NotNull OcppProtocol protocol) {
         ctx.update(CHARGE_BOX)
             .set(CHARGE_BOX.OCPP_PROTOCOL, protocol.getCompositeValue())
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -105,7 +106,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress) {
+    public void updateEndpointAddress(@NotNull String chargeBoxIdentity, @NotNull String endpointAddress) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.ENDPOINT_ADDRESS, endpointAddress)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -113,7 +114,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
+    public void updateChargeboxFirmwareStatus(@NotNull String chargeBoxIdentity, @NotNull String firmwareStatus) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
            .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, DateTime.now())
@@ -122,7 +123,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
+    public void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxIdentity, @NotNull String status) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
            .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, DateTime.now())
@@ -131,7 +132,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts) {
+    public void updateChargeboxHeartbeat(@NotNull String chargeBoxIdentity, @NotNull DateTime ts) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, ts)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -169,7 +170,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
+    public void insertMeterValues(@NotNull String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
@@ -188,35 +189,44 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
+    public void insertMeterValues(@NotNull String chargeBoxIdentity, List<MeterValue> list, @Nullable TransactionRecord transaction) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
 
-        ctx.transaction(configuration -> {
-            try {
-                DSLContext ctx = DSL.using(configuration);
+        if (transaction == null) {
+            log.warn("Will not insert MeterValues: Transaction for chargeBoxId '{}' is null", chargeBoxIdentity);
+            return;
+        }
 
-                // First, get connector primary key from transaction table
-                int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
-                                     .from(TRANSACTION_START)
-                                     .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
-                                     .fetchOne()
-                                     .value1();
-
-                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
-            } catch (Exception e) {
-                log.error("Exception occurred", e);
-            }
-        });
+        try {
+            batchInsertMeterValues(ctx, list, transaction.getConnectorPk(), transaction.getTransactionPk());
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
+        }
     }
 
     @Nullable
     @Override
-    public TransactionRecord getTransaction(int transactionId) {
-        return ctx.selectFrom(TRANSACTION)
+    public TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId) {
+        var records = ctx.select(TRANSACTION.fields())
+            .from(TRANSACTION)
+            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
             .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
-            .fetchOne();
+            .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .orderBy(TRANSACTION.START_TIMESTAMP.desc())
+            .fetchInto(TRANSACTION);
+
+        if (records.isEmpty()) {
+            log.warn("No row found for chargeBoxId '{}' and transactionId '{}'", chargeBoxId, transactionId);
+            return null;
+        }
+
+        if (records.size() > 1) {
+            log.warn("Found multiple rows for chargeBoxId '{}' and transactionId '{}'. Returning the most recent one.", chargeBoxId, transactionId);
+        }
+
+        return records.get(0);
     }
 
     @Override

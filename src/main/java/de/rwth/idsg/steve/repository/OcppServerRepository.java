@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -37,18 +38,18 @@ import java.util.List;
 public interface OcppServerRepository {
 
     void updateChargebox(UpdateChargeboxParams params);
-    void updateOcppProtocol(String chargeBoxId, OcppProtocol protocol);
-    void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
-    void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
-    void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
-    void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts);
+    void updateOcppProtocol(@NotNull String chargeBoxId, @NotNull OcppProtocol protocol);
+    void updateEndpointAddress(@NotNull String chargeBoxId, @NotNull String endpointAddress);
+    void updateChargeboxFirmwareStatus(@NotNull String chargeBoxId, @NotNull String firmwareStatus);
+    void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxId, @NotNull String status);
+    void updateChargeboxHeartbeat(@NotNull String chargeBoxId, @NotNull DateTime ts);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 
-    void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId);
-    void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, @Nullable TransactionRecord transaction);
+    void insertMeterValues(@NotNull String chargeBoxId, List<MeterValue> list, int connectorId, Integer transactionId);
+    void insertMeterValues(@NotNull String chargeBoxId, List<MeterValue> list, @Nullable TransactionRecord transaction);
 
-    @Nullable TransactionRecord getTransaction(String chargeBoxId, int transactionId);
+    @Nullable TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId);
     int insertTransaction(InsertTransactionParams params);
     void updateTransaction(UpdateTransactionParams params);
     void updateTransactionAsFailed(UpdateTransactionParams params, Exception exception);

@@ -213,10 +213,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Nullable
     @Override
-    public TransactionRecord getTransaction(int transactionId) {
-        return ctx.selectFrom(TRANSACTION)
+    public TransactionRecord getTransaction(String chargeBoxId, int transactionId) {
+        return ctx.select(TRANSACTION.fields())
+            .from(TRANSACTION)
+            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
             .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
-            .fetchOne();
+            .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .fetchOneInto(TRANSACTION);
     }
 
     @Override

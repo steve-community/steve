@@ -246,7 +246,7 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        var transaction = ocppServerRepository.getTransaction(params.getTransactionId());
+        var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, transactionId);
         var exception = serviceValidator.validateStop(transaction, params);
 
         if (exception == null) {

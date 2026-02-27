@@ -175,6 +175,11 @@ public class CentralSystemService16_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
 
+        var exception = serviceValidator.validateMeterValues(parameters);
+        if (exception != null) {
+            log.warn("MeterValues validation failed", exception);
+        }
+
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
                 parameters.getMeterValue(),
@@ -213,6 +218,11 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
+        var exception = serviceValidator.validateStart(parameters);
+        if (exception != null) {
+            log.warn("StartTransaction validation failed", exception);
+        }
+
         int transactionId = ocppServerRepository.insertTransaction(params);
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
@@ -247,7 +257,7 @@ public class CentralSystemService16_Service {
                                        .build();
 
         var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, transactionId);
-        var exception = serviceValidator.validateStop(transaction, params);
+        var exception = serviceValidator.validateStop(transaction, parameters);
 
         if (exception == null) {
             ocppServerRepository.updateTransaction(params);

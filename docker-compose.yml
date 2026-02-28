@@ -1,8 +1,12 @@
-version: "3.0"
+version: "3.8"
 
 volumes:
   db-data:
     external: false
+
+networks:
+  steve-network:
+    driver: bridge
 
 services:
 
@@ -13,24 +17,53 @@ services:
     # TODO: Get database migrations to work with the latest point releases of
     # MariaDB 10.4.
     image: mariadb:10.4.30
+    container_name: steve-mariadb
     restart: unless-stopped
-    ports:
-      - 3306:3306
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: changeme
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      steve-network:
+        # Preserve 'mariadb' hostname that the Dockerfile and
+        # application-docker.properties expect (dockerize -wait tcp://mariadb:3306)
+        aliases:
+          - mariadb
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
   app:
+    container_name: steve-app
     restart: unless-stopped
-    build: .
-    links:
-      - "db:mariadb"
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/code
     ports:
-      - "8180:8180"
-      - "8443:8443"
+      - "${HTTP_PORT:-8180}:8180"
+      - "${HTTPS_PORT:-8443}:8443"
     depends_on:
-      - db
-    
+      db:
+        condition: service_healthy
+    networks:
+      - steve-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G

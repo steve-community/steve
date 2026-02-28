@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -88,12 +89,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
         Optional<ChargePointRegistration> registration = chargePointService.getRegistration(chargeBoxId);
 
-        // Allow connections, if station is in db (registration_status field from db does not matter)
-        boolean allowConnection = registration.isPresent();
+        // Allow connections, if station is in DB and its registration_status is not Rejected
+        boolean allowConnection = registration.isPresent() && RegistrationStatus.REJECTED != registration.get().registrationStatus();
 
         // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
-            log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
+            log.error("ChargeBoxId '{}' is not recognized or its registration status is 'Rejected'.", chargeBoxId);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }

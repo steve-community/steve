@@ -211,6 +211,29 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         }
     }
 
+    @Override
+    public void cancelActiveReservationsForChargeBox(String chargeBoxId) {
+        try {
+            int count = ctx.update(RESERVATION)
+                           .set(RESERVATION.STATUS, ReservationStatus.CANCELLED.name())
+                           .where(RESERVATION.CONNECTOR_PK.in(
+                                   DSL.select(CONNECTOR.CONNECTOR_PK)
+                                      .from(CONNECTOR)
+                                      .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                           ))
+                           .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
+                           .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
+                           .execute();
+
+            if (count > 0) {
+                log.info("Cancelled {} active reservation(s) for chargeBoxId '{}' (all connectors) "
+                        + "due to charge point becoming unavailable/faulted.", count, chargeBoxId);
+            }
+        } catch (DataAccessException e) {
+            log.error("Failed to cancel reservations for chargeBoxId '{}'", chargeBoxId, e);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

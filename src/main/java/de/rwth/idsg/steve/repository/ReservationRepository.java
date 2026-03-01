@@ -57,4 +57,11 @@ public interface ReservationRepository {
      * or connector are set to Faulted or Unavailable."
      */
     void cancelActiveReservationsForConnector(String chargeBoxId, int connectorId);
+
+    /**
+     * Cancels all active reservations for an entire charge box (all connectors).
+     * Used when connectorId=0 in StatusNotification indicates a charge-point-wide
+     * status change to Faulted or Unavailable.
+     */
+    void cancelActiveReservationsForChargeBox(String chargeBoxId);
 }

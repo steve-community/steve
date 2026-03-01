@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
@@ -94,6 +95,7 @@ public class CentralSystemService16_Service {
     private final CertificateSigningService certificateSigningService;
     private final TaskScheduler taskScheduler;
     private final CentralSystemService16_ServiceValidator serviceValidator;
+    private final ReservationRepository reservationRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -167,6 +169,19 @@ public class CentralSystemService16_Service {
          if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
+        }
+
+        // OCPP 1.6: "A reservation SHALL be terminated on the Charge Point when [...]
+        // the Charge Point or connector are set to Faulted or Unavailable."
+        if (parameters.getStatus() == ChargePointStatus.UNAVAILABLE
+                || parameters.getStatus() == ChargePointStatus.FAULTED) {
+            int connectorId = parameters.getConnectorId();
+            if (connectorId == 0) {
+                // connectorId 0 means charge-point-wide: cancel all reservations for this charge box
+                reservationRepository.cancelActiveReservationsForChargeBox(chargeBoxIdentity);
+            } else {
+                reservationRepository.cancelActiveReservationsForConnector(chargeBoxIdentity, connectorId);
+            }
         }
 
         return new StatusNotificationResponse();

@@ -50,4 +50,18 @@ public interface ReservationRepository {
     void accepted(int reservationId);
     void cancelled(int reservationId);
     void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
+
+    /**
+     * Cancels all active reservations for a given connector.
+     * Per OCPP 1.6: "A reservation SHALL be terminated when the Charge Point
+     * or connector are set to Faulted or Unavailable."
+     */
+    void cancelActiveReservationsForConnector(String chargeBoxId, int connectorId);
+
+    /**
+     * Cancels all active reservations for an entire charge box (all connectors).
+     * Used when connectorId=0 in StatusNotification indicates a charge-point-wide
+     * status change to Faulted or Unavailable.
+     */
+    void cancelActiveReservationsForChargeBox(String chargeBoxId);
 }

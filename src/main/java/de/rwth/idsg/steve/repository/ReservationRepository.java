@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Record1;
 import org.jooq.Select;
 
@@ -53,10 +53,10 @@ public interface ReservationRepository {
     void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
 
     /**
-     * Cancels all active reservations for a charge box. When connectorId is null,
+     * Cancels all active reservations for a charge box. When connectorId is 0,
      * cancels for all connectors of the charge box (charge-point-wide).
      * Per OCPP 1.6: "A reservation SHALL be terminated when the Charge Point
      * or connector are set to Faulted or Unavailable."
      */
-    void cancelActiveReservations(String chargeBoxId, @Nullable Integer connectorId);
+    void cancelActiveReservations(String chargeBoxId, @NotNull Integer connectorId);
 }

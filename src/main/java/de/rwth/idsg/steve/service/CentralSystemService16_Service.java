@@ -49,7 +49,6 @@ import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
-import ocpp.cs._2015._10.ChargePointStatus;
 import ocpp.cs._2015._10.DataTransferRequest;
 import ocpp.cs._2015._10.DataTransferResponse;
 import ocpp.cs._2015._10.DataTransferStatus;
@@ -76,6 +75,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
+
+import static ocpp.cs._2015._10.ChargePointStatus.FAULTED;
+import static ocpp.cs._2015._10.ChargePointStatus.SUSPENDED_EV;
+import static ocpp.cs._2015._10.ChargePointStatus.UNAVAILABLE;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -161,23 +164,21 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertConnectorStatus(params);
 
-        if (parameters.getStatus() == ChargePointStatus.FAULTED) {
+        if (parameters.getStatus() == FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
-         if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
+         if (parameters.getStatus() == SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
         }
 
+        // https://github.com/steve-community/steve/issues/1398
         // OCPP 1.6: "A reservation SHALL be terminated on the Charge Point when [...]
         // the Charge Point or connector are set to Faulted or Unavailable."
-        if (parameters.getStatus() == ChargePointStatus.UNAVAILABLE
-                || parameters.getStatus() == ChargePointStatus.FAULTED) {
-            int connectorId = parameters.getConnectorId();
-            reservationRepository.cancelActiveReservations(
-                    chargeBoxIdentity, connectorId == 0 ? null : connectorId);
+        if (parameters.getStatus() == UNAVAILABLE || parameters.getStatus() == FAULTED) {
+            reservationRepository.cancelActiveReservations(chargeBoxIdentity, parameters.getConnectorId());
         }
 
         return new StatusNotificationResponse();

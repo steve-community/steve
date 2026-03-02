@@ -176,12 +176,8 @@ public class CentralSystemService16_Service {
         if (parameters.getStatus() == ChargePointStatus.UNAVAILABLE
                 || parameters.getStatus() == ChargePointStatus.FAULTED) {
             int connectorId = parameters.getConnectorId();
-            if (connectorId == 0) {
-                // connectorId 0 means charge-point-wide: cancel all reservations for this charge box
-                reservationRepository.cancelActiveReservationsForChargeBox(chargeBoxIdentity);
-            } else {
-                reservationRepository.cancelActiveReservationsForConnector(chargeBoxIdentity, connectorId);
-            }
+            reservationRepository.cancelActiveReservations(
+                    chargeBoxIdentity, connectorId == 0 ? null : connectorId);
         }
 
         return new StatusNotificationResponse();

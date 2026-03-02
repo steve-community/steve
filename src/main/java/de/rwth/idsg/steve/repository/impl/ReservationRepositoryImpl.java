@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -183,6 +184,29 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         if (count != 1) {
             log.warn("Could not mark the reservation '{}' as used: Problems occurred due to sent reservation id, " +
                     "charge box connector, user id tag or the reservation was used already.", reservationId);
+        }
+    }
+
+    @Override
+    public void cancelActiveReservations(String chargeBoxId, @NotNull Integer connectorId) {
+        try {
+            var connectorSelect = DSL.select(CONNECTOR.CONNECTOR_PK)
+                                     .from(CONNECTOR)
+                                     .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId));
+
+            if (connectorId != 0) {
+                connectorSelect = connectorSelect.and(CONNECTOR.CONNECTOR_ID.equal(connectorId));
+            }
+
+            int count = ctx.update(RESERVATION)
+                           .set(RESERVATION.STATUS, ReservationStatus.CANCELLED.name())
+                           .where(RESERVATION.CONNECTOR_PK.in(connectorSelect))
+                           .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
+                           .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
+                           .execute();
+            log.info("Cancelled {} active reservation(s) for chargeBoxId={}, connectorId={}", count, chargeBoxId, connectorId);
+        } catch (Exception e) {
+            log.error("Failed to cancel reservations for chargeBoxId={}, connectorId={}", chargeBoxId, connectorId, e);
         }
     }
 

@@ -128,7 +128,7 @@ public class OcppTagService {
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
                                   @Nullable String chargeBoxId, @Nullable Integer connectorId,
-        Supplier<IdTagInfo> supplierWhenException) {
+                                  Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {

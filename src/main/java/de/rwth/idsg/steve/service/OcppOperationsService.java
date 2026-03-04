@@ -123,7 +123,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
-        validateIdTag(params.getIdTag(), params.getChargeBoxIdList().getFirst(), params.getConnectorId());
+        validateIdTag(params.getIdTag(), true, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
@@ -150,7 +150,7 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<ReservationStatus> reserveNow(ReserveNowParams params) throws Exception {
-        validateIdTag(params.getIdTag(), params.getChargeBoxIdList().getFirst(), params.getConnectorId());
+        validateIdTag(params.getIdTag(), false, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         return execute(params, chargePointServiceClient::reserveNow);
     }
 
@@ -277,11 +277,11 @@ public class OcppOperationsService {
         }
     }
 
-    private void validateIdTag(String idTag, String chargeBoxId, Integer connectorId) {
+    private void validateIdTag(String idTag, boolean isStartTransactionReqContext, String chargeBoxId, Integer connectorId) {
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
             idTag,
-            false,
+            isStartTransactionReqContext,
             chargeBoxId,
             connectorId,
             () -> null

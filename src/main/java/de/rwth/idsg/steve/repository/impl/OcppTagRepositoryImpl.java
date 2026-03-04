@@ -213,18 +213,6 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public boolean isActive(String idTag) {
-        List<Condition> conditions = getConditionsForActive();
-        conditions.add(OCPP_TAG_ACTIVITY.ID_TAG.eq(idTag));
-
-        return ctx.selectOne()
-                  .from(OCPP_TAG_ACTIVITY)
-                  .where(conditions)
-                  .fetchOptional()
-                  .isPresent();
-    }
-
-    @Override
     public List<String> getParentIdTags() {
         return ctx.selectDistinct(OCPP_TAG.PARENT_ID_TAG)
                   .from(OCPP_TAG)

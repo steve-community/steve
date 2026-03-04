@@ -74,6 +74,8 @@ import ocpp.cp._2015._10.ResetStatus;
 import ocpp.cp._2015._10.TriggerMessageStatus;
 import ocpp.cp._2015._10.UnlockStatus;
 import ocpp.cp._2015._10.UpdateStatus;
+import ocpp.cs._2015._10.AuthorizationStatus;
+import ocpp.cs._2015._10.IdTagInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -121,7 +123,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
-        validateIdTag(params.getIdTag());
+        validateIdTag(params.getIdTag(), true, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
@@ -148,7 +150,7 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<ReservationStatus> reserveNow(ReserveNowParams params) throws Exception {
-        validateIdTag(params.getIdTag());
+        validateIdTag(params.getIdTag(), false, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         return execute(params, chargePointServiceClient::reserveNow);
     }
 
@@ -275,8 +277,17 @@ public class OcppOperationsService {
         }
     }
 
-    private void validateIdTag(String idTag) {
-        if (!ocppTagService.isActive(idTag)) {
+    private void validateIdTag(String idTag, boolean isStartTransactionReqContext, String chargeBoxId, Integer connectorId) {
+        // Get the authorization info of the user
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+            idTag,
+            isStartTransactionReqContext,
+            chargeBoxId,
+            connectorId,
+            () -> null
+        );
+
+        if (idTagInfo == null || idTagInfo.getStatus() != AuthorizationStatus.ACCEPTED) {
             throw new SteveException.BadRequest("Requested OCPP Tag is not eligible for this operation. Ensure that the OCPP Tag is registered and active.");
         }
     }

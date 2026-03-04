@@ -79,10 +79,6 @@ public class OcppTagService {
         return ocppTagRepository.getActiveIdTags();
     }
 
-    public boolean isActive(String idTag) {
-        return ocppTagRepository.isActive(idTag);
-    }
-
     public List<String> getParentIdTags() {
         return ocppTagRepository.getParentIdTags();
     }
@@ -128,7 +124,7 @@ public class OcppTagService {
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
                                   @Nullable String chargeBoxId, @Nullable Integer connectorId,
-        Supplier<IdTagInfo> supplierWhenException) {
+                                  Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {

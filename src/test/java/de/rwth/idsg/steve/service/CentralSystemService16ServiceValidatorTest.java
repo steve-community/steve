@@ -217,6 +217,59 @@ public class CentralSystemService16ServiceValidatorTest {
         Assertions.assertEquals("at least one MeterValue.timestamp is after stop.timestamp", result.getMessage());
     }
 
+    @Test
+    public void validateStop_transactionDataBeforeStartTimestamp_returnsError() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T08:59:59Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("at least one MeterValue.timestamp is before start.timestamp", result.getMessage());
+    }
+
+    @Test
+    public void validateStop_transactionDataAtStartTimestamp_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T09:00:00Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_timestampsOutOfOrder_returnsError() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T10:00:00Z"),
+            meterValue("2026-02-17T09:00:00Z")
+        )));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("MeterValue timestamps are not in chronological order", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValues_timestampsInOrder_returnsNull() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T09:00:00Z"),
+            meterValue("2026-02-17T09:30:00Z"),
+            meterValue("2026-02-17T10:00:00Z")
+        )));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_sameTimestamps_returnsNull() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T10:00:00Z"),
+            meterValue("2026-02-17T10:00:00Z")
+        )));
+
+        Assertions.assertNull(result);
+    }
+
     private static StopTransactionRequest stopParams(DateTime stopTimestamp, String meterStop) {
         return new StopTransactionRequest()
             .withIdTag("tag-1")

@@ -53,7 +53,7 @@ public class CentralSystemService16_ServiceValidator {
         this(clock, Duration.ofMinutes(5));
     }
 
-    public SteveException validateStart(StartTransactionRequest params) {
+    public SteveException validateStart(StartTransactionRequest params, @Nullable String previousStopValue) {
         if (params.getConnectorId() < 1) {
             return new SteveException("StartTransaction.connectorId must be positive");
         }
@@ -64,6 +64,10 @@ public class CentralSystemService16_ServiceValidator {
 
         if (params.getTimestamp().getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
             return new SteveException("StartTransaction.timestamp is in the future");
+        }
+
+        if (previousStopValue != null && params.getMeterStart() < Integer.parseInt(previousStopValue)) {
+            return new SteveException("StartTransaction.meterStart is less than previous transaction's meterStop");
         }
 
         return null;

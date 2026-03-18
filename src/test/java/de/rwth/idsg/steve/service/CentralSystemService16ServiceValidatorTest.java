@@ -47,7 +47,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStart_connectorIdZero_returnsError() {
-        var result = validator.validateStart(startParams(0, 10, new DateTime(NOW.toEpochMilli())));
+        var result = validator.validateStart(startParams(0, 10, new DateTime(NOW.toEpochMilli())), null);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("StartTransaction.connectorId must be positive", result.getMessage());
@@ -55,7 +55,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStart_meterStartNegative_returnsError() {
-        var result = validator.validateStart(startParams(1, -1, new DateTime(NOW.toEpochMilli())));
+        var result = validator.validateStart(startParams(1, -1, new DateTime(NOW.toEpochMilli())), null);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("StartTransaction.meterStart must not be negative", result.getMessage());
@@ -63,7 +63,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStart_futureTimestamp_returnsError() {
-        var result = validator.validateStart(startParams(1, 10, DateTime.parse("2026-02-17T12:05:01Z")));
+        var result = validator.validateStart(startParams(1, 10, DateTime.parse("2026-02-17T12:05:01Z")), null);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("StartTransaction.timestamp is in the future", result.getMessage());
@@ -71,7 +71,29 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStart_futureTimestampAtBoundary_isAllowed() {
-        var result = validator.validateStart(startParams(1, 10, DateTime.parse("2026-02-17T12:05:00Z")));
+        var result = validator.validateStart(startParams(1, 10, DateTime.parse("2026-02-17T12:05:00Z")), null);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateStart_meterRegression_returnsError() {
+        var result = validator.validateStart(startParams(1, 100, new DateTime(NOW.toEpochMilli())), "200");
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("StartTransaction.meterStart is less than previous transaction's meterStop", result.getMessage());
+    }
+
+    @Test
+    public void validateStart_meterRegressionEqual_isAllowed() {
+        var result = validator.validateStart(startParams(1, 200, new DateTime(NOW.toEpochMilli())), "200");
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateStart_meterRegressionNoPrevious_isAllowed() {
+        var result = validator.validateStart(startParams(1, 10, new DateTime(NOW.toEpochMilli())), null);
 
         Assertions.assertNull(result);
     }

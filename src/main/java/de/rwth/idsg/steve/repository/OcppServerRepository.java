@@ -50,6 +50,7 @@ public interface OcppServerRepository {
     void insertMeterValues(@NotNull String chargeBoxId, List<MeterValue> list, @Nullable TransactionRecord transaction);
 
     @Nullable TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId);
+    @Nullable String getLastTransactionStopValue(@NotNull String chargeBoxId, int connectorId);
     int insertTransaction(InsertTransactionParams params);
     void updateTransaction(UpdateTransactionParams params);
     void updateTransactionAsFailed(UpdateTransactionParams params, Exception exception);

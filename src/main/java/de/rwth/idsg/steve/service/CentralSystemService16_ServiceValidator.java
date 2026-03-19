@@ -132,9 +132,13 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("at least one MeterValue.timestamp is after stop.timestamp");
         }
 
+        // allow the same operational delta tolerance for start timestamp check, since charge points
+        // may have slight clock drift and meter values can be sampled before the StartTransaction
+        // message is processed on the server side
         if (startTimestamp != null) {
             DateTime earliest = timestamps.stream().min(Comparator.naturalOrder()).get();
-            if (earliest.isBefore(startTimestamp)) {
+            long deltaMillis = operationalDeltaForNow.toMillis();
+            if (earliest.getMillis() < startTimestamp.getMillis() - deltaMillis) {
                 return new SteveException("at least one MeterValue.timestamp is before start.timestamp");
             }
         }

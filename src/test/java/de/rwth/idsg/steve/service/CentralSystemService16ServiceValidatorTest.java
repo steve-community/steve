@@ -219,13 +219,25 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStop_transactionDataBeforeStartTimestamp_returnsError() {
+        // more than 5 minutes (operational delta) before start
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
-            .withTransactionData(List.of(meterValue("2026-02-17T08:59:59Z")));
+            .withTransactionData(List.of(meterValue("2026-02-17T08:54:59Z")));
         var result = validator.validateStop(tx, params);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("at least one MeterValue.timestamp is before start.timestamp", result.getMessage());
+    }
+
+    @Test
+    public void validateStop_transactionDataSlightlyBeforeStartTimestamp_isAllowed() {
+        // within 5 minutes (operational delta) before start — allowed for clock drift
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T08:55:01Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
     }
 
     @Test

@@ -99,6 +99,13 @@ public class CentralSystemService16ServiceValidatorTest {
     }
 
     @Test
+    public void validateStart_meterRegressionNonNumericPrevious_isAllowed() {
+        var result = validator.validateStart(startParams(1, 10, new DateTime(NOW.toEpochMilli())), "not-a-number");
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
     public void validateMeterValues_connectorIdNegative_returnsError() {
         var result = validator.validateMeterValues(meterValuesParams(-1, List.of(meterValue("2026-02-17T10:00:00Z"))));
 

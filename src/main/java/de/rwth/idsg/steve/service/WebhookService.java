@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.service.notification.OcppMeterValues;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.service.notification.OcppConnectorStatus;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
@@ -128,6 +129,24 @@ public class WebhookService {
         payload.put("transactionId", event.getTransactionId());
         payload.put("sampledValues", sampledValues);
         send("OcppMeterValues", payload);
+    }
+
+    @Async
+    @EventListener
+    public void onConnectorStatus(OcppConnectorStatus event) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("chargeBoxId", event.getChargeBoxId());
+        payload.put("connectorId", event.getConnectorId());
+        payload.put("status", event.getStatus());
+        payload.put("errorCode", event.getErrorCode());
+        payload.put("info", event.getInfo());
+        payload.put("vendorId", event.getVendorId());
+        payload.put("vendorErrorCode", event.getVendorErrorCode());
+        payload.put("timestamp", event.getTimestamp() != null 
+            ? event.getTimestamp().toString() 
+            : null);
+        
+        send("OcppConnectorStatus", payload);
     }
 
     // -------------------------------------------------------------------------

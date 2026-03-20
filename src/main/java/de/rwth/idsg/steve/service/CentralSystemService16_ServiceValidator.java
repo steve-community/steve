@@ -113,6 +113,7 @@ public class CentralSystemService16_ServiceValidator {
         }
 
         List<DateTime> timestamps = meterValues.stream()
+            .filter(java.util.Objects::nonNull)
             .map(MeterValue::getTimestamp)
             .filter(java.util.Objects::nonNull)
             .toList();

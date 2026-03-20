@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -280,6 +281,29 @@ public class CentralSystemService16ServiceValidatorTest {
         )));
 
         Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_nullElementsInList_doesNotThrowNPE() {
+        // null MeterValue elements should be filtered out, not cause NPE
+        var result = validator.validateMeterValues(meterValuesParams(1, Arrays.asList(
+            null,
+            meterValue("2026-02-17T09:00:00Z"),
+            null
+        )));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_allNullElements_returnsError() {
+        // when all elements are null, all timestamps are filtered out → treated as empty
+        var result = validator.validateMeterValues(meterValuesParams(1, Arrays.asList(
+            null, null
+        )));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("MeterValue.timestamp is empty", result.getMessage());
     }
 
     private static StopTransactionRequest stopParams(DateTime stopTimestamp, String meterStop) {

@@ -28,13 +28,13 @@ import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.joda.time.base.AbstractInstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -94,7 +94,7 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("meterStart is greater than meterStop");
         }
 
-        return this.validateMeterValuesInternal(stopParams.getTransactionData(), stopParams.getTimestamp());
+        return this.validateMeterValuesInternal(stopParams.getTransactionData(), thisTx.getStartTimestamp(), stopParams.getTimestamp());
     }
 
     public SteveException validateMeterValues(MeterValuesRequest params) {
@@ -102,24 +102,28 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("MeterValues.connectorId must not be negative");
         }
 
-        return this.validateMeterValuesInternal(params.getMeterValue(), null);
+        return this.validateMeterValuesInternal(params.getMeterValue(), null, null);
     }
 
-    private SteveException validateMeterValuesInternal(List<MeterValue> meterValues, @Nullable DateTime stopTimestamp) {
+    private SteveException validateMeterValuesInternal(List<MeterValue> meterValues,
+                                                       @Nullable DateTime startTimestamp,
+                                                       @Nullable DateTime stopTimestamp) {
         if (CollectionUtils.isEmpty(meterValues)) {
             return null;
         }
 
-        DateTime latest = meterValues.stream()
+        List<DateTime> timestamps = meterValues.stream()
+            .filter(java.util.Objects::nonNull)
             .map(MeterValue::getTimestamp)
             .filter(java.util.Objects::nonNull)
-            .max(AbstractInstant::compareTo)
-            .orElse(null);
+            .toList();
 
         // should not happen because of @NotNull
-        if (latest == null) {
+        if (timestamps.isEmpty()) {
             return new SteveException("MeterValue.timestamp is empty");
         }
+
+        DateTime latest = timestamps.stream().max(Comparator.naturalOrder()).get();
 
         if (latest.getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
             return new SteveException("at least one MeterValue.timestamp is in the future");
@@ -127,6 +131,24 @@ public class CentralSystemService16_ServiceValidator {
 
         if (stopTimestamp != null && latest.isAfter(stopTimestamp)) {
             return new SteveException("at least one MeterValue.timestamp is after stop.timestamp");
+        }
+
+        // allow the same operational delta tolerance for start timestamp check, since charge points
+        // may have slight clock drift and meter values can be sampled before the StartTransaction
+        // message is processed on the server side
+        if (startTimestamp != null) {
+            DateTime earliest = timestamps.stream().min(Comparator.naturalOrder()).get();
+            long deltaMillis = operationalDeltaForNow.toMillis();
+            if (earliest.getMillis() < startTimestamp.getMillis() - deltaMillis) {
+                return new SteveException("at least one MeterValue.timestamp is before start.timestamp");
+            }
+        }
+
+        // check timestamp monotonicity: timestamps should be non-decreasing
+        for (int i = 1; i < timestamps.size(); i++) {
+            if (timestamps.get(i).isBefore(timestamps.get(i - 1))) {
+                return new SteveException("MeterValue timestamps are not in chronological order");
+            }
         }
 
         return null;

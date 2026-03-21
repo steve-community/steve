@@ -230,7 +230,10 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
-        var exception = serviceValidator.validateStart(parameters);
+        String previousStopValue = ocppServerRepository.getLastTransactionStopValue(
+            chargeBoxIdentity, parameters.getConnectorId()
+        );
+        var exception = serviceValidator.validateStart(parameters, previousStopValue);
         if (exception != null) {
             log.warn("StartTransaction validation failed", exception);
         }

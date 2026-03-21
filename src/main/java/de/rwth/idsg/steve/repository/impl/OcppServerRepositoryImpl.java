@@ -229,6 +229,20 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         return records.get(0);
     }
 
+    @Nullable
+    @Override
+    public String getLastTransactionStopValue(@NotNull String chargeBoxId, int connectorId) {
+        return ctx.select(TRANSACTION.STOP_VALUE)
+            .from(TRANSACTION)
+            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(CONNECTOR.CONNECTOR_ID.eq(connectorId))
+            .and(TRANSACTION.STOP_VALUE.isNotNull())
+            .orderBy(TRANSACTION.STOP_TIMESTAMP.desc())
+            .limit(1)
+            .fetchOneInto(String.class);
+    }
+
     @Override
     public int insertTransaction(InsertTransactionParams p) {
 

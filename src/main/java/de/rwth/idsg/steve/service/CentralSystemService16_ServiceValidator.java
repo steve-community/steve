@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
@@ -41,6 +42,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.02.2026
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CentralSystemService16_ServiceValidator {
@@ -53,7 +55,7 @@ public class CentralSystemService16_ServiceValidator {
         this(clock, Duration.ofMinutes(5));
     }
 
-    public SteveException validateStart(StartTransactionRequest params) {
+    public SteveException validateStart(StartTransactionRequest params, @Nullable String previousStopValue) {
         if (params.getConnectorId() < 1) {
             return new SteveException("StartTransaction.connectorId must be positive");
         }
@@ -64,6 +66,17 @@ public class CentralSystemService16_ServiceValidator {
 
         if (params.getTimestamp().getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
             return new SteveException("StartTransaction.timestamp is in the future");
+        }
+
+        if (previousStopValue != null) {
+            try {
+                int prevStop = Integer.parseInt(previousStopValue);
+                if (params.getMeterStart() < prevStop) {
+                    return new SteveException("StartTransaction.meterStart is less than previous transaction's meterStop");
+                }
+            } catch (NumberFormatException e) {
+                log.warn("Could not parse previous stop value '{}', skipping meter regression check", previousStopValue);
+            }
         }
 
         return null;

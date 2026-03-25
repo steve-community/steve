@@ -34,7 +34,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -112,18 +111,37 @@ public class CentralSystemService16_ServiceValidator {
             return null;
         }
 
-        List<DateTime> timestamps = meterValues.stream()
-            .filter(java.util.Objects::nonNull)
-            .map(MeterValue::getTimestamp)
-            .filter(java.util.Objects::nonNull)
-            .toList();
+        // single pass: track earliest, latest, and chronological order
+        DateTime earliest = null;
+        DateTime latest = null;
+        DateTime previous = null;
+        boolean outOfOrder = false;
 
-        // should not happen because of @NotNull
-        if (timestamps.isEmpty()) {
-            return new SteveException("MeterValue.timestamp is empty");
+        for (MeterValue mv : meterValues) {
+            if (mv == null) {
+                continue;
+            }
+            DateTime ts = mv.getTimestamp();
+            if (ts == null) {
+                continue;
+            }
+
+            if (earliest == null || ts.isBefore(earliest)) {
+                earliest = ts;
+            }
+            if (latest == null || ts.isAfter(latest)) {
+                latest = ts;
+            }
+            if (!outOfOrder && previous != null && ts.isBefore(previous)) {
+                outOfOrder = true;
+            }
+            previous = ts;
         }
 
-        DateTime latest = timestamps.stream().max(Comparator.naturalOrder()).get();
+        // should not happen because of @NotNull
+        if (earliest == null) {
+            return new SteveException("MeterValue.timestamp is empty");
+        }
 
         if (latest.getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
             return new SteveException("at least one MeterValue.timestamp is in the future");
@@ -137,18 +155,14 @@ public class CentralSystemService16_ServiceValidator {
         // may have slight clock drift and meter values can be sampled before the StartTransaction
         // message is processed on the server side
         if (startTimestamp != null) {
-            DateTime earliest = timestamps.stream().min(Comparator.naturalOrder()).get();
             long deltaMillis = operationalDeltaForNow.toMillis();
             if (earliest.getMillis() < startTimestamp.getMillis() - deltaMillis) {
                 return new SteveException("at least one MeterValue.timestamp is before start.timestamp");
             }
         }
 
-        // check timestamp monotonicity: timestamps should be non-decreasing
-        for (int i = 1; i < timestamps.size(); i++) {
-            if (timestamps.get(i).isBefore(timestamps.get(i - 1))) {
-                return new SteveException("MeterValue timestamps are not in chronological order");
-            }
+        if (outOfOrder) {
+            return new SteveException("MeterValue timestamps are not in chronological order");
         }
 
         return null;

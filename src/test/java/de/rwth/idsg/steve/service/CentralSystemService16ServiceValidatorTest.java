@@ -252,6 +252,17 @@ public class CentralSystemService16ServiceValidatorTest {
     }
 
     @Test
+    public void validateStop_transactionDataOneSecondAfterStop_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T10:00:01Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
     public void validateMeterValues_timestampsOutOfOrder_returnsError() {
         var result = validator.validateMeterValues(meterValuesParams(1, List.of(
             meterValue("2026-02-17T10:00:00Z"),

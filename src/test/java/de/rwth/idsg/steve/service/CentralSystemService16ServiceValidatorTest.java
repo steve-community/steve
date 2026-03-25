@@ -252,6 +252,11 @@ public class CentralSystemService16ServiceValidatorTest {
         Assertions.assertNull(result);
     }
 
+    /**
+     * this behavior is coming from a real station in the field: the latest of meterValues is 1 second
+     * after stopTimestamp, because the station sampled stop timestamp first, and then later the timestamp
+     * for this meterValue entry.
+     */
     @Test
     public void validateStop_transactionDataOneSecondAfterStop_isAllowed() {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);

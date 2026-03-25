@@ -44,6 +44,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CentralSystemService16_ServiceValidator {
 
+    private static final DateTime MIN = new DateTime(0);
+    private static final DateTime MAX = new DateTime(Long.MAX_VALUE);
+
     private final Clock clock;
     private final Duration operationalDeltaForNow;
 
@@ -111,35 +114,34 @@ public class CentralSystemService16_ServiceValidator {
             return null;
         }
 
-        // single pass: track earliest, latest, and chronological order
-        DateTime earliest = null;
-        DateTime latest = null;
-        DateTime previous = null;
-        boolean outOfOrder = false;
+        DateTime earliest = MAX;
+        DateTime latest = MIN;
+        DateTime prev = MIN;
 
+        // single pass: track earliest, latest, and check chronological order
         for (MeterValue mv : meterValues) {
             if (mv == null) {
                 continue;
             }
+
             DateTime ts = mv.getTimestamp();
+
+            // should not happen because of @NotNull
             if (ts == null) {
-                continue;
+                return new SteveException("MeterValue.timestamp is empty");
             }
 
-            if (earliest == null || ts.isBefore(earliest)) {
-                earliest = ts;
+            // check timestamp monotonicity: timestamps should be non-decreasing
+            if (ts.isBefore(prev)) {
+                return new SteveException("MeterValue timestamps are not in chronological order");
             }
-            if (latest == null || ts.isAfter(latest)) {
-                latest = ts;
-            }
-            if (!outOfOrder && previous != null && ts.isBefore(previous)) {
-                outOfOrder = true;
-            }
-            previous = ts;
+
+            if (ts.isBefore(earliest)) earliest = ts;
+            if (ts.isAfter(latest))  latest = ts;
+            prev = ts;
         }
 
-        // should not happen because of @NotNull
-        if (earliest == null) {
+        if (earliest == MAX || latest == MIN) {
             return new SteveException("MeterValue.timestamp is empty");
         }
 
@@ -159,10 +161,6 @@ public class CentralSystemService16_ServiceValidator {
             if (earliest.getMillis() < startTimestamp.getMillis() - deltaMillis) {
                 return new SteveException("at least one MeterValue.timestamp is before start.timestamp");
             }
-        }
-
-        if (outOfOrder) {
-            return new SteveException("MeterValue timestamps are not in chronological order");
         }
 
         return null;

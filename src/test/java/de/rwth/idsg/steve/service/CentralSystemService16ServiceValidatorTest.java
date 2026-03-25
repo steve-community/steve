@@ -209,9 +209,10 @@ public class CentralSystemService16ServiceValidatorTest {
 
     @Test
     public void validateStop_transactionDataAfterStopTimestamp_returnsError() {
+        // more than 5 minutes (operational delta) after stop
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
-            .withTransactionData(List.of(meterValue("2026-02-17T10:00:01Z")));
+            .withTransactionData(List.of(meterValue("2026-02-17T10:10:00Z")));
         var result = validator.validateStop(tx, params);
 
         Assertions.assertNotNull(result);
@@ -246,6 +247,22 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T09:00:00Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    /**
+     * this behavior is coming from a real station in the field: the latest of meterValues is 1 second
+     * after stopTimestamp, because the station sampled stop timestamp first, and then later the timestamp
+     * for this meterValue entry.
+     */
+    @Test
+    public void validateStop_transactionDataOneSecondAfterStop_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T10:00:01Z")));
         var result = validator.validateStop(tx, params);
 
         Assertions.assertNull(result);

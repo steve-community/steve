@@ -48,7 +48,7 @@ public class CentralSystemService16_ServiceValidator {
     private static final DateTime MAX = new DateTime(Long.MAX_VALUE);
 
     private final Clock clock;
-    private final Duration operationalDeltaForNow;
+    private final Duration operationalDelta;
 
     @Autowired
     public CentralSystemService16_ServiceValidator(Clock clock) {
@@ -64,7 +64,7 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("StartTransaction.meterStart must not be negative");
         }
 
-        if (params.getTimestamp().getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
+        if (params.getTimestamp().getMillis() > clock.instant().plus(operationalDelta).toEpochMilli()) {
             return new SteveException("StartTransaction.timestamp is in the future");
         }
 
@@ -88,7 +88,7 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("start.timestamp is after stop.timestamp");
         }
 
-        if (stopParams.getTimestamp().getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
+        if (stopParams.getTimestamp().getMillis() > clock.instant().plus(operationalDelta).toEpochMilli()) {
             return new SteveException("stop.timestamp is in the future");
         }
 
@@ -145,19 +145,22 @@ public class CentralSystemService16_ServiceValidator {
             return new SteveException("MeterValue.timestamp is empty");
         }
 
-        if (latest.getMillis() > clock.instant().plus(operationalDeltaForNow).toEpochMilli()) {
+        // allow operational delta tolerance for the following timestamp checks, since charge points
+        // may have slight clock drift and meter values can be sampled a little bit later or before
+        // our reference point.
+        long deltaMillis = operationalDelta.toMillis();
+
+        if (latest.getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
             return new SteveException("at least one MeterValue.timestamp is in the future");
         }
 
-        if (stopTimestamp != null && latest.isAfter(stopTimestamp)) {
-            return new SteveException("at least one MeterValue.timestamp is after stop.timestamp");
+        if (stopTimestamp != null) {
+            if (latest.getMillis() > stopTimestamp.getMillis() + deltaMillis) {
+                return new SteveException("at least one MeterValue.timestamp is after stop.timestamp");
+            }
         }
 
-        // allow the same operational delta tolerance for start timestamp check, since charge points
-        // may have slight clock drift and meter values can be sampled before the StartTransaction
-        // message is processed on the server side
         if (startTimestamp != null) {
-            long deltaMillis = operationalDeltaForNow.toMillis();
             if (earliest.getMillis() < startTimestamp.getMillis() - deltaMillis) {
                 return new SteveException("at least one MeterValue.timestamp is before start.timestamp");
             }

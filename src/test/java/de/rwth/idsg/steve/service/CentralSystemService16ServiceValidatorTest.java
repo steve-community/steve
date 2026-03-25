@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.service;
 
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionRecord;
+import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
-import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.ReadingContext;
 import ocpp.cs._2015._10.Reason;
 import ocpp.cs._2015._10.SampledValue;
@@ -311,15 +311,18 @@ public class CentralSystemService16ServiceValidatorTest {
         Assertions.assertNull(result);
     }
 
+    /**
+     * we cannot and should not check whether timestamps are in chronological order. there are real and valid
+     * reasons for why they might not be: https://github.com/steve-community/steve/issues/1992
+     */
     @Test
-    public void validateMeterValues_timestampsOutOfOrder_returnsError() {
+    public void validateMeterValues_timestampsOutOfOrder_returnsNull() {
         var result = validator.validateMeterValues(meterValuesParams(1, List.of(
             meterValue("2026-02-17T10:00:00Z"),
             meterValue("2026-02-17T09:00:00Z")
         )));
 
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals("MeterValue timestamps are not in chronological order", result.getMessage());
+        Assertions.assertNull(result);
     }
 
     @Test

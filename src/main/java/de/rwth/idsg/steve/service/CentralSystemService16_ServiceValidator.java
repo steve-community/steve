@@ -116,9 +116,8 @@ public class CentralSystemService16_ServiceValidator {
 
         DateTime earliest = MAX;
         DateTime latest = MIN;
-        DateTime prev = MIN;
 
-        // single pass: track earliest, latest, and check chronological order
+        // single pass: track earliest and latest
         for (MeterValue mv : meterValues) {
             if (mv == null) {
                 continue;
@@ -131,14 +130,8 @@ public class CentralSystemService16_ServiceValidator {
                 return new SteveException("MeterValue.timestamp is empty");
             }
 
-            // check timestamp monotonicity: timestamps should be non-decreasing
-            if (ts.isBefore(prev)) {
-                return new SteveException("MeterValue timestamps are not in chronological order");
-            }
-
             if (ts.isBefore(earliest)) earliest = ts;
             if (ts.isAfter(latest))  latest = ts;
-            prev = ts;
         }
 
         if (earliest == MAX || latest == MIN) {

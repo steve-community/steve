@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -215,6 +216,94 @@ public class CentralSystemService16ServiceValidatorTest {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals("at least one MeterValue.timestamp is after stop.timestamp", result.getMessage());
+    }
+
+    @Test
+    public void validateStop_transactionDataBeforeStartTimestamp_returnsError() {
+        // more than 5 minutes (operational delta) before start
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T08:54:59Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("at least one MeterValue.timestamp is before start.timestamp", result.getMessage());
+    }
+
+    @Test
+    public void validateStop_transactionDataSlightlyBeforeStartTimestamp_isAllowed() {
+        // within 5 minutes (operational delta) before start — allowed for clock drift
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T08:55:01Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateStop_transactionDataAtStartTimestamp_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withTransactionData(List.of(meterValue("2026-02-17T09:00:00Z")));
+        var result = validator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_timestampsOutOfOrder_returnsError() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T10:00:00Z"),
+            meterValue("2026-02-17T09:00:00Z")
+        )));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("MeterValue timestamps are not in chronological order", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValues_timestampsInOrder_returnsNull() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T09:00:00Z"),
+            meterValue("2026-02-17T09:30:00Z"),
+            meterValue("2026-02-17T10:00:00Z")
+        )));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_sameTimestamps_returnsNull() {
+        var result = validator.validateMeterValues(meterValuesParams(1, List.of(
+            meterValue("2026-02-17T10:00:00Z"),
+            meterValue("2026-02-17T10:00:00Z")
+        )));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_nullElementsInList_doesNotThrowNPE() {
+        // null MeterValue elements should be filtered out, not cause NPE
+        var result = validator.validateMeterValues(meterValuesParams(1, Arrays.asList(
+            null,
+            meterValue("2026-02-17T09:00:00Z"),
+            null
+        )));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValues_allNullElements_returnsError() {
+        // when all elements are null, all timestamps are filtered out → treated as empty
+        var result = validator.validateMeterValues(meterValuesParams(1, Arrays.asList(
+            null, null
+        )));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("MeterValue.timestamp is empty", result.getMessage());
     }
 
     private static StopTransactionRequest stopParams(DateTime stopTimestamp, String meterStop) {

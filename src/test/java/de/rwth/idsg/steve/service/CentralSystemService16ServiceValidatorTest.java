@@ -20,10 +20,16 @@ package de.rwth.idsg.steve.service;
 
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionRecord;
+import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.ReadingContext;
+import ocpp.cs._2015._10.Reason;
+import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
+import ocpp.cs._2015._10.UnitOfMeasure;
+import ocpp.cs._2015._10.ValueFormat;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -268,15 +274,55 @@ public class CentralSystemService16ServiceValidatorTest {
         Assertions.assertNull(result);
     }
 
+    /**
+     * we cannot and should not check whether timestamps are in chronological order. there are real and valid
+     * reasons for why they might not be: https://github.com/steve-community/steve/issues/1992
+     */
     @Test
-    public void validateMeterValues_timestampsOutOfOrder_returnsError() {
+    public void validateStop_outOfOrderTransactionData_isAllowed() {
+        var messageClock = Clock.fixed(Instant.parse("2026-03-25T08:10:00Z"), ZoneOffset.UTC);
+        var localValidator = new CentralSystemService16_ServiceValidator(messageClock);
+
+        var tx = tx("100", DateTime.parse("2026-03-25T06:22:44.000Z"), null, null, null);
+
+        StopTransactionRequest params = new StopTransactionRequest()
+            .withIdTag("XYZ")
+            .withMeterStop(200)
+            .withTimestamp(DateTime.parse("2026-03-25T07:58:42.000Z"))
+            .withTransactionId(123)
+            .withReason(Reason.OTHER)
+            .withTransactionData(List.of(
+                new MeterValue()
+                    .withTimestamp(DateTime.parse("2026-03-25T06:22:44.000Z"))
+                    .withSampledValue(sampledValue("101", ReadingContext.TRANSACTION_BEGIN, ValueFormat.RAW)),
+                new MeterValue()
+                    .withTimestamp(DateTime.parse("2026-03-25T07:58:42.000Z"))
+                    .withSampledValue(sampledValue("202", ReadingContext.TRANSACTION_END, ValueFormat.RAW)),
+                new MeterValue()
+                    .withTimestamp(DateTime.parse("2026-03-25T06:22:45.000Z"))
+                    .withSampledValue(sampledValue("102", ReadingContext.TRANSACTION_BEGIN, ValueFormat.SIGNED_DATA)),
+                new MeterValue()
+                    .withTimestamp(DateTime.parse("2026-03-25T07:58:43.000Z"))
+                    .withSampledValue(sampledValue("203", ReadingContext.TRANSACTION_END, ValueFormat.SIGNED_DATA))
+            ));
+
+        var result = localValidator.validateStop(tx, params);
+
+        Assertions.assertNull(result);
+    }
+
+    /**
+     * we cannot and should not check whether timestamps are in chronological order. there are real and valid
+     * reasons for why they might not be: https://github.com/steve-community/steve/issues/1992
+     */
+    @Test
+    public void validateMeterValues_timestampsOutOfOrder_returnsNull() {
         var result = validator.validateMeterValues(meterValuesParams(1, List.of(
             meterValue("2026-02-17T10:00:00Z"),
             meterValue("2026-02-17T09:00:00Z")
         )));
 
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals("MeterValue timestamps are not in chronological order", result.getMessage());
+        Assertions.assertNull(result);
     }
 
     @Test
@@ -347,6 +393,15 @@ public class CentralSystemService16ServiceValidatorTest {
 
     private static MeterValue meterValue(String timestamp) {
         return new MeterValue().withTimestamp(DateTime.parse(timestamp));
+    }
+
+    private static SampledValue sampledValue(String value, ReadingContext context, ValueFormat format) {
+        return new SampledValue()
+            .withValue(value)
+            .withContext(context)
+            .withFormat(format)
+            .withMeasurand(Measurand.ENERGY_ACTIVE_IMPORT_REGISTER)
+            .withUnit(UnitOfMeasure.WH);
     }
 
     private static TransactionRecord tx(String startValue, DateTime startTimestamp,

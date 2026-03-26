@@ -28,6 +28,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,5 +88,18 @@ public final class DateTimeUtils {
         DateTime now = DateTime.now();
         long offsetInMilliseconds = timeZone.getOffset(now.getMillis());
         return TimeUnit.MILLISECONDS.toSeconds(offsetInMilliseconds);
+    }
+
+    public static DateTime toDateTime(OffsetDateTime odt) {
+        if (odt == null) {
+            return null;
+        }
+        long instant = odt.toInstant().toEpochMilli();
+        int offsetMillis = (int) TimeUnit.SECONDS.toMillis(odt.getOffset().getTotalSeconds());
+        return new DateTime(instant, DateTimeZone.forOffsetMillis(offsetMillis));
+    }
+
+    public static OffsetDateTime toOffsetDateTime(DateTime dt, ZoneId zoneId) {
+        return OffsetDateTime.ofInstant(dt.toDate().toInstant(), zoneId);
     }
 }

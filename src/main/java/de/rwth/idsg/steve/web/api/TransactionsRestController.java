@@ -20,9 +20,12 @@ package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.TransactionReportService;
 import de.rwth.idsg.steve.service.TransactionService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import de.rwth.idsg.steve.web.dto.TransactionReportRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,13 +35,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -58,6 +67,7 @@ import java.util.List;
 public class TransactionsRestController {
 
     private final TransactionService transactionService;
+    private final TransactionReportService transactionReportService;
 
     @Operation(description = """
         Returns a list of transactions based on the query parameters.
@@ -80,5 +90,42 @@ public class TransactionsRestController {
         var response = transactionService.getTransactions(params);
         log.debug("Read response for query: {}", response);
         return response;
+    }
+
+    @Operation(description = """
+        Returns the details of a single transaction based on the transactionPk.
+        The details are the intermediate values of the transaction.
+        """)
+    @GetMapping(value = "/{transactionPk}")
+    public TransactionDetails getTransactionDetails(@PathVariable("transactionPk") int transactionPk) {
+        return transactionService.getDetails(transactionPk);
+    }
+
+    @Operation(description = """
+        Manually changes this transaction from 'active' to 'stopped'.
+        """)
+    @PatchMapping(value = "/{transactionPk}/stop")
+    public void stopTransaction(@PathVariable("transactionPk") int transactionPk) {
+        transactionService.stop(transactionPk);
+    }
+
+    @Operation(description = """
+        Returns charging consumption data as CSV between the given 'from' and 'to' timestamps.
+        All transactions that stopped between the given timestamps are included.
+        The exported data can be used for reports or can be imported into 3rd party payment/billing systems.
+        """)
+    @GetMapping(value = "/reports/csv", produces = "text/csv")
+    public ResponseEntity<String> getTransactionReportCsv(@Valid @ParameterObject TransactionReportRequest dto) {
+        String data = transactionReportService.getTransactionReportCsv(dto.getFrom(), dto.getTo());
+
+        String fileName = "transaction_report.csv";
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/csv");
+        headers.add(headerKey, headerValue);
+
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
     }
 }

@@ -16,30 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jooq.steve.db.tables.records.TransactionRecord;
+import de.rwth.idsg.steve.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.Result;
+import org.springframework.stereotype.Service;
 
-import java.io.Writer;
-import java.util.List;
+import java.time.OffsetDateTime;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 19.08.2014
- */
-public interface TransactionRepository {
-    List<Transaction> getTransactions(TransactionQueryForm form);
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
-    void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class TransactionReportService {
 
-    List<Integer> getActiveTransactionIds(String chargeBoxId);
+    private final TransactionRepository transactionRepository;
 
-    TransactionDetails getDetails(int transactionPk);
+    public String getTransactionReportCsv(OffsetDateTime from, OffsetDateTime to) {
+        DateTime dateTimeFrom = toDateTime(from);
+        DateTime dateTimeTo = toDateTime(to);
 
-    Result<TransactionRecord> getStoppedTransactions(DateTime from, DateTime to);
+        return transactionRepository.getStoppedTransactions(dateTimeFrom, dateTimeTo).formatCSV();
+    }
 }

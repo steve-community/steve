@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,7 @@ public class TransactionDetails {
      * that is at the same chargebox and connector
      */
     @Nullable
+    @JsonIgnore
     private final TransactionStartRecord nextTransactionStart;
 
     @Getter

@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
+import jooq.steve.db.tables.records.TransactionRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.UnitOfMeasure;
@@ -34,6 +35,7 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.springframework.stereotype.Repository;
@@ -271,6 +273,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .toList();
 
         return new TransactionDetails(transaction, values, nextTx);
+    }
+
+    @Override
+    public Result<TransactionRecord> getStoppedTransactions(DateTime from, DateTime to) {
+        if (!to.isAfter(from)) {
+            throw new SteveException.BadRequest("'to' must be after 'from'");
+        }
+
+        return ctx.selectFrom(TRANSACTION)
+            .where(TRANSACTION.STOP_TIMESTAMP.ge(from)
+            .and(TRANSACTION.STOP_TIMESTAMP.lt(to)))
+            .orderBy(TRANSACTION.START_TIMESTAMP)
+            .fetch();
     }
 
     // -------------------------------------------------------------------------

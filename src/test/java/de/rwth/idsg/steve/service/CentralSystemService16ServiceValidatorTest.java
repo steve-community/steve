@@ -27,6 +27,7 @@ import ocpp.cs._2015._10.ReadingContext;
 import ocpp.cs._2015._10.Reason;
 import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
@@ -79,6 +80,36 @@ public class CentralSystemService16ServiceValidatorTest {
     @Test
     public void validateStart_futureTimestampAtBoundary_isAllowed() {
         var result = validator.validateStart(startParams(1, 10, DateTime.parse("2026-02-17T12:05:00Z")));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateStatusNotification_connectorIdNegative_returnsError() {
+        var result = validator.validateStatusNotification(statusParams(-1, DateTime.parse("2026-02-17T12:00:00Z")));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("StatusNotification.connectorId must not be negative", result.getMessage());
+    }
+
+    @Test
+    public void validateStatusNotification_futureTimestamp_returnsError() {
+        var result = validator.validateStatusNotification(statusParams(1, DateTime.parse("2026-02-17T12:05:01Z")));
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("StatusNotification.timestamp is in the future", result.getMessage());
+    }
+
+    @Test
+    public void validateStatusNotification_futureTimestampAtBoundary_isAllowed() {
+        var result = validator.validateStatusNotification(statusParams(1, DateTime.parse("2026-02-17T12:05:00Z")));
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateStatusNotification_withoutTimestamp_isAllowed() {
+        var result = validator.validateStatusNotification(new StatusNotificationRequest().withConnectorId(1));
 
         Assertions.assertNull(result);
     }
@@ -383,6 +414,12 @@ public class CentralSystemService16ServiceValidatorTest {
             .withMeterStart(meterStart)
             .withTimestamp(timestamp)
             .withIdTag("tag-1");
+    }
+
+    private static StatusNotificationRequest statusParams(int connectorId, DateTime timestamp) {
+        return new StatusNotificationRequest()
+            .withConnectorId(connectorId)
+            .withTimestamp(timestamp);
     }
 
     private static MeterValuesRequest meterValuesParams(int connectorId, List<MeterValue> values) {

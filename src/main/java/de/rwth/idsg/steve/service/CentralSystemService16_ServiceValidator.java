@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +57,22 @@ public class CentralSystemService16_ServiceValidator {
         this(clock, Duration.ofMinutes(5));
     }
 
-    public SteveException validateStart(StartTransactionRequest params) {
+    public SteveException validateStatusNotification(@NotNull StatusNotificationRequest params) {
+        if (params.getConnectorId() < 0) {
+            return new SteveException("StatusNotification.connectorId must not be negative");
+        }
+
+        if (params.isSetTimestamp()) {
+            long deltaMillis = operationalDelta.toMillis();
+            if (params.getTimestamp().getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
+                return new SteveException("StatusNotification.timestamp is in the future");
+            }
+        }
+
+        return null;
+    }
+
+    public SteveException validateStart(@NotNull StartTransactionRequest params) {
         if (params.getConnectorId() < 1) {
             return new SteveException("StartTransaction.connectorId must be positive");
         }
@@ -71,7 +88,7 @@ public class CentralSystemService16_ServiceValidator {
         return null;
     }
 
-    public SteveException validateStop(TransactionRecord thisTx, StopTransactionRequest stopParams) {
+    public SteveException validateStop(TransactionRecord thisTx, @NotNull StopTransactionRequest stopParams) {
         if (thisTx == null) {
             return new SteveException("The transaction is not found in database");
         }
@@ -99,7 +116,7 @@ public class CentralSystemService16_ServiceValidator {
         return this.validateMeterValuesInternal(stopParams.getTransactionData(), thisTx.getStartTimestamp(), stopParams.getTimestamp());
     }
 
-    public SteveException validateMeterValues(MeterValuesRequest params) {
+    public SteveException validateMeterValues(@NotNull MeterValuesRequest params) {
         if (params.getConnectorId() < 0) {
             return new SteveException("MeterValues.connectorId must not be negative");
         }

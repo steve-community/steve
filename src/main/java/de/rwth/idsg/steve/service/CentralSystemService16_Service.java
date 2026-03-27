@@ -147,6 +147,12 @@ public class CentralSystemService16_Service {
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
+
+        var exception = serviceValidator.validateStatusNotification(parameters);
+        if (exception != null) {
+            log.warn("StatusNotification validation failed: {}", exception.getMessage(), exception);
+        }
+
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 
@@ -189,7 +195,7 @@ public class CentralSystemService16_Service {
 
         var exception = serviceValidator.validateMeterValues(parameters);
         if (exception != null) {
-            log.warn("MeterValues validation failed", exception);
+            log.warn("MeterValues validation failed: {}", exception.getMessage(), exception);
         }
 
         ocppServerRepository.insertMeterValues(
@@ -232,7 +238,7 @@ public class CentralSystemService16_Service {
 
         var exception = serviceValidator.validateStart(parameters);
         if (exception != null) {
-            log.warn("StartTransaction validation failed", exception);
+            log.warn("StartTransaction validation failed: {}", exception.getMessage(), exception);
         }
 
         int transactionId = ocppServerRepository.insertTransaction(params);
@@ -276,7 +282,7 @@ public class CentralSystemService16_Service {
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
             applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
         } else {
-            log.warn("StopTransaction validation failed", exception);
+            log.warn("StopTransaction validation failed: {}", exception.getMessage(), exception);
             ocppServerRepository.updateTransactionAsFailed(params, exception);
             // TODO: we need to handle meter values of invalid stops differently. will come later.
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);

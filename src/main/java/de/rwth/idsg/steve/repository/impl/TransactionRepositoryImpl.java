@@ -164,7 +164,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         var transactions = getTransactions(form);
         if (transactions.size() != 1) {
-            throw new SteveException("There is no transaction with id '%s'", transactionPk);
+            throw new SteveException.NotFound("There is no transaction with id '%s'", transactionPk);
         }
         Transaction transaction = transactions.getFirst();
 

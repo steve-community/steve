@@ -73,6 +73,10 @@ public class SteveException extends RuntimeException {
         public NotFound(String message) {
             super(message);
         }
+
+        public NotFound(String template, Object arg1) {
+            super(template, arg1);
+        }
     }
 
     public static class BadRequest extends SteveException {

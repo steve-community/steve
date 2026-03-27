@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.service.notification.OcppMeterValues;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,11 @@ import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.service.notification.OcppMeterValues;
+import de.rwth.idsg.steve.service.notification.OcppConnectorStatus;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -169,6 +175,19 @@ public class CentralSystemService16_Service {
                                            .build();
 
         ocppServerRepository.insertConnectorStatus(params);
+        // Publish unified connector status event for webhook
+        applicationEventPublisher.publishEvent(new OcppConnectorStatus(
+            chargeBoxIdentity,
+            parameters.getConnectorId(),
+            parameters.getStatus().value(),        // "Available", "Charging", etc.
+            parameters.getErrorCode().value(),     // "NoError", etc.
+            parameters.getInfo(),                  // Optional info field
+            parameters.getVendorId(),              // Optional vendor ID
+            parameters.getVendorErrorCode(),       // Optional vendor error code
+            parameters.isSetTimestamp() 
+                ? parameters.getTimestamp().toDate().toInstant() 
+                : java.time.Instant.now()
+        ));
 
         if (parameters.getStatus() == FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
@@ -204,7 +223,8 @@ public class CentralSystemService16_Service {
                 parameters.getConnectorId(),
                 transactionId
         );
-
+        applicationEventPublisher.publishEvent(new OcppMeterValues(
+                chargeBoxIdentity, parameters.getConnectorId(), transactionId, parameters.getMeterValue()));	
         return new MeterValuesResponse();
     }
 

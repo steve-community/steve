@@ -147,6 +147,12 @@ public class CentralSystemService16_Service {
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
+
+        var exception = serviceValidator.validateStatusNotification(parameters);
+        if (exception != null) {
+            log.warn("StatusNotification validation failed", exception);
+        }
+
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 

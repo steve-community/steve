@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -53,6 +54,21 @@ public class CentralSystemService16_ServiceValidator {
     @Autowired
     public CentralSystemService16_ServiceValidator(Clock clock) {
         this(clock, Duration.ofMinutes(5));
+    }
+
+    public SteveException validateStatusNotification(StatusNotificationRequest params) {
+        if (params.getConnectorId() < 0) {
+            return new SteveException("StatusNotification.connectorId must not be negative");
+        }
+
+        if (params.isSetTimestamp()) {
+            long deltaMillis = operationalDelta.toMillis();
+            if (params.getTimestamp().getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
+                return new SteveException("StatusNotification.timestamp is in the future");
+            }
+        }
+
+        return null;
     }
 
     public SteveException validateStart(StartTransactionRequest params) {

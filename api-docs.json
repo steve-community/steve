@@ -7,7 +7,7 @@
 			"url": "https://github.com/steve-community/steve/blob/master/LICENSE.txt"
 		},
 		"title": "SteVe REST API Documentation",
-		"version": "3.11.0-SNAPSHOT"
+		"version": "3.12.0-SNAPSHOT"
 	},
 	"servers": [
 		{
@@ -2321,14 +2321,18 @@
 				"operationId": "get_1",
 				"parameters": [
 					{
-						"description": "Database primary key of the transaction",
+						"description": "Database primary keys of the transactions",
 						"in": "query",
 						"name": "transactionPk",
 						"required": false,
 						"schema": {
-							"type": "integer",
-							"format": "int32",
-							"description": "Database primary key of the transaction"
+							"type": "array",
+							"description": "Database primary keys of the transactions",
+							"items": {
+								"type": "integer",
+								"format": "int32",
+								"description": "Database primary keys of the transactions"
+							}
 						}
 					},
 					{
@@ -2376,35 +2380,47 @@
 						}
 					},
 					{
-						"description": "The identifier of the chargebox (i.e. charging station)",
+						"description": "The identifiers of the chargebox (i.e. charging station)",
 						"in": "query",
 						"name": "chargeBoxId",
 						"required": false,
 						"schema": {
-							"type": "string",
-							"description": "The identifier of the chargebox (i.e. charging station)"
+							"type": "array",
+							"description": "The identifiers of the chargebox (i.e. charging station)",
+							"items": {
+								"type": "string",
+								"description": "The identifiers of the chargebox (i.e. charging station)"
+							}
 						}
 					},
 					{
-						"description": "The OCPP tag",
+						"description": "The OCPP tags",
 						"in": "query",
 						"name": "ocppIdTag",
 						"required": false,
 						"schema": {
-							"type": "string",
-							"description": "The OCPP tag"
+							"type": "array",
+							"description": "The OCPP tags",
+							"items": {
+								"type": "string",
+								"description": "The OCPP tags"
+							}
 						}
 					},
 					{
-						"description": "The User ID",
+						"description": "The User IDs",
 						"in": "query",
 						"name": "userId",
 						"required": false,
 						"schema": {
-							"type": "integer",
-							"format": "int32",
-							"description": "The User ID",
-							"exclusiveMinimum": 0
+							"type": "array",
+							"description": "The User IDs",
+							"items": {
+								"type": "integer",
+								"format": "int32",
+								"description": "The User IDs",
+								"exclusiveMinimum": 0
+							}
 						}
 					},
 					{
@@ -2487,6 +2503,229 @@
 					"500": {
 						"content": {
 							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"transaction-controller"
+				]
+			}
+		},
+		"/api/v1/transactions/reports/csv": {
+			"get": {
+				"description": "Returns charging consumption data as CSV between the given 'from' and 'to' timestamps.\nAll transactions that stopped between the given timestamps are included.\nThe exported data can be used for reports or can be imported into 3rd party payment/billing systems.\n",
+				"operationId": "getTransactionReportCsv",
+				"parameters": [
+					{
+						"example": "2000-10-10T01:30:00.000+01:00",
+						"in": "query",
+						"name": "from",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"example": "2000-10-10T01:30:00.000+01:00"
+						}
+					},
+					{
+						"example": "2000-10-15T01:30:00.000+01:00",
+						"in": "query",
+						"name": "to",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"format": "date-time",
+							"example": "2000-10-15T01:30:00.000+01:00"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"text/csv": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"transaction-controller"
+				]
+			}
+		},
+		"/api/v1/transactions/{transactionPk}": {
+			"get": {
+				"description": "Returns the details of a single transaction based on the transactionPk.\nThe details are the intermediate values of the transaction.\n",
+				"operationId": "getTransactionDetails",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TransactionDetails"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"transaction-controller"
+				]
+			}
+		},
+		"/api/v1/transactions/{transactionPk}/stop": {
+			"patch": {
+				"description": "Manually changes this transaction from 'active' to 'stopped'.\n",
+				"operationId": "stopTransaction",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiErrorResponse"
 								}
@@ -2675,7 +2914,9 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/ChargingSchedulePeriod"
-						}
+						},
+						"maxItems": 2147483647,
+						"minItems": 1
 					},
 					"duration": {
 						"type": "integer",
@@ -2710,7 +2951,8 @@
 					}
 				},
 				"required": [
-					"limit"
+					"limit",
+					"startPeriod"
 				]
 			},
 			"ClearChargingProfileParams": {
@@ -3153,7 +3395,9 @@
 				"type": "object",
 				"properties": {
 					"fileName": {
-						"type": "string"
+						"type": "string",
+						"maxLength": 255,
+						"minLength": 0
 					}
 				}
 			},
@@ -3330,6 +3574,36 @@
 					},
 					"value": {
 						"type": "string"
+					}
+				}
+			},
+			"MeterValues": {
+				"type": "object",
+				"properties": {
+					"format": {
+						"type": "string"
+					},
+					"location": {
+						"type": "string"
+					},
+					"measurand": {
+						"type": "string"
+					},
+					"phase": {
+						"type": "string"
+					},
+					"readingContext": {
+						"type": "string"
+					},
+					"unit": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					},
+					"valueTimestamp": {
+						"type": "string",
+						"format": "date-time"
 					}
 				}
 			},
@@ -4924,6 +5198,20 @@
 						"type": "integer",
 						"format": "int32",
 						"description": "The ID of the user who owns the Ocpp Tag associated with this transaction"
+					}
+				}
+			},
+			"TransactionDetails": {
+				"type": "object",
+				"properties": {
+					"transaction": {
+						"$ref": "#/components/schemas/Transaction"
+					},
+					"values": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/MeterValues"
+						}
 					}
 				}
 			},

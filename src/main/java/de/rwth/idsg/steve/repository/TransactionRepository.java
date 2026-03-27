@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.TransactionRecord;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.Result;
 
@@ -41,5 +42,5 @@ public interface TransactionRepository {
 
     TransactionDetails getDetails(int transactionPk);
 
-    Result<TransactionRecord> getStoppedTransactions(DateTime from, DateTime to);
+    Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to);
 }

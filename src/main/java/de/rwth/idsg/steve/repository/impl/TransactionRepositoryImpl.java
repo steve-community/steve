@@ -31,6 +31,7 @@ import jooq.steve.db.tables.records.TransactionRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.UnitOfMeasure;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -276,7 +277,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public Result<TransactionRecord> getStoppedTransactions(DateTime from, DateTime to) {
+    public Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to) {
         if (!to.isAfter(from)) {
             throw new SteveException.BadRequest("'to' must be after 'from'");
         }

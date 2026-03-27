@@ -35,10 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -114,18 +111,23 @@ public class TransactionsRestController {
         All transactions that stopped between the given timestamps are included.
         The exported data can be used for reports or can be imported into 3rd party payment/billing systems.
         """)
+    @ApiResponse(
+        responseCode = "200",
+        content = @Content(
+            mediaType = "text/csv",
+            schema = @Schema(type = "string", format = "binary")
+        )
+    )
     @GetMapping(value = "/reports/csv", produces = "text/csv")
-    public ResponseEntity<String> getTransactionReportCsv(@Valid @ParameterObject TransactionReportRequest dto) {
-        String data = transactionReportService.getTransactionReportCsv(dto.getFrom(), dto.getTo());
-
+    public void getTransactionReportCsv(@Valid @ParameterObject TransactionReportRequest dto,
+                                        HttpServletResponse response) throws IOException {
         String fileName = "transaction_report.csv";
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "text/csv");
-        headers.add(headerKey, headerValue);
+        response.setContentType("text/csv");
+        response.setHeader(headerKey, headerValue);
 
-        return new ResponseEntity<>(data, headers, HttpStatus.OK);
+        transactionReportService.getTransactionReportCsv(dto.getFrom(), dto.getTo(), response.getWriter());
     }
 }

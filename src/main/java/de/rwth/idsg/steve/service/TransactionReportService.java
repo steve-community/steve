@@ -21,9 +21,11 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
@@ -35,10 +37,12 @@ public class TransactionReportService {
 
     private final TransactionRepository transactionRepository;
 
-    public String getTransactionReportCsv(OffsetDateTime from, OffsetDateTime to) {
+    public void getTransactionReportCsv(@NotNull OffsetDateTime from,
+                                        @NotNull OffsetDateTime to,
+                                        PrintWriter writer) {
         DateTime dateTimeFrom = toDateTime(from);
         DateTime dateTimeTo = toDateTime(to);
 
-        return transactionRepository.getStoppedTransactions(dateTimeFrom, dateTimeTo).formatCSV();
+        transactionRepository.getStoppedTransactions(dateTimeFrom, dateTimeTo).formatCSV(writer);
     }
 }

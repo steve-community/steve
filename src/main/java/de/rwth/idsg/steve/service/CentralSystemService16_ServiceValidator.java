@@ -73,7 +73,7 @@ public class CentralSystemService16_ServiceValidator {
         return null;
     }
 
-    public SteveException validateSecurityEvent(SecurityEventNotification params) {
+    public SteveException validateSecurityEvent(@NotNull SecurityEventNotification params) {
         long deltaMillis = operationalDelta.toMillis();
         if (params.getTimestamp().getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
             return new SteveException("SecurityEventNotification.timestamp is in the future");

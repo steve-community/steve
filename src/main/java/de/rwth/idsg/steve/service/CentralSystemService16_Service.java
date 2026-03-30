@@ -366,6 +366,11 @@ public class CentralSystemService16_Service {
 
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
+        var exception = serviceValidator.validateSecurityEvent(parameters);
+        if (exception != null) {
+            log.warn("SecurityEvent validation failed: {}", exception.getMessage(), exception);
+        }
+
         try {
             eventRepository.insertSecurityEvent(
                 chargeBoxIdentity,

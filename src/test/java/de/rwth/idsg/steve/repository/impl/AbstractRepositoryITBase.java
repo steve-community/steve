@@ -87,7 +87,6 @@ abstract class AbstractRepositoryITBase {
 
     protected static void resetDatabase(DSLContext dslContext) {
         var preparer = new __DatabasePreparer__(dslContext);
-        preparer.cleanUp();
         preparer.prepare();
 
         dslContext.insertInto(CONNECTOR)

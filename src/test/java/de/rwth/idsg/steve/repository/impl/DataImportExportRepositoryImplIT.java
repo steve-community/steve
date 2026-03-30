@@ -53,12 +53,8 @@ public class DataImportExportRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
-    public void beforeImport() {
+    public void beforeImportAndAfterExport() {
         assertNoDatabaseException(repository::beforeImport);
-    }
-
-    @Test
-    public void afterImport() {
         assertNoDatabaseException(repository::afterImport);
     }
 

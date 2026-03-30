@@ -22,6 +22,9 @@ import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -29,6 +32,9 @@ import java.util.UUID;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Transactional
 abstract class AbstractRepositoryITBase {
 
     protected static final String KNOWN_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();

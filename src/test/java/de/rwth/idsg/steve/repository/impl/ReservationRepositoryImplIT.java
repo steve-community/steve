@@ -28,15 +28,9 @@ import org.jooq.Record1;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 
-@ActiveProfiles(profiles = "test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Transactional
 public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired

@@ -25,9 +25,6 @@ import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -35,9 +32,6 @@ import java.util.List;
 import static jooq.steve.db.tables.Certificate.CERTIFICATE;
 import static org.mockito.Mockito.mock;
 
-@ActiveProfiles(profiles = "test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@Transactional
 public class CertificateRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired

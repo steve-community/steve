@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.RequiredArgsConstructor;
+import ocpp._2022._02.security.SecurityEventNotification;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
@@ -67,6 +68,15 @@ public class CentralSystemService16_ServiceValidator {
             if (params.getTimestamp().getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
                 return new SteveException("StatusNotification.timestamp is in the future");
             }
+        }
+
+        return null;
+    }
+
+    public SteveException validateSecurityEvent(SecurityEventNotification params) {
+        long deltaMillis = operationalDelta.toMillis();
+        if (params.getTimestamp().getMillis() > clock.instant().toEpochMilli() + deltaMillis) {
+            return new SteveException("SecurityEventNotification.timestamp is in the future");
         }
 
         return null;

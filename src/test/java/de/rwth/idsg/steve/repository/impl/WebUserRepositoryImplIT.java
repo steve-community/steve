@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.WebUserRepository;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import jooq.steve.db.tables.records.WebUserRecord;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
@@ -33,17 +32,19 @@ import java.util.UUID;
 import static jooq.steve.db.Tables.WEB_USER;
 import static org.jooq.JSON.json;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class WebUserRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
     private DSLContext dslContext;
-
     @Autowired
     private WebUserRepository webUserRepository;
 
     @BeforeEach
     public void setup() {
-        new __DatabasePreparer__(dslContext).cleanUp();
+        resetDatabase(dslContext);
     }
 
     @Test

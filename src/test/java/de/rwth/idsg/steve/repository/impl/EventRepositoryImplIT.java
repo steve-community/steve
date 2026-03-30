@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetLogParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SignedUpdateFirmwareParams;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static jooq.steve.db.tables.ChargeBoxFirmwareUpdateJob.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
+import static jooq.steve.db.tables.ChargeBoxFirmwareUpdateEvent.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
 import static jooq.steve.db.tables.ChargeBoxLogUploadJob.CHARGE_BOX_LOG_UPLOAD_JOB;
+import static jooq.steve.db.tables.ChargeBoxLogUploadEvent.CHARGE_BOX_LOG_UPLOAD_EVENT;
+import static jooq.steve.db.tables.ChargeBoxSecurityEvent.CHARGE_BOX_SECURITY_EVENT;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class EventRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -49,21 +56,32 @@ public class EventRepositoryImplIT extends AbstractRepositoryITBase {
     @Test
     public void insertSecurityEvent() {
         assertNoDatabaseException(() -> repository.insertSecurityEvent(KNOWN_CHARGE_BOX_ID, "event", DateTime.now(), "info"));
+
+        Integer count = dslContext.selectCount()
+            .from(CHARGE_BOX_SECURITY_EVENT)
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void getSecurityEvents() {
-        assertNoDatabaseException(() -> repository.getSecurityEvents(new SecurityEventsQueryForm()));
+        repository.insertSecurityEvent(KNOWN_CHARGE_BOX_ID, "event", DateTime.now(), "info");
+        var rows = assertNoDatabaseException(() -> repository.getSecurityEvents(new SecurityEventsQueryForm()));
+        Assertions.assertFalse(rows.isEmpty());
     }
 
     @Test
     public void insertFirmwareUpdateJob() {
-        assertNoDatabaseException(() -> repository.insertFirmwareUpdateJob(signedUpdateFirmwareParams()));
+        Integer jobId = assertNoDatabaseException(() -> repository.insertFirmwareUpdateJob(signedUpdateFirmwareParams()));
+        Assertions.assertNotNull(jobId);
     }
 
     @Test
     public void getFirmwareUpdateDetails() {
-        assertNoDatabaseException(() -> repository.getFirmwareUpdateDetails(1));
+        Integer jobId = repository.insertFirmwareUpdateJob(signedUpdateFirmwareParams());
+        var row = assertNoDatabaseException(() -> repository.getFirmwareUpdateDetails(jobId));
+        Assertions.assertNotNull(row);
+        Assertions.assertEquals(jobId, row.getJobId());
     }
 
     @Test
@@ -75,16 +93,26 @@ public class EventRepositoryImplIT extends AbstractRepositoryITBase {
             .getJobId();
 
         assertNoDatabaseException(() -> repository.insertFirmwareUpdateStatus(KNOWN_CHARGE_BOX_ID, jobId, "Accepted", DateTime.now()));
+
+        Integer count = dslContext.selectCount()
+            .from(CHARGE_BOX_FIRMWARE_UPDATE_EVENT)
+            .where(CHARGE_BOX_FIRMWARE_UPDATE_EVENT.JOB_ID.eq(jobId))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void insertLogUploadJob() {
-        assertNoDatabaseException(() -> repository.insertLogUploadJob(getLogParams()));
+        Integer jobId = assertNoDatabaseException(() -> repository.insertLogUploadJob(getLogParams()));
+        Assertions.assertNotNull(jobId);
     }
 
     @Test
     public void getLogUploadDetails() {
-        assertNoDatabaseException(() -> repository.getLogUploadDetails(1));
+        Integer jobId = repository.insertLogUploadJob(getLogParams());
+        var row = assertNoDatabaseException(() -> repository.getLogUploadDetails(jobId));
+        Assertions.assertNotNull(row);
+        Assertions.assertEquals(jobId, row.getJobId());
     }
 
     @Test
@@ -96,11 +124,21 @@ public class EventRepositoryImplIT extends AbstractRepositoryITBase {
             .getJobId();
 
         assertNoDatabaseException(() -> repository.insertLogUploadStatus(KNOWN_CHARGE_BOX_ID, jobId, "Accepted", DateTime.now()));
+
+        Integer count = dslContext.selectCount()
+            .from(CHARGE_BOX_LOG_UPLOAD_EVENT)
+            .where(CHARGE_BOX_LOG_UPLOAD_EVENT.JOB_ID.eq(jobId))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void getStatusEvents() {
-        assertNoDatabaseException(() -> repository.getStatusEvents(new StatusEventsQueryForm()));
+        Integer jobId = repository.insertFirmwareUpdateJob(signedUpdateFirmwareParams());
+        repository.insertFirmwareUpdateStatus(KNOWN_CHARGE_BOX_ID, jobId, "Accepted", DateTime.now());
+
+        var rows = assertNoDatabaseException(() -> repository.getStatusEvents(new StatusEventsQueryForm()));
+        Assertions.assertFalse(rows.isEmpty());
     }
 
     private static SignedUpdateFirmwareParams signedUpdateFirmwareParams() {

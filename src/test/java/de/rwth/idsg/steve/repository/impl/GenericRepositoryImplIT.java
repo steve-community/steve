@@ -20,10 +20,14 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.GenericRepository;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class GenericRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -43,12 +47,13 @@ public class GenericRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getStats() {
-        assertNoDatabaseException(repository::getStats);
+        var stats = assertNoDatabaseException(repository::getStats);
+        Assertions.assertNotNull(stats);
     }
 
     @Test
     public void getDBVersion() {
-        assertNoDatabaseException(repository::getDBVersion);
+        var version = assertNoDatabaseException(repository::getDBVersion);
+        Assertions.assertNotNull(version);
     }
 }
-

@@ -25,12 +25,18 @@ import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.jooq.Record1;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Reservation.RESERVATION;
+import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -45,46 +51,116 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getReservations() {
-        assertNoDatabaseException(() -> repository.getReservations(new ReservationQueryForm()));
+        var rows = assertNoDatabaseException(() -> repository.getReservations(new ReservationQueryForm()));
+        Assertions.assertNotNull(rows);
     }
 
     @Test
     public void getActiveReservationIds() {
-        assertNoDatabaseException(() -> repository.getActiveReservationIds(KNOWN_CHARGE_BOX_ID));
+        var ids = assertNoDatabaseException(() -> repository.getActiveReservationIds(KNOWN_CHARGE_BOX_ID));
+        Assertions.assertNotNull(ids);
     }
 
     @Test
     public void insert() {
-        assertNoDatabaseException(() -> repository.insert(insertReservationParams()));
+        Integer id = assertNoDatabaseException(() -> repository.insert(insertReservationParams()));
+        Assertions.assertNotNull(id);
+
+        Integer count = dslContext.selectCount()
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void delete() {
-        assertNoDatabaseException(() -> repository.delete(1));
+        Integer id = repository.insert(insertReservationParams());
+        assertNoDatabaseException(() -> repository.delete(id));
+
+        Integer count = dslContext.selectCount()
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 
     @Test
     public void accepted() {
-        assertNoDatabaseException(() -> repository.accepted(1));
+        Integer id = repository.insert(insertReservationParams());
+        assertNoDatabaseException(() -> repository.accepted(id));
+
+        String status = dslContext.select(RESERVATION.STATUS)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.STATUS);
+        Assertions.assertEquals("ACCEPTED", status);
     }
 
     @Test
     public void cancelled() {
-        assertNoDatabaseException(() -> repository.cancelled(1));
+        Integer id = repository.insert(insertReservationParams());
+        assertNoDatabaseException(() -> repository.cancelled(id));
+
+        String status = dslContext.select(RESERVATION.STATUS)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.STATUS);
+        Assertions.assertEquals("CANCELLED", status);
     }
 
     @Test
     public void used() {
-        Select<Record1<Integer>> connectorPkSelect = dslContext.select(CONNECTOR.CONNECTOR_PK)
+        Integer id = repository.insert(insertReservationParams());
+        repository.accepted(id);
+
+        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
             .from(CONNECTOR)
             .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1));
-        assertNoDatabaseException(() -> repository.used(connectorPkSelect, KNOWN_OCPP_TAG, 1, 1));
+            .and(CONNECTOR.CONNECTOR_ID.eq(1))
+            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Assertions.assertNotNull(connectorPk);
+
+        Integer transactionPk = dslContext.insertInto(TRANSACTION_START)
+            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
+            .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
+            .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(1))
+            .set(TRANSACTION_START.START_VALUE, "100")
+            .returning(TRANSACTION_START.TRANSACTION_PK)
+            .fetchOne()
+            .getTransactionPk();
+
+        Select<Record1<Integer>> connectorPkSelect = dslContext.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CONNECTOR_PK.eq(connectorPk));
+        assertNoDatabaseException(() -> repository.used(connectorPkSelect, KNOWN_OCPP_TAG, id, transactionPk));
+
+        String status = dslContext.select(RESERVATION.STATUS)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.STATUS);
+        Assertions.assertEquals("USED", status);
+
+        Integer linkedTransactionPk = dslContext.select(RESERVATION.TRANSACTION_PK)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.TRANSACTION_PK);
+        Assertions.assertEquals(transactionPk, linkedTransactionPk);
     }
 
     @Test
     public void cancelActiveReservations() {
+        Integer id = repository.insert(insertReservationParams());
+        repository.accepted(id);
+
         assertNoDatabaseException(() -> repository.cancelActiveReservations(KNOWN_CHARGE_BOX_ID, 1));
+
+        String status = dslContext.select(RESERVATION.STATUS)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.STATUS);
+        Assertions.assertEquals("CANCELLED", status);
     }
 
     private static InsertReservationParams insertReservationParams() {

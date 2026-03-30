@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.DataImportExportRepository;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ import java.io.StringWriter;
 
 import static jooq.steve.db.tables.WebUser.WEB_USER;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class DataImportExportRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -43,7 +47,9 @@ public class DataImportExportRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void exportCsv() {
-        assertNoDatabaseException(() -> repository.exportCsv(new StringWriter(), WEB_USER));
+        StringWriter out = new StringWriter();
+        assertNoDatabaseException(() -> repository.exportCsv(out, WEB_USER));
+        Assertions.assertNotNull(out.toString());
     }
 
     @Test
@@ -58,7 +64,9 @@ public class DataImportExportRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void importCsv() {
+        Integer before = dslContext.selectCount().from(WEB_USER).fetchOne(0, int.class);
         assertNoDatabaseException(() -> repository.importCsv(new ByteArrayInputStream(new byte[0]), WEB_USER));
+        Integer after = dslContext.selectCount().from(WEB_USER).fetchOne(0, int.class);
+        Assertions.assertEquals(before, after);
     }
 }
-

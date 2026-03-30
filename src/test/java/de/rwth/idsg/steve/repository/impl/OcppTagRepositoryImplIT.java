@@ -21,11 +21,18 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
+import jooq.steve.db.tables.records.OcppTagRecord;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
+
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -40,52 +47,70 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getOverview() {
-        assertNoDatabaseException(() -> repository.getOverview(new OcppTagQueryForm()));
+        var rows = assertNoDatabaseException(() -> repository.getOverview(new OcppTagQueryForm()));
+        Assertions.assertNotNull(rows);
     }
 
     @Test
     public void getRecords() {
-        assertNoDatabaseException(repository::getRecords);
+        var rows = assertNoDatabaseException(() -> repository.getRecords());
+        Assertions.assertNotNull(rows);
     }
 
     @Test
     public void getRecordsByIdTagList() {
-        assertNoDatabaseException(() -> repository.getRecords(java.util.List.of(KNOWN_OCPP_TAG)));
+        var rows = assertNoDatabaseException(() -> repository.getRecords(java.util.List.of(KNOWN_OCPP_TAG)));
+        Assertions.assertNotNull(rows);
     }
 
     @Test
     public void getRecordByIdTag() {
-        assertNoDatabaseException(() -> repository.getRecord(KNOWN_OCPP_TAG));
+        var row = assertNoDatabaseException(() -> repository.getRecord(KNOWN_OCPP_TAG));
+        Assertions.assertNotNull(row);
+        Assertions.assertEquals(KNOWN_OCPP_TAG, row.getIdTag());
     }
 
     @Test
     public void getRecordByPk() {
-        assertNoDatabaseException(() -> repository.getRecord(1));
+        Integer pk = dslContext.select(OCPP_TAG.OCPP_TAG_PK)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.ID_TAG.eq(KNOWN_OCPP_TAG))
+            .fetchOne(OCPP_TAG.OCPP_TAG_PK);
+        Assertions.assertNotNull(pk);
+
+        var row = assertNoDatabaseException(() -> repository.getRecord(pk));
+        Assertions.assertNotNull(row);
+        Assertions.assertEquals(KNOWN_OCPP_TAG, row.getIdTag());
     }
 
     @Test
     public void getIdTags() {
-        assertNoDatabaseException(repository::getIdTags);
+        var tags = assertNoDatabaseException(() -> repository.getIdTags());
+        Assertions.assertTrue(tags.contains(KNOWN_OCPP_TAG));
     }
 
     @Test
     public void getIdTagsByIdTagList() {
-        assertNoDatabaseException(() -> repository.getIdTags(java.util.List.of(KNOWN_OCPP_TAG)));
+        var tags = assertNoDatabaseException(() -> repository.getIdTags(java.util.List.of(KNOWN_OCPP_TAG)));
+        Assertions.assertTrue(tags.contains(KNOWN_OCPP_TAG));
     }
 
     @Test
     public void getIdTagsWithoutUser() {
-        assertNoDatabaseException(repository::getIdTagsWithoutUser);
+        var tags = assertNoDatabaseException(repository::getIdTagsWithoutUser);
+        Assertions.assertNotNull(tags);
     }
 
     @Test
     public void getActiveIdTags() {
-        assertNoDatabaseException(repository::getActiveIdTags);
+        var tags = assertNoDatabaseException(repository::getActiveIdTags);
+        Assertions.assertNotNull(tags);
     }
 
     @Test
     public void getParentIdTags() {
-        assertNoDatabaseException(repository::getParentIdTags);
+        var tags = assertNoDatabaseException(repository::getParentIdTags);
+        Assertions.assertNotNull(tags);
     }
 
     @Test
@@ -95,27 +120,59 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void addOcppTagList() {
-        assertNoDatabaseException(() -> repository.addOcppTagList(java.util.List.of(uniqueId("tag"))));
+        String idTag = uniqueId("tag");
+        assertNoDatabaseException(() -> repository.addOcppTagList(java.util.List.of(idTag)));
+
+        Integer count = dslContext.selectCount()
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.ID_TAG.eq(idTag))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void addOcppTag() {
         var form = new OcppTagForm();
         form.setIdTag(uniqueId("tag"));
-        assertNoDatabaseException(() -> repository.addOcppTag(form));
+        Integer pk = assertNoDatabaseException(() -> repository.addOcppTag(form));
+        Assertions.assertNotNull(pk);
     }
 
     @Test
     public void updateOcppTag() {
+        String initial = uniqueId("tag");
+        Integer pk = dslContext.insertInto(OCPP_TAG)
+            .set(OCPP_TAG.ID_TAG, initial)
+            .returning(OCPP_TAG.OCPP_TAG_PK)
+            .fetchOne()
+            .getOcppTagPk();
+
         var form = new OcppTagForm();
-        form.setOcppTagPk(1);
-        form.setIdTag(KNOWN_OCPP_TAG);
+        form.setOcppTagPk(pk);
+        form.setNote("new note");
         assertNoDatabaseException(() -> repository.updateOcppTag(form));
+
+        OcppTagRecord updated = dslContext.selectFrom(OCPP_TAG)
+            .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
+            .fetchOne();
+        Assertions.assertEquals(form.getNote(), updated.getNote());
     }
 
     @Test
     public void deleteOcppTag() {
-        assertNoDatabaseException(() -> repository.deleteOcppTag(1));
+        String idTag = uniqueId("tag");
+        Integer pk = dslContext.insertInto(OCPP_TAG)
+            .set(OCPP_TAG.ID_TAG, idTag)
+            .returning(OCPP_TAG.OCPP_TAG_PK)
+            .fetchOne()
+            .getOcppTagPk();
+
+        assertNoDatabaseException(() -> repository.deleteOcppTag(pk));
+
+        Integer count = dslContext.selectCount()
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 }
-

@@ -22,12 +22,19 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.StringWriter;
 
+import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
+
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -42,27 +49,49 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getTransactions() {
-        assertNoDatabaseException(() -> repository.getTransactions(new TransactionQueryForm()));
+        var result = assertNoDatabaseException(() -> repository.getTransactions(new TransactionQueryForm()));
+        Assertions.assertNotNull(result);
     }
 
     @Test
     public void writeTransactionsCSV() {
-        assertNoDatabaseException(() -> repository.writeTransactionsCSV(new TransactionQueryForm(), new StringWriter()));
+        StringWriter writer = new StringWriter();
+        assertNoDatabaseException(() -> repository.writeTransactionsCSV(new TransactionQueryForm(), writer));
+        Assertions.assertNotNull(writer.toString());
     }
 
     @Test
     public void getActiveTransactionIds() {
-        assertNoDatabaseException(() -> repository.getActiveTransactionIds(KNOWN_CHARGE_BOX_ID));
+        var ids = assertNoDatabaseException(() -> repository.getActiveTransactionIds(KNOWN_CHARGE_BOX_ID));
+        Assertions.assertNotNull(ids);
     }
 
     @Test
     public void getDetails() {
-        assertNoDatabaseException(() -> repository.getDetails(1));
+        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(CONNECTOR.CONNECTOR_ID.eq(1))
+            .fetchOne(CONNECTOR.CONNECTOR_PK);
+
+        Integer txId = dslContext.insertInto(TRANSACTION_START)
+            .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
+            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
+            .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(5))
+            .set(TRANSACTION_START.START_VALUE, "100")
+            .returning(TRANSACTION_START.TRANSACTION_PK)
+            .fetchOne()
+            .getTransactionPk();
+
+        var details = assertNoDatabaseException(() -> repository.getDetails(txId));
+        Assertions.assertNotNull(details);
+        Assertions.assertEquals(txId, details.getTransaction().getId());
     }
 
     @Test
     public void getStoppedTransactions() {
-        assertNoDatabaseException(() -> repository.getStoppedTransactions(DateTime.now().minusDays(1), DateTime.now()));
+        var result = assertNoDatabaseException(() -> repository.getStoppedTransactions(DateTime.now().minusDays(1), DateTime.now()));
+        Assertions.assertNotNull(result);
     }
 }
-

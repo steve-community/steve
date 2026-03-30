@@ -23,10 +23,17 @@ import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static jooq.steve.db.tables.User.USER;
+import static org.jooq.impl.DSL.max;
+
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class UserRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -41,29 +48,60 @@ public class UserRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getOverview() {
-        assertNoDatabaseException(() -> repository.getOverview(new UserQueryForm()));
+        var rows = assertNoDatabaseException(() -> repository.getOverview(new UserQueryForm()));
+        Assertions.assertNotNull(rows);
     }
 
     @Test
     public void getDetails() {
-        assertNoDatabaseException(() -> repository.getDetails(1));
+        repository.add(userForm());
+        Integer pk = dslContext.select(max(USER.USER_PK)).from(USER).fetchOne(0, int.class);
+
+        var details = assertNoDatabaseException(() -> repository.getDetails(pk));
+        Assertions.assertNotNull(details);
+        Assertions.assertEquals("Repo", details.getUserRecord().getFirstName());
     }
 
     @Test
     public void add() {
-        assertNoDatabaseException(() -> repository.add(userForm()));
+        repository.add(userForm());
+        Integer count = dslContext.selectCount()
+            .from(USER)
+            .where(USER.FIRST_NAME.eq("Repo"))
+            .and(USER.LAST_NAME.eq("IT"))
+            .fetchOne(0, int.class);
+        Assertions.assertTrue(count >= 1);
     }
 
     @Test
     public void update() {
+        repository.add(userForm());
+        Integer pk = dslContext.select(max(USER.USER_PK)).from(USER).fetchOne(0, int.class);
+
         var form = userForm();
-        form.setUserPk(1);
-        assertNoDatabaseException(() -> repository.update(form));
+        form.setUserPk(pk);
+        form.setFirstName("Updated");
+        repository.update(form);
+
+        String firstName = dslContext.select(USER.FIRST_NAME)
+            .from(USER)
+            .where(USER.USER_PK.eq(pk))
+            .fetchOne(USER.FIRST_NAME);
+        Assertions.assertEquals("Updated", firstName);
     }
 
     @Test
     public void delete() {
-        assertNoDatabaseException(() -> repository.delete(1));
+        repository.add(userForm());
+        Integer pk = dslContext.select(max(USER.USER_PK)).from(USER).fetchOne(0, int.class);
+
+        repository.delete(pk);
+
+        Integer count = dslContext.selectCount()
+            .from(USER)
+            .where(USER.USER_PK.eq(pk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 
     private static UserForm userForm() {

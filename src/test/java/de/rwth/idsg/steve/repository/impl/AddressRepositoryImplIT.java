@@ -20,14 +20,19 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.web.dto.Address;
+import jooq.steve.db.tables.records.AddressRecord;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static jooq.steve.db.tables.Address.ADDRESS;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class AddressRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -42,17 +47,48 @@ public class AddressRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void get() {
-        assertNoDatabaseException(() -> repository.get(dslContext, null));
+        Integer pk = dslContext.insertInto(ADDRESS)
+            .set(ADDRESS.CITY, "Aachen")
+            .returning(ADDRESS.ADDRESS_PK)
+            .fetchOne()
+            .getAddressPk();
+
+        AddressRecord record = assertNoDatabaseException(() -> repository.get(dslContext, pk));
+        Assertions.assertNotNull(record);
+        Assertions.assertEquals("Aachen", record.getCity());
     }
 
     @Test
     public void updateOrInsert() {
-        assertNoDatabaseException(() -> repository.updateOrInsert(dslContext, new Address()));
+        var address = new Address();
+        address.setCity("Cologne");
+        address.setStreet("Main");
+
+        Integer pk = assertNoDatabaseException(() -> repository.updateOrInsert(dslContext, address));
+        Assertions.assertNotNull(pk);
+
+        String city = dslContext.select(ADDRESS.CITY)
+            .from(ADDRESS)
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .fetchOne(ADDRESS.CITY);
+        Assertions.assertEquals("Cologne", city);
     }
 
     @Test
     public void delete() {
+        Integer pk = dslContext.insertInto(ADDRESS)
+            .set(ADDRESS.CITY, "Berlin")
+            .returning(ADDRESS.ADDRESS_PK)
+            .fetchOne()
+            .getAddressPk();
+
         SelectConditionStep<?> select = dslContext.select(ADDRESS.ADDRESS_PK).from(ADDRESS).where(ADDRESS.ADDRESS_PK.ge(0));
         assertNoDatabaseException(() -> repository.delete(dslContext, (SelectConditionStep) select));
+
+        Integer count = dslContext.selectCount()
+            .from(ADDRESS)
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 }

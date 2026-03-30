@@ -29,15 +29,23 @@ import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
+import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
+import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -53,36 +61,71 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     @Test
     public void updateChargebox() {
         assertNoDatabaseException(() -> repository.updateChargebox(updateChargeboxParams()));
+        String vendor = dslContext.select(CHARGE_BOX.CHARGE_POINT_VENDOR)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.CHARGE_POINT_VENDOR);
+        Assertions.assertEquals("vendor", vendor);
     }
 
     @Test
     public void updateOcppProtocol() {
         assertNoDatabaseException(() -> repository.updateOcppProtocol(KNOWN_CHARGE_BOX_ID, OcppProtocol.V_16_JSON));
+        String protocol = dslContext.select(CHARGE_BOX.OCPP_PROTOCOL)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.OCPP_PROTOCOL);
+        Assertions.assertEquals(OcppProtocol.V_16_JSON.getCompositeValue(), protocol);
     }
 
     @Test
     public void updateEndpointAddress() {
         assertNoDatabaseException(() -> repository.updateEndpointAddress(KNOWN_CHARGE_BOX_ID, "ws://example"));
+        String endpoint = dslContext.select(CHARGE_BOX.ENDPOINT_ADDRESS)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.ENDPOINT_ADDRESS);
+        Assertions.assertEquals("ws://example", endpoint);
     }
 
     @Test
     public void updateChargeboxFirmwareStatus() {
         assertNoDatabaseException(() -> repository.updateChargeboxFirmwareStatus(KNOWN_CHARGE_BOX_ID, "Downloading"));
+        String status = dslContext.select(CHARGE_BOX.FW_UPDATE_STATUS)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.FW_UPDATE_STATUS);
+        Assertions.assertEquals("Downloading", status);
     }
 
     @Test
     public void updateChargeboxDiagnosticsStatus() {
         assertNoDatabaseException(() -> repository.updateChargeboxDiagnosticsStatus(KNOWN_CHARGE_BOX_ID, "Idle"));
+        String status = dslContext.select(CHARGE_BOX.DIAGNOSTICS_STATUS)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.DIAGNOSTICS_STATUS);
+        Assertions.assertEquals("Idle", status);
     }
 
     @Test
     public void updateChargeboxHeartbeat() {
-        assertNoDatabaseException(() -> repository.updateChargeboxHeartbeat(KNOWN_CHARGE_BOX_ID, DateTime.now()));
+        DateTime ts = DateTime.now();
+        assertNoDatabaseException(() -> repository.updateChargeboxHeartbeat(KNOWN_CHARGE_BOX_ID, ts));
+        DateTime stored = dslContext.select(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP);
+        Assertions.assertNotNull(stored);
     }
 
     @Test
     public void insertConnectorStatus() {
         assertNoDatabaseException(() -> repository.insertConnectorStatus(connectorStatusParams()));
+        Integer count = dslContext.selectCount()
+            .from(CONNECTOR_STATUS)
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
@@ -100,24 +143,46 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getTransaction() {
-        assertNoDatabaseException(() -> repository.getTransaction(KNOWN_CHARGE_BOX_ID, 1));
+        int txId = repository.insertTransaction(insertTransactionParams());
+        var tx = assertNoDatabaseException(() -> repository.getTransaction(KNOWN_CHARGE_BOX_ID, txId));
+        Assertions.assertNotNull(tx);
+        Assertions.assertEquals(txId, tx.getTransactionPk());
     }
 
     @Test
     public void insertTransaction() {
-        assertNoDatabaseException(() -> repository.insertTransaction(insertTransactionParams()));
+        Integer txId = assertNoDatabaseException(() -> repository.insertTransaction(insertTransactionParams()));
+        Assertions.assertNotNull(txId);
+
+        Integer count = dslContext.selectCount()
+            .from(TRANSACTION_START)
+            .where(TRANSACTION_START.TRANSACTION_PK.eq(txId))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void updateTransaction() {
-        seedTransactionStart(1);
-        assertNoDatabaseException(() -> repository.updateTransaction(updateTransactionParams(1)));
+        int txId = repository.insertTransaction(insertTransactionParams());
+        assertNoDatabaseException(() -> repository.updateTransaction(updateTransactionParams(txId)));
+
+        Integer count = dslContext.selectCount()
+            .from(TRANSACTION_STOP)
+            .where(TRANSACTION_STOP.TRANSACTION_PK.eq(txId))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void updateTransactionAsFailed() {
-        seedTransactionStart(1);
-        assertNoDatabaseException(() -> repository.updateTransactionAsFailed(updateTransactionParams(1), new RuntimeException("it")));
+        int txId = repository.insertTransaction(insertTransactionParams());
+        assertNoDatabaseException(() -> repository.updateTransactionAsFailed(updateTransactionParams(txId), new RuntimeException("it")));
+
+        Integer count = dslContext.selectCount()
+            .from(TRANSACTION_STOP_FAILED)
+            .where(TRANSACTION_STOP_FAILED.TRANSACTION_PK.eq(txId))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     private void seedTransactionStart(int transactionId) {

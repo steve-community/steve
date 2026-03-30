@@ -32,6 +32,9 @@ import java.util.UUID;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
@@ -45,6 +48,11 @@ abstract class AbstractRepositoryITBase {
         void run() throws Exception;
     }
 
+    @FunctionalInterface
+    protected interface ThrowingSupplier<T> {
+        T get() throws Exception;
+    }
+
     protected static void assertNoDatabaseException(ThrowingRunnable runnable) {
         try {
             runnable.run();
@@ -52,6 +60,18 @@ abstract class AbstractRepositoryITBase {
             if (containsDatabaseException(t)) {
                 Assertions.fail("Database exception", t);
             }
+            Assertions.fail("Unexpected exception", t);
+        }
+    }
+
+    protected static <T> T assertNoDatabaseException(ThrowingSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Throwable t) {
+            if (containsDatabaseException(t)) {
+                Assertions.fail("Database exception", t);
+            }
+            return Assertions.fail("Unexpected exception", t);
         }
     }
 

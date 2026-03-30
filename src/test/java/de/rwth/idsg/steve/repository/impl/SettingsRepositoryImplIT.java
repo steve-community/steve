@@ -21,12 +21,16 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class SettingsRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -41,42 +45,62 @@ public class SettingsRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getForm() {
-        assertNoDatabaseException(repository::getForm);
+        var form = assertNoDatabaseException(repository::getForm);
+        Assertions.assertNotNull(form);
     }
 
     @Test
     public void getOcppSettings() {
-        assertNoDatabaseException(repository::getOcppSettings);
+        var settings = assertNoDatabaseException(repository::getOcppSettings);
+        Assertions.assertNotNull(settings);
     }
 
     @Test
     public void getMailSettings() {
-        assertNoDatabaseException(repository::getMailSettings);
+        var settings = assertNoDatabaseException(repository::getMailSettings);
+        Assertions.assertNotNull(settings);
     }
 
     @Test
     public void getHeartbeatIntervalInSeconds() {
-        assertNoDatabaseException(repository::getHeartbeatIntervalInSeconds);
+        Integer heartbeat = assertNoDatabaseException(repository::getHeartbeatIntervalInSeconds);
+        Assertions.assertTrue(heartbeat >= 0);
     }
 
     @Test
     public void getHoursToExpire() {
-        assertNoDatabaseException(repository::getHoursToExpire);
+        Integer hours = assertNoDatabaseException(repository::getHoursToExpire);
+        Assertions.assertTrue(hours >= 0);
     }
 
     @Test
     public void updateSettingsForm() {
-        assertNoDatabaseException(() -> repository.update(settingsForm()));
+        SettingsForm form = settingsForm();
+        assertNoDatabaseException(() -> repository.update(form));
+
+        var after = repository.getOcppSettings();
+        Assertions.assertEquals(form.getOcppSettings().getHeartbeat(), after.getHeartbeat());
+        Assertions.assertEquals(form.getOcppSettings().getExpiration(), after.getExpiration());
     }
 
     @Test
     public void updateOcppSettings() {
-        assertNoDatabaseException(() -> repository.update(settingsForm().getOcppSettings()));
+        SettingsForm form = settingsForm();
+        assertNoDatabaseException(() -> repository.update(form.getOcppSettings()));
+
+        var after = repository.getOcppSettings();
+        Assertions.assertEquals(form.getOcppSettings().getHeartbeat(), after.getHeartbeat());
+        Assertions.assertEquals(form.getOcppSettings().getExpiration(), after.getExpiration());
     }
 
     @Test
     public void updateMailSettings() {
-        assertNoDatabaseException(() -> repository.update(settingsForm().getMailSettings()));
+        SettingsForm form = settingsForm();
+        assertNoDatabaseException(() -> repository.update(form.getMailSettings()));
+
+        var after = repository.getMailSettings();
+        Assertions.assertEquals(form.getMailSettings().getMailHost(), after.getMailHost());
+        Assertions.assertEquals(form.getMailSettings().getRecipients(), after.getRecipients());
     }
 
     private static SettingsForm settingsForm() {

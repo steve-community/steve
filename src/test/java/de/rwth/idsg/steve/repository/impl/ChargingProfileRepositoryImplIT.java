@@ -24,12 +24,19 @@ import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
+import static jooq.steve.db.tables.ChargingProfile.CHARGING_PROFILE;
+import static jooq.steve.db.tables.ConnectorChargingProfile.CONNECTOR_CHARGING_PROFILE;
+
+/**
+ * Created with assistance from GPT-5.3-Codex
+ */
 public class ChargingProfileRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Autowired
@@ -44,59 +51,113 @@ public class ChargingProfileRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void setProfile() {
-        assertNoDatabaseException(() -> repository.setProfile(1, KNOWN_CHARGE_BOX_ID, 1));
+        Integer profilePk = repository.add(chargingProfileForm());
+        assertNoDatabaseException(() -> repository.setProfile(profilePk, KNOWN_CHARGE_BOX_ID, 1));
+
+        Integer count = dslContext.selectCount()
+            .from(CONNECTOR_CHARGING_PROFILE)
+            .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(1, count);
     }
 
     @Test
     public void clearProfileByPkAndChargeBox() {
-        assertNoDatabaseException(() -> repository.clearProfile(1, KNOWN_CHARGE_BOX_ID));
+        Integer profilePk = repository.add(chargingProfileForm());
+        repository.setProfile(profilePk, KNOWN_CHARGE_BOX_ID, 1);
+
+        assertNoDatabaseException(() -> repository.clearProfile(profilePk, KNOWN_CHARGE_BOX_ID));
+
+        Integer count = dslContext.selectCount()
+            .from(CONNECTOR_CHARGING_PROFILE)
+            .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 
     @Test
     public void clearProfileByFilter() {
+        Integer profilePk = repository.add(chargingProfileForm());
+        repository.setProfile(profilePk, KNOWN_CHARGE_BOX_ID, 1);
+
         assertNoDatabaseException(() -> repository.clearProfile(KNOWN_CHARGE_BOX_ID, 1, ChargingProfilePurposeType.TX_PROFILE, 0));
+
+        Integer count = dslContext.selectCount()
+            .from(CONNECTOR_CHARGING_PROFILE)
+            .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 
     @Test
     public void getAssignments() {
-        assertNoDatabaseException(() -> repository.getAssignments(new ChargingProfileAssignmentQueryForm()));
+        Integer profilePk = repository.add(chargingProfileForm());
+        repository.setProfile(profilePk, KNOWN_CHARGE_BOX_ID, 1);
+
+        var rows = assertNoDatabaseException(() -> repository.getAssignments(new ChargingProfileAssignmentQueryForm()));
+        Assertions.assertFalse(rows.isEmpty());
     }
 
     @Test
     public void getBasicInfo() {
-        assertNoDatabaseException(repository::getBasicInfo);
+        repository.add(chargingProfileForm());
+        var rows = assertNoDatabaseException(repository::getBasicInfo);
+        Assertions.assertFalse(rows.isEmpty());
     }
 
     @Test
     public void getOverview() {
-        assertNoDatabaseException(() -> repository.getOverview(new ChargingProfileQueryForm()));
+        repository.add(chargingProfileForm());
+        var rows = assertNoDatabaseException(() -> repository.getOverview(new ChargingProfileQueryForm()));
+        Assertions.assertFalse(rows.isEmpty());
     }
 
     @Test
     public void getDetails() {
-        assertNoDatabaseException(() -> repository.getDetails(1));
+        Integer profilePk = repository.add(chargingProfileForm());
+        var details = assertNoDatabaseException(() -> repository.getDetails(profilePk));
+        Assertions.assertNotNull(details);
+        Assertions.assertEquals(profilePk, details.getProfile().getChargingProfilePk());
     }
 
     @Test
     public void exists() {
-        assertNoDatabaseException(() -> repository.exists(1));
+        Integer profilePk = repository.add(chargingProfileForm());
+        boolean exists = assertNoDatabaseException(() -> repository.exists(profilePk));
+        Assertions.assertTrue(exists);
     }
 
     @Test
     public void add() {
-        assertNoDatabaseException(() -> repository.add(chargingProfileForm()));
+        Integer profilePk = assertNoDatabaseException(() -> repository.add(chargingProfileForm()));
+        Assertions.assertNotNull(profilePk);
     }
 
     @Test
     public void update() {
+        Integer profilePk = repository.add(chargingProfileForm());
         var form = chargingProfileForm();
-        form.setChargingProfilePk(1);
+        form.setChargingProfilePk(profilePk);
+        form.setDescription("updated-profile");
         assertNoDatabaseException(() -> repository.update(form));
+
+        String description = dslContext.select(CHARGING_PROFILE.DESCRIPTION)
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne(CHARGING_PROFILE.DESCRIPTION);
+        Assertions.assertEquals("updated-profile", description);
     }
 
     @Test
     public void delete() {
-        assertNoDatabaseException(() -> repository.delete(1));
+        Integer profilePk = repository.add(chargingProfileForm());
+        assertNoDatabaseException(() -> repository.delete(profilePk));
+
+        Integer count = dslContext.selectCount()
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne(0, int.class);
+        Assertions.assertEquals(0, count);
     }
 
     private static ChargingProfileForm chargingProfileForm() {

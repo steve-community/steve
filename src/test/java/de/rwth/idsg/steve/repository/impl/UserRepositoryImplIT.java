@@ -1,0 +1,83 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2026 SteVe Community Team
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package de.rwth.idsg.steve.repository.impl;
+
+import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.web.dto.Address;
+import de.rwth.idsg.steve.web.dto.UserForm;
+import de.rwth.idsg.steve.web.dto.UserQueryForm;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Transactional
+public class UserRepositoryImplIT extends AbstractRepositoryITBase {
+
+    @Autowired
+    private DSLContext dslContext;
+    @Autowired
+    private UserRepository repository;
+
+    @BeforeEach
+    public void setup() {
+        resetDatabase(dslContext);
+    }
+
+    @Test
+    public void getOverview() {
+        assertNoDatabaseException(() -> repository.getOverview(new UserQueryForm()));
+    }
+
+    @Test
+    public void getDetails() {
+        assertNoDatabaseException(() -> repository.getDetails(1));
+    }
+
+    @Test
+    public void add() {
+        assertNoDatabaseException(() -> repository.add(userForm()));
+    }
+
+    @Test
+    public void update() {
+        var form = userForm();
+        form.setUserPk(1);
+        assertNoDatabaseException(() -> repository.update(form));
+    }
+
+    @Test
+    public void delete() {
+        assertNoDatabaseException(() -> repository.delete(1));
+    }
+
+    private static UserForm userForm() {
+        var form = new UserForm();
+        form.setFirstName("Repo");
+        form.setLastName("IT");
+        form.setAddress(new Address());
+        form.setIdTagList(java.util.List.of(KNOWN_OCPP_TAG));
+        return form;
+    }
+}

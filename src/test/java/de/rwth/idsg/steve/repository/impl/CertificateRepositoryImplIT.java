@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import static jooq.steve.db.tables.Certificate.CERTIFICATE;
 import static org.mockito.Mockito.mock;
 
 @ActiveProfiles(profiles = "test")
@@ -57,7 +58,13 @@ public class CertificateRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insertCertificateSignResponse() {
-        assertNoDatabaseException(() -> repository.insertCertificateSignResponse(KNOWN_CHARGE_BOX_ID, 1, true));
+        Integer certificateId = dslContext.insertInto(CERTIFICATE)
+            .set(CERTIFICATE.CERTIFICATE_CHAIN_PEM, "chain")
+            .returning(CERTIFICATE.CERTIFICATE_ID)
+            .fetchOne()
+            .getCertificateId();
+
+        assertNoDatabaseException(() -> repository.insertCertificateSignResponse(KNOWN_CHARGE_BOX_ID, certificateId, true));
     }
 
     @Test

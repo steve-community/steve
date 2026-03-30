@@ -34,6 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static jooq.steve.db.tables.ChargeBoxFirmwareUpdateJob.CHARGE_BOX_FIRMWARE_UPDATE_JOB;
+import static jooq.steve.db.tables.ChargeBoxLogUploadJob.CHARGE_BOX_LOG_UPLOAD_JOB;
+
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
@@ -71,7 +74,13 @@ public class EventRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insertFirmwareUpdateStatus() {
-        assertNoDatabaseException(() -> repository.insertFirmwareUpdateStatus(KNOWN_CHARGE_BOX_ID, 1, "Accepted", DateTime.now()));
+        Integer jobId = dslContext.insertInto(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
+            .set(CHARGE_BOX_FIRMWARE_UPDATE_JOB.FIRMWARE_LOCATION, "https://example.com/fw.bin")
+            .returning(CHARGE_BOX_FIRMWARE_UPDATE_JOB.JOB_ID)
+            .fetchOne()
+            .getJobId();
+
+        assertNoDatabaseException(() -> repository.insertFirmwareUpdateStatus(KNOWN_CHARGE_BOX_ID, jobId, "Accepted", DateTime.now()));
     }
 
     @Test
@@ -86,7 +95,13 @@ public class EventRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insertLogUploadStatus() {
-        assertNoDatabaseException(() -> repository.insertLogUploadStatus(KNOWN_CHARGE_BOX_ID, 1, "Accepted", DateTime.now()));
+        Integer jobId = dslContext.insertInto(CHARGE_BOX_LOG_UPLOAD_JOB)
+            .set(CHARGE_BOX_LOG_UPLOAD_JOB.LOG_TYPE, "DiagnosticsLog")
+            .returning(CHARGE_BOX_LOG_UPLOAD_JOB.JOB_ID)
+            .fetchOne()
+            .getJobId();
+
+        assertNoDatabaseException(() -> repository.insertLogUploadStatus(KNOWN_CHARGE_BOX_ID, jobId, "Accepted", DateTime.now()));
     }
 
     @Test

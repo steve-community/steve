@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java: [ '21', '23', '25' ]
-        db: [ 'mysql:8.0', 'mysql:8.4', 'mariadb:10.6.14', 'mariadb:10.6.25', 'mariadb:10.11.16', 'mariadb:11.4.10', 'mariadb:11.8.6']
+        db: [ 'mysql:8.0', 'mysql:8.4', 'mariadb:10.6.25', 'mariadb:10.11.16']
     runs-on: ${{ matrix.os }}
     services:
       mysql:

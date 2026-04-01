@@ -177,7 +177,7 @@ public class CentralSystemService16_Service {
 
          if (parameters.getStatus() == SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
+                    chargeBoxIdentity, parameters.getConnectorId(), timestamp));
         }
 
         // https://github.com/steve-community/steve/issues/1398

@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2026 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -43,16 +43,8 @@
 	<form:form action="${ctxPath}/manager/reservations/query" method="get" modelAttribute="params">
 		<table class="userInput">
 			<tr>
-				<td>Reservation ID:</td>
-				<td><form:input path="reservationId" type="number" min="1"/></td>
-			</tr>
-			<tr>
-				<td>Transaction ID:</td>
-				<td><form:input path="transactionId" type="number" min="1"/></td>
-			</tr>
-			<tr>
 				<td>ChargeBox ID:</td>
-				<td><form:select path="chargeBoxId" multiple="false">
+				<td><form:select path="chargeBoxId">
 						<option value="" selected>All</option>
 						<form:options items="${cpList}"/>
 					</form:select>
@@ -60,7 +52,7 @@
 			</tr>
 			<tr>
 				<td>OCPP ID Tag:</td>
-				<td><form:select path="ocppIdTag" multiple="false">
+				<td><form:select path="ocppIdTag">
 					    <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>
@@ -68,7 +60,7 @@
 			</tr>
 			<tr>
 				<td>User ID:</td>
-				<td><form:input path="userId" type="number" min="1"/></td>
+				<td><form:input path="userId"/></td>
 			</tr>
             <tr>
                 <td>Reservation Status:</td>

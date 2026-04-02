@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -97,12 +97,6 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
-
-        // original value in the connection URL provided by the station might have a different uppercase/lowercase
-        // configuration than the one from database. functionally this is not an issue, since the entries in the
-        // database are case-insensitive. but still, let's use the value from DB from here on (and also reference it in
-        // sessions) to prevent confusion.
-        chargeBoxId = registration.get().chargeBoxId();
 
         // -------------------------------------------------------------------------
         // 2. Check Ocpp security profiles (if needed)

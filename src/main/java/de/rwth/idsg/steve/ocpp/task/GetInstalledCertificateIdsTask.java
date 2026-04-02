@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,12 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
 import ocpp._2022._02.security.CertificateHashData;
 import ocpp._2022._02.security.GetInstalledCertificateIds;
 import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
-import org.springframework.util.CollectionUtils;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.Collections;
 import java.util.List;
 
-public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, GetInstalledCertificateIdsResponse> {
+public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, String> {
 
     private final CertificateRepository certificateRepository;
 
@@ -42,19 +41,8 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
     }
 
     @Override
-    public OcppCallback<GetInstalledCertificateIdsResponse> defaultCallback() {
-        return new DefaultOcppCallback<GetInstalledCertificateIdsResponse>() {
-            @Override
-            public void success(String chargeBoxId, GetInstalledCertificateIdsResponse response) {
-                var status = response.getStatus().value();
-
-                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
-                    ? Collections.emptyList()
-                    : response.getCertificateHashData();
-
-                addNewResponse(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -69,18 +57,22 @@ public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstal
         return res -> {
             try {
                 var response = res.get();
-                String certType = params.getCertificateType().value();
+                var status = response.getStatus().value();
 
-                // Always delete existing certificates to reflect the current state on the charge point.
-                // - if certificateHashData null/empty -> station has no certs -> delete if we have some leftovers
-                // - if certificateHashData has certs -> delete anyway, since we will re-insert current snapshot
-                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
+                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
+                    ? Collections.emptyList()
+                    : response.getCertificateHashData();
 
-                if (!CollectionUtils.isEmpty(response.getCertificateHashData())) {
-                    certificateRepository.insertInstalledCertificates(chargeBoxId, certType, response.getCertificateHashData());
+                success(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
+
+                if (certificateHashData.isEmpty()) {
+                    return;
                 }
 
-                success(chargeBoxId, response);
+                String certType = params.getCertificateType().value();
+                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
+                certificateRepository.insertInstalledCertificates(chargeBoxId, certType, certificateHashData);
+
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

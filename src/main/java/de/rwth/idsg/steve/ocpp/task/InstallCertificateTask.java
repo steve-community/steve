@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,24 +23,18 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.InstallCertificateParams;
 import ocpp._2022._02.security.InstallCertificate;
 import ocpp._2022._02.security.InstallCertificateResponse;
-import ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
 
-public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, InstallCertificateStatusEnumType> {
+public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificateParams, String> {
 
     public InstallCertificateTask(InstallCertificateParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<InstallCertificateStatusEnumType> defaultCallback() {
-        return new DefaultOcppCallback<InstallCertificateStatusEnumType>() {
-            @Override
-            public void success(String chargeBoxId, InstallCertificateStatusEnumType response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -55,7 +49,8 @@ public class InstallCertificateTask extends Ocpp16AndAboveTask<InstallCertificat
     public AsyncHandler<InstallCertificateResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                var response = res.get();
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

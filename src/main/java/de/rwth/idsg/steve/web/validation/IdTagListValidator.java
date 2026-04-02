@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package de.rwth.idsg.steve.web.validation;
-
-import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -39,10 +37,6 @@ public class IdTagListValidator implements ConstraintValidator<IdTag, List<Strin
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
-        if (CollectionUtils.isEmpty(value)) {
-            return true; // null or empty is valid, because it is another constraint's responsibility
-        }
-
         for (String s : value) {
             if (!VALIDATOR.isValid(s, context)) {
                 return false;

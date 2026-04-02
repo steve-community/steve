@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import java.util.UUID;
 public class Helpers {
 
     public static String getRandomString() {
-        return UUID.randomUUID().toString().substring(0, 20);
+        return UUID.randomUUID().toString();
     }
 
     public static List<String> getRandomStrings(int size) {

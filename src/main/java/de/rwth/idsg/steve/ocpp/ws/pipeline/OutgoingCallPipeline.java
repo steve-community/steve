@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -31,36 +30,33 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.03.2015
  */
-@RequiredArgsConstructor
 @Component
 public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
 
-    private final FutureResponseContextStore store;
+    private final Consumer<CommunicationContext> chainedConsumers;
 
-    /**
-     * Uses a store-before-send strategy to close response-correlation races.
-     * If transport sending fails, the stored context is rolled back immediately.
-     */
+    public OutgoingCallPipeline(FutureResponseContextStore store) {
+        chainedConsumers = OutgoingCallPipeline.start(Serializer.INSTANCE)
+                                               .andThen(Sender.INSTANCE)
+                                               .andThen(saveInStore(store));
+    }
+
     @Override
     public void accept(CommunicationContext ctx) {
-        // 1. Create the payload to send
-        Serializer.INSTANCE.accept(ctx);
-
-        // 2. Store the response context for later lookup.
-        store.add(
-            ctx.getSession(),
-            ctx.getOutgoingMessage().getMessageId(),
-            ctx.getFutureResponseContext()
-        );
-
-        // 3. Send the payload via WebSocket
-        try {
-            if (!Sender.INSTANCE.accept(ctx)) {
-                store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
-            }
-        } catch (Exception e) {
-            store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
-            throw e;
-        }
+        chainedConsumers.accept(ctx);
     }
+
+    private static Consumer<CommunicationContext> saveInStore(FutureResponseContextStore store) {
+        return context -> {
+            // All went well, and the call is sent. Store the response context for later lookup.
+            store.add(context.getSession(),
+                      context.getOutgoingMessage().getMessageId(),
+                      context.getFutureResponseContext());
+        };
+    }
+
+    private static Consumer<CommunicationContext> start(Consumer<CommunicationContext> starter) {
+        return starter;
+    }
+
 }

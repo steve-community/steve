@@ -1,0 +1,23 @@
+# Build output
+target/
+
+# Git
+.git/
+.github/
+.gitignore
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# Kubernetes
+k8s/
+
+# Website/docs
+website/
+
+# Docker (prevent recursive context)
+docker-compose.yml

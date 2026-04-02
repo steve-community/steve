@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,11 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.web.validation.ChargeBoxId;
-import de.rwth.idsg.steve.web.validation.IdTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.util.CollectionUtils;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,30 +34,27 @@ import java.util.List;
 @ToString
 public abstract class QueryForm extends QueryPeriodFromToFilter {
 
-    @Schema(description = "The identifiers of the chargebox (i.e. charging station)")
-    @ChargeBoxId
-    private List<String> chargeBoxId;
+    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
+    private String chargeBoxId;
 
-    @Schema(description = "The OCPP tags")
-    @IdTag
-    private List<String> ocppIdTag;
+    @Schema(description = "The OCPP tag")
+    private String ocppIdTag;
 
-    @Schema(description = "The User IDs")
-    private List<@NotNull(message = "userId must not be null")
-                 @Positive(message = "userId has to be a positive number") Integer> userId;
+    @Schema(description = "The User ID")
+    private Integer userId;
 
     @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {
-        return !CollectionUtils.isEmpty(chargeBoxId);
+        return chargeBoxId != null;
     }
 
     @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
-        return !CollectionUtils.isEmpty(ocppIdTag);
+        return ocppIdTag != null;
     }
 
     @Schema(hidden = true)
     public boolean isUserIdSet() {
-        return !CollectionUtils.isEmpty(userId);
+        return userId != null;
     }
 }

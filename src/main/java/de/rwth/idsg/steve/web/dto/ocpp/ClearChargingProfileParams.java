@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
@@ -51,7 +50,6 @@ public class ClearChargingProfileParams extends MultipleChargePointSelect {
 
     private Integer stackLevel;
 
-    @JsonIgnore
     @AssertTrue(message = "When filtering by id, charging profile id must be set")
     public boolean isValidWhenFilterById() {
         return filterType != ClearChargingProfileFilterType.ChargingProfileId || chargingProfilePk != null;

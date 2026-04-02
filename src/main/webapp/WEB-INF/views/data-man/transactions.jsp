@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2026 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -39,11 +39,11 @@ Transactions
         <table class="userInput">
             <tr>
                 <td>Transaction ID:</td>
-                <td><form:input path="transactionPk" type="number" min="1"/></td>
+                <td><form:input path="transactionPk"/></td>
             </tr>
             <tr>
                 <td>ChargeBox ID:</td>
-                <td><form:select path="chargeBoxId" multiple="false">
+                <td><form:select path="chargeBoxId">
                         <option value="" selected>All</option>
                         <form:options items="${cpList}"/>
                     </form:select>
@@ -51,7 +51,7 @@ Transactions
             </tr>
             <tr>
                 <td>OCPP ID Tag:</td>
-                <td><form:select path="ocppIdTag" multiple="false">
+                <td><form:select path="ocppIdTag">
                         <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>
@@ -59,7 +59,7 @@ Transactions
             </tr>
             <tr>
                 <td>User ID:</td>
-                <td><form:input path="userId" type="number" min="1"/></td>
+                <td><form:input path="userId"/></td>
             </tr>
             <tr>
                 <td>Transaction Type:</td>

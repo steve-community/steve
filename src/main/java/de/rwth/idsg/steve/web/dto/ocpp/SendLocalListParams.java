@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,8 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import ocpp.cp._2015._10.UpdateType;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -42,28 +39,19 @@ public class SendLocalListParams extends MultipleChargePointSelect {
     private Integer listVersion;
 
     @NotNull(message = "Update Type is required")
-    private UpdateType updateType = UpdateType.FULL;
+    private SendLocalListUpdateType updateType = SendLocalListUpdateType.FULL;
 
     @NotNull
-    @Schema(description = """
-        If set to <code>true</code> and the update type is FULL, an empty list will be sent.
-        As a result, the charge point will remove all ID Tags from its list.
-        """)
     private Boolean sendEmptyListWhenFull = Boolean.FALSE;
 
-    @Schema(description = "User ID Tags to be deleted")
     private List<String> deleteList;
-
-    @Schema(description = "User ID Tags to be added or updated")
     private List<String> addUpdateList;
 
-    @JsonIgnore
     @AssertTrue(message = "When Update Type is DIFFERENTIAL, either Add/Update or Delete list should not be empty")
     public boolean isValidWhenDifferential() {
-        return UpdateType.FULL.equals(updateType) || !getDeleteList().isEmpty() || !getAddUpdateList().isEmpty();
+        return SendLocalListUpdateType.FULL.equals(updateType) || !getDeleteList().isEmpty() || !getAddUpdateList().isEmpty();
     }
 
-    @JsonIgnore
     @AssertTrue(message = "The Add/Update and Delete lists should have no elements in ocpp")
     public boolean isDisjoint() {
         return Collections.disjoint(getDeleteList(), getAddUpdateList());

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,30 +42,12 @@ public class PingTask implements Runnable {
 
     @Override
     public void run() {
-        if (!session.isOpen()) {
-            closeSession();
-            return;
-        }
-
         WebSocketLogger.sendingPing(chargeBoxId, session);
         try {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
             WebSocketLogger.pingError(chargeBoxId, session, e);
             // TODO: Do something about this
-        }
-    }
-
-    /**
-     * If the session is not open, the websocket connection probably went away without proper closing steps,
-     * and we have a dangling reference.
-     */
-    private void closeSession() {
-        WebSocketLogger.closingDangling(chargeBoxId, session);
-        try {
-            session.close();
-        } catch (Exception e) {
-            WebSocketLogger.closingDanglingError(chargeBoxId, session, e);
         }
     }
 }

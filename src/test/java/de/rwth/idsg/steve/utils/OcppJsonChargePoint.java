@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.TreeNode;
@@ -138,9 +137,8 @@ public class OcppJsonChargePoint {
             } else if (ocppMsg instanceof OcppJsonCallForTesting testing) {
                 handleCall(testing);
             }
-        } catch (Throwable e) {
-            testerThreadInterruptReason = new RuntimeException(e);
-            testerThread.interrupt();
+        } catch (Exception e) {
+            log.error("Exception", e);
         } finally {
             if (receivedMessagesSignal != null) {
                 receivedMessagesSignal.countDown();
@@ -178,10 +176,8 @@ public class OcppJsonChargePoint {
         call.setPayload(payload);
         call.setAction(action);
 
-        JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
-        webSocketSession.initializeNativeSession(session);
-
-        CommunicationContext ctx = new CommunicationContext(webSocketSession, chargeBoxId);
+        // session is null, because we do not need org.springframework.web.socket.WebSocketSession
+        CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
         ctx.setOutgoingMessage(call);
 
         Serializer.INSTANCE.accept(ctx);

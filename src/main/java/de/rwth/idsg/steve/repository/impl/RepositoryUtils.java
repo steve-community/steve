@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 
-import java.util.List;
-
 import static jooq.steve.db.Tables.OCPP_TAG;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 
@@ -36,10 +34,10 @@ import static jooq.steve.db.Tables.USER_OCPP_TAG;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RepositoryUtils {
 
-    public static Select<Record1<String>> ocppTagByUserIdQuery(DSLContext ctx, List<Integer> userIds) {
+    public static Select<Record1<String>> ocppTagByUserIdQuery(DSLContext ctx, int userId) {
         return ctx.select(OCPP_TAG.ID_TAG)
             .from(OCPP_TAG)
             .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-            .where(USER_OCPP_TAG.USER_PK.in(userIds));
+            .where(USER_OCPP_TAG.USER_PK.eq(userId));
     }
 }

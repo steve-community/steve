@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,10 +41,6 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
     @IdTag
     private String idTag;
 
-    @Schema(description = """
-    PK of the charging profile to be used for the transaction.
-    <code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.
-    """)
     @Positive
     private Integer chargingProfilePk;
 
@@ -53,7 +48,11 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
      * Not for a specific connector, when frontend sends the value 0.
      * This corresponds to not to include the connector id parameter in OCPP request.
      */
-    public Integer getConnectorId() {
-        return (connectorId == null || connectorId == 0) ? null : connectorId;
+    public void setConnectorId(Integer connectorId) {
+        if (connectorId == 0) {
+            this.connectorId = null;
+        } else {
+            this.connectorId = connectorId;
+        }
     }
 }

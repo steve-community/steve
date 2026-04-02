@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
-import ocpp.cp._2015._10.AvailabilityStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -29,20 +28,15 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailabilityParams, AvailabilityStatus> {
+public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailabilityParams, String> {
 
     public ChangeAvailabilityTask(ChangeAvailabilityParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<AvailabilityStatus> defaultCallback() {
-        return new DefaultOcppCallback<AvailabilityStatus>() {
-            @Override
-            public void success(String chargeBoxId, AvailabilityStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -63,14 +57,14 @@ public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailability
     public ocpp.cp._2015._10.ChangeAvailabilityRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(params.getAvailType());
+                .withType(ocpp.cp._2015._10.AvailabilityType.fromValue(params.getAvailType().value()));
     }
 
     @Override
     public AsyncHandler<ocpp.cp._2010._08.ChangeAvailabilityResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, AvailabilityStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -81,7 +75,7 @@ public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailability
     public AsyncHandler<ocpp.cp._2012._06.ChangeAvailabilityResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, AvailabilityStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -92,7 +86,7 @@ public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailability
     public AsyncHandler<ocpp.cp._2015._10.ChangeAvailabilityResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,17 +26,15 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import jakarta.annotation.Nullable;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
-import jooq.steve.db.tables.records.TransactionRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.springframework.stereotype.Repository;
@@ -45,7 +43,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.DATE_TIME_TYPE;
+import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -159,13 +159,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // -------------------------------------------------------------------------
 
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setTransactionPk(List.of(transactionPk));
+        form.setTransactionPk(transactionPk);
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(QueryPeriodType.ALL);
 
         var transactions = getTransactions(form);
         if (transactions.size() != 1) {
-            throw new SteveException.NotFound("There is no transaction with id '%s'", transactionPk);
+            throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
         Transaction transaction = transactions.getFirst();
 
@@ -276,19 +276,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return new TransactionDetails(transaction, values, nextTx);
     }
 
-    @Override
-    public Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to) {
-        if (!to.isAfter(from)) {
-            throw new SteveException.BadRequest("'to' must be after 'from'");
-        }
-
-        return ctx.selectFrom(TRANSACTION)
-            .where(TRANSACTION.STOP_TIMESTAMP.ge(from)
-            .and(TRANSACTION.STOP_TIMESTAMP.lt(to)))
-            .orderBy(TRANSACTION.START_TIMESTAMP)
-            .fetch();
-    }
-
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
@@ -297,11 +284,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         List<Condition> conditions = new ArrayList<>();
 
         if (form.isTransactionPkSet()) {
-            conditions.add(TRANSACTION.TRANSACTION_PK.in(form.getTransactionPk()));
+            conditions.add(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
         }
 
         if (form.isChargeBoxIdSet()) {
-            conditions.add(CONNECTOR.CHARGE_BOX_ID.in(form.getChargeBoxId()));
+            conditions.add(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
         if (form.isConnectorIdSet()) {
@@ -309,11 +296,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         if (form.isOcppIdTagSet()) {
-            conditions.add(TRANSACTION.ID_TAG.in(form.getOcppIdTag()));
+            conditions.add(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }
 
         if (form.isUserIdSet()) {
-            conditions.add(USER_OCPP_TAG.USER_PK.in(form.getUserId()));
+            conditions.add(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

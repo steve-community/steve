@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
-import ocpp.cp._2015._10.UnlockStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -29,20 +28,15 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, UnlockStatus> {
+public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, String> {
 
     public UnlockConnectorTask(UnlockConnectorParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<UnlockStatus> defaultCallback() {
-        return new DefaultOcppCallback<UnlockStatus>() {
-            @Override
-            public void success(String chargeBoxId, UnlockStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -67,7 +61,7 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
     public AsyncHandler<ocpp.cp._2010._08.UnlockConnectorResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, UnlockStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -78,7 +72,7 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
     public AsyncHandler<ocpp.cp._2012._06.UnlockConnectorResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, UnlockStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -89,7 +83,7 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
     public AsyncHandler<ocpp.cp._2015._10.UnlockConnectorResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

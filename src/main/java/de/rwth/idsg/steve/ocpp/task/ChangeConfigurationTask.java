@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import ocpp.cp._2015._10.ConfigurationStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,7 @@ import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, ConfigurationStatus> {
+public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, String> {
 
     private final ChargePointService chargePointService;
 
@@ -46,13 +45,8 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     @Override
-    public OcppCallback<ConfigurationStatus> defaultCallback() {
-        return new DefaultOcppCallback<ConfigurationStatus>() {
-            @Override
-            public void success(String chargeBoxId, ConfigurationStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -87,7 +81,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, ConfigurationStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -98,7 +92,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, ConfigurationStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -113,7 +107,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
                 if (status == ACCEPTED && CpoName.name().equals(params.getKey())) {
                     chargePointService.updateCpoName(chargeBoxId, params.getValue());
                 }
-                success(chargeBoxId, status);
+                success(chargeBoxId, status.value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

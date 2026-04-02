@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +59,6 @@ public class GetDiagnosticsParams extends MultipleChargePointSelect {
     @Schema(description = "Latest timestamp to include in log file")
     private DateTime stop;
 
-    @JsonIgnore
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")
     public boolean isValid() {
         return !(start != null && stop != null) || stop.isAfter(start);

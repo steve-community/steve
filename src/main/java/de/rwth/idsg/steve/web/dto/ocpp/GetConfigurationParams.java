@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,6 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +28,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.rwth.idsg.steve.config.ApiDocsConfiguration.ConfigurationKeyEnum_Read_Keys;
 import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 
 /**
@@ -41,20 +38,10 @@ import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 @Getter
 public class GetConfigurationParams extends MultipleChargePointSelect {
 
-    @Schema(
-        ref = ConfigurationKeyEnum_Read_Keys,
-        description = """
-            List of Configuration Keys predefined by Ocpp.
-            The documented keys are the superset of all keys defined in Ocpp versions 1.2, 1.5 and 1.6.
-            Therefore, not all possible keys apply to all Ocpp versions.
-            """
-    )
     private List<String> confKeyList;
 
-    @Schema(description = "Comma separated sequence of Custom Configuration Keys")
     private String commaSeparatedCustomConfKeys;
 
-    @JsonIgnore
     public List<String> getAllKeys() {
         List<String> fromPredefined = Objects.requireNonNullElse(confKeyList, Collections.emptyList());
         List<String> fromCustom = splitByComma(commaSeparatedCustomConfKeys);

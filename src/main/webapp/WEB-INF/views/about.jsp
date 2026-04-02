@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2026 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -39,16 +39,12 @@
 <section><span>Endpoint Info</span></section>
 <table class="userInputFullPage">
     <tr>
-        <td>Enabled OCPP Protocols:</td>
-        <td>${enabledOcppProtocols}</td>
-    </tr>
-    <tr>
         <td>SOAP endpoint for OCPP:</td>
         <td>${endpointInfo.ocppSoap}</td>
-    </tr>
     <tr>
         <td>WebSocket/JSON endpoint for OCPP:</td>
         <td>${endpointInfo.ocppWebSocket}</td>
+    </tr>
     </tr>
 </table>
 

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,13 +32,10 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.enums.TransactionStopFailedEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
-import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -56,7 +53,6 @@ import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
-import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
 import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED;
@@ -77,7 +73,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     private final DSLContext ctx;
     private final ReservationRepository reservationRepository;
 
-    private final Striped<Lock> transactionTableLocks = Striped.lock(128);
+    private final Striped<Lock> transactionTableLocks = Striped.lock(16);
 
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {
@@ -98,7 +94,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateOcppProtocol(@NotNull String chargeBoxIdentity, @NotNull OcppProtocol protocol) {
+    public void updateOcppProtocol(String chargeBoxIdentity, OcppProtocol protocol) {
         ctx.update(CHARGE_BOX)
             .set(CHARGE_BOX.OCPP_PROTOCOL, protocol.getCompositeValue())
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -106,7 +102,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateEndpointAddress(@NotNull String chargeBoxIdentity, @NotNull String endpointAddress) {
+    public void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.ENDPOINT_ADDRESS, endpointAddress)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -114,7 +110,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxFirmwareStatus(@NotNull String chargeBoxIdentity, @NotNull String firmwareStatus) {
+    public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
            .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, DateTime.now())
@@ -123,7 +119,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxIdentity, @NotNull String status) {
+    public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
            .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, DateTime.now())
@@ -132,7 +128,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxHeartbeat(@NotNull String chargeBoxIdentity, @NotNull DateTime ts) {
+    public void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, ts)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -170,7 +166,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(@NotNull String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
+    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
@@ -189,44 +185,27 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(@NotNull String chargeBoxIdentity, List<MeterValue> list, @Nullable TransactionRecord transaction) {
+    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
 
-        if (transaction == null) {
-            log.warn("Will not insert MeterValues: Transaction for chargeBoxId '{}' is null", chargeBoxIdentity);
-            return;
-        }
+        ctx.transaction(configuration -> {
+            try {
+                DSLContext ctx = DSL.using(configuration);
 
-        try {
-            batchInsertMeterValues(ctx, list, transaction.getConnectorPk(), transaction.getTransactionPk());
-        } catch (Exception e) {
-            log.error("Exception occurred", e);
-        }
-    }
+                // First, get connector primary key from transaction table
+                int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
+                                     .from(TRANSACTION_START)
+                                     .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
+                                     .fetchOne()
+                                     .value1();
 
-    @Nullable
-    @Override
-    public TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId) {
-        var records = ctx.select(TRANSACTION.fields())
-            .from(TRANSACTION)
-            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
-            .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
-            .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-            .orderBy(TRANSACTION.START_TIMESTAMP.desc())
-            .fetchInto(TRANSACTION);
-
-        if (records.isEmpty()) {
-            log.warn("No row found for chargeBoxId '{}' and transactionId '{}'", chargeBoxId, transactionId);
-            return null;
-        }
-
-        if (records.size() > 1) {
-            log.warn("Found multiple rows for chargeBoxId '{}' and transactionId '{}'. Returning the most recent one.", chargeBoxId, transactionId);
-        }
-
-        return records.get(0);
+                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+            } catch (Exception e) {
+                log.error("Exception occurred", e);
+            }
+        });
     }
 
     @Override
@@ -301,7 +280,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .execute();
         } catch (Exception e) {
             log.error("Exception occurred", e);
-            updateTransactionAsFailed(p, e);
+            tryInsertingFailed(p, e);
         }
 
         // -------------------------------------------------------------------------
@@ -316,26 +295,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                        .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
             insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
-        }
-    }
-
-    @Override
-    public void updateTransactionAsFailed(UpdateTransactionParams p, Exception e) {
-        try {
-            ctx.insertInto(TRANSACTION_STOP_FAILED)
-                .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
-                .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
-                .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
-                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
-                .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())
-                .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())
-                .set(TRANSACTION_STOP_FAILED.STOP_REASON, p.getStopReason())
-                .set(TRANSACTION_STOP_FAILED.FAIL_REASON, Throwables.getStackTraceAsString(e))
-                .execute();
-        } catch (Exception ex) {
-            // This is where we give up and just log
-            log.error("Exception occurred", ex);
-            log.error("Original exception", e);
         }
     }
 
@@ -490,6 +449,24 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
+    }
+
+    private void tryInsertingFailed(UpdateTransactionParams p, Exception e) {
+        try {
+            ctx.insertInto(TRANSACTION_STOP_FAILED)
+               .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
+               .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
+               .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
+               .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())
+               .set(TRANSACTION_STOP_FAILED.STOP_REASON, p.getStopReason())
+               .set(TRANSACTION_STOP_FAILED.FAIL_REASON, Throwables.getStackTraceAsString(e))
+               .execute();
+        } catch (Exception ex) {
+            // This is where we give up and just log
+            log.error("Exception occurred", e);
+        }
     }
 
     private static TransactionStopFailedEventActor mapActor(TransactionStopEventActor a) {

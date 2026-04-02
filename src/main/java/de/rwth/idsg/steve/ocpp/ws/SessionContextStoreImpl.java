@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,18 +20,14 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,79 +52,68 @@ public class SessionContextStoreImpl implements SessionContextStore {
      * Value (Deque<SessionContext>) = WebSocket session contexts
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
-    private final IncomingMessageIdStore messageIdStore = new IncomingMessageIdStore(1_000_000);
 
-    private final Striped<Lock> locks = Striped.lock(128);
+    private final Striped<Lock> locks = Striped.lock(16);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
-    private final TaskScheduler taskScheduler;
-    private final FutureResponseContextStore futureResponseContextStore;
 
     @Override
-    public boolean add(String chargeBoxId, WebSocketSession session) {
+    public int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
-            if (!session.isOpen()) {
-                log.warn("Session closed. Skipping add for chargeBoxId '{}' and session '{}'", chargeBoxId, session.getId());
-                return false; // we dont want to trigger any action based on this 'bad' session which we did not process anyway
-            }
-
-            // Just to keep the connection alive, such that the servers do not close
-            // the connection because of a idle timeout, we ping-pong at fixed intervals.
-            ScheduledFuture<?> pingSchedule = taskScheduler.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
-                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
-                WebSocketConfiguration.PING_INTERVAL
-            );
-
             SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
-            messageIdStore.addSession(session);
-            futureResponseContextStore.addSession(session);
-
             int size = endpointDeque.size();
             log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}", chargeBoxId, size);
-            return size == 1;
+            return size;
         } finally {
             l.unlock();
         }
     }
 
     @Override
-    public boolean remove(String chargeBoxId, WebSocketSession session) {
+    public int remove(String chargeBoxId, WebSocketSession session) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
             Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
             if (endpointDeque == null) {
                 log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
-                return false; // we did not have any session anyway
+                return 0;
             }
 
-            for (var it = endpointDeque.iterator(); it.hasNext();) {
-                SessionContext context = it.next();
+            // Prevent "java.util.ConcurrentModificationException: null"
+            // Reason: Cannot modify the set (remove the item) we are iterating
+            // Solution: Iterate the set, find the item, remove the item after the for-loop
+            //
+            SessionContext toRemove = null;
+            for (SessionContext context : endpointDeque) {
                 if (context.getSession().getId().equals(session.getId())) {
-                    context.getPingSchedule().cancel(true);
-                    it.remove();
-                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}", chargeBoxId, endpointDeque.size());
+                    toRemove = context;
                     break;
                 }
             }
 
-            // Delete empty collection from lookup table in order to correctly calculate
-            // the number of connected chargeboxes with getNumberOfChargeBoxes()
-            if (endpointDeque.isEmpty()) {
-                lookupTable.remove(chargeBoxId);
+            if (toRemove != null) {
+                // 1. Cancel the ping task
+                toRemove.getPingSchedule().cancel(true);
+                // 2. Delete from collection
+                if (endpointDeque.remove(toRemove)) {
+                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
+                            chargeBoxId, endpointDeque.size());
+                }
+                // 3. Delete empty collection from lookup table in order to correctly calculate
+                // the number of connected chargeboxes with getNumberOfChargeBoxes()
+                if (endpointDeque.size() == 0) {
+                    lookupTable.remove(chargeBoxId);
+                }
             }
 
-            messageIdStore.removeSession(session);
-            futureResponseContextStore.removeSession(session);
-
-            return endpointDeque.isEmpty();
+            return endpointDeque.size();
         } finally {
             l.unlock();
         }
@@ -146,17 +131,6 @@ public class SessionContextStoreImpl implements SessionContextStore {
             return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
-        } finally {
-            l.unlock();
-        }
-    }
-
-    @Override
-    public Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId) {
-        Lock l = locks.get(chargeBoxId);
-        l.lock();
-        try {
-            return messageIdStore.registerIncomingCallId(session, messageId);
         } finally {
             l.unlock();
         }
@@ -190,7 +164,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
     @Override
     public int getSize(String chargeBoxId) {
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-        return endpointDeque == null ? 0 : endpointDeque.size();
+        if (endpointDeque == null) {
+            return 0;
+        } else {
+            return endpointDeque.size();
+        }
     }
 
     @Override

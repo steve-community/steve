@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,10 +41,6 @@ public class SetChargingProfileParams extends MultipleChargePointSelect {
     @Positive
     private Integer chargingProfilePk;
 
-    @Schema(description = """
-    Apply the profile to the transaction with this ID.
-    <code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.
-    """)
     @Positive
     private Integer transactionId;
 }

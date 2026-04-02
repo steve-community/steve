@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ public class TransactionService {
 
     public Transaction getTransaction(int transactionPk) {
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setTransactionPk(List.of(transactionPk));
+        form.setTransactionPk(transactionPk);
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ALL);
 
@@ -87,7 +87,7 @@ public class TransactionService {
 
     public Transaction getLatestActiveTransaction(String chargeBoxId, Integer connectorId) {
         TransactionQueryForm form = new TransactionQueryForm();
-        form.setChargeBoxId(List.of(chargeBoxId));
+        form.setChargeBoxId(chargeBoxId);
         form.setConnectorId(connectorId);
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ACTIVE);

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -76,15 +76,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                                                      .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
                                                                      .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
 
-        int count = ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
-                       .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
-                       .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
-                       .onDuplicateKeyIgnore()
-                       .execute();
-
-        if (count == 0) {
-            log.warn("Could not insert charging profile assignment (maybe duplicate?). chargeBoxId={}, connectorId={}, chargingProfilePk={}", chargeBoxId, connectorId, chargingProfilePk);
-        }
+        ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
+           .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
+           .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
+           .execute();
     }
 
     @Override
@@ -273,15 +268,6 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .fetch();
 
         return new ChargingProfile.Details(profile, periods);
-    }
-
-    @Override
-    public boolean exists(int chargingProfilePk) {
-        return ctx.selectOne()
-            .from(CHARGING_PROFILE)
-            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-            .fetchOptional()
-            .isPresent();
     }
 
     @Override

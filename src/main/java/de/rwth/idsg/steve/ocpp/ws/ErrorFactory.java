@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 public final class ErrorFactory {
     private ErrorFactory() { }
 
-    public static OcppJsonError propertyConstraintViolation(String messageId, String details) {
-        return setFields(messageId, ErrorCode.PropertyConstraintViolation,
-            "Message validation failed", details);
-    }
-
     public static OcppJsonError genericDeserializeError(String messageId, String details) {
         return setFields(messageId, ErrorCode.GenericError,
                 "The incoming string could not be parsed into an array. Is the JSON syntactically correct?", details);
@@ -59,16 +54,6 @@ public final class ErrorFactory {
     public static OcppJsonError payloadProcessingError(String messageId, String details) {
         return setFields(messageId, ErrorCode.InternalError,
                 "Internal services failed while processing of the payload", details);
-    }
-
-    public static OcppJsonError duplicateCallMessageId(String messageId) {
-        return setFields(messageId, ErrorCode.ProtocolError,
-                "A CALL with this messageId was already received on this WebSocket connection", null);
-    }
-
-    public static OcppJsonError invalidMessageId(String messageId) {
-        return setFields(messageId, ErrorCode.FormationViolation,
-                "The messageId of CALL must be a non-empty string", null);
     }
 
     private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, String details) {

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,35 +84,13 @@ import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp._2022._02.security.CertificateSignedResponse.CertificateSignedStatusEnumType;
-import ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatusEnumType;
-import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
-import ocpp._2022._02.security.GetLogResponse;
-import ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType;
-import ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
-import ocpp.cp._2015._10.AvailabilityStatus;
-import ocpp.cp._2015._10.CancelReservationStatus;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import ocpp.cp._2015._10.ChargingProfileStatus;
-import ocpp.cp._2015._10.ClearCacheStatus;
-import ocpp.cp._2015._10.ClearChargingProfileStatus;
-import ocpp.cp._2015._10.ConfigurationStatus;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import ocpp.cp._2015._10.GetDiagnosticsResponse;
-import ocpp.cp._2015._10.RemoteStartStopStatus;
-import ocpp.cp._2015._10.ReservationStatus;
-import ocpp.cp._2015._10.ResetStatus;
-import ocpp.cp._2015._10.TriggerMessageStatus;
-import ocpp.cp._2015._10.UnlockStatus;
-import ocpp.cp._2015._10.UpdateStatus;
 import org.joda.time.DateTime;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask.UpdateFirmwareResponseStatus;
-import static ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -140,7 +118,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int changeAvailability(ChangeAvailabilityParams params,
-                                        OcppCallback<AvailabilityStatus>... callbacks) {
+                                        OcppCallback<String>... callbacks) {
         ChangeAvailabilityTask task = new ChangeAvailabilityTask(params);
 
         for (var callback : callbacks) {
@@ -156,7 +134,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int changeConfiguration(ChangeConfigurationParams params,
-                                         OcppCallback<ConfigurationStatus>... callbacks) {
+                                         OcppCallback<String>... callbacks) {
         ChangeConfigurationTask task = new ChangeConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
@@ -172,7 +150,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int clearCache(MultipleChargePointSelect params,
-                                OcppCallback<ClearCacheStatus>... callbacks) {
+                                OcppCallback<String>... callbacks) {
         ClearCacheTask task = new ClearCacheTask(params);
 
         for (var callback : callbacks) {
@@ -188,7 +166,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getDiagnostics(GetDiagnosticsParams params,
-                                    OcppCallback<GetDiagnosticsResponse>... callbacks) {
+                                    OcppCallback<String>... callbacks) {
         GetDiagnosticsTask task = new GetDiagnosticsTask(params);
 
         for (var callback : callbacks) {
@@ -204,7 +182,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int reset(ResetParams params,
-                           OcppCallback<ResetStatus>... callbacks) {
+                           OcppCallback<String>... callbacks) {
         ResetTask task = new ResetTask(params);
 
         for (var callback : callbacks) {
@@ -220,7 +198,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int updateFirmware(UpdateFirmwareParams params,
-                                    OcppCallback<UpdateFirmwareResponseStatus>... callbacks) {
+                                    OcppCallback<String>... callbacks) {
         UpdateFirmwareTask task = new UpdateFirmwareTask(params);
 
         for (var callback : callbacks) {
@@ -240,7 +218,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params,
-                                            OcppCallback<RemoteStartStopStatus>... callbacks) {
+                                            OcppCallback<String>... callbacks) {
         ocpp.cp._2015._10.ChargingProfile chargingProfile = null;
         Integer chargingProfilePk = params.getChargingProfilePk();
         if (chargingProfilePk != null) {
@@ -266,7 +244,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int remoteStopTransaction(RemoteStopTransactionParams params,
-                                           OcppCallback<RemoteStartStopStatus>... callbacks) {
+                                           OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params);
 
         for (var callback : callbacks) {
@@ -282,7 +260,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int unlockConnector(UnlockConnectorParams params,
-                                     OcppCallback<UnlockStatus>... callbacks) {
+                                     OcppCallback<String>... callbacks) {
         UnlockConnectorTask task = new UnlockConnectorTask(params);
 
         for (var callback : callbacks) {
@@ -302,7 +280,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int dataTransfer(DataTransferParams params,
-                                  OcppCallback<ocpp.cp._2015._10.DataTransferResponse>... callbacks) {
+                                  OcppCallback<DataTransferTask.ResponseWrapper>... callbacks) {
         DataTransferTask task = new DataTransferTask(params);
 
         for (var callback : callbacks) {
@@ -318,7 +296,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getConfiguration(GetConfigurationParams params,
-                                      OcppCallback<GetConfigurationTask.ConfigurationKeyValues>... callbacks) {
+                                      OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
         GetConfigurationTask task = new GetConfigurationTask(params, chargePointService);
 
         for (var callback : callbacks) {
@@ -334,7 +312,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getLocalListVersion(MultipleChargePointSelect params,
-                                         OcppCallback<Integer>... callbacks) {
+                                         OcppCallback<String>... callbacks) {
         GetLocalListVersionTask task = new GetLocalListVersionTask(params);
 
         for (var callback : callbacks) {
@@ -350,7 +328,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int sendLocalList(SendLocalListParams params,
-                                   OcppCallback<UpdateStatus>... callbacks) {
+                                   OcppCallback<String>... callbacks) {
         SendLocalListTask task = new SendLocalListTask(params, ocppTagService);
 
         for (var callback : callbacks) {
@@ -370,7 +348,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int reserveNow(ReserveNowParams params,
-                                OcppCallback<ReservationStatus>... callbacks) {
+                                OcppCallback<String>... callbacks) {
         List<ChargePointSelect> list = params.getChargePointSelectList();
 
         InsertReservationParams res = InsertReservationParams.builder()
@@ -399,7 +377,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int cancelReservation(CancelReservationParams params,
-                                       OcppCallback<CancelReservationStatus>... callbacks) {
+                                       OcppCallback<String>... callbacks) {
         CancelReservationTask task = new CancelReservationTask(params, reservationRepository);
 
         for (var callback : callbacks) {
@@ -419,7 +397,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int triggerMessage(TriggerMessageParams params,
-                                    OcppCallback<TriggerMessageStatus>... callbacks) {
+                                    OcppCallback<String>... callbacks) {
         TriggerMessageTask task = new TriggerMessageTask(params);
 
         for (var callback : callbacks) {
@@ -435,7 +413,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int setChargingProfile(SetChargingProfileTask task,
-                                        OcppCallback<ChargingProfileStatus>... callbacks) {
+                                        OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
@@ -449,7 +427,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int setChargingProfile(SetChargingProfileParams params,
-                                        OcppCallback<ChargingProfileStatus>... callbacks) {
+                                        OcppCallback<String>... callbacks) {
         ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
         SetChargingProfileTaskFromDB task = new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
@@ -459,7 +437,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int clearChargingProfile(ClearChargingProfileParams params,
-                                          OcppCallback<ClearChargingProfileStatus>... callbacks) {
+                                          OcppCallback<String>... callbacks) {
         ClearChargingProfileTask task = new ClearChargingProfileTask(params, chargingProfileRepository);
 
         for (var callback : callbacks) {
@@ -495,7 +473,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int extendedTriggerMessage(ExtendedTriggerMessageParams params,
-                                            OcppCallback<TriggerMessageStatusEnumType>... callbacks) {
+                                            OcppCallback<String>... callbacks) {
         ExtendedTriggerMessageTask task = new ExtendedTriggerMessageTask(params);
 
         for (var callback : callbacks) {
@@ -511,7 +489,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getLog(GetLogParams params,
-                            OcppCallback<GetLogResponse>... callbacks) {
+                            OcppCallback<String>... callbacks) {
         int requestId = eventRepository.insertLogUploadJob(params);
 
         GetLogTask task = new GetLogTask(params, requestId);
@@ -529,7 +507,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int signedUpdateFirmware(SignedUpdateFirmwareParams params,
-                                          OcppCallback<UpdateFirmwareStatusEnumType>... callbacks) {
+                                          OcppCallback<String>... callbacks) {
         int requestId = eventRepository.insertFirmwareUpdateJob(params);
 
         SignedUpdateFirmwareTask task = new SignedUpdateFirmwareTask(params, requestId);
@@ -547,7 +525,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int installCertificate(InstallCertificateParams params,
-                                        OcppCallback<InstallCertificateStatusEnumType>... callbacks) {
+                                        OcppCallback<String>... callbacks) {
         InstallCertificateTask task = new InstallCertificateTask(params);
 
         for (var callback : callbacks) {
@@ -563,7 +541,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int deleteCertificate(DeleteCertificateParams params,
-                                       OcppCallback<DeleteCertificateStatusEnumType>... callbacks) {
+                                       OcppCallback<String>... callbacks) {
         DeleteCertificateTask task = new DeleteCertificateTask(params, certificateRepository);
 
         for (var callback : callbacks) {
@@ -579,7 +557,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int certificateSigned(CertificateSignedParams params,
-                                       OcppCallback<CertificateSignedStatusEnumType>... callbacks) {
+                                       OcppCallback<String>... callbacks) {
         CertificateSignedTask task = new CertificateSignedTask(params, certificateRepository);
 
         for (var callback : callbacks) {
@@ -595,7 +573,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int getInstalledCertificateIds(GetInstalledCertificateIdsParams params,
-                                                OcppCallback<GetInstalledCertificateIdsResponse>... callbacks) {
+                                                OcppCallback<String>... callbacks) {
         GetInstalledCertificateIdsTask task = new GetInstalledCertificateIdsTask(params, certificateRepository);
 
         for (var callback : callbacks) {

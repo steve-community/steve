@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,8 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import ocpp.cp._2012._06.DataTransferResponse;
 
 import jakarta.xml.ws.AsyncHandler;
@@ -29,18 +31,18 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, ocpp.cp._2015._10.DataTransferResponse> {
+public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
     public DataTransferTask(DataTransferParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<ocpp.cp._2015._10.DataTransferResponse> defaultCallback() {
-        return new DefaultOcppCallback<ocpp.cp._2015._10.DataTransferResponse>() {
+    public OcppCallback<ResponseWrapper> defaultCallback() {
+        return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
-            public void success(String chargeBoxId, ocpp.cp._2015._10.DataTransferResponse response) {
-                String status = response.getStatus().value();
+            public void success(String chargeBoxId, ResponseWrapper response) {
+                String status = response.getStatus();
                 String data = response.getData();
 
                 StringBuilder builder = new StringBuilder(status);
@@ -79,7 +81,7 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, ocp
         return res -> {
             try {
                 DataTransferResponse response = res.get();
-                success(chargeBoxId, convert(response));
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -91,16 +93,17 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, ocp
         return res -> {
             try {
                 ocpp.cp._2015._10.DataTransferResponse response = res.get();
-                success(chargeBoxId, response);
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
     }
 
-    private static ocpp.cp._2015._10.DataTransferResponse convert(ocpp.cp._2012._06.DataTransferResponse response) {
-        return new ocpp.cp._2015._10.DataTransferResponse()
-            .withStatus(ocpp.cp._2015._10.DataTransferStatus.fromValue(response.getStatus().value()))
-            .withData(response.getData());
+    @Getter
+    @RequiredArgsConstructor
+    public static class ResponseWrapper {
+        private final String status;
+        private final String data;
     }
 }

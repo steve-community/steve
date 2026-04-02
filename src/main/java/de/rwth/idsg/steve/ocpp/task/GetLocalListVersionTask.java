@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,20 +28,15 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, Integer> {
+public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, String> {
 
     public GetLocalListVersionTask(MultipleChargePointSelect params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<Integer> defaultCallback() {
-        return new DefaultOcppCallback<Integer>() {
-            @Override
-            public void success(String chargeBoxId, Integer response) {
-                addNewResponse(chargeBoxId, String.valueOf(response));
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -58,7 +53,7 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     public AsyncHandler<ocpp.cp._2012._06.GetLocalListVersionResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getListVersion());
+                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -69,7 +64,7 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     public AsyncHandler<ocpp.cp._2015._10.GetLocalListVersionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getListVersion());
+                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

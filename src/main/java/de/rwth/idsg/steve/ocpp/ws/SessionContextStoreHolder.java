@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,18 +35,12 @@ public class SessionContextStoreHolder {
     private final ConcurrentHashMap<OcppVersion, SessionContextStore> storesPerVersion = new ConcurrentHashMap<>();
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
-    private final TaskScheduler taskScheduler;
-    private final FutureResponseContextStore futureResponseContextStore;
 
-    public SessionContextStoreHolder(SteveProperties steveProperties,
-                                     TaskScheduler taskScheduler,
-                                     FutureResponseContextStore futureResponseContextStore) {
+    public SessionContextStoreHolder(SteveProperties steveProperties) {
         wsSessionSelectStrategy = steveProperties.getOcpp().getWsSessionSelectStrategy();
-        this.taskScheduler = taskScheduler;
-        this.futureResponseContextStore = futureResponseContextStore;
     }
 
     public SessionContextStore getOrCreate(OcppVersion version) {
-        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy, taskScheduler, futureResponseContextStore));
+        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy));
     }
 }

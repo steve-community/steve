@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -257,7 +257,7 @@ public class UserRepositoryImpl implements UserRepository {
                       .set(USER.BIRTH_DAY, form.getBirthDay())
                       .set(USER.SEX, form.getSex().getDatabaseValue())
                       .set(USER.PHONE, form.getPhone())
-                      .set(USER.E_MAIL, form.getEmail())
+                      .set(USER.E_MAIL, form.getEMail())
                       .set(USER.NOTE, form.getNote())
                       .set(USER.ADDRESS_PK, addressPk)
                       .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))
@@ -276,7 +276,7 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.BIRTH_DAY, form.getBirthDay())
            .set(USER.SEX, form.getSex().getDatabaseValue())
            .set(USER.PHONE, form.getPhone())
-           .set(USER.E_MAIL, form.getEmail())
+           .set(USER.E_MAIL, form.getEMail())
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
            .set(USER.NOTIFICATION_FEATURES, NotificationFeature.joinFeatures(form.getNotificationFeatures()))

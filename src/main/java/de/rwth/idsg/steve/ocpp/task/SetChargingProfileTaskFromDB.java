@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import ocpp.cp._2015._10.ChargingProfileStatus;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.ChargingSchedule;
 import ocpp.cp._2015._10.ChargingSchedulePeriod;
@@ -58,14 +57,14 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
     }
 
     @Override
-    public OcppCallback<ChargingProfileStatus> defaultCallback() {
-        return new DefaultOcppCallback<ChargingProfileStatus>() {
+    public OcppCallback<String> defaultCallback() {
+        return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, ChargingProfileStatus status) {
+            public void success(String chargeBoxId, String statusValue) {
                 ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());
-                addNewResponse(chargeBoxId, status.value());
+                addNewResponse(chargeBoxId, statusValue);
 
-                if (ChargingProfileStatus.ACCEPTED == status && ChargingProfilePurposeType.TX_PROFILE != purpose) {
+                if ("Accepted".equalsIgnoreCase(statusValue) && ChargingProfilePurposeType.TX_PROFILE != purpose) {
                     int chargingProfilePk = details.getProfile().getChargingProfilePk();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }

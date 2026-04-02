@@ -13,9 +13,7 @@ If you are going to deploy it we are happy to see the [logo](website/logo/manage
 
 ### Relation to Powerfill
 
-[Powerfill](https://powerfill.io/) is a SaaS company to expand beyond the basics of SteVe. 
-While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. 
-Read more in [the company announcement](https://github.com/steve-community/steve/issues/1643) and [the public launch post](https://powerfill.io/blog/from-university-project-to-enterprise-platform).
+[Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
 
 ### Charge Point Support
 
@@ -82,10 +80,10 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 3. Configure SteVe **before** building:
 
     The basic configuration is defined in [application-prod.properties](src/main/resources/application-prod.properties):
-      - You _must_ change [database configuration](src/main/resources/application-prod.properties#L7-L13)
-      - You _must_ change [the host](src/main/resources/application-prod.properties#L28) to the correct IP address of your server
-      - You _must_ change [web interface credentials](src/main/resources/application-prod.properties#L15-L18)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties#L36-L41)
+      - You _must_ change [database configuration](src/main/resources/application-prod.properties)
+      - You _must_ change [the host](src/main/resources/application-prod.properties) to the correct IP address of your server
+      - You _must_ change [web interface credentials](src/main/resources/application-prod.properties)
+      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties)
 
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
@@ -107,13 +105,45 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 # Docker
 
-If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
+This fork features an **optimized multi-stage Docker build** that works on **Linux, macOS, and Windows** (including Windows native Docker / Docker Desktop).
+
+Key improvements over the upstream Docker setup:
+- **Multi-stage build**: The application is compiled during `docker build` using a temporary embedded MariaDB instance — no runtime compilation, containers start instantly.
+- **Non-root execution**: The application runs as an unprivileged `appuser` inside the container for improved security.
+- **Windows compatibility**: The `mvnw` execute bit is explicitly set during the build, preventing failures when cloning on Windows.
+- **Proper health checks**: The `app` service only starts after MariaDB passes a real health check — no race conditions.
+- **Optimized build context**: A `.dockerignore` file excludes unnecessary files (build output, IDE files, git history) from the Docker build context.
+
+To start the application:
+
+```bash
+docker compose up -d
+```
 
 Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
 Instead of changing the [application-prod.properties](src/main/resources/application-prod.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
-The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
 
 With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`
+
+### ⚠️ Production Security Notice
+
+The default `docker-compose.yml` uses a hardcoded database password (`changeme`) **for development purposes only**.
+
+**Before deploying to production**, replace the hardcoded credentials by creating a `.env` file in the project root:
+
+```env
+MYSQL_PASSWORD=your_secure_password_here
+```
+
+Then update `docker-compose.yml` to reference the variable:
+
+```yaml
+MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+```
+
+And update `Dockerfile` build args accordingly, or use Docker Secrets for production-grade secret management.
+
+> **Never commit a `.env` file containing real passwords to version control.** Add `.env` to your `.gitignore`.
 
 # Kubernetes
 
@@ -176,12 +206,6 @@ Screenshots
 1. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 1. [Operations - OCPP v1.6](website/screenshots/ocpp16.png)
 1. [Settings](website/screenshots/settings.png)
-1. [APIs](website/screenshots/apis.png)
-
-OpenAPI spec
------
-An export of the actual OpenAPI spec for APIs is available [here](api-docs.json).
-To explore it interactively, open it in the [Live Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/steve-community/steve/refs/heads/master/api-docs.json).
 
 GDPR
 -----

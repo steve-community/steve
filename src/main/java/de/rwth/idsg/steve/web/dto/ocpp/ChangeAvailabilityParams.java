@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
-import ocpp.cp._2015._10.AvailabilityType;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -31,19 +30,18 @@ import java.util.Objects;
  * @since 08.03.2018
  */
 @Getter
-@Setter
 public class ChangeAvailabilityParams extends MultipleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
     @NotNull(message = "Availability Type is required")
-    private AvailabilityType availType;
+    @Setter private AvailabilityType availType;
 
     /**
      * if empty, 0 = charge point as a whole
      */
-    public Integer getConnectorId() {
-        return Objects.requireNonNullElse(connectorId, 0);
+    public void setConnectorId(Integer connectorId) {
+        this.connectorId = Objects.requireNonNullElse(connectorId, 0);
     }
 }

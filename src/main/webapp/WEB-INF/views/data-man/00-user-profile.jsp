@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2026 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 		</td>
 	</tr>
 	<tr><td>Phone:</td><td><form:input path="phone"/></td></tr>
-	<tr><td>E-mail:</td><td><form:input path="email"/></td></tr>
+	<tr><td>E-mail:</td><td><form:input path="eMail"/></td></tr>
         <tr>
             <td>Notify when... </td>
             <td><form:checkboxes items="${features}" path="notificationFeatures"

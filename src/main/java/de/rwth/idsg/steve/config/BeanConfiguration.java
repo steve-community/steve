@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -49,8 +49,6 @@ import tools.jackson.datatype.joda.JodaModule;
 
 import javax.sql.DataSource;
 
-import java.time.Clock;
-
 import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static tools.jackson.databind.cfg.DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS;
 
@@ -66,11 +64,6 @@ import static tools.jackson.databind.cfg.DateTimeFeature.WRITE_DATES_AS_TIMESTAM
 @EnableAsync
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
-
-    @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration

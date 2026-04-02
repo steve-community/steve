@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cp._2015._10.MessageTrigger;
-import ocpp.cp._2015._10.TriggerMessageStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -30,20 +29,15 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, TriggerMessageStatus> {
+public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, String> {
 
     public TriggerMessageTask(TriggerMessageParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<TriggerMessageStatus> defaultCallback() {
-        return new DefaultOcppCallback<TriggerMessageStatus>() {
-            @Override
-            public void success(String chargeBoxId, TriggerMessageStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -57,7 +51,7 @@ public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams,
     public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

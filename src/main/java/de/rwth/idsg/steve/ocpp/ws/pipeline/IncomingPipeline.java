@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,14 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import jakarta.xml.ws.Response;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -50,16 +46,7 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
 
     @Override
     public void accept(CommunicationContext context) {
-        try {
-            deserializer.accept(context);
-        } catch (SteveException e) {
-            // do not let OcppCallbacks hang. try to inform them when the response from the station cannot be parsed.
-            var frc = context.getFutureResponseContext();
-            if (frc != null) {
-                frc.getTask().failed(context.getChargeBoxId(), e);
-            }
-            throw e;
-        }
+        deserializer.accept(context);
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {
@@ -68,63 +55,21 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
             return;
         }
 
-        switch (context.getIncomingMessage()) {
-            case OcppJsonCall call -> processCall(context, call);
-            case OcppJsonResult result -> processResult(context, result);
-            case OcppJsonError error -> processError(context, error);
-            default -> log.warn("Unexpected value: {}", context.getIncomingMessage());
+        OcppJsonMessage msg = context.getIncomingMessage();
+
+        if (msg instanceof OcppJsonCall) {
+            handler.accept(context);
+            serializer.accept(context);
+            sender.accept(context);
+
+        } else if (msg instanceof OcppJsonResult result) {
+            context.getResultHandler()
+                   .accept(result);
+
+        } else if (msg instanceof OcppJsonError error) {
+            context.getErrorHandler()
+                   .accept(error);
         }
     }
 
-    private void processCall(CommunicationContext context, OcppJsonCall call) {
-        handler.accept(context);
-        serializer.accept(context);
-        sender.accept(context);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void processResult(CommunicationContext context, OcppJsonResult result) {
-        context.getFutureResponseContext()
-            .getTask()
-            .getHandler(context.getChargeBoxId())
-            .handleResponse(new DummyResponse(result.getPayload()));
-    }
-
-    private void processError(CommunicationContext context, OcppJsonError error) {
-        context.getFutureResponseContext()
-            .getTask()
-            .success(context.getChargeBoxId(), error);
-    }
-
-    private record DummyResponse(ResponseType payload) implements Response<ResponseType> {
-        @Override
-        public Map<String, Object> getContext() {
-            return null;
-        }
-
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
-        public boolean isDone() {
-            return true;
-        }
-
-        @Override
-        public ResponseType get() {
-            return payload;
-        }
-
-        @Override
-        public ResponseType get(long timeout, TimeUnit unit) {
-            return payload;
-        }
-    }
 }

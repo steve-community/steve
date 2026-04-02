@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,24 +23,18 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import ocpp._2022._02.security.ExtendedTriggerMessage;
 import ocpp._2022._02.security.ExtendedTriggerMessageResponse;
-import ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
 
 import jakarta.xml.ws.AsyncHandler;
 
-public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, TriggerMessageStatusEnumType> {
+public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTriggerMessageParams, String> {
 
     public ExtendedTriggerMessageTask(ExtendedTriggerMessageParams params) {
         super(params);
     }
 
     @Override
-    public OcppCallback<TriggerMessageStatusEnumType> defaultCallback() {
-        return new DefaultOcppCallback<TriggerMessageStatusEnumType>() {
-            @Override
-            public void success(String chargeBoxId, TriggerMessageStatusEnumType response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -55,7 +49,7 @@ public class ExtendedTriggerMessageTask extends Ocpp16AndAboveTask<ExtendedTrigg
     public AsyncHandler<ExtendedTriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

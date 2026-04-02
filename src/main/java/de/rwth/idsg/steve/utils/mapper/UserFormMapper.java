@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ public final class UserFormMapper {
         form.setBirthDay(userRecord.getBirthDay());
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
-        form.setEmail(userRecord.getEMail());
+        form.setEMail(userRecord.getEMail());
         form.setNotificationFeatures(NotificationFeature.splitFeatures(userRecord.getNotificationFeatures()));
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));

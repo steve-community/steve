@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java: [ '21', '23', '25' ]
-        db: [ 'mysql:8.0', 'mysql:8.4', 'mariadb:10.6.25', 'mariadb:10.11.16']
+        db: [ 'mysql:8.0', 'mysql:8.4', 'mariadb:10.6.14']
     runs-on: ${{ matrix.os }}
     services:
       mysql:
@@ -38,10 +38,6 @@ jobs:
 
       - name: Build with Maven
         run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
-
-      - name: Run integration tests (*IT)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest -Dtest='*IT' test --file pom.xml
 
       - name: Start the app and visit signin web page
         run: |

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,17 +19,12 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.repository.ReservationStatus;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -39,12 +34,6 @@ import java.util.List;
 @Setter
 @ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
-
-    private List<@NotNull(message = "reservationId must not be null")
-                 @Positive(message = "reservationId has to be a positive number") Integer> reservationId;
-
-    private List<@NotNull(message = "transactionId must not be null")
-                 @Positive(message = "transactionId has to be a positive number") Integer> transactionId;
 
     private ReservationStatus status;
 
@@ -57,19 +46,8 @@ public class ReservationQueryForm extends QueryForm {
         periodType = QueryPeriodType.ACTIVE;
     }
 
-    @Schema(hidden = true)
     public boolean isStatusSet() {
         return status != null;
-    }
-
-    @Schema(hidden = true)
-    public boolean isReservationIdSet() {
-        return !CollectionUtils.isEmpty(reservationId);
-    }
-
-    @Schema(hidden = true)
-    public boolean isTransactionIdSet() {
-        return !CollectionUtils.isEmpty(transactionId);
     }
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")

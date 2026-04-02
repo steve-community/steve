@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,5 @@ import java.util.List;
  * @since 09.03.2018
  */
 public interface ChargePointSelection {
-
     List<ChargePointSelect> getChargePointSelectList();
-
-    void setChargePointSelectList(List<ChargePointSelect> chargePointSelectList);
-
-    List<String> getChargeBoxIdList();
 }

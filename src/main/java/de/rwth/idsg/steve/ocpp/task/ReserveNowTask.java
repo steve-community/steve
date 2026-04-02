@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
-import ocpp.cp._2015._10.ReservationStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -31,7 +30,7 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, ReservationStatus> {
+public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, String> {
 
     private final int reservationId;
     private final String parentIdTag;
@@ -46,13 +45,13 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, Reserva
     }
 
     @Override
-    public OcppCallback<ReservationStatus> defaultCallback() {
-        return new DefaultOcppCallback<ReservationStatus>() {
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback() {
             @Override
-            public void success(String chargeBoxId, ReservationStatus response) {
-                addNewResponse(chargeBoxId, response.value());
+            public void success(String chargeBoxId, String responseStatus) {
+                addNewResponse(chargeBoxId, responseStatus);
 
-                if (ReservationStatus.ACCEPTED == response) {
+                if ("Accepted".equalsIgnoreCase(responseStatus)) {
                     reservationRepository.accepted(reservationId);
                 } else {
                     delete();
@@ -97,7 +96,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, Reserva
     public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, ReservationStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -108,7 +107,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, Reserva
     public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

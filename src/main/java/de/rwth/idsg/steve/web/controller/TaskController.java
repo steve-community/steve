@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -108,7 +108,7 @@ public class TaskController {
 
     private String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
-        GetConfigurationTask.ConfigurationKeyValues response = result.getDetails();
+        GetConfigurationTask.ResponseWrapper response = result.getDetails();
 
         model.addAttribute("chargeBoxId", chargeBoxId);
         model.addAttribute("response", response);

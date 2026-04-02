@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,6 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jooq.steve.db.tables.records.TransactionRecord;
-import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
-import org.jooq.Result;
 
 import java.io.Writer;
 import java.util.List;
@@ -41,6 +37,4 @@ public interface TransactionRepository {
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
     TransactionDetails getDetails(int transactionPk);
-
-    Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to);
 }

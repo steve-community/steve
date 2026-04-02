@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import ocpp.cp._2015._10.ChargingProfileStatus;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 
 /**
@@ -39,13 +38,8 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
     }
 
     @Override
-    public OcppCallback<ChargingProfileStatus> defaultCallback() {
-        return new DefaultOcppCallback<ChargingProfileStatus>() {
-            @Override
-            public void success(String chargeBoxId, ChargingProfileStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override

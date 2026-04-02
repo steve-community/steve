@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -81,13 +81,5 @@ public final class WebSocketLogger {
         } else {
             log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
         }
-    }
-
-    public static void closingDangling(String chargeBoxId, WebSocketSession session) {
-        log.warn("[chargeBoxId={}, sessionId={}] Closing a dangling WebSocketSession", chargeBoxId, session.getId());
-    }
-
-    public static void closingDanglingError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        log.error("[chargeBoxId={}, sessionId={}] Error while trying to close the WebSocketSession", chargeBoxId, session.getId(), t);
     }
 }

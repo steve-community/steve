@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
-import ocpp.cp._2015._10.ClearChargingProfileStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -34,7 +33,7 @@ import jakarta.xml.ws.AsyncHandler;
  * @since 13.03.2018
  */
 @Slf4j
-public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, ClearChargingProfileStatus> {
+public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
 
     private final ChargingProfileRepository chargingProfileRepository;
 
@@ -45,18 +44,19 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
     }
 
     @Override
-    public OcppCallback<ClearChargingProfileStatus> defaultCallback() {
-        return new DefaultOcppCallback<ClearChargingProfileStatus>() {
+    public OcppCallback<String> defaultCallback() {
+        return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, ClearChargingProfileStatus status) {
-                addNewResponse(chargeBoxId, status.value());
+            public void success(String chargeBoxId, String statusValue) {
+                addNewResponse(chargeBoxId, statusValue);
 
                 switch (params.getFilterType()) {
                     case ChargingProfileId:
                         chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
                         break;
                     case OtherParameters:
-                        chargingProfileRepository.clearProfile(chargeBoxId, params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+                        chargingProfileRepository.clearProfile(chargeBoxId,
+                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
                         break;
                     default:
                         log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
@@ -64,8 +64,8 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                 }
 
                 // https://github.com/steve-community/steve/pull/968
-                if (ClearChargingProfileStatus.ACCEPTED != status) {
-                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, status);
+                if (!"Accepted".equalsIgnoreCase(statusValue)) {
+                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, statusValue);
                 }
             }
         };
@@ -84,7 +84,7 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
     public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

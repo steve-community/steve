@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2015
@@ -34,23 +32,6 @@ import java.time.Instant;
 @Setter
 @RequiredArgsConstructor
 public class FutureResponseContext {
-
-    /**
-     * Internal safety window for matching inbound CALL_RESULT/CALL_ERROR messages.
-     * This limits how long a request context is considered valid for correlation.
-     */
-    public static final int TIMEOUT_IN_SECONDS = 30;
-
     private final CommunicationTask task;
     private final Class<? extends ResponseType> responseClass;
-
-    /**
-     * Timestamp used to detect stale response contexts and prevent late responses
-     * from being correlated as if they were still active.
-     */
-    private final Instant createdAt = Instant.now();
-
-    public boolean hasTimedOut(Instant now) {
-        return createdAt.plusSeconds(TIMEOUT_IN_SECONDS).isBefore(now);
-    }
 }

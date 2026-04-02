@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatus
 import jakarta.xml.ws.AsyncHandler;
 
 @Slf4j
-public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, DeleteCertificateStatusEnumType> {
+public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateParams, String> {
 
     private final CertificateRepository certificateRepository;
 
@@ -42,13 +42,8 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
     }
 
     @Override
-    public OcppCallback<DeleteCertificateStatusEnumType> defaultCallback() {
-        return new DefaultOcppCallback<DeleteCertificateStatusEnumType>() {
-            @Override
-            public void success(String chargeBoxId, DeleteCertificateStatusEnumType response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -71,13 +66,12 @@ public class DeleteCertificateTask extends Ocpp16AndAboveTask<DeleteCertificateP
         return res -> {
             try {
                 var status = res.get().getStatus();
+                success(chargeBoxId, status.value());
 
                 if (status == DeleteCertificateStatusEnumType.ACCEPTED) {
                     log.info("Request accepted. Deleting from database...");
                     certificateRepository.deleteInstalledCertificate(params.getInstalledCertificateId());
                 }
-
-                success(chargeBoxId, status);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

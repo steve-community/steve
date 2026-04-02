@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,8 +59,6 @@ public interface ChargingProfileRepository {
     List<ChargingProfile.Overview> getOverview(ChargingProfileQueryForm form);
 
     ChargingProfile.Details getDetails(int chargingProfilePk);
-
-    boolean exists(int chargingProfilePk);
 
     int add(ChargingProfileForm form);
 

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,18 +33,16 @@ import java.util.Map;
 public interface SessionContextStore {
 
     /**
-     * @return whether this is the first session for this chargeBoxId.
+     * @return the number of sessions for this chargeBoxId after the add.
      */
-    boolean add(String chargeBoxId, WebSocketSession session);
+    int add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
 
     /**
-     * @return whether this was the last session for this chargeBoxId.
+     * @return the number of sessions for this chargeBoxId after the remove.
      */
-    boolean remove(String chargeBoxId, WebSocketSession session);
+    int remove(String chargeBoxId, WebSocketSession session);
 
     WebSocketSession getSession(String chargeBoxId);
-
-    Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId);
 
     void closeSessions(String chargeBoxId);
 

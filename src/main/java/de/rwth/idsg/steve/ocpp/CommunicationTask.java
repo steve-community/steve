@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -152,20 +152,6 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    /**
-     * Relevant to WebSocket/JSON transport: Handle OCPP error responses (e.g., NotImplemented, NotSupported)
-     * from charging stations. This iterates through all registered callbacks, not just the default one.
-     */
-    public void success(String chargeBoxId, OcppJsonError error) {
-        for (OcppCallback<RESPONSE> c : callbackList) {
-            try {
-                c.success(chargeBoxId, error);
-            } catch (Exception e) {
-                log.error("Exception occurred in OcppCallback", e);
-            }
-        }
-    }
-
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
         return switch (versionMap.get(chargeBoxId)) {
             case V_12 -> getOcpp12Handler(chargeBoxId);
@@ -200,6 +186,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         @Override
         public void failed(String chargeBoxId, Exception e) {
             addNewError(chargeBoxId, e.getMessage());
+        }
+    }
+
+    public class StringOcppCallback extends DefaultOcppCallback<String> {
+
+        @Override
+        public void success(String chargeBoxId, String response) {
+            addNewResponse(chargeBoxId, response);
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.config.SteveProperties;
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.DataImportExportService;
@@ -90,10 +89,6 @@ public class AboutSettingsController {
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
         model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host, contextPath));
-
-        var enabledProtocols = steveProperties.getOcpp().getEnabledProtocols();
-        var vals = OcppProtocol.getCompositeValuesOfEnabledOcppProtocols(enabledProtocols);
-        model.addAttribute("enabledOcppProtocols", String.join(", ", vals));
 
         model.addAttribute("exportForm", new DataExportForm());
         model.addAttribute("masterDataTableNames", String.join(", ", dataImportExportService.getMasterDataTableNames()));

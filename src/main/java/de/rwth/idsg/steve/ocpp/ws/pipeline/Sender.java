@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * This class should remain stateless.
@@ -35,16 +36,11 @@ import java.io.IOException;
  * @since 12.03.2015
  */
 @Slf4j
-public enum Sender {
+public enum Sender implements Consumer<CommunicationContext> {
     INSTANCE;
 
-    /**
-     * Return value is used by callers to decide whether they must rollback any pre-send bookkeeping.
-     * Outgoing CALL failures are surfaced as exceptions to avoid silently keeping invalid correlation state.
-     *
-     * @return whether the message was actually sent or not
-     */
-    public boolean accept(CommunicationContext context) {
+    @Override
+    public void accept(CommunicationContext context) {
         String outgoingString = context.getOutgoingString();
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();
@@ -52,21 +48,19 @@ public enum Sender {
         // https://github.com/steve-community/steve/issues/1914
         if (!session.isOpen()) {
             WebSocketLogger.willNotSend(chargeBoxId, session, outgoingString);
-            return false;
+            return;
         }
 
         WebSocketLogger.sending(chargeBoxId, session, outgoingString);
         TextMessage out = new TextMessage(outgoingString);
         try {
             session.sendMessage(out);
-            return true;
         } catch (IOException e) {
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
             if (context.getOutgoingMessage() instanceof OcppJsonCall) {
-                throw new SteveException("OCPP CALL failed", e);
+                throw new SteveException(e.getMessage());
             } else {
                 log.error("Could not send the outgoing message", e);
-                return false;
             }
         }
     }

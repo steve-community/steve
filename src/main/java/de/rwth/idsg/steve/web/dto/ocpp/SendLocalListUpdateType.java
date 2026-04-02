@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+/**
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @since 13.03.2018
+ */
+public enum SendLocalListUpdateType {
+    DIFFERENTIAL("Differential"),
+    FULL("Full");
 
-import jakarta.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
+    private final String value;
 
-@Data
-public class TransactionReportRequest {
+    SendLocalListUpdateType(String v) {
+        value = v;
+    }
 
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Schema(example = "2000-10-10T01:30:00.000+01:00")
-    OffsetDateTime from;
+    public String value() {
+        return value;
+    }
 
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Schema(example = "2000-10-15T01:30:00.000+01:00")
-    OffsetDateTime to;
+    public static SendLocalListUpdateType fromValue(String v) {
+        for (SendLocalListUpdateType c : SendLocalListUpdateType.values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
+    }
 }

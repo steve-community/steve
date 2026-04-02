@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -32,21 +32,10 @@ import java.util.List;
  * @since 21.01.2016
  */
 @Component
+@RequiredArgsConstructor
 public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
 
     private final ChargeBoxIdValidator validator;
-
-    /**
-     * For tests
-     */
-    public ChargeBoxIdListValidator() {
-        this.validator = new ChargeBoxIdValidator((String) null);
-    }
-
-    @Autowired
-    public ChargeBoxIdListValidator(ChargeBoxIdValidator validator) {
-        this.validator = validator;
-    }
 
     @Override
     public void initialize(ChargeBoxId constraintAnnotation) {

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.Record1;
 import org.jooq.Select;
 
@@ -51,12 +50,4 @@ public interface ReservationRepository {
     void accepted(int reservationId);
     void cancelled(int reservationId);
     void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
-
-    /**
-     * Cancels all active reservations for a charge box. When connectorId is 0,
-     * cancels for all connectors of the charge box (charge-point-wide).
-     * Per OCPP 1.6: "A reservation SHALL be terminated when the Charge Point
-     * or connector are set to Faulted or Unavailable."
-     */
-    void cancelActiveReservations(String chargeBoxId, @NotNull Integer connectorId);
 }

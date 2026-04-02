@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.service.TransactionReportService;
 import de.rwth.idsg.steve.service.TransactionService;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -58,14 +57,12 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
 
     @Mock
     private TransactionService transactionService;
-    @Mock
-    private TransactionReportService transactionReportService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionService, transactionReportService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionService))
             .setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType("application/json"))

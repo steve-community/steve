@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,11 @@ import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
-import ocpp.cp._2015._10.UpdateStatus;
 
 import jakarta.xml.ws.AsyncHandler;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, UpdateStatus> {
+public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, String> {
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
@@ -45,13 +46,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
     }
 
     @Override
-    public OcppCallback<UpdateStatus> defaultCallback() {
-        return new DefaultOcppCallback<UpdateStatus>() {
-            @Override
-            public void success(String chargeBoxId, UpdateStatus response) {
-                addNewResponse(chargeBoxId, response.value());
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -73,7 +69,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
     public AsyncHandler<ocpp.cp._2012._06.SendLocalListResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, UpdateStatus.fromValue(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -84,7 +80,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
     public AsyncHandler<ocpp.cp._2015._10.SendLocalListResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -97,7 +93,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
 
     private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagService ocppTagService) {
         // DIFFERENTIAL update
-        if (params.getUpdateType() == ocpp.cp._2015._10.UpdateType.DIFFERENTIAL) {
+        if (params.getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
             List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();
 
             // Step 1: For the idTags to be deleted, insert only the idTag
@@ -110,7 +106,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
-                    .withUpdateType(params.getUpdateType())
+                    .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
                     .withLocalAuthorizationList(auths);
 
             // FULL update
@@ -123,7 +119,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, U
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
-                    .withUpdateType(params.getUpdateType())
+                    .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
                     .withLocalAuthorizationList(values);
         }
     }

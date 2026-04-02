@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import ocpp._2022._02.security.LogParametersType;
 import jakarta.xml.ws.AsyncHandler;
 import java.util.Map;
 
-public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, GetLogResponse> {
+public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, String> {
 
     private final int requestId;
 
@@ -38,19 +38,8 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, GetLogResponse>
     }
 
     @Override
-    public OcppCallback<GetLogResponse> defaultCallback() {
-        return new DefaultOcppCallback<GetLogResponse>() {
-            @Override
-            public void success(String chargeBoxId, GetLogResponse response) {
-                var status = response.getStatus().value();
-
-                String responseMessage = (response.getFilename() == null)
-                    ? status
-                    : status + " (filename: " + response.getFilename() + ")";
-
-                addNewResponse(chargeBoxId, responseMessage);
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Override
@@ -73,7 +62,14 @@ public class GetLogTask extends Ocpp16AndAboveTask<GetLogParams, GetLogResponse>
     public AsyncHandler<GetLogResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get());
+                var response = res.get();
+                var status = response.getStatus().value();
+
+                String responseMessage = (response.getFilename() == null)
+                    ? status
+                    : status + " (filename: " + response.getFilename() + ")";
+
+                success(chargeBoxId, responseMessage);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ public class UserForm {
     private UserSex sex = UserSex.OTHER;
 
     @Email(message = "Not a valid e-mail address")
-    private String email;
+    private String eMail;
 
     private List<NotificationFeature> notificationFeatures;
 

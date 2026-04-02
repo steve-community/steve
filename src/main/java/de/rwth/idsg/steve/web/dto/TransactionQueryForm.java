@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,8 +37,8 @@ import java.util.Objects;
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
-    @Schema(description = "Database primary keys of the transactions")
-    private List<@NotNull(message = "transactionPk must not be null") Integer> transactionPk;
+    @Schema(description = "Database primary key of the transaction")
+    private Integer transactionPk;
     
     @Schema(description = "ID of the connector")
     private Integer connectorId;
@@ -63,7 +60,7 @@ public class TransactionQueryForm extends QueryForm {
 
     @Schema(hidden = true)
     public boolean isTransactionPkSet() {
-        return !CollectionUtils.isEmpty(transactionPk);
+        return transactionPk != null;
     }
     
     @Schema(hidden = true)

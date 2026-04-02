@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,10 +67,6 @@ public class OcppTagService {
         return ocppTagRepository.getIdTags();
     }
 
-    public List<String> getIdTags(List<String> idTagList) {
-        return ocppTagRepository.getIdTags(idTagList);
-    }
-
     public List<String> getIdTagsWithoutUser() {
         return ocppTagRepository.getIdTagsWithoutUser();
     }
@@ -124,7 +120,7 @@ public class OcppTagService {
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
                                   @Nullable String chargeBoxId, @Nullable Integer connectorId,
-                                  Supplier<IdTagInfo> supplierWhenException) {
+        Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {

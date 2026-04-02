@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ public class SteveException extends RuntimeException {
     public static class AlreadyExists extends SteveException {
 
         public AlreadyExists(String template, Object arg1) {
-            super(template, arg1);
+            super(template.formatted(arg1));
         }
     }
 
@@ -72,10 +72,6 @@ public class SteveException extends RuntimeException {
 
         public NotFound(String message) {
             super(message);
-        }
-
-        public NotFound(String template, Object arg1) {
-            super(template, arg1);
         }
     }
 

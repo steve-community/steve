@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
@@ -49,6 +48,7 @@ import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.ChargePointStatus;
 import ocpp.cs._2015._10.DataTransferRequest;
 import ocpp.cs._2015._10.DataTransferResponse;
 import ocpp.cs._2015._10.DataTransferStatus;
@@ -76,10 +76,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Optional;
 
-import static ocpp.cs._2015._10.ChargePointStatus.FAULTED;
-import static ocpp.cs._2015._10.ChargePointStatus.SUSPENDED_EV;
-import static ocpp.cs._2015._10.ChargePointStatus.UNAVAILABLE;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
@@ -97,8 +93,6 @@ public class CentralSystemService16_Service {
     private final EventRepository eventRepository;
     private final CertificateSigningService certificateSigningService;
     private final TaskScheduler taskScheduler;
-    private final CentralSystemService16_ServiceValidator serviceValidator;
-    private final ReservationRepository reservationRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -147,12 +141,6 @@ public class CentralSystemService16_Service {
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-
-        var exception = serviceValidator.validateStatusNotification(parameters);
-        if (exception != null) {
-            log.warn("StatusNotification validation failed: {}", exception.getMessage(), exception);
-        }
-
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 
@@ -170,21 +158,14 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertConnectorStatus(params);
 
-        if (parameters.getStatus() == FAULTED) {
+        if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
-         if (parameters.getStatus() == SUSPENDED_EV) {
+         if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
-                    chargeBoxIdentity, parameters.getConnectorId(), timestamp));
-        }
-
-        // https://github.com/steve-community/steve/issues/1398
-        // OCPP 1.6: "A reservation SHALL be terminated on the Charge Point when [...]
-        // the Charge Point or connector are set to Faulted or Unavailable."
-        if (parameters.getStatus() == UNAVAILABLE || parameters.getStatus() == FAULTED) {
-            reservationRepository.cancelActiveReservations(chargeBoxIdentity, parameters.getConnectorId());
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
         }
 
         return new StatusNotificationResponse();
@@ -192,11 +173,6 @@ public class CentralSystemService16_Service {
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
-
-        var exception = serviceValidator.validateMeterValues(parameters);
-        if (exception != null) {
-            log.warn("MeterValues validation failed: {}", exception.getMessage(), exception);
-        }
 
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
@@ -236,11 +212,6 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
-        var exception = serviceValidator.validateStart(parameters);
-        if (exception != null) {
-            log.warn("StartTransaction validation failed: {}", exception.getMessage(), exception);
-        }
-
         int transactionId = ocppServerRepository.insertTransaction(params);
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
@@ -274,19 +245,11 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, transactionId);
-        var exception = serviceValidator.validateStop(transaction, parameters);
+        ocppServerRepository.updateTransaction(params);
 
-        if (exception == null) {
-            ocppServerRepository.updateTransaction(params);
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
-            applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
-        } else {
-            log.warn("StopTransaction validation failed: {}", exception.getMessage(), exception);
-            ocppServerRepository.updateTransactionAsFailed(params, exception);
-            // TODO: we need to handle meter values of invalid stops differently. will come later.
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
-        }
+        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+
+        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
@@ -366,11 +329,6 @@ public class CentralSystemService16_Service {
 
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
-        var exception = serviceValidator.validateSecurityEvent(parameters);
-        if (exception != null) {
-            log.warn("SecurityEvent validation failed: {}", exception.getMessage(), exception);
-        }
-
         try {
             eventRepository.insertSecurityEvent(
                 chargeBoxIdentity,

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2026 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -110,7 +110,7 @@ public class Issue1219 {
             }
 
             TransactionQueryForm form = new TransactionQueryForm();
-            form.setTransactionPk(List.of(transactionId));
+            form.setTransactionPk(transactionId);
             Transaction transaction = transactionRepository.getTransactions(form).get(0);
 
             DateTime stopTimestamp = transaction.getStartTimestamp().plusHours(1);

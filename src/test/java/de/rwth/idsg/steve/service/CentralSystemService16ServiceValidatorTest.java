@@ -146,6 +146,92 @@ public class CentralSystemService16ServiceValidatorTest {
     }
 
     @Test
+    public void validateMeterValuesWithTransaction_transactionMissing_returnsError() {
+        var result = validator.validateMeterValues(
+            meterValuesParams(1, List.of(meterValue("2026-02-17T10:00:00Z"))),
+            null
+        );
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("The transaction is not found in database", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValuesWithTransaction_transactionAlreadyStoppedByStation_returnsError() {
+        var tx = tx(
+            "100",
+            DateTime.parse("2026-02-17T09:00:00Z"),
+            "150",
+            DateTime.parse("2026-02-17T10:00:00Z"),
+            TransactionStopEventActor.station
+        );
+
+        var result = validator.validateMeterValues(
+            meterValuesParams(1, List.of(meterValue("2026-02-17T10:30:00Z"))),
+            tx
+        );
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("The transaction was already stopped by the station", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValuesWithTransaction_transactionAlreadyStoppedManually_isAllowed() {
+        var tx = tx(
+            "100",
+            DateTime.parse("2026-02-17T09:00:00Z"),
+            "150",
+            DateTime.parse("2026-02-17T10:00:00Z"),
+            TransactionStopEventActor.manual
+        );
+
+        var result = validator.validateMeterValues(
+            meterValuesParams(1, List.of(meterValue("2026-02-17T10:30:00Z"))),
+            tx
+        );
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    public void validateMeterValuesWithTransaction_connectorIdNegative_returnsError() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+
+        var result = validator.validateMeterValues(
+            meterValuesParams(-1, List.of(meterValue("2026-02-17T10:00:00Z"))),
+            tx
+        );
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("MeterValues.connectorId must not be negative", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValuesWithTransaction_beforeStartTimestamp_returnsError() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+
+        var result = validator.validateMeterValues(
+            meterValuesParams(1, List.of(meterValue("2026-02-17T08:54:59Z"))),
+            tx
+        );
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("at least one MeterValue.timestamp is before start.timestamp", result.getMessage());
+    }
+
+    @Test
+    public void validateMeterValuesWithTransaction_valid_returnsNull() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+
+        var result = validator.validateMeterValues(
+            meterValuesParams(1, List.of(meterValue("2026-02-17T10:00:00Z"))),
+            tx
+        );
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
     public void validateStop_transactionMissing_returnsError() {
         var params = stopParams(new DateTime(NOW.toEpochMilli()), "200");
         var result = validator.validateStop(null, params);

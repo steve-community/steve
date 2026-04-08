@@ -224,12 +224,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             .fetchInto(TRANSACTION);
 
         if (records.isEmpty()) {
-            log.warn("No row found for chargeBoxId '{}' and transactionId '{}'", chargeBoxId, transactionId);
+            log.warn("No row found for chargeBoxId={}, connectorId={} and transactionId={}", chargeBoxId, connectorId, transactionId);
             return null;
         }
 
         if (records.size() > 1) {
-            log.warn("Found multiple rows for chargeBoxId '{}' and transactionId '{}'. Returning the most recent one.", chargeBoxId, transactionId);
+            log.warn("Found multiple rows for chargeBoxId={}, connectorId={} and transactionId={}. Returning the most recent one.", chargeBoxId, connectorId, transactionId);
         }
 
         return records.get(0);

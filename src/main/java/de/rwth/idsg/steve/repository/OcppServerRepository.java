@@ -49,7 +49,10 @@ public interface OcppServerRepository {
     void insertMeterValues(@NotNull String chargeBoxId, List<MeterValue> list, int connectorId, Integer transactionId);
     void insertMeterValues(@NotNull String chargeBoxId, List<MeterValue> list, @Nullable TransactionRecord transaction);
 
-    @Nullable TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId);
+    /**
+     * connectorId is the optional parameter to tighten the check
+     */
+    @Nullable TransactionRecord getTransaction(@NotNull String chargeBoxId, @Nullable Integer connectorId, int transactionId);
     int insertTransaction(InsertTransactionParams params);
     void updateTransaction(UpdateTransactionParams params);
     void updateTransactionAsFailed(UpdateTransactionParams params, Exception exception);

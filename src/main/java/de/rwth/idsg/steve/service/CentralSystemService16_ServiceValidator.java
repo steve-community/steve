@@ -126,6 +126,32 @@ public class CentralSystemService16_ServiceValidator {
         return this.validateMeterValuesInternal(stopParams.getTransactionData(), thisTx.getStartTimestamp(), stopParams.getTimestamp());
     }
 
+    /**
+     * Validation for MeterValues with transaction reference, i.e. a transaction must exist
+     */
+    public SteveException validateMeterValues(@NotNull MeterValuesRequest params, TransactionRecord thisTx) {
+        if (thisTx == null) {
+            return new SteveException("The transaction is not found in database");
+        }
+
+        boolean wasStopped = thisTx.getStopEventActor() == TransactionStopEventActor.station
+            && thisTx.getStopValue() != null
+            && thisTx.getStopTimestamp() != null;
+
+        if (wasStopped) {
+            return new SteveException("The transaction was already stopped by the station");
+        }
+
+        if (params.getConnectorId() < 0) {
+            return new SteveException("MeterValues.connectorId must not be negative");
+        }
+
+        return this.validateMeterValuesInternal(params.getMeterValue(), thisTx.getStartTimestamp(), null);
+    }
+
+    /**
+     * Validation for MeterValues without any transaction reference
+     */
     public SteveException validateMeterValues(@NotNull MeterValuesRequest params) {
         if (params.getConnectorId() < 0) {
             return new SteveException("MeterValues.connectorId must not be negative");

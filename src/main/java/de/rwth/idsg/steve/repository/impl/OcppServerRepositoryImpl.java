@@ -40,6 +40,7 @@ import ocpp.cs._2015._10.MeterValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
@@ -208,22 +209,27 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Nullable
     @Override
-    public TransactionRecord getTransaction(@NotNull String chargeBoxId, int transactionId) {
+    public TransactionRecord getTransaction(@NotNull String chargeBoxId, @Nullable Integer connectorId, int transactionId) {
+        Condition connectorIdCondition = (connectorId == null)
+            ? DSL.noCondition()
+            : DSL.condition(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+
         var records = ctx.select(TRANSACTION.fields())
             .from(TRANSACTION)
             .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
             .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
             .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(connectorIdCondition)
             .orderBy(TRANSACTION.START_TIMESTAMP.desc())
             .fetchInto(TRANSACTION);
 
         if (records.isEmpty()) {
-            log.warn("No row found for chargeBoxId '{}' and transactionId '{}'", chargeBoxId, transactionId);
+            log.warn("No row found for chargeBoxId={}, connectorId={} and transactionId={}", chargeBoxId, connectorId, transactionId);
             return null;
         }
 
         if (records.size() > 1) {
-            log.warn("Found multiple rows for chargeBoxId '{}' and transactionId '{}'. Returning the most recent one.", chargeBoxId, transactionId);
+            log.warn("Found multiple rows for chargeBoxId={}, connectorId={} and transactionId={}. Returning the most recent one.", chargeBoxId, connectorId, transactionId);
         }
 
         return records.get(0);

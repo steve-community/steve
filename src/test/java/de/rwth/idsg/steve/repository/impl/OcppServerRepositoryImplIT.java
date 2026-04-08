@@ -143,8 +143,9 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getTransaction() {
-        int txId = repository.insertTransaction(insertTransactionParams());
-        var tx = assertNoDatabaseException(() -> repository.getTransaction(KNOWN_CHARGE_BOX_ID, txId));
+        var params = insertTransactionParams();
+        int txId = repository.insertTransaction(params);
+        var tx = assertNoDatabaseException(() -> repository.getTransaction(KNOWN_CHARGE_BOX_ID, params.getConnectorId(), txId));
         Assertions.assertNotNull(tx);
         Assertions.assertEquals(txId, tx.getTransactionPk());
     }

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -193,7 +194,14 @@ public class CentralSystemService16_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
 
-        var exception = serviceValidator.validateMeterValues(parameters);
+        SteveException exception;
+        if (transactionId == null) {
+            exception = serviceValidator.validateMeterValues(parameters);
+        } else {
+            var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, parameters.getConnectorId(), transactionId);
+            exception = serviceValidator.validateMeterValues(parameters, transaction);
+        }
+
         if (exception != null) {
             log.warn("MeterValues validation failed: {}", exception.getMessage(), exception);
         }
@@ -274,7 +282,7 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, transactionId);
+        var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, null, transactionId);
         var exception = serviceValidator.validateStop(transaction, parameters);
 
         if (exception == null) {

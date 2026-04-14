@@ -33,6 +33,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -135,6 +136,9 @@ public class OcppJsonChargePoint {
             } else if (ocppMsg instanceof OcppJsonError error) {
                 ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
                 ctx.errorHandler.accept(error);
+            } else if (ocppMsg instanceof OcppJsonCallToIgnore toIgnore) {
+                // Do nothing. We did not anticipate this message.
+                log.warn("Ignoring unexpected incoming message: {}", toIgnore.getReq());
             } else if (ocppMsg instanceof OcppJsonCallForTesting testing) {
                 handleCall(testing);
             }
@@ -388,8 +392,9 @@ public class OcppJsonChargePoint {
 
             RequestContext context = requestContextMap.get(action);
             if (context == null) {
-                testerThreadInterruptReason = new RuntimeException("Unexpected message arrived: " + req);
-                testerThread.interrupt();
+                return new OcppJsonCallToIgnore(req);
+                // testerThreadInterruptReason = new RuntimeException("Unexpected message arrived: " + req);
+                // testerThread.interrupt();
             } else if (Objects.equals(context.requestPayload, req)) {
                 requestContextMap.remove(action);
             }
@@ -406,6 +411,12 @@ public class OcppJsonChargePoint {
     @Getter
     private static class OcppJsonCallForTesting extends OcppJsonCall {
         private RequestContext context;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    private static class OcppJsonCallToIgnore extends OcppJsonCall {
+        private final String req;
     }
 
 }

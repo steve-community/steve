@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
@@ -85,13 +84,15 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.setPassword(properties.getPassword());
 
         // set non-standard params
-        hc.addDataSourceProperty(PropertyKey.cachePrepStmts.getKeyName(), true);
-        hc.addDataSourceProperty(PropertyKey.useServerPrepStmts.getKeyName(), true);
-        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
-        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
-        hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
-        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), SteveProperties.TIME_ZONE_ID);
-        hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
+        // https://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html
+        // https://mariadb.com/docs/connectors/mariadb-connector-j/about-mariadb-connector-j
+        hc.addDataSourceProperty("cachePrepStmts", true);
+        hc.addDataSourceProperty("useServerPrepStmts", true);
+        hc.addDataSourceProperty("prepStmtCacheSize", 250);
+        hc.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+        hc.addDataSourceProperty("characterEncoding", "utf8");
+        hc.addDataSourceProperty("connectionTimeZone", SteveProperties.TIME_ZONE_ID);
+        hc.addDataSourceProperty("useSSL", true);
 
         // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);

@@ -8,28 +8,38 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         java: [ '21', '23', '25' ]
-        db: [ 'mysql:8.0', 'mysql:8.4', 'mariadb:10.6.25', 'mariadb:10.11.16']
+        database:
+          - image: 'mysql:8.0'
+            databaseName: 'mysql'
+          - image: 'mysql:8.4'
+            databaseName: 'mysql'
+          - image: 'mariadb:10.6.25'
+            databaseName: 'mariadb'
+          - image: 'mariadb:10.11.16'
+            databaseName: 'mariadb'
     runs-on: ${{ matrix.os }}
     services:
-      mysql:
-        image: ${{ matrix.db }}
+      db:
+        image: ${{ matrix.database.image }}
         env:
           MYSQL_ROOT_PASSWORD: root
+          MARIADB_ROOT_PASSWORD: root
           MYSQL_DATABASE: root
+          MARIADB_DATABASE: root
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Java ${{ matrix.Java }}
+      - name: Set up Java ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
 
-      - name: Set up MySQL
+      - name: Set up database
         run: |
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "SELECT @@VERSION;"
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
@@ -37,11 +47,11 @@ jobs:
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
 
       - name: Build with Maven
-        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
+        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest,${{ matrix.database.databaseName }} clean package --file pom.xml
 
       - name: Run integration tests (*IT)
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest -Dtest='*IT' test --file pom.xml
+        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest,${{ matrix.database.databaseName }} -Dtest='*IT' test --file pom.xml
 
       - name: Start the app and visit signin web page
         run: |

@@ -11,20 +11,33 @@ jobs:
         database:
           - image: 'mysql:8.0'
             databaseName: 'mysql'
+            command: ''
+            healthCmd: 'mysqladmin ping'
           - image: 'mysql:8.4'
             databaseName: 'mysql'
+            command: ''
+            healthCmd: 'mysqladmin ping'
           - image: 'mariadb:10.6.25'
             databaseName: 'mariadb'
+            command: '--innodb-use-native-aio=0'
+            healthCmd: 'healthcheck.sh --connect --innodb_initialized'
           - image: 'mariadb:10.11.16'
             databaseName: 'mariadb'
+            command: '--innodb-use-native-aio=0'
+            healthCmd: 'healthcheck.sh --connect --innodb_initialized'
           - image: 'mariadb:11.4.10'
             databaseName: 'mariadb'
+            command: '--innodb-use-native-aio=0'
+            healthCmd: 'healthcheck.sh --connect --innodb_initialized'
           - image: 'mariadb:11.8.6'
             databaseName: 'mariadb'
+            command: '--innodb-use-native-aio=0'
+            healthCmd: 'healthcheck.sh --connect --innodb_initialized'
     runs-on: ${{ matrix.os }}
     services:
       db:
         image: ${{ matrix.database.image }}
+        command: ${{ matrix.database.command }}
         env:
           MYSQL_ROOT_PASSWORD: root
           MARIADB_ROOT_PASSWORD: root
@@ -32,7 +45,7 @@ jobs:
           MARIADB_DATABASE: root
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="${{ matrix.database.healthCmd }}" --health-interval=10s --health-timeout=5s --health-retries=6
 
     steps:
       - uses: actions/checkout@v6

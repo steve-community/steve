@@ -34,6 +34,7 @@ jobs:
             command: '--innodb-use-native-aio=0'
             healthCmd: 'healthcheck.sh --connect --innodb_initialized'
     runs-on: ${{ matrix.os }}
+    name: java:${{ matrix.java }}, ${{ matrix.database.image }}
     services:
       db:
         image: ${{ matrix.database.image }}

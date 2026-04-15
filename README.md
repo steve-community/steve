@@ -49,7 +49,7 @@ See [dedicated Wiki page](https://github.com/steve-community/steve/wiki/OCPP-1.6
 SteVe requires 
 * JDK 21 or newer
 * Maven 
-* MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11) supported versions.
+* MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11-L35) supported versions.
 
 to build and run. 
 
@@ -94,7 +94,13 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To compile SteVe simply use Maven. A runnable `war` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```
-    # ./mvnw package
+    # ./mvnw package -Pprod,mysql
+    ```
+
+    To build against MariaDB instead, use:
+
+    ```
+    # ./mvnw package -Pprod,mariadb
     ```
 
 5. Run SteVe:

@@ -5,7 +5,7 @@ spring:
   application:
     name: steve
   datasource:
-    url: jdbc:mysql://${db.ip}:${db.port}/${db.schema}
+    url: jdbc:@databaseName@://${db.ip}:${db.port}/${db.schema}
     username: ${db.user}
     password: ${db.password}
   servlet:

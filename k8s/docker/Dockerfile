@@ -35,8 +35,8 @@ RUN sed -i 's|${server.host}|${env.SERVER_HOST}|g' pom.xml
 # Make the Maven wrapper executable
 RUN chmod +x mvnw
 
-# Build the project
-RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
+# Build the project (assuming mariadb)
+RUN ./mvnw clean package -Pkubernetes,mariadb -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
 # Release Stage
 FROM base AS release

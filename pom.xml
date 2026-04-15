@@ -268,7 +268,10 @@
                     <table>schema_version</table>
 
                     <cleanDisabled>true</cleanDisabled>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
+                    <!--  By default, the driver is autodetected based on the url.
+                          See org.flywaydb.maven.AbstractFlywayMojo#driver at
+                          https://github.com/flyway/flyway/blob/main/flyway-plugins/flyway-maven-plugin/src/main/java/org/flywaydb/maven/AbstractFlywayMojo.java#L83 -->
+                    <!-- <driver>...</driver> -->
                     <url>${jdbcUrl}</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
@@ -280,6 +283,8 @@
                     </locations>
                 </configuration>
                 <dependencies>
+                    <!-- MariaDB is supported by the same dependency.
+                         https://documentation.red-gate.com/flyway/reference/database-driver-reference/mariadb -->
                     <dependency>
                         <groupId>org.flywaydb</groupId>
                         <artifactId>flyway-mysql</artifactId>
@@ -326,7 +331,10 @@
                      http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
                 <configuration>
                     <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <!-- If not set, generator infers from url.
+                             See org.jooq.codegen.GenerationTool#driverClass(org.jooq.meta.jaxb.Jdbc) at
+                             https://github.com/jOOQ/jOOQ/blob/main/jOOQ-codegen/src/main/java/org/jooq/codegen/GenerationTool.java#L1294 -->
+                        <!-- <driver>...</driver> -->
                         <url>${jdbcUrl}</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>
@@ -334,7 +342,9 @@
 
                     <generator>
                         <database>
-                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
+                            <!-- The default database name, if no name is supplied, will be derived from the JDBC connection.
+                                 https://www.jooq.org/doc/latest/manual/code-generation/codegen-advanced/codegen-config-database/codegen-database-name/ -->
+                            <!-- <name>...</name> -->
                             <includes>.*</includes>
                             <excludes/>
                             <inputSchema>${db.schema}</inputSchema>

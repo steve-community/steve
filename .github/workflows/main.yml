@@ -17,6 +17,10 @@ jobs:
             databaseName: 'mariadb'
           - image: 'mariadb:10.11.16'
             databaseName: 'mariadb'
+          - image: 'mariadb:11.4.10'
+            databaseName: 'mariadb'
+          - image: 'mariadb:11.8.6'
+            databaseName: 'mariadb'
     runs-on: ${{ matrix.os }}
     services:
       db:

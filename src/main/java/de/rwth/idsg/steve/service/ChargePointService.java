@@ -122,7 +122,7 @@ public class ChargePointService {
     }
 
     public void updateSecurityProfile(String chargeBoxId, String securityProfile) {
-        var ocppSecurityProfile = OcppSecurityProfile.fromValue(Integer.valueOf(securityProfile));
+        var ocppSecurityProfile = OcppSecurityProfile.fromValueNoException(securityProfile);
         chargePointRepository.updateSecurityProfile(chargeBoxId, ocppSecurityProfile);
     }
 

@@ -94,42 +94,46 @@ public class ChargePointConfigUpdater {
     }
 
     private void tryToChangeConfiguration(String chargeBoxId, String configKey, String configValue) {
+        log.debug("Trying to change config '{}' at station={}", configKey, chargeBoxId);
+
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(chargeBoxId));
         params.setKeyType(ChangeConfigurationParams.ConfigurationKeyType.PREDEFINED);
         params.setConfKey(configKey);
         params.setValue(configValue);
 
+        final String prefix = "Database updated, but";
+
         try {
             RestCallback<ConfigurationStatus> callback = ocppOperationsService.changeConfiguration(params);
             if (!callback.isFinished()) {
-                throw new SteveException("Timed out while applying ChangeConfiguration for key '%s' to chargeBoxId '%s'".formatted(configKey, chargeBoxId));
+                throw new SteveException("%s timed out while applying ChangeConfiguration for key '%s' at station '%s'".formatted(prefix, configKey, chargeBoxId));
             }
 
             var exception = callback.getExceptionsByChargeBoxId().get(chargeBoxId);
             if (exception != null) {
-                throw new SteveException("Failed to apply ChangeConfiguration for key '%s' to chargeBoxId '%s'".formatted(configKey, chargeBoxId), exception);
+                throw new SteveException("%s failed to apply ChangeConfiguration for key '%s' at station '%s'".formatted(prefix, configKey, chargeBoxId), exception);
             }
 
             var error = callback.getErrorResponsesByChargeBoxId().get(chargeBoxId);
             if (error != null) {
-                throw new SteveException("Charge point '%s' returned CallError for ChangeConfiguration key '%s': %s".formatted(chargeBoxId, configKey, error));
+                throw new SteveException("%s station '%s' returned CallError for ChangeConfiguration key '%s': %s".formatted(prefix, chargeBoxId, configKey, error));
             }
 
             var status = callback.getSuccessResponsesByChargeBoxId().get(chargeBoxId);
             if (status == null) {
-                throw new SteveException("Missing ChangeConfiguration response for key '%s' from chargeBoxId '%s'".formatted(configKey, chargeBoxId));
+                throw new SteveException("%s missing ChangeConfiguration response for key '%s' from station '%s'".formatted(prefix, configKey, chargeBoxId));
             }
 
             if (status != ConfigurationStatus.ACCEPTED) {
-                throw new SteveException("Charge point '%s' rejected ChangeConfiguration key '%s' with status '%s'".formatted(chargeBoxId, configKey, status.value()));
+                throw new SteveException("%s station '%s' rejected ChangeConfiguration key '%s' with status '%s'".formatted(prefix, chargeBoxId, configKey, status.value()));
             }
         } catch (SteveException.BadRequest e) {
-            log.warn("Skipping ChangeConfiguration for key={} on offline/unreachable chargeBoxId={}", configKey, chargeBoxId);
+            log.warn("{} skipping ChangeConfiguration for key={} at offline/unreachable station={}", prefix, configKey, chargeBoxId);
         } catch (SteveException e) {
             throw e;
         } catch (Exception e) {
-            throw new SteveException("Failed to apply ChangeConfiguration for key '%s' to chargeBoxId '%s'".formatted(configKey, chargeBoxId), e);
+            throw new SteveException("%s failed to apply ChangeConfiguration for key '%s' at station '%s'".formatted(prefix, configKey, chargeBoxId), e);
         }
     }
 }

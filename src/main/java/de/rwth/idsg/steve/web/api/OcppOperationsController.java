@@ -200,6 +200,11 @@ public class OcppOperationsController {
         return OcppOperationResponse.from(callback);
     }
 
+    @Operation(description = """
+        A <code>successResponses[].response: -1</code> indicates that the charge point does not support Local Authorization Lists.
+        A <code>successResponses[].response: 0</code> indicates that the local authorization list is empty.
+        Positive values indicate the configured local authorization list version.
+        """)
     @PostMapping(value = "/GetLocalListVersion")
     public OcppOperationResponse<Integer> getLocalListVersion(@RequestBody @Valid MultipleChargePointSelect params) throws Exception {
         var callback = operationsService.getLocalListVersion(params);

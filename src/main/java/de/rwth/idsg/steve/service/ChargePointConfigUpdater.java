@@ -83,11 +83,17 @@ public class ChargePointConfigUpdater {
         }
     }
 
+    /**
+     * Needs to be blocking, must not be Async
+     */
     @EventListener
     public void tryToChangeSecurityProfileAtStation(OcppStationSecurityProfileChanged event) {
         tryToChangeConfiguration(event.chargeBoxId(), SecurityProfile.value(), String.valueOf(event.newSecurityProfile().getValue()));
     }
 
+    /**
+     * Needs to be blocking, must not be Async
+     */
     @EventListener
     public void tryToChangeAuthorizationKeyAtStation(OcppStationSecurityBasicAuthChanged event) {
         tryToChangeConfiguration(event.chargeBoxId(), AuthorizationKey.value(), event.newRawPassword());

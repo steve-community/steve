@@ -147,10 +147,15 @@ public class ChargePointService {
         chargePointRepository.updateChargePoint(form);
 
         // if securityProfile or authPassword changed, try to change these at the station as well.
-        // we do this on best-effort principle: if the call fails or the station rejects, we will have new values in DB
+        //
+        // 1) we do this on best-effort principle: if the call fails or station rejects, we will have new values in DB
         // but station will not know about them. whenever this happens, it does not happen silently though. the function
         // calls below will throw exceptions which we bubble up to the user. then, it becomes the operational concern
         // of the user to follow up.
+        // 2) it is crucial for registered EventListeners NOT to be async such that exceptions can be visible to user.
+        // 3) these two keys are only applicable to OCPP 1.6J stations with improved security. any other station will
+        // reject them. we do not filter/validate here with the assumption that the user knows what she is doing.
+        //
         entry.ifPresent(fromDatabase -> {
             if (fromDatabase.securityProfile() != newSecurityProfile) {
                 applicationEventPublisher.publishEvent(new OcppStationSecurityProfileChanged(chargeBoxId, newSecurityProfile));

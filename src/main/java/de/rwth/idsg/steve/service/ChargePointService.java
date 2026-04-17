@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
@@ -106,6 +107,19 @@ public class ChargePointService {
         } catch (Exception e) {
             log.error("Failed during updateCpoName, because: {}", e.getMessage(), e);
         }
+    }
+
+    public void updateBasicAuthPassword(String chargeBoxId, String authPassword) {
+        String encodedPwd = StringUtils.isEmpty(authPassword)
+            ? null
+            : passwordEncoder.encode(authPassword);
+
+        chargePointRepository.updateBasicAuthPassword(chargeBoxId, encodedPwd);
+    }
+
+    public void updateSecurityProfile(String chargeBoxId, String securityProfile) {
+        var ocppSecurityProfile = OcppSecurityProfile.fromValue(Integer.valueOf(securityProfile));
+        chargePointRepository.updateSecurityProfile(chargeBoxId, ocppSecurityProfile);
     }
 
     public void addChargePointList(List<String> chargeBoxIdList) {

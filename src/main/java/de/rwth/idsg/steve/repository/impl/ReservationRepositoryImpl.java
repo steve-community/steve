@@ -171,7 +171,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(Select<Record1<Integer>> connectorPkSelect, String idTagFromTransaction, int reservationId, int transactionId) {
+    public void used(Select<Record1<Integer>> connectorPkSelect, @NotNull String idTagFromTransaction, int reservationId, int transactionId) {
 
         // -------------------------------------------------------------------------
         // 1. idTagFromTransaction can either be the exact same idTag that reserved or the parent of this idTag

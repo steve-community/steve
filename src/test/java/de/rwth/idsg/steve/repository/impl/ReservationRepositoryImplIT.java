@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 
@@ -111,42 +112,24 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void used() {
-        Integer id = repository.insert(insertReservationParams());
-        repository.accepted(id);
+        useReservation(KNOWN_OCPP_TAG);
+    }
 
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
-        Assertions.assertNotNull(connectorPk);
+    @Test
+    public void usedByParentIdTag() {
+        String parentIdTag = KNOWN_OCPP_TAG + "_parent";
 
-        Integer transactionPk = dslContext.insertInto(TRANSACTION_START)
-            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
-            .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
-            .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
-            .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(1))
-            .set(TRANSACTION_START.START_VALUE, "100")
-            .returning(TRANSACTION_START.TRANSACTION_PK)
-            .fetchOne()
-            .getTransactionPk();
+        dslContext.insertInto(OCPP_TAG)
+            .set(OCPP_TAG.ID_TAG, parentIdTag)
+            .onDuplicateKeyIgnore()
+            .execute();
 
-        Select<Record1<Integer>> connectorPkSelect = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CONNECTOR_PK.eq(connectorPk));
-        assertNoDatabaseException(() -> repository.used(connectorPkSelect, KNOWN_OCPP_TAG, id, transactionPk));
+        dslContext.update(OCPP_TAG)
+            .set(OCPP_TAG.PARENT_ID_TAG, parentIdTag)
+            .where(OCPP_TAG.ID_TAG.eq(KNOWN_OCPP_TAG))
+            .execute();
 
-        String status = dslContext.select(RESERVATION.STATUS)
-            .from(RESERVATION)
-            .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(RESERVATION.STATUS);
-        Assertions.assertEquals("USED", status);
-
-        Integer linkedTransactionPk = dslContext.select(RESERVATION.TRANSACTION_PK)
-            .from(RESERVATION)
-            .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(RESERVATION.TRANSACTION_PK);
-        Assertions.assertEquals(transactionPk, linkedTransactionPk);
+        useReservation(parentIdTag);
     }
 
     @Test
@@ -161,6 +144,45 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
             .where(RESERVATION.RESERVATION_PK.eq(id))
             .fetchOne(RESERVATION.STATUS);
         Assertions.assertEquals("CANCELLED", status);
+    }
+
+    private void useReservation(String idTagFromTransaction) {
+        Integer id = repository.insert(insertReservationParams());
+        repository.accepted(id);
+
+        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(CONNECTOR.CONNECTOR_ID.eq(1))
+            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Assertions.assertNotNull(connectorPk);
+
+        Integer transactionPk = dslContext.insertInto(TRANSACTION_START)
+            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.ID_TAG, idTagFromTransaction)
+            .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
+            .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(1))
+            .set(TRANSACTION_START.START_VALUE, "100")
+            .returning(TRANSACTION_START.TRANSACTION_PK)
+            .fetchOne()
+            .getTransactionPk();
+
+        Select<Record1<Integer>> connectorPkSelect = dslContext.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CONNECTOR_PK.eq(connectorPk));
+        assertNoDatabaseException(() -> repository.used(connectorPkSelect, idTagFromTransaction, id, transactionPk));
+
+        String status = dslContext.select(RESERVATION.STATUS)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.STATUS);
+        Assertions.assertEquals("USED", status);
+
+        Integer linkedTransactionPk = dslContext.select(RESERVATION.TRANSACTION_PK)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne(RESERVATION.TRANSACTION_PK);
+        Assertions.assertEquals(transactionPk, linkedTransactionPk);
     }
 
     private static InsertReservationParams insertReservationParams() {

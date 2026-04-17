@@ -68,7 +68,7 @@ jobs:
         run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest,${{ matrix.database.databaseName }} clean package --file pom.xml
 
       - name: Run integration tests (*IT)
-        #if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest,${{ matrix.database.databaseName }} -Dtest='*IT' test --file pom.xml
 
       - name: Start the app and visit signin web page

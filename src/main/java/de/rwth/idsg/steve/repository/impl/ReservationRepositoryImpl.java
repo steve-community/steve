@@ -171,12 +171,29 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId) {
+    public void used(Select<Record1<Integer>> connectorPkSelect, String idTagFromTransaction, int reservationId, int transactionId) {
+
+        // -------------------------------------------------------------------------
+        // 1. idTagFromTransaction can either be the exact same idTag that reserved or the parent of this idTag
+        // https://github.com/steve-community/steve/issues/2015
+        // TC_053_CSMS: Use a reserved Connector with parentIdTag
+        // -------------------------------------------------------------------------
+
+        var selectChildrenOfParent = DSL.select(OCPP_TAG.ID_TAG)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.PARENT_ID_TAG.eq(idTagFromTransaction));
+
+        var idTagCondition = RESERVATION.ID_TAG.equal(idTagFromTransaction).or(RESERVATION.ID_TAG.in(selectChildrenOfParent));
+
+        // -------------------------------------------------------------------------
+        // Execute
+        // -------------------------------------------------------------------------
+
         int count = ctx.update(RESERVATION)
                        .set(RESERVATION.STATUS, ReservationStatus.USED.name())
                        .set(RESERVATION.TRANSACTION_PK, transactionId)
                        .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-                       .and(RESERVATION.ID_TAG.equal(ocppIdTag))
+                       .and(idTagCondition)
                        .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
                        .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                        .execute();

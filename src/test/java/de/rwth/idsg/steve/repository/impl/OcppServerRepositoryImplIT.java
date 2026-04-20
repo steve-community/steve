@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.enums.TransactionStopEventActor;
+import jooq.steve.db.tables.records.ReservationRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
@@ -39,6 +40,7 @@ import java.util.List;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
+import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
 import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED;
@@ -160,6 +162,48 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
             .where(TRANSACTION_START.TRANSACTION_PK.eq(txId))
             .fetchOne(0, int.class);
         Assertions.assertEquals(1, count);
+    }
+
+    @Test
+    public void insertTransaction_usesChargePointWideReservation() {
+        Integer connectorPkZero = dslContext.insertInto(CONNECTOR)
+            .set(CONNECTOR.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
+            .set(CONNECTOR.CONNECTOR_ID, 0)
+            .returning(CONNECTOR.CONNECTOR_PK)
+            .fetchOne()
+            .getConnectorPk();
+        Assertions.assertNotNull(connectorPkZero);
+
+        Integer reservationId = dslContext.insertInto(RESERVATION)
+            .set(RESERVATION.CONNECTOR_PK, connectorPkZero)
+            .set(RESERVATION.ID_TAG, KNOWN_OCPP_TAG)
+            .set(RESERVATION.START_DATETIME, DateTime.now())
+            .set(RESERVATION.EXPIRY_DATETIME, DateTime.now().plusHours(1))
+            .set(RESERVATION.STATUS, "ACCEPTED")
+            .returning(RESERVATION.RESERVATION_PK)
+            .fetchOne()
+            .getReservationPk();
+        Assertions.assertNotNull(reservationId);
+
+        InsertTransactionParams params = InsertTransactionParams.builder()
+            .chargeBoxId(KNOWN_CHARGE_BOX_ID)
+            .connectorId(1)
+            .idTag(KNOWN_OCPP_TAG)
+            .reservationId(reservationId)
+            .startTimestamp(DateTime.now())
+            .startMeterValue("1000")
+            .eventTimestamp(DateTime.now())
+            .build();
+
+        Integer txId = assertNoDatabaseException(() -> repository.insertTransaction(params));
+        Assertions.assertNotNull(txId);
+
+        ReservationRecord reservation = dslContext.selectFrom(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(reservationId))
+            .fetchOne();
+        Assertions.assertNotNull(reservation);
+        Assertions.assertEquals("USED", reservation.getStatus());
+        Assertions.assertEquals(txId, reservation.getTransactionPk());
     }
 
     @Test

@@ -50,7 +50,7 @@ public interface ReservationRepository {
 
     void accepted(int reservationId);
     void cancelled(int reservationId);
-    void used(Select<Record1<Integer>> connectorPkSelect, @NotNull String idTagFromTransaction, int reservationId, int transactionId);
+    void used(@NotNull String chargeBoxId, int connectorId, @NotNull String idTagFromTransaction, int reservationId, int transactionId);
 
     /**
      * Cancels all active reservations for a charge box. When connectorId is 0,

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -39,6 +40,8 @@ import java.util.Optional;
 public interface ChargePointRepository {
     Optional<ChargePointRegistration> getRegistration(String chargeBoxId);
     void updateCpoName(String chargeBoxId, String cpoName);
+    void updateBasicAuthPassword(String chargeBoxId, String encodedPwd);
+    void updateSecurityProfile(String chargeBoxId, OcppSecurityProfile ocppSecurityProfile);
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 

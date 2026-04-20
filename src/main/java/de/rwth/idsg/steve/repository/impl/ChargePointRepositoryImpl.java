@@ -115,6 +115,25 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
+    public void updateBasicAuthPassword(String chargeBoxId, String encodedPwd) {
+        ctx.update(CHARGE_BOX)
+            .set(CHARGE_BOX.AUTH_PASSWORD, encodedPwd)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+            .execute();
+    }
+
+    @Override
+    public void updateSecurityProfile(String chargeBoxId, OcppSecurityProfile ocppSecurityProfile) {
+        if (ocppSecurityProfile == null) {
+            return;
+        }
+        ctx.update(CHARGE_BOX)
+            .set(CHARGE_BOX.SECURITY_PROFILE, ocppSecurityProfile.getValue())
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+            .execute();
+    }
+
+    @Override
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
         Condition chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
             ? DSL.trueCondition()

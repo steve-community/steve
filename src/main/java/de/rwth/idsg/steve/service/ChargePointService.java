@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
@@ -33,6 +34,8 @@ import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.service.notification.OcppStationSecurityBasicAuthChanged;
+import de.rwth.idsg.steve.service.notification.OcppStationSecurityProfileChanged;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
@@ -45,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -75,6 +79,7 @@ public class ChargePointService {
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
     private final Striped<Lock> isRegisteredLocks = Striped.lock(128);
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final ChargePointRepository chargePointRepository;
     private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
@@ -108,6 +113,19 @@ public class ChargePointService {
         }
     }
 
+    public void updateBasicAuthPassword(String chargeBoxId, String authPassword) {
+        String encodedPwd = StringUtils.isEmpty(authPassword)
+            ? null
+            : passwordEncoder.encode(authPassword);
+
+        chargePointRepository.updateBasicAuthPassword(chargeBoxId, encodedPwd);
+    }
+
+    public void updateSecurityProfile(String chargeBoxId, String securityProfile) {
+        var ocppSecurityProfile = OcppSecurityProfile.fromValueNoException(securityProfile);
+        chargePointRepository.updateSecurityProfile(chargeBoxId, ocppSecurityProfile);
+    }
+
     public void addChargePointList(List<String> chargeBoxIdList) {
         chargePointRepository.addChargePointList(chargeBoxIdList);
     }
@@ -118,8 +136,34 @@ public class ChargePointService {
     }
 
     public void updateChargePoint(ChargePointForm form) {
+        var chargeBoxId = form.getChargeBoxId();
+        var newRawPassword = form.getAuthPassword();
+        var newSecurityProfile = form.getSecurityProfile();
+
+        // get this, before updating DB
+        var entry = this.getRegistrationDirect(form.getChargeBoxId());
+
         encodePasswordIfNeeded(form);
         chargePointRepository.updateChargePoint(form);
+
+        // if securityProfile or authPassword changed, try to change these at the station as well.
+        //
+        // 1) we do this on best-effort principle: if the call fails or station rejects, we will have new values in DB
+        // but station will not know about them. whenever this happens, it does not happen silently though. the function
+        // calls below will throw exceptions which we bubble up to the user. then, it becomes the operational concern
+        // of the user to follow up.
+        // 2) it is crucial for registered EventListeners NOT to be async such that exceptions can be visible to user.
+        // 3) these two keys are only applicable to OCPP 1.6J stations with improved security. any other station will
+        // reject them. we do not filter/validate here with the assumption that the user knows what they are doing.
+        //
+        entry.ifPresent(fromDatabase -> {
+            if (fromDatabase.securityProfile() != newSecurityProfile) {
+                applicationEventPublisher.publishEvent(new OcppStationSecurityProfileChanged(chargeBoxId, newSecurityProfile));
+            }
+            if (StringUtils.isNotBlank(newRawPassword) && !passwordEncoder.matches(newRawPassword, fromDatabase.hashedAuthPassword())) {
+                applicationEventPublisher.publishEvent(new OcppStationSecurityBasicAuthChanged(chargeBoxId, newRawPassword));
+            }
+        });
     }
 
     public void deleteChargePoint(int chargeBoxPk) {

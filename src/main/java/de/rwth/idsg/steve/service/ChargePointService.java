@@ -154,7 +154,7 @@ public class ChargePointService {
         // of the user to follow up.
         // 2) it is crucial for registered EventListeners NOT to be async such that exceptions can be visible to user.
         // 3) these two keys are only applicable to OCPP 1.6J stations with improved security. any other station will
-        // reject them. we do not filter/validate here with the assumption that the user knows what she is doing.
+        // reject them. we do not filter/validate here with the assumption that the user knows what they are doing.
         //
         entry.ifPresent(fromDatabase -> {
             if (fromDatabase.securityProfile() != newSecurityProfile) {

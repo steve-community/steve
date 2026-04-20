@@ -37,7 +37,7 @@ import jakarta.validation.constraints.NotNull;
 public class ReserveNowParams extends SingleChargePointSelect {
 
     @NotNull(message = "Connector ID is required")
-    @Min(value = 1, message = "Connector ID must be at least {value}")
+    @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
     @NotNull(message = "Expiry Date/Time is required")

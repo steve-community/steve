@@ -23,8 +23,6 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
-import org.jooq.Select;
-import org.jooq.Record1;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +62,7 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insert() {
-        Integer id = assertNoDatabaseException(() -> repository.insert(insertReservationParams()));
+        Integer id = assertNoDatabaseException(() -> repository.insert(insertReservationParams(1)));
         Assertions.assertNotNull(id);
 
         Integer count = dslContext.selectCount()
@@ -76,7 +74,7 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void delete() {
-        Integer id = repository.insert(insertReservationParams());
+        Integer id = repository.insert(insertReservationParams(1));
         assertNoDatabaseException(() -> repository.delete(id));
 
         Integer count = dslContext.selectCount()
@@ -88,7 +86,7 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void accepted() {
-        Integer id = repository.insert(insertReservationParams());
+        Integer id = repository.insert(insertReservationParams(1));
         assertNoDatabaseException(() -> repository.accepted(id));
 
         String status = dslContext.select(RESERVATION.STATUS)
@@ -100,7 +98,7 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void cancelled() {
-        Integer id = repository.insert(insertReservationParams());
+        Integer id = repository.insert(insertReservationParams(1));
         assertNoDatabaseException(() -> repository.cancelled(id));
 
         String status = dslContext.select(RESERVATION.STATUS)
@@ -112,7 +110,18 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void used() {
-        useReservation(KNOWN_OCPP_TAG);
+        useReservation(1, KNOWN_OCPP_TAG);
+    }
+
+    @Test
+    public void used_chargePointWideReservationOnConnectorZero() {
+        dslContext.insertInto(CONNECTOR)
+            .set(CONNECTOR.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
+            .set(CONNECTOR.CONNECTOR_ID, 0)
+            .onDuplicateKeyIgnore()
+            .execute();
+
+        useReservation(0, KNOWN_OCPP_TAG);
     }
 
     @Test
@@ -129,12 +138,12 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
             .where(OCPP_TAG.ID_TAG.eq(KNOWN_OCPP_TAG))
             .execute();
 
-        useReservation(parentIdTag);
+        useReservation(1, parentIdTag);
     }
 
     @Test
     public void cancelActiveReservations() {
-        Integer id = repository.insert(insertReservationParams());
+        Integer id = repository.insert(insertReservationParams(1));
         repository.accepted(id);
 
         assertNoDatabaseException(() -> repository.cancelActiveReservations(KNOWN_CHARGE_BOX_ID, 1));
@@ -146,8 +155,8 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals("CANCELLED", status);
     }
 
-    private void useReservation(String idTagFromTransaction) {
-        Integer id = repository.insert(insertReservationParams());
+    private void useReservation(int reservationConnectorId, String idTagFromTransaction) {
+        Integer id = repository.insert(insertReservationParams(reservationConnectorId));
         repository.accepted(id);
 
         Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
@@ -167,10 +176,7 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne()
             .getTransactionPk();
 
-        Select<Record1<Integer>> connectorPkSelect = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CONNECTOR_PK.eq(connectorPk));
-        assertNoDatabaseException(() -> repository.used(connectorPkSelect, idTagFromTransaction, id, transactionPk));
+        assertNoDatabaseException(() -> repository.used(KNOWN_CHARGE_BOX_ID, 1, idTagFromTransaction, id, transactionPk));
 
         String status = dslContext.select(RESERVATION.STATUS)
             .from(RESERVATION)
@@ -185,10 +191,10 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals(transactionPk, linkedTransactionPk);
     }
 
-    private static InsertReservationParams insertReservationParams() {
+    private static InsertReservationParams insertReservationParams(int connectorId) {
         return InsertReservationParams.builder()
             .chargeBoxId(KNOWN_CHARGE_BOX_ID)
-            .connectorId(1)
+            .connectorId(connectorId)
             .idTag(KNOWN_OCPP_TAG)
             .startTimestamp(DateTime.now())
             .expiryTimestamp(DateTime.now().plusHours(1))

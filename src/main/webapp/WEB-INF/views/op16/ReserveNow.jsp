@@ -25,7 +25,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../snippets/getConnectorIds.js" %>
+        <%@ include file="../snippets/getConnectorIdsZeroAllowed.js" %>
         <%@ include file="../snippets/dateTimePicker-future.js" %>
     });
 </script>

@@ -171,7 +171,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(Select<Record1<Integer>> connectorPkSelect, @NotNull String idTagFromTransaction, int reservationId, int transactionId) {
+    public void used(@NotNull String chargeBoxId, int connectorId, @NotNull String idTagFromTransaction, int reservationId, int transactionId) {
 
         // -------------------------------------------------------------------------
         // 1. idTagFromTransaction can either be the exact same idTag that reserved or the parent of this idTag
@@ -186,6 +186,20 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         var idTagCondition = RESERVATION.ID_TAG.equal(idTagFromTransaction).or(RESERVATION.ID_TAG.in(selectChildrenOfParent));
 
         // -------------------------------------------------------------------------
+        // 2. incoming connectorId is where the transaction started. but reservation can be on a specific connector
+        // or 0 (if the reservation did not specify a connector)
+        // https://github.com/steve-community/steve/issues/2020
+        // TC_049_CSMS: Reservation of a Charge Point
+        // -------------------------------------------------------------------------
+
+        var chargePointWideConnectorPk = DSL.select(CONNECTOR.CONNECTOR_PK)
+                                            .from(CONNECTOR)
+                                            .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+                                            .and(CONNECTOR.CONNECTOR_ID.in(0, connectorId));
+
+        var connectorCondition = RESERVATION.CONNECTOR_PK.in(chargePointWideConnectorPk);
+
+        // -------------------------------------------------------------------------
         // Execute
         // -------------------------------------------------------------------------
 
@@ -194,7 +208,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                        .set(RESERVATION.TRANSACTION_PK, transactionId)
                        .where(RESERVATION.RESERVATION_PK.equal(reservationId))
                        .and(idTagCondition)
-                       .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
+                       .and(connectorCondition)
                        .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                        .execute();
 

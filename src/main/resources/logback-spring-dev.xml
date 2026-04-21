@@ -16,6 +16,7 @@
     <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
     <logger name="org.jooq.Constants" level="WARN" />
 
+    <logger name="org.mariadb.jdbc" level="INFO"/>
     <logger name="org.apache.cxf" level="INFO"/>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="com.zaxxer.hikari" level="INFO"/>

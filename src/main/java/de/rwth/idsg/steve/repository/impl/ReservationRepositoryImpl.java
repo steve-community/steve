@@ -131,6 +131,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // Check overlapping
         //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
+        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, params.getChargeBoxId(), params.getConnectorId());
+
         SelectConditionStep<Record1<Integer>> connectorPkQuery =
                 DSL.select(CONNECTOR.CONNECTOR_PK)
                    .from(CONNECTOR)

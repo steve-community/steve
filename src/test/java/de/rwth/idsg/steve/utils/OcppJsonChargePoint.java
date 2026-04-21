@@ -59,13 +59,14 @@ import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.net.URI;
-import java.util.ArrayDeque;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -108,7 +109,7 @@ public class OcppJsonChargePoint {
         this.basicAuthPassword = basicAuthPassword;
         this.client = new WebSocketClient();
         this.testerThread = Thread.currentThread();
-        this.exchangeQueue = new ArrayDeque<>();
+        this.exchangeQueue = new ConcurrentLinkedDeque<>();
         this.closeHappenedSignal = new CountDownLatch(1);
     }
 
@@ -123,7 +124,7 @@ public class OcppJsonChargePoint {
                 request.setSubProtocols(versions);
             }
             if (basicAuthPassword != null) {
-                String encoding = Base64.getEncoder().encodeToString((chargeBoxId + ":" + basicAuthPassword).getBytes());
+                String encoding = Base64.getEncoder().encodeToString((chargeBoxId + ":" + basicAuthPassword).getBytes(StandardCharsets.UTF_8));
                 request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
             }
             client.start();
@@ -145,7 +146,15 @@ public class OcppJsonChargePoint {
                 throw new RuntimeException("Did not exchange all planned communications");
             }
             session.close(StatusCode.NORMAL, "Finished", NOOP);
-            closeHappenedSignal.await(30, TimeUnit.SECONDS);
+            boolean closedInTime = closeHappenedSignal.await(30, TimeUnit.SECONDS);
+            if (!closedInTime) {
+                try {
+                    client.stop();
+                } catch (Exception stopException) {
+                    log.warn("Failed to stop websocket client after close timeout", stopException);
+                }
+                throw new RuntimeException("Timed out waiting for websocket close event");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -227,7 +236,10 @@ public class OcppJsonChargePoint {
 
         // wait for the response to arrive and be processed
         try {
-            ctx.doneSignal.await(30, TimeUnit.SECONDS);
+            boolean completedInTime = ctx.doneSignal.await(30, TimeUnit.SECONDS);
+            if (!completedInTime) {
+                throw new AssertionFailedError("Timed out waiting for response. action=" + action + ", messageId=" + messageId);
+            }
         } catch (InterruptedException e) {
             if (testerThreadInterruptReason != null) {
                 throw testerThreadInterruptReason;
@@ -255,7 +267,10 @@ public class OcppJsonChargePoint {
 
         // wait for the call to arrive and be responded with
         try {
-            ctx.doneSignal.await(30, TimeUnit.SECONDS);
+            boolean completedInTime = ctx.doneSignal.await(30, TimeUnit.SECONDS);
+            if (!completedInTime) {
+                throw new AssertionFailedError("Timed out waiting for expected request. action=" + call.getAction());
+            }
         } catch (InterruptedException e) {
             if (testerThreadInterruptReason != null) {
                 throw testerThreadInterruptReason;

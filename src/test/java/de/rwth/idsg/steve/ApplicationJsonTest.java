@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.ExtendedTriggerMessage;
-import ocpp._2022._02.security.ExtendedTriggerMessageResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -32,7 +31,6 @@ import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.HeartbeatResponse;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
-import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.api.exceptions.UpgradeException;
 import org.joda.time.DateTime;
@@ -46,6 +44,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static de.rwth.idsg.steve.ocpp.ws.data.ErrorCode.PropertyConstraintViolation;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
@@ -82,80 +82,63 @@ public class ApplicationJsonTest {
 
     @Test
     public void testOcpp12() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         ocpp.cs._2010._08.BootNotificationRequest boot = new ocpp.cs._2010._08.BootNotificationRequest()
             .withChargePointVendor(getRandomString())
             .withChargePointModel(getRandomString());
-
-        chargePoint.prepare(boot, ocpp.cs._2010._08.BootNotificationResponse.class,
-            bootResponse -> Assertions.assertEquals(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-            error -> Assertions.fail()
-        );
+        var bootResponse = chargePoint.send(boot, ocpp.cs._2010._08.BootNotificationResponse.class);
+        Assertions.assertEquals(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
         ocpp.cs._2010._08.AuthorizeRequest auth = new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
+        var authResponse = chargePoint.send(auth, ocpp.cs._2010._08.AuthorizeResponse.class);
+        Assertions.assertEquals(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus());
 
-        chargePoint.prepare(auth, ocpp.cs._2010._08.AuthorizeResponse.class,
-            authResponse -> Assertions.assertEquals(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-            error -> Assertions.fail()
-        );
-
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testOcpp15() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         ocpp.cs._2012._06.BootNotificationRequest boot = new ocpp.cs._2012._06.BootNotificationRequest()
             .withChargePointVendor(getRandomString())
             .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2012._06.BootNotificationResponse.class,
-            bootResponse -> Assertions.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-            error -> Assertions.fail()
-        );
+        var bootResponse = chargePoint.send(boot, ocpp.cs._2012._06.BootNotificationResponse.class);
+        Assertions.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
         ocpp.cs._2012._06.AuthorizeRequest auth = new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2012._06.AuthorizeResponse.class,
-            authResponse -> Assertions.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-            error -> Assertions.fail()
-        );
+        var authResponse = chargePoint.send(auth, ocpp.cs._2012._06.AuthorizeResponse.class);
+        Assertions.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus());
 
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testOcpp16() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         BootNotificationRequest boot = new BootNotificationRequest()
                 .withChargePointVendor(getRandomString())
                 .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, BootNotificationResponse.class,
-                bootResponse -> Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-                error -> Assertions.fail()
-        );
+        var bootResponse = chargePoint.send(boot, BootNotificationResponse.class);
+        Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
         AuthorizeRequest auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, AuthorizeResponse.class,
-                authResponse -> Assertions.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-                error -> Assertions.fail()
-        );
+        var authResponse = chargePoint.send(auth, AuthorizeResponse.class);
+        Assertions.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus());
 
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testWithMissingVersion() {
         RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((String) null, REGISTERED_CHARGE_BOX_ID, PATH);
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((List<String>) null, REGISTERED_CHARGE_BOX_ID, PATH, null);
             chargePoint.start();
         });
 
@@ -169,7 +152,7 @@ public class ApplicationJsonTest {
     @Test
     public void testWithWrongVersion() {
         RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint("ocpp1234", REGISTERED_CHARGE_BOX_ID, PATH);
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(List.of("ocpp1234"), REGISTERED_CHARGE_BOX_ID, PATH, null);
             chargePoint.start();
         });
 
@@ -199,78 +182,60 @@ public class ApplicationJsonTest {
      */
     @Test
     public void testWithNullPayload() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var response = chargePoint.send(null, "Heartbeat", HeartbeatResponse.class);
+        Assertions.assertNotNull(response.getCurrentTime());
 
-        chargePoint.prepare(null, "Heartbeat", HeartbeatResponse.class,
-            response -> Assertions.assertNotNull(response.getCurrentTime()),
-            error -> Assertions.fail()
-        );
-
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testValidation_Ocpp12IdTagMissing() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         ocpp.cs._2010._08.AuthorizeRequest auth = new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(null);
+        var error = chargePoint.send(auth);
+        Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
 
-        chargePoint.prepare(auth, ocpp.cs._2010._08.AuthorizeResponse.class,
-            authResponse -> Assertions.fail(),
-            error -> Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode())
-        );
-
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testValidation_Ocpp15IdTagTooLong() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         ocpp.cs._2012._06.AuthorizeRequest auth = new ocpp.cs._2012._06.AuthorizeRequest().withIdTag("1234567890:1234567890:abc");
+        var error = chargePoint.send(auth);
+        Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
 
-        chargePoint.prepare(auth, ocpp.cs._2012._06.AuthorizeResponse.class,
-            authResponse -> Assertions.fail(),
-            error -> Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode())
-        );
-
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testValidation_Ocpp16MeterValueCascade() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         MeterValuesRequest req = new MeterValuesRequest()
             .withConnectorId(1)
             .withMeterValue(new MeterValue().withTimestamp(DateTime.now()));
 
-        chargePoint.prepare(req, MeterValuesResponse.class,
-            res -> Assertions.fail(),
-            error -> Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode())
-        );
+        var error = chargePoint.send(req);
+        Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
 
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
     @Test
     public void testValidation_Ocpp16Security() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
-        chargePoint.start();
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         var req = new ExtendedTriggerMessage()
             .withRequestedMessage(null);
 
-        chargePoint.prepare(req, ExtendedTriggerMessageResponse.class,
-            res -> Assertions.fail(),
-            error -> Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode())
-        );
+        var error = chargePoint.send(req);
+        Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
 
-        chargePoint.processAndClose();
+        chargePoint.close();
     }
 
 }

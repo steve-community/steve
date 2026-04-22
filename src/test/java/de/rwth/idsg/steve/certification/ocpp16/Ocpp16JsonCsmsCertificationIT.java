@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
+import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
@@ -50,28 +51,29 @@ import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.CertificateHashData;
+import ocpp._2022._02.security.CertificateHashDataType;
+import ocpp._2022._02.security.DeleteCertificate;
+import ocpp._2022._02.security.DeleteCertificateResponse;
+import ocpp._2022._02.security.FirmwareType;
+import ocpp._2022._02.security.GetInstalledCertificateIds;
+import ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType;
+import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
+import ocpp._2022._02.security.GetLog;
+import ocpp._2022._02.security.GetLogResponse;
 import ocpp._2022._02.security.InstallCertificate;
-import ocpp.cp._2015._10.ChangeConfigurationRequest;
-import ocpp.cp._2015._10.ChangeConfigurationResponse;
-import ocpp.cp._2015._10.ClearCacheRequest;
-import ocpp.cp._2015._10.ClearCacheResponse;
-import ocpp.cp._2015._10.ClearCacheStatus;
-import ocpp.cp._2015._10.ConfigurationStatus;
-import ocpp.cp._2015._10.GetConfigurationRequest;
-import ocpp.cp._2015._10.GetConfigurationResponse;
-import ocpp.cp._2015._10.KeyValue;
-import ocpp.cp._2015._10.RemoteStartStopStatus;
-import ocpp.cp._2015._10.RemoteStartTransactionRequest;
-import ocpp.cp._2015._10.RemoteStartTransactionResponse;
-import ocpp.cp._2015._10.RemoteStopTransactionRequest;
-import ocpp.cp._2015._10.RemoteStopTransactionResponse;
-import ocpp.cp._2015._10.ResetRequest;
-import ocpp.cp._2015._10.ResetResponse;
-import ocpp.cp._2015._10.ResetStatus;
-import ocpp.cp._2015._10.ResetType;
-import ocpp.cp._2015._10.UnlockConnectorRequest;
-import ocpp.cp._2015._10.UnlockConnectorResponse;
-import ocpp.cp._2015._10.UnlockStatus;
+import ocpp._2022._02.security.InstallCertificateResponse;
+import ocpp._2022._02.security.LogParametersType;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
+import ocpp._2022._02.security.SignedUpdateFirmware;
+import ocpp._2022._02.security.SignedUpdateFirmwareResponse;
+import ocpp.cp._2015._10.*;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -79,8 +81,18 @@ import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.ChargePointErrorCode;
 import ocpp.cs._2015._10.ChargePointStatus;
+import ocpp.cs._2015._10.DataTransferRequest;
+import ocpp.cs._2015._10.DataTransferResponse;
+import ocpp.cs._2015._10.DiagnosticsStatus;
+import ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse;
+import ocpp.cs._2015._10.FirmwareStatus;
+import ocpp.cs._2015._10.FirmwareStatusNotificationRequest;
+import ocpp.cs._2015._10.FirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.HeartbeatRequest;
 import ocpp.cs._2015._10.HeartbeatResponse;
+import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.Reason;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
@@ -89,6 +101,7 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
@@ -121,6 +134,12 @@ import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_EVENT;
 import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
+import static ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
+import static ocpp.cp._2015._10.ReservationStatus.ACCEPTED;
+import static ocpp.cp._2015._10.ReservationStatus.FAULTED;
+import static ocpp.cp._2015._10.ReservationStatus.OCCUPIED;
+import static ocpp.cp._2015._10.ReservationStatus.REJECTED;
+import static ocpp.cp._2015._10.ReservationStatus.UNAVAILABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -130,7 +149,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * These are the integration tests for all OCPP 1.6 (SUT) CSMS test cases relevant for the OCA certification
  * (version: 2026-02).
- *
+ * <p>
  * https://openchargealliance.org/wp-content/uploads/2026/03/CompliancyTestTool-TestCaseDocument.pdf
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -175,22 +194,16 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_001_CSMS_ColdBootChargePoint() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var boot = new BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+        var boot = bootNotification();
         var bootResponse = chargePoint.send(boot, BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus());
         assertNotNull(bootResponse.getCurrentTime());
         assertTrue(bootResponse.getInterval() > 0);
 
-        for (int i = 0; i < 3; i++) {
-            var status = new StatusNotificationRequest()
-                .withConnectorId(i)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now());
+        for (var connectorId : List.of(0, 1, 2)) {
+            var status = statusNotification(connectorId, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
             var statusResponse = chargePoint.send(status, StatusNotificationResponse.class);
             assertNotNull(statusResponse);
         }
@@ -204,13 +217,9 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_003_CSMS_RegularChargingSession_PluginFirst() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         var preparingResponse = chargePoint.send(preparing, StatusNotificationResponse.class);
         assertNotNull(preparingResponse);
 
@@ -218,20 +227,12 @@ public class Ocpp16JsonCsmsCertificationIT {
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         var chargingResponse = chargePoint.send(charging, StatusNotificationResponse.class);
         assertNotNull(chargingResponse);
 
@@ -240,26 +241,18 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_004_1_CSMS_RegularChargingSession_IdentificationFirst() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         var chargingResponse = chargePoint.send(charging, StatusNotificationResponse.class);
         assertNotNull(chargingResponse);
 
@@ -268,25 +261,17 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_004_2_CSMS_RegularChargingSession_IdentificationFirst_ConnectionTimeout() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         var preparingResponse = chargePoint.send(preparing, StatusNotificationResponse.class);
         assertNotNull(preparingResponse);
 
-        var available = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now().plusSeconds(5));
+        var available = statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR, DateTime.now().plusSeconds(5));
         var availableResponse = chargePoint.send(available, StatusNotificationResponse.class);
         assertNotNull(availableResponse);
 
@@ -295,65 +280,36 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_005_1_CSMS_EVSideDisconnected_StopTransactionAndUnlock() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
-        var suspendedEv = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.SUSPENDED_EV)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var suspendedEv = statusNotification(1, ChargePointStatus.SUSPENDED_EV, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(suspendedEv, StatusNotificationResponse.class));
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStop(10)
-            .withReason(Reason.EV_DISCONNECTED)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), REGISTERED_OCPP_TAG, 10, Reason.EV_DISCONNECTED);
         var stopTransactionResponse = chargePoint.send(stopTransaction, StopTransactionResponse.class);
         assertNotNull(stopTransactionResponse);
         assertNotNull(stopTransactionResponse.getIdTagInfo());
         assertEquals(AuthorizationStatus.ACCEPTED, stopTransactionResponse.getIdTagInfo().getStatus());
 
-        var finishing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FINISHING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var finishing = statusNotification(1, ChargePointStatus.FINISHING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(finishing, StatusNotificationResponse.class));
 
-        var available = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var available = statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(available, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -361,30 +317,18 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_007_CSMS_RegularStartChargingSession_CachedId() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse.getIdTagInfo());
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -392,40 +336,27 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_061_CSMS_ClearAuthorizationDataInAuthorizationCache() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
 
-        CompletableFuture<ocpp.cp._2015._10.ClearCacheStatus> operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.clearCache(params);
-                assertNotNull(callback);
-                assertFalse(callback.getSuccessResponsesByChargeBoxId().isEmpty());
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.clearCache(params));
 
-        var clearCacheRequest = new ClearCacheRequest();
-        var clearCacheResponse = new ClearCacheResponse().withStatus(ClearCacheStatus.ACCEPTED);
-        chargePoint.expectRequest(clearCacheRequest, clearCacheResponse);
+        chargePoint.expectRequest(
+            new ClearCacheRequest(),
+            new ClearCacheResponse().withStatus(ClearCacheStatus.ACCEPTED)
+        );
+        assertEquals(ClearCacheStatus.ACCEPTED, successResponse(operationFuture.join()));
 
-        assertEquals(ClearCacheStatus.ACCEPTED, operationFuture.join());
         chargePoint.close();
     }
 
     @Test
     public void test_TC_010_CSMS_RemoteStartChargingSession_CablePluggedInFirst() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
         var params = new RemoteStartTransactionParams();
@@ -433,40 +364,24 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setConnectorId(1);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStartTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStartTransaction(params));
 
-        var remoteStartReq = new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG);
-        var remoteStartRes = new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED);
-        chargePoint.expectRequest(remoteStartReq, remoteStartRes);
-        assertEquals(RemoteStartStopStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG),
+            new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
+        );
+        assertEquals(RemoteStartStopStatus.ACCEPTED, successResponse(operationFuture.join()));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -474,54 +389,34 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_011_1_CSMS_RemoteStartChargingSession_RemoteStartFirst() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStartTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStartTransaction(params));
 
-        var remoteStartReq = new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG);
-        var remoteStartRes = new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED);
-        chargePoint.expectRequest(remoteStartReq, remoteStartRes);
-        assertEquals(RemoteStartStopStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG),
+            new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
+        );
+        assertEquals(RemoteStartStopStatus.ACCEPTED, successResponse(operationFuture.join()));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -529,45 +424,29 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_011_2_CSMS_RemoteStartChargingSession_Timeout() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStartTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStartTransaction(params));
 
-        var remoteStartReq = new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG);
-        var remoteStartRes = new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED);
-        chargePoint.expectRequest(remoteStartReq, remoteStartRes);
-        assertEquals(RemoteStartStopStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG),
+            new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
+        );
+        assertEquals(RemoteStartStopStatus.ACCEPTED, successResponse(operationFuture.join()));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var available = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now().plusSeconds(5));
+        var available = statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR, DateTime.now().plusSeconds(5));
         assertNotNull(chargePoint.send(available, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -575,75 +454,42 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_012_CSMS_RemoteStopChargingSession() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         var params = new RemoteStopTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setTransactionId(startTransactionResponse.getTransactionId());
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStopTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStopTransaction(params));
 
-        var remoteStopReq = new RemoteStopTransactionRequest().withTransactionId(startTransactionResponse.getTransactionId());
-        var remoteStopRes = new RemoteStopTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED);
-        chargePoint.expectRequest(remoteStopReq, remoteStopRes);
-        assertEquals(RemoteStartStopStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStopTransactionRequest().withTransactionId(startTransactionResponse.getTransactionId()),
+            new RemoteStopTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
+        );
+        assertEquals(RemoteStartStopStatus.ACCEPTED, successResponse(operationFuture.join()));
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStop(10)
-            .withReason(Reason.REMOTE)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), REGISTERED_OCPP_TAG, 10, Reason.REMOTE);
         assertNotNull(chargePoint.send(stopTransaction, StopTransactionResponse.class));
 
-        var finishing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FINISHING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var finishing = statusNotification(1, ChargePointStatus.FINISHING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(finishing, StatusNotificationResponse.class));
 
-        var available = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var available = statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(available, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -651,40 +497,25 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_013_CSMS_HardReset() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new ResetParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setResetType(ResetType.HARD);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reset(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.reset(params));
 
-        var resetReq = new ResetRequest().withType(ResetType.HARD);
-        var resetRes = new ResetResponse().withStatus(ResetStatus.ACCEPTED);
-        chargePoint.expectRequest(resetReq, resetRes);
-        assertEquals(ResetStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new ResetRequest().withType(ResetType.HARD),
+            new ResetResponse().withStatus(ResetStatus.ACCEPTED)
+        );
+        assertEquals(ResetStatus.ACCEPTED, successResponse(operationFuture.join()));
 
-        var boot = new BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
-        var bootResponse = chargePoint.send(boot, BootNotificationResponse.class);
+        var bootResponse = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
         for (var connectorId : List.of(0, 1, 2)) {
-            var status = new StatusNotificationRequest()
-                .withConnectorId(connectorId)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now());
+            var status = statusNotification(connectorId, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
             assertNotNull(chargePoint.send(status, StatusNotificationResponse.class));
         }
 
@@ -693,40 +524,25 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_014_CSMS_SoftReset() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new ResetParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setResetType(ResetType.SOFT);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reset(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.reset(params));
 
-        var resetReq = new ResetRequest().withType(ResetType.SOFT);
-        var resetRes = new ResetResponse().withStatus(ResetStatus.ACCEPTED);
-        chargePoint.expectRequest(resetReq, resetRes);
-        assertEquals(ResetStatus.ACCEPTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new ResetRequest().withType(ResetType.SOFT),
+            new ResetResponse().withStatus(ResetStatus.ACCEPTED)
+        );
+        assertEquals(ResetStatus.ACCEPTED, successResponse(operationFuture.join()));
 
-        var boot = new BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
-        var bootResponse = chargePoint.send(boot, BootNotificationResponse.class);
+        var bootResponse = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
         for (var connectorId : List.of(0, 1, 2)) {
-            var status = new StatusNotificationRequest()
-                .withConnectorId(connectorId)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now());
+            var status = statusNotification(connectorId, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
             assertNotNull(chargePoint.send(status, StatusNotificationResponse.class));
         }
 
@@ -735,129 +551,80 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_017_1_CSMS_UnlockConnector_NoTransaction_NotFixedCable() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.unlockConnector(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.unlockConnector(params));
 
-        var unlockReq = new UnlockConnectorRequest().withConnectorId(1);
-        var unlockRes = new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCKED);
-        chargePoint.expectRequest(unlockReq, unlockRes);
-        assertEquals(UnlockStatus.UNLOCKED, operationFuture.join());
+        chargePoint.expectRequest(
+            new UnlockConnectorRequest().withConnectorId(1),
+            new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCKED)
+        );
+        assertEquals(UnlockStatus.UNLOCKED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_017_2_CSMS_UnlockConnector_NoTransaction_FixedCable() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.unlockConnector(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.unlockConnector(params));
 
-        var unlockReq = new UnlockConnectorRequest().withConnectorId(1);
-        var unlockRes = new UnlockConnectorResponse().withStatus(UnlockStatus.NOT_SUPPORTED);
-        chargePoint.expectRequest(unlockReq, unlockRes);
-        assertEquals(UnlockStatus.NOT_SUPPORTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new UnlockConnectorRequest().withConnectorId(1),
+            new UnlockConnectorResponse().withStatus(UnlockStatus.NOT_SUPPORTED)
+        );
+        assertEquals(UnlockStatus.NOT_SUPPORTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_018_1_CSMS_UnlockConnector_WithChargingSession() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
         var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
         assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.unlockConnector(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.unlockConnector(params));
 
-        var unlockReq = new UnlockConnectorRequest().withConnectorId(1);
-        var unlockRes = new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCKED);
-        chargePoint.expectRequest(unlockReq, unlockRes);
-        assertEquals(UnlockStatus.UNLOCKED, operationFuture.join());
+        chargePoint.expectRequest(
+            new UnlockConnectorRequest().withConnectorId(1),
+            new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCKED)
+        );
+        assertEquals(UnlockStatus.UNLOCKED, successResponse(operationFuture.join()));
 
-        var finishing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FINISHING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var finishing = statusNotification(1, ChargePointStatus.FINISHING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(finishing, StatusNotificationResponse.class));
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStop(10)
-            .withReason(Reason.UNLOCK_COMMAND)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), REGISTERED_OCPP_TAG, 10, Reason.UNLOCK_COMMAND);
         assertNotNull(chargePoint.send(stopTransaction, StopTransactionResponse.class));
 
-        var available = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var available = statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(available, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -865,22 +632,13 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_019_1_CSMS_RetrieveAllConfigurationKeys() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new GetConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConfKeyList(List.of());
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getConfiguration(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getConfiguration(params));
 
         var getConfigReq = new GetConfigurationRequest().withKey(List.of());
         var getConfigRes = new GetConfigurationResponse()
@@ -891,7 +649,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .withUnknownKey(List.of());
         chargePoint.expectRequest(getConfigReq, getConfigRes);
 
-        var values = operationFuture.join();
+        var values = successResponse(operationFuture.join());
         assertNotNull(values);
         assertTrue(values.getUnknownKeys().isEmpty());
         assertFalse(values.getConfigurationKeys().isEmpty());
@@ -901,22 +659,13 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_019_2_CSMS_RetrieveSpecificConfigurationKey() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new GetConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConfKeyList(List.of("SupportedFeatureProfiles"));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getConfiguration(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getConfiguration(params));
 
         var getConfigReq = new GetConfigurationRequest().withKey(List.of("SupportedFeatureProfiles"));
         var getConfigRes = new GetConfigurationResponse()
@@ -926,7 +675,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .withUnknownKey(List.of());
         chargePoint.expectRequest(getConfigReq, getConfigRes);
 
-        var values = operationFuture.join();
+        var values = successResponse(operationFuture.join());
         assertNotNull(values);
         assertTrue(values.getUnknownKeys().isEmpty());
         assertEquals(1, values.getConfigurationKeys().size());
@@ -937,37 +686,29 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_021_CSMS_ChangeSetConfiguration() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConfKey("MeterValueSampleInterval");
         params.setValue("60");
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.changeConfiguration(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
 
         var changeConfigReq = new ChangeConfigurationRequest()
             .withKey("MeterValueSampleInterval")
             .withValue("60");
         var changeConfigRes = new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED);
         chargePoint.expectRequest(changeConfigReq, changeConfigRes);
-        assertEquals(ConfigurationStatus.ACCEPTED, operationFuture.join());
+
+        assertEquals(ConfigurationStatus.ACCEPTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_023_1_CSMS_StartChargingSession_AuthorizeInvalid() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var authorize = new AuthorizeRequest().withIdTag("INVALID_TAG");
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
@@ -986,7 +727,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .set(OCPP_TAG.NOTE, "integration test expired idTag")
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var authorize = new AuthorizeRequest().withIdTag(expiredTag);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
@@ -1005,7 +746,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .set(OCPP_TAG.NOTE, "integration test blocked idTag")
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var authorize = new AuthorizeRequest().withIdTag(blockedTag);
         var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
@@ -1016,20 +757,12 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_024_CSMS_StartChargingSession_LockFailure() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var faulted = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FAULTED)
-            .withErrorCode(ChargePointErrorCode.CONNECTOR_LOCK_FAILURE)
-            .withTimestamp(DateTime.now());
+        var faulted = statusNotification(1, ChargePointStatus.FAULTED, ChargePointErrorCode.CONNECTOR_LOCK_FAILURE);
         assertNotNull(chargePoint.send(faulted, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -1037,197 +770,122 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_026_CSMS_RemoteStartChargingSession_Rejected() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStartTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStartTransaction(params));
 
-        var remoteStartReq = new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG);
-        var remoteStartRes = new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.REJECTED);
-        chargePoint.expectRequest(remoteStartReq, remoteStartRes);
-        assertEquals(RemoteStartStopStatus.REJECTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStartTransactionRequest().withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG),
+            new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.REJECTED)
+        );
+        assertEquals(RemoteStartStopStatus.REJECTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_028_CSMS_RemoteStopTransaction_Rejected() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         var params = new RemoteStopTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setTransactionId(startTransactionResponse.getTransactionId());
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.remoteStopTransaction(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.remoteStopTransaction(params));
 
-        var remoteStopReq = new RemoteStopTransactionRequest().withTransactionId(startTransactionResponse.getTransactionId());
-        var remoteStopRes = new RemoteStopTransactionResponse().withStatus(RemoteStartStopStatus.REJECTED);
-        chargePoint.expectRequest(remoteStopReq, remoteStopRes);
-        assertEquals(RemoteStartStopStatus.REJECTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new RemoteStopTransactionRequest().withTransactionId(startTransactionResponse.getTransactionId()),
+            new RemoteStopTransactionResponse().withStatus(RemoteStartStopStatus.REJECTED)
+        );
+        assertEquals(RemoteStartStopStatus.REJECTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_030_CSMS_UnlockConnector_UnlockFailure() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.unlockConnector(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.unlockConnector(params));
 
-        var unlockReq = new UnlockConnectorRequest().withConnectorId(1);
-        var unlockRes = new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCK_FAILED);
-        chargePoint.expectRequest(unlockReq, unlockRes);
-        assertEquals(UnlockStatus.UNLOCK_FAILED, operationFuture.join());
+        chargePoint.expectRequest(
+            new UnlockConnectorRequest().withConnectorId(1),
+            new UnlockConnectorResponse().withStatus(UnlockStatus.UNLOCK_FAILED)
+        );
+        assertEquals(UnlockStatus.UNLOCK_FAILED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_031_CSMS_UnlockConnector_UnknownConnector() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.unlockConnector(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.unlockConnector(params));
 
-        var unlockReq = new UnlockConnectorRequest().withConnectorId(1);
-        var unlockRes = new UnlockConnectorResponse().withStatus(UnlockStatus.NOT_SUPPORTED);
-        chargePoint.expectRequest(unlockReq, unlockRes);
-        assertEquals(UnlockStatus.NOT_SUPPORTED, operationFuture.join());
+        chargePoint.expectRequest(
+            new UnlockConnectorRequest().withConnectorId(1),
+            new UnlockConnectorResponse().withStatus(UnlockStatus.NOT_SUPPORTED)
+        );
+        assertEquals(UnlockStatus.NOT_SUPPORTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_032_1_CSMS_PowerFailureBoot_StopTransactions() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var preparing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.PREPARING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var preparing = statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(preparing, StatusNotificationResponse.class));
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
-        var boot = new BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+        var boot = bootNotification();
         var bootResponse = chargePoint.send(boot, BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus());
 
-        var connector0 = new StatusNotificationRequest()
-            .withConnectorId(0)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var connector0 = statusNotification(0, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(connector0, StatusNotificationResponse.class));
 
-        var connector1 = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FINISHING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var connector1 = statusNotification(1, ChargePointStatus.FINISHING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(connector1, StatusNotificationResponse.class));
 
-        var connector2 = new StatusNotificationRequest()
-            .withConnectorId(2)
-            .withStatus(ChargePointStatus.AVAILABLE)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var connector2 = statusNotification(2, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(connector2, StatusNotificationResponse.class));
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStop(10)
-            .withReason(Reason.POWER_LOSS)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), REGISTERED_OCPP_TAG, 10, Reason.POWER_LOSS);
         assertNotNull(chargePoint.send(stopTransaction, StopTransactionResponse.class));
 
         chargePoint.close();
@@ -1235,23 +893,15 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_037_1_CSMS_OfflineStartTransaction_ValidIdTag() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -1259,39 +909,22 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_037_3_CSMS_OfflineStartTransaction_InvalidIdTag_StopOnInvalidTrue() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
         var invalidTag = getRandomString();
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(invalidTag)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, invalidTag, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.INVALID, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var charging = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.CHARGING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var charging = statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(charging, StatusNotificationResponse.class));
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(invalidTag)
-            .withMeterStop(10)
-            .withReason(Reason.DE_AUTHORIZED)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), invalidTag, 10, Reason.DE_AUTHORIZED);
         assertNotNull(chargePoint.send(stopTransaction, StopTransactionResponse.class));
 
-        var finishing = new StatusNotificationRequest()
-            .withConnectorId(1)
-            .withStatus(ChargePointStatus.FINISHING)
-            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-            .withTimestamp(DateTime.now());
+        var finishing = statusNotification(1, ChargePointStatus.FINISHING, ChargePointErrorCode.NO_ERROR);
         assertNotNull(chargePoint.send(finishing, StatusNotificationResponse.class));
 
         chargePoint.close();
@@ -1299,24 +932,15 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_039_CSMS_OfflineTransaction() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var startTransaction = new StartTransactionRequest()
-            .withConnectorId(1)
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStart(0)
-            .withTimestamp(DateTime.now());
+        var startTransaction = startTransaction(1, REGISTERED_OCPP_TAG, 0);
         var startTransactionResponse = chargePoint.send(startTransaction, StartTransactionResponse.class);
         assertNotNull(startTransactionResponse);
         assertTrue(startTransactionResponse.getTransactionId() > 0);
         assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
 
-        var stopTransaction = new StopTransactionRequest()
-            .withTransactionId(startTransactionResponse.getTransactionId())
-            .withIdTag(REGISTERED_OCPP_TAG)
-            .withMeterStop(10)
-            .withReason(Reason.LOCAL)
-            .withTimestamp(DateTime.now());
+        var stopTransaction = stopTransaction(startTransactionResponse.getTransactionId(), REGISTERED_OCPP_TAG, 10, Reason.LOCAL);
         assertNotNull(chargePoint.send(stopTransaction, StopTransactionResponse.class));
 
         chargePoint.close();
@@ -1324,7 +948,7 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_040_1_CSMS_ConfigurationKeys_NotSupported() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
         var key = "UnknownConfigKey_" + getRandomString();
 
         var params = new ChangeConfigurationParams();
@@ -1333,261 +957,189 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setCustomConfKey(key);
         params.setValue("123");
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.changeConfiguration(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
 
-        var changeConfigReq = new ChangeConfigurationRequest()
-            .withKey(key)
-            .withValue("123");
+        var changeConfigReq = new ChangeConfigurationRequest().withKey(key).withValue("123");
         var changeConfigRes = new ChangeConfigurationResponse().withStatus(ConfigurationStatus.NOT_SUPPORTED);
         chargePoint.expectRequest(changeConfigReq, changeConfigRes);
-        assertEquals(ConfigurationStatus.NOT_SUPPORTED, operationFuture.join());
+
+        assertEquals(ConfigurationStatus.NOT_SUPPORTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_040_2_CSMS_ConfigurationKeys_InvalidValue() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConfKey("MeterValueSampleInterval");
         params.setValue("INVALID_VALUE");
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.changeConfiguration(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
 
-        var changeConfigReq = new ChangeConfigurationRequest()
-            .withKey("MeterValueSampleInterval")
-            .withValue("INVALID_VALUE");
+        var changeConfigReq = new ChangeConfigurationRequest().withKey("MeterValueSampleInterval").withValue("INVALID_VALUE");
         var changeConfigRes = new ChangeConfigurationResponse().withStatus(ConfigurationStatus.REJECTED);
         chargePoint.expectRequest(changeConfigReq, changeConfigRes);
-        assertEquals(ConfigurationStatus.REJECTED, operationFuture.join());
+
+        assertEquals(ConfigurationStatus.REJECTED, successResponse(operationFuture.join()));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_042_1_CSMS_GetLocalListVersion_NotSupported() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getLocalListVersion(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getLocalListVersion(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.GetLocalListVersionRequest(),
-            new ocpp.cp._2015._10.GetLocalListVersionResponse().withListVersion(-1)
+            new GetLocalListVersionRequest(),
+            new GetLocalListVersionResponse().withListVersion(-1)
         );
-        assertEquals(-1, operationFuture.join());
+        assertEquals(-1, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_042_2_CSMS_GetLocalListVersion_Empty() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getLocalListVersion(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getLocalListVersion(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.GetLocalListVersionRequest(),
-            new ocpp.cp._2015._10.GetLocalListVersionResponse().withListVersion(0)
+            new GetLocalListVersionRequest(),
+            new GetLocalListVersionResponse().withListVersion(0)
         );
-        assertEquals(0, operationFuture.join());
+        assertEquals(0, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_043_1_CSMS_SendLocalAuthorizationList_NotSupported() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setListVersion(1);
-        params.setUpdateType(ocpp.cp._2015._10.UpdateType.FULL);
+        params.setUpdateType(UpdateType.FULL);
 
-        var expectedRequest = new ocpp.cp._2015._10.SendLocalListRequest()
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.sendLocalList(params));
+
+        var expectedRequest = new SendLocalListRequest()
             .withListVersion(1)
-            .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
+            .withUpdateType(UpdateType.FULL)
             .withLocalAuthorizationList(List.of(
-                new ocpp.cp._2015._10.AuthorizationData()
+                new AuthorizationData()
                     .withIdTag(REGISTERED_OCPP_TAG)
-                    .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
+                    .withIdTagInfo(new IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
             ));
-
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.sendLocalList(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         chargePoint.expectRequest(
             expectedRequest,
-            new ocpp.cp._2015._10.SendLocalListResponse().withStatus(ocpp.cp._2015._10.UpdateStatus.NOT_SUPPORTED)
+            new SendLocalListResponse().withStatus(UpdateStatus.NOT_SUPPORTED)
         );
-        assertEquals(ocpp.cp._2015._10.UpdateStatus.NOT_SUPPORTED, operationFuture.join());
+        assertEquals(UpdateStatus.NOT_SUPPORTED, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_043_3_CSMS_SendLocalAuthorizationList_Failed() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setListVersion(1);
-        params.setUpdateType(ocpp.cp._2015._10.UpdateType.FULL);
+        params.setUpdateType(UpdateType.FULL);
 
-        var expectedRequest = new ocpp.cp._2015._10.SendLocalListRequest()
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.sendLocalList(params));
+
+        var expectedRequest = new SendLocalListRequest()
             .withListVersion(1)
-            .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
+            .withUpdateType(UpdateType.FULL)
             .withLocalAuthorizationList(List.of(
-                new ocpp.cp._2015._10.AuthorizationData()
+                new AuthorizationData()
                     .withIdTag(REGISTERED_OCPP_TAG)
-                    .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
+                    .withIdTagInfo(new IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
             ));
-
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.sendLocalList(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         chargePoint.expectRequest(
             expectedRequest,
-            new ocpp.cp._2015._10.SendLocalListResponse().withStatus(ocpp.cp._2015._10.UpdateStatus.FAILED)
+            new SendLocalListResponse().withStatus(UpdateStatus.FAILED)
         );
-        assertEquals(ocpp.cp._2015._10.UpdateStatus.FAILED, operationFuture.join());
+        assertEquals(UpdateStatus.FAILED, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_043_4_CSMS_SendLocalAuthorizationList_Full() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setListVersion(1);
-        params.setUpdateType(ocpp.cp._2015._10.UpdateType.FULL);
+        params.setUpdateType(UpdateType.FULL);
 
-        var expectedRequest = new ocpp.cp._2015._10.SendLocalListRequest()
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.sendLocalList(params));
+
+        var expectedRequest = new SendLocalListRequest()
             .withListVersion(1)
-            .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
+            .withUpdateType(UpdateType.FULL)
             .withLocalAuthorizationList(List.of(
-                new ocpp.cp._2015._10.AuthorizationData()
+                new AuthorizationData()
                     .withIdTag(REGISTERED_OCPP_TAG)
-                    .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
+                    .withIdTagInfo(new IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
             ));
-
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.sendLocalList(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         chargePoint.expectRequest(
             expectedRequest,
-            new ocpp.cp._2015._10.SendLocalListResponse().withStatus(ocpp.cp._2015._10.UpdateStatus.ACCEPTED)
+            new SendLocalListResponse().withStatus(UpdateStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.UpdateStatus.ACCEPTED, operationFuture.join());
+        assertEquals(UpdateStatus.ACCEPTED, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_043_5_CSMS_SendLocalAuthorizationList_Differential() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setListVersion(2);
-        params.setUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL);
+        params.setUpdateType(UpdateType.DIFFERENTIAL);
         params.setAddUpdateList(List.of(REGISTERED_OCPP_TAG));
 
-        var expectedRequest = new ocpp.cp._2015._10.SendLocalListRequest()
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.sendLocalList(params));
+
+        var expectedRequest = new SendLocalListRequest()
             .withListVersion(2)
-            .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
+            .withUpdateType(UpdateType.DIFFERENTIAL)
             .withLocalAuthorizationList(List.of(
-                new ocpp.cp._2015._10.AuthorizationData()
+                new AuthorizationData()
                     .withIdTag(REGISTERED_OCPP_TAG)
-                    .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
+                    .withIdTagInfo(new IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED))
             ));
-
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.sendLocalList(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         chargePoint.expectRequest(
             expectedRequest,
-            new ocpp.cp._2015._10.SendLocalListResponse().withStatus(ocpp.cp._2015._10.UpdateStatus.ACCEPTED)
+            new SendLocalListResponse().withStatus(UpdateStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.UpdateStatus.ACCEPTED, operationFuture.join());
+        assertEquals(UpdateStatus.ACCEPTED, successResponse(operationFuture.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_044_1_CSMS_FirmwareUpdate_DownloadAndInstall() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1596,67 +1148,57 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setRetryInterval(1);
         params.setRetrieveDateTime(DateTime.now().plusMinutes(1));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.updateFirmware(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.updateFirmware(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.UpdateFirmwareRequest()
+            new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
                 .withRetrieveDate(params.getRetrieveDateTime())
                 .withRetries(1)
                 .withRetryInterval(1),
-            new ocpp.cp._2015._10.UpdateFirmwareResponse()
+            new UpdateFirmwareResponse()
         );
-        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, operationFuture.join());
+        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, successResponse(operationFuture.join()));
 
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Downloading")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOADING),
+            FirmwareStatusNotificationResponse.class
+        ));
+
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Downloaded")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOADED),
+            FirmwareStatusNotificationResponse.class
+        ));
+
         assertNotNull(chargePoint.send(
-            new StatusNotificationRequest()
-                .withConnectorId(1)
-                .withStatus(ChargePointStatus.UNAVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now()),
-            StatusNotificationResponse.class));
+            statusNotification(1, ChargePointStatus.UNAVAILABLE, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
+
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Installing")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
-        assertEquals(RegistrationStatus.ACCEPTED, chargePoint.send(
-            new BootNotificationRequest().withChargePointVendor(getRandomString()).withChargePointModel(getRandomString()),
-            BootNotificationResponse.class).getStatus());
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.INSTALLING),
+            FirmwareStatusNotificationResponse.class
+        ));
+
+        var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+        assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
+
         assertNotNull(chargePoint.send(
-            new StatusNotificationRequest()
-                .withConnectorId(1)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now()),
-            StatusNotificationResponse.class));
+            statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
+
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Installed")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.INSTALLED),
+            FirmwareStatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_044_2_CSMS_FirmwareUpdate_DownloadFailed() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1665,42 +1207,34 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setRetryInterval(1);
         params.setRetrieveDateTime(DateTime.now().plusMinutes(1));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.updateFirmware(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.updateFirmware(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.UpdateFirmwareRequest()
+            new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
                 .withRetrieveDate(params.getRetrieveDateTime())
                 .withRetries(1)
                 .withRetryInterval(1),
-            new ocpp.cp._2015._10.UpdateFirmwareResponse()
+            new UpdateFirmwareResponse()
         );
-        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, operationFuture.join());
+        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, successResponse(operationFuture.join()));
 
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Downloading")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOADING),
+            FirmwareStatusNotificationResponse.class
+        ));
+
         assertNotNull(chargePoint.send(
-            new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-                .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("DownloadFailed")),
-            ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOAD_FAILED),
+            FirmwareStatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_044_3_CSMS_FirmwareUpdate_InstallationFailed() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1709,49 +1243,57 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setRetryInterval(1);
         params.setRetrieveDateTime(DateTime.now().plusMinutes(1));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.updateFirmware(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.updateFirmware(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.UpdateFirmwareRequest()
+            new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
                 .withRetrieveDate(params.getRetrieveDateTime())
                 .withRetries(1)
                 .withRetryInterval(1),
-            new ocpp.cp._2015._10.UpdateFirmwareResponse()
+            new UpdateFirmwareResponse()
         );
-        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, operationFuture.join());
+        assertEquals(UpdateFirmwareTask.UpdateFirmwareResponseStatus.OK, successResponse(operationFuture.join()));
 
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Downloading")), ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Downloaded")), ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.UNAVAILABLE).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("Installing")), ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
-        assertEquals(RegistrationStatus.ACCEPTED, chargePoint.send(
-            new BootNotificationRequest().withChargePointVendor(getRandomString()).withChargePointModel(getRandomString()),
-            BootNotificationResponse.class).getStatus());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.AVAILABLE).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.FirmwareStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.FirmwareStatus.fromValue("InstallationFailed")), ocpp.cs._2015._10.FirmwareStatusNotificationResponse.class));
+        assertNotNull(chargePoint.send(
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOADING),
+            FirmwareStatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.DOWNLOADED),
+            FirmwareStatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            statusNotification(1, ChargePointStatus.UNAVAILABLE, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.INSTALLING),
+            FirmwareStatusNotificationResponse.class
+        ));
+
+        var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+        assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
+
+        assertNotNull(chargePoint.send(
+            statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            new FirmwareStatusNotificationRequest().withStatus(FirmwareStatus.INSTALLATION_FAILED),
+            FirmwareStatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_045_1_CSMS_GetDiagnostics() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new GetDiagnosticsParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1761,39 +1303,35 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setStart(DateTime.now().minusHours(2));
         params.setStop(DateTime.now().minusHours(1));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getDiagnostics(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getDiagnostics(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.GetDiagnosticsRequest()
+            new GetDiagnosticsRequest()
                 .withLocation(params.getLocation())
                 .withRetries(1)
                 .withRetryInterval(1)
                 .withStartTime(params.getStart())
                 .withStopTime(params.getStop()),
-            new ocpp.cp._2015._10.GetDiagnosticsResponse().withFileName("diag.log")
+            new GetDiagnosticsResponse().withFileName("diag.log")
         );
-        assertEquals("diag.log", operationFuture.join().getFileName());
+        assertEquals("diag.log", successResponse(operationFuture.join()).getFileName());
 
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.DiagnosticsStatus.fromValue("Uploading")), ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.DiagnosticsStatus.fromValue("Uploaded")), ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse.class));
+        assertNotNull(chargePoint.send(
+            new DiagnosticsStatusNotificationRequest().withStatus(DiagnosticsStatus.UPLOADING),
+            DiagnosticsStatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            new DiagnosticsStatusNotificationRequest().withStatus(DiagnosticsStatus.UPLOADED),
+            DiagnosticsStatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_045_2_CSMS_GetDiagnostics_UploadFailed() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new GetDiagnosticsParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1803,39 +1341,35 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setStart(DateTime.now().minusHours(2));
         params.setStop(DateTime.now().minusHours(1));
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.getDiagnostics(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.getDiagnostics(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.GetDiagnosticsRequest()
+            new GetDiagnosticsRequest()
                 .withLocation(params.getLocation())
                 .withRetries(1)
                 .withRetryInterval(1)
                 .withStartTime(params.getStart())
                 .withStopTime(params.getStop()),
-            new ocpp.cp._2015._10.GetDiagnosticsResponse().withFileName("diag.log")
+            new GetDiagnosticsResponse().withFileName("diag.log")
         );
-        assertEquals("diag.log", operationFuture.join().getFileName());
+        assertEquals("diag.log", successResponse(operationFuture.join()).getFileName());
 
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.DiagnosticsStatus.fromValue("Uploading")), ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest()
-            .withStatus(ocpp.cs._2015._10.DiagnosticsStatus.fromValue("UploadFailed")), ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse.class));
+        assertNotNull(chargePoint.send(
+            new DiagnosticsStatusNotificationRequest().withStatus(DiagnosticsStatus.UPLOADING),
+            DiagnosticsStatusNotificationResponse.class
+        ));
+
+        assertNotNull(chargePoint.send(
+            new DiagnosticsStatusNotificationRequest().withStatus(DiagnosticsStatus.UPLOAD_FAILED),
+            DiagnosticsStatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_046_CSMS_ReservationOfConnector_Transaction() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var expiry = DateTime.now().plusMinutes(5);
         var params = new ReserveNowParams();
@@ -1844,34 +1378,23 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setExpiry(expiry);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(expiry).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(expiry).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, operationFuture.join());
+        assertEquals(ACCEPTED, successResponse(operationFuture.join()));
 
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new StartTransactionRequest()
-            .withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1).withMeterStart(0).withTimestamp(DateTime.now()), StartTransactionResponse.class));
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
+        assertNotNull(chargePoint.send(startTransaction(1, REGISTERED_OCPP_TAG, 0, 1), StartTransactionResponse.class));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_047_CSMS_ReservationOfConnector_Expire() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var expiry = DateTime.now().plusMinutes(2);
         var params = new ReserveNowParams();
@@ -1880,61 +1403,45 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setExpiry(expiry);
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var operationFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                assertNotNull(callback);
-                assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(expiry).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(expiry).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, operationFuture.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.AVAILABLE).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now().plusMinutes(3)), StatusNotificationResponse.class));
+        assertEquals(ACCEPTED, successResponse(operationFuture.join()));
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR, DateTime.now().plusMinutes(3)), StatusNotificationResponse.class));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_048_1_CSMS_ReservationOfConnector_Faulted() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new ReserveNowParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setExpiry(DateTime.now().plusMinutes(5));
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
 
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.FAULTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(FAULTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.FAULTED, future.join());
+        assertEquals(FAULTED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_048_2_CSMS_ReservationOfConnector_Occupied() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.PREPARING).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        var chargePoint = defaultStation().start();
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
 
         var params = new ReserveNowParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1942,75 +1449,62 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setExpiry(DateTime.now().plusMinutes(5));
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.OCCUPIED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(OCCUPIED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.OCCUPIED, future.join());
+        assertEquals(OCCUPIED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_048_3_CSMS_ReservationOfConnector_Unavailable() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new ReserveNowParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setExpiry(DateTime.now().plusMinutes(5));
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.UNAVAILABLE)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(UNAVAILABLE)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.UNAVAILABLE, future.join());
+        assertEquals(UNAVAILABLE, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_048_4_CSMS_ReservationOfConnector_Rejected() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new ReserveNowParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setExpiry(DateTime.now().plusMinutes(5));
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.REJECTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(REJECTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.REJECTED, future.join());
+        assertEquals(REJECTED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_049_CSMS_ReservationOfChargePoint_Transaction() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var params = new ReserveNowParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2018,27 +1512,22 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setExpiry(DateTime.now().plusMinutes(5));
         params.setIdTag(REGISTERED_OCPP_TAG);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(params);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.reserveNow(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(0).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowRequest().withConnectorId(0).withExpiryDate(params.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, future.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        assertEquals(ACCEPTED, successResponse(future.join()));
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_051_CSMS_CancelReservation() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var reserve = new ReserveNowParams();
         reserve.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2046,47 +1535,36 @@ public class Ocpp16JsonCsmsCertificationIT {
         reserve.setExpiry(DateTime.now().plusMinutes(5));
         reserve.setIdTag(REGISTERED_OCPP_TAG);
 
-        var reserveFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(reserve);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var reserveFuture = supplyAsyncUnchecked(() -> operationsService.reserveNow(reserve));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(reserve.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(reserve.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, reserveFuture.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        assertEquals(ACCEPTED, successResponse(reserveFuture.join()));
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
 
         var cancel = new CancelReservationParams();
         cancel.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         cancel.setReservationId(1);
 
-        var cancelFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.cancelReservation(cancel);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var cancelFuture = supplyAsyncUnchecked(() -> operationsService.cancelReservation(cancel));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.CancelReservationRequest().withReservationId(1),
-            new ocpp.cp._2015._10.CancelReservationResponse().withStatus(ocpp.cp._2015._10.CancelReservationStatus.ACCEPTED)
+            new CancelReservationRequest().withReservationId(1),
+            new CancelReservationResponse().withStatus(CancelReservationStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.CancelReservationStatus.ACCEPTED, cancelFuture.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.AVAILABLE).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        assertEquals(CancelReservationStatus.ACCEPTED, successResponse(cancelFuture.join()));
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_052_CSMS_CancelReservation_Rejected() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var reserve = new ReserveNowParams();
         reserve.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2094,39 +1572,28 @@ public class Ocpp16JsonCsmsCertificationIT {
         reserve.setExpiry(DateTime.now().plusMinutes(5));
         reserve.setIdTag(REGISTERED_OCPP_TAG);
 
-        var reserveFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(reserve);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var reserveFuture = supplyAsyncUnchecked(() -> operationsService.reserveNow(reserve));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest().withConnectorId(1).withExpiryDate(reserve.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowRequest().withConnectorId(1).withExpiryDate(reserve.getExpiry()).withIdTag(REGISTERED_OCPP_TAG).withReservationId(1),
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, reserveFuture.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        assertEquals(ACCEPTED, successResponse(reserveFuture.join()));
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
 
         var cancel = new CancelReservationParams();
         cancel.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         cancel.setReservationId(1);
 
-        var cancelFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.cancelReservation(cancel);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var cancelFuture = supplyAsyncUnchecked(() -> operationsService.cancelReservation(cancel));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.CancelReservationRequest().withReservationId(1),
-            new ocpp.cp._2015._10.CancelReservationResponse().withStatus(ocpp.cp._2015._10.CancelReservationStatus.REJECTED)
+            new CancelReservationRequest().withReservationId(1),
+            new CancelReservationResponse().withStatus(CancelReservationStatus.REJECTED)
         );
-        assertEquals(ocpp.cp._2015._10.CancelReservationStatus.REJECTED, cancelFuture.join());
+        assertEquals(CancelReservationStatus.REJECTED, successResponse(cancelFuture.join()));
+
         chargePoint.close();
     }
 
@@ -2139,13 +1606,14 @@ public class Ocpp16JsonCsmsCertificationIT {
             .set(OCPP_TAG.ID_TAG, parentTag)
             .set(OCPP_TAG.NOTE, "integration parent idTag")
             .execute();
+
         dslContext.insertInto(OCPP_TAG)
             .set(OCPP_TAG.ID_TAG, childTag)
             .set(OCPP_TAG.PARENT_ID_TAG, parentTag)
             .set(OCPP_TAG.NOTE, "integration child idTag")
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var reserve = new ReserveNowParams();
         reserve.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2153,68 +1621,54 @@ public class Ocpp16JsonCsmsCertificationIT {
         reserve.setExpiry(DateTime.now().plusMinutes(5));
         reserve.setIdTag(childTag);
 
-        var reserveFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                var callback = operationsService.reserveNow(reserve);
-                return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var reserveFuture = supplyAsyncUnchecked(() -> operationsService.reserveNow(reserve));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ReserveNowRequest()
+            new ReserveNowRequest()
                 .withConnectorId(1)
                 .withExpiryDate(reserve.getExpiry())
                 .withIdTag(childTag)
                 .withParentIdTag(parentTag)
                 .withReservationId(1),
-            new ocpp.cp._2015._10.ReserveNowResponse().withStatus(ocpp.cp._2015._10.ReservationStatus.ACCEPTED)
+            new ReserveNowResponse().withStatus(ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ReservationStatus.ACCEPTED, reserveFuture.join());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.RESERVED).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        assertEquals(ACCEPTED, successResponse(reserveFuture.join()));
+
+        assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_054_CSMS_TriggerMessage() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var p1 = new TriggerMessageParams();
         p1.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         p1.setTriggerMessage(TriggerMessageEnum.MeterValues);
         p1.setConnectorId(1);
-        var f1 = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.triggerMessage(p1).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        chargePoint.expectRequest(
-            new ocpp.cp._2015._10.TriggerMessageRequest().withRequestedMessage(ocpp.cp._2015._10.MessageTrigger.METER_VALUES).withConnectorId(1),
-            new ocpp.cp._2015._10.TriggerMessageResponse().withStatus(ocpp.cp._2015._10.TriggerMessageStatus.ACCEPTED)
-        );
-        assertEquals(ocpp.cp._2015._10.TriggerMessageStatus.ACCEPTED, f1.join());
 
-        assertNotNull(chargePoint.send(new ocpp.cs._2015._10.MeterValuesRequest().withConnectorId(1), ocpp.cs._2015._10.MeterValuesResponse.class));
+        var f1 = supplyAsyncUnchecked(() -> operationsService.triggerMessage(p1));
+
+        chargePoint.expectRequest(
+            new TriggerMessageRequest().withRequestedMessage(MessageTrigger.METER_VALUES).withConnectorId(1),
+            new TriggerMessageResponse().withStatus(TriggerMessageStatus.ACCEPTED)
+        );
+        assertEquals(TriggerMessageStatus.ACCEPTED, successResponse(f1.join()));
+
+        assertNotNull(chargePoint.send(new MeterValuesRequest().withConnectorId(1), MeterValuesResponse.class));
 
         var p2 = new TriggerMessageParams();
         p2.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         p2.setTriggerMessage(TriggerMessageEnum.Heartbeat);
-        var f2 = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.triggerMessage(p2).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        var f2 = supplyAsyncUnchecked(() -> operationsService.triggerMessage(p2));
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.TriggerMessageRequest().withRequestedMessage(ocpp.cp._2015._10.MessageTrigger.HEARTBEAT),
-            new ocpp.cp._2015._10.TriggerMessageResponse().withStatus(ocpp.cp._2015._10.TriggerMessageStatus.ACCEPTED)
+            new TriggerMessageRequest().withRequestedMessage(MessageTrigger.HEARTBEAT),
+            new TriggerMessageResponse().withStatus(TriggerMessageStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.TriggerMessageStatus.ACCEPTED, f2.join());
+        assertEquals(TriggerMessageStatus.ACCEPTED, successResponse(f2.join()));
+
         assertNotNull(chargePoint.send(new HeartbeatRequest(), HeartbeatResponse.class));
 
         chargePoint.close();
@@ -2222,87 +1676,85 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_055_CSMS_TriggerMessage_Rejected() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var p = new TriggerMessageParams();
         p.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         p.setTriggerMessage(TriggerMessageEnum.MeterValues);
         p.setConnectorId(1);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.triggerMessage(p).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.triggerMessage(p));
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.TriggerMessageRequest().withRequestedMessage(ocpp.cp._2015._10.MessageTrigger.METER_VALUES).withConnectorId(1),
-            new ocpp.cp._2015._10.TriggerMessageResponse().withStatus(ocpp.cp._2015._10.TriggerMessageStatus.REJECTED)
+            new TriggerMessageRequest().withRequestedMessage(MessageTrigger.METER_VALUES).withConnectorId(1),
+            new TriggerMessageResponse().withStatus(TriggerMessageStatus.REJECTED)
         );
-        assertEquals(ocpp.cp._2015._10.TriggerMessageStatus.REJECTED, future.join());
+        assertEquals(TriggerMessageStatus.REJECTED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_056_CSMS_CentralSmartCharging_TxDefaultProfile() {
+        DateTime nowDt = DateTime.now();
+
         var form = new ChargingProfileForm();
         form.setDescription("tc056");
         form.setStackLevel(0);
-        form.setChargingProfilePurpose(ocpp.cp._2015._10.ChargingProfilePurposeType.TX_DEFAULT_PROFILE);
-        form.setChargingProfileKind(ocpp.cp._2015._10.ChargingProfileKindType.ABSOLUTE);
-        form.setChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W);
-        form.setValidFrom(DateTime.now().plusMinutes(1));
-        form.setValidTo(DateTime.now().plusHours(2));
-        form.setStartSchedule(DateTime.now().plusMinutes(2));
+        form.setChargingProfilePurpose(ChargingProfilePurposeType.TX_DEFAULT_PROFILE);
+        form.setChargingProfileKind(ChargingProfileKindType.ABSOLUTE);
+        form.setChargingRateUnit(ChargingRateUnitType.W);
+        form.setValidFrom(nowDt.plusMinutes(1));
+        form.setValidTo(nowDt.plusHours(2));
+        form.setStartSchedule(nowDt.plusMinutes(2));
         form.setDurationInSeconds(3600);
+
         var period = new ChargingProfileForm.SchedulePeriod();
         period.setStartPeriodInSeconds(0);
         period.setPowerLimit(BigDecimal.valueOf(6.0));
         period.setNumberPhases(3);
         form.setSchedulePeriods(List.of(period));
+
         var profilePk = chargingProfileRepository.add(form);
         var details = chargingProfileRepository.getDetails(profilePk);
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new SetChargingProfileParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setChargingProfilePk(profilePk);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.setChargingProfile(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.setChargingProfile(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(details, null)),
-            new ocpp.cp._2015._10.SetChargingProfileResponse().withStatus(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED)
+            new SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(details, null)),
+            new SetChargingProfileResponse().withStatus(ChargingProfileStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED, future.join());
+        assertEquals(ChargingProfileStatus.ACCEPTED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
     @Test
     public void test_TC_057_CSMS_CentralSmartCharging_TxProfile() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
-        var start = chargePoint.send(new StartTransactionRequest()
-            .withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG).withMeterStart(0).withTimestamp(DateTime.now()), StartTransactionResponse.class);
+        var chargePoint = defaultStation().start();
+
+        var start = chargePoint.send(startTransaction(1, REGISTERED_OCPP_TAG, 0), StartTransactionResponse.class);
         var txId = start.getTransactionId();
 
         var form = new ChargingProfileForm();
         form.setDescription("tc057");
         form.setStackLevel(0);
-        form.setChargingProfilePurpose(ocpp.cp._2015._10.ChargingProfilePurposeType.TX_PROFILE);
-        form.setChargingProfileKind(ocpp.cp._2015._10.ChargingProfileKindType.ABSOLUTE);
-        form.setChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W);
+        form.setChargingProfilePurpose(ChargingProfilePurposeType.TX_PROFILE);
+        form.setChargingProfileKind(ChargingProfileKindType.ABSOLUTE);
+        form.setChargingRateUnit(ChargingRateUnitType.W);
         form.setDurationInSeconds(1800);
+
         var period = new ChargingProfileForm.SchedulePeriod();
         period.setStartPeriodInSeconds(0);
         period.setPowerLimit(BigDecimal.valueOf(6.0));
         form.setSchedulePeriods(List.of(period));
+
         var profilePk = chargingProfileRepository.add(form);
         var details = chargingProfileRepository.getDetails(profilePk);
 
@@ -2312,18 +1764,14 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setChargingProfilePk(profilePk);
         params.setTransactionId(txId);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.setChargingProfile(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.setChargingProfile(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(details, txId)),
-            new ocpp.cp._2015._10.SetChargingProfileResponse().withStatus(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED)
+            new SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(details, txId)),
+            new SetChargingProfileResponse().withStatus(ChargingProfileStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED, future.join());
+        assertEquals(ChargingProfileStatus.ACCEPTED, successResponse(future.join()));
+
         chargePoint.close();
     }
 
@@ -2332,63 +1780,70 @@ public class Ocpp16JsonCsmsCertificationIT {
         var form = new ChargingProfileForm();
         form.setDescription("tc059");
         form.setStackLevel(0);
-        form.setChargingProfilePurpose(ocpp.cp._2015._10.ChargingProfilePurposeType.TX_PROFILE);
-        form.setChargingProfileKind(ocpp.cp._2015._10.ChargingProfileKindType.ABSOLUTE);
-        form.setChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W);
+        form.setChargingProfilePurpose(ChargingProfilePurposeType.TX_PROFILE);
+        form.setChargingProfileKind(ChargingProfileKindType.ABSOLUTE);
+        form.setChargingRateUnit(ChargingRateUnitType.W);
         form.setDurationInSeconds(1200);
+
         var period = new ChargingProfileForm.SchedulePeriod();
         period.setStartPeriodInSeconds(0);
         period.setPowerLimit(BigDecimal.valueOf(6.0));
         form.setSchedulePeriods(List.of(period));
+
         var profilePk = chargingProfileRepository.add(form);
         var details = chargingProfileRepository.getDetails(profilePk);
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setIdTag(REGISTERED_OCPP_TAG);
         params.setChargingProfilePk(profilePk);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.remoteStartTransaction(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.remoteStartTransaction(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.RemoteStartTransactionRequest()
+            new RemoteStartTransactionRequest()
                 .withIdTag(REGISTERED_OCPP_TAG)
                 .withConnectorId(1)
                 .withChargingProfile(ChargingProfileDetailsMapper.mapToOcpp(details, null)),
-            new ocpp.cp._2015._10.RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
+            new RemoteStartTransactionResponse().withStatus(RemoteStartStopStatus.ACCEPTED)
         );
-        assertEquals(RemoteStartStopStatus.ACCEPTED, future.join());
+        assertEquals(RemoteStartStopStatus.ACCEPTED, successResponse(future.join()));
 
-        assertEquals(AuthorizationStatus.ACCEPTED, chargePoint.send(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), AuthorizeResponse.class).getIdTagInfo().getStatus());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.PREPARING).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
-        assertEquals(AuthorizationStatus.ACCEPTED, chargePoint.send(new StartTransactionRequest()
-            .withConnectorId(1).withIdTag(REGISTERED_OCPP_TAG).withMeterStart(0).withTimestamp(DateTime.now()), StartTransactionResponse.class).getIdTagInfo().getStatus());
-        assertNotNull(chargePoint.send(new StatusNotificationRequest()
-            .withConnectorId(1).withStatus(ChargePointStatus.CHARGING).withErrorCode(ChargePointErrorCode.NO_ERROR).withTimestamp(DateTime.now()), StatusNotificationResponse.class));
+        var authResp = chargePoint.send(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), AuthorizeResponse.class);
+        assertEquals(AuthorizationStatus.ACCEPTED, authResp.getIdTagInfo().getStatus());
+
+        assertNotNull(chargePoint.send(
+            statusNotification(1, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
+
+        var startTxResp = chargePoint.send(startTransaction(1, REGISTERED_OCPP_TAG, 0), StartTransactionResponse.class);
+        assertEquals(AuthorizationStatus.ACCEPTED, startTxResp.getIdTagInfo().getStatus());
+
+        assertNotNull(chargePoint.send(
+            statusNotification(1, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR),
+            StatusNotificationResponse.class
+        ));
 
         chargePoint.close();
     }
 
     @Test
     public void test_TC_064_CSMS_DataTransferToCentralSystem() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
-        var request = new ocpp.cs._2015._10.DataTransferRequest()
+        var request = new DataTransferRequest()
             .withVendorId(getRandomString())
             .withMessageId("TestMessage")
             .withData("test-payload");
-        var response = chargePoint.send(request, ocpp.cs._2015._10.DataTransferResponse.class);
+        var response = chargePoint.send(request, DataTransferResponse.class);
 
         var status = response.getStatus();
         var statusValue = status.value();
+
         assertTrue(
             statusValue.equals("Rejected")
                 || statusValue.equals("UnknownMessageId")
@@ -2401,32 +1856,32 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_066_CSMS_GetCompositeSchedule() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var params = new GetCompositeScheduleParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setConnectorId(1);
         params.setDurationInSeconds(300);
-        params.setChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W);
+        params.setChargingRateUnit(ChargingRateUnitType.W);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.getCompositeSchedule(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.getCompositeSchedule(params));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.GetCompositeScheduleRequest().withConnectorId(1).withDuration(300).withChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W),
-            new ocpp.cp._2015._10.GetCompositeScheduleResponse()
-                .withStatus(ocpp.cp._2015._10.GetCompositeScheduleStatus.ACCEPTED)
+            new GetCompositeScheduleRequest()
+                .withConnectorId(1)
+                .withDuration(300)
+                .withChargingRateUnit(ChargingRateUnitType.W),
+            new GetCompositeScheduleResponse()
+                .withStatus(GetCompositeScheduleStatus.ACCEPTED)
                 .withConnectorId(1)
                 .withScheduleStart(DateTime.now())
-                .withChargingSchedule(new ocpp.cp._2015._10.ChargingSchedule()
-                    .withChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W)
+                .withChargingSchedule(new ChargingSchedule()
+                    .withChargingRateUnit(ChargingRateUnitType.W)
                     .withDuration(300)
-                    .withChargingSchedulePeriod(List.of(new ocpp.cp._2015._10.ChargingSchedulePeriod().withStartPeriod(0).withLimit(BigDecimal.valueOf(6.0)))))
+                    .withChargingSchedulePeriod(List.of(new ChargingSchedulePeriod().withStartPeriod(0).withLimit(BigDecimal.valueOf(6.0)))))
         );
-        assertEquals(ocpp.cp._2015._10.GetCompositeScheduleStatus.ACCEPTED, future.join().getStatus());
+        assertEquals(GetCompositeScheduleStatus.ACCEPTED, successResponse(future.join()).getStatus());
+
         chargePoint.close();
     }
 
@@ -2435,68 +1890,58 @@ public class Ocpp16JsonCsmsCertificationIT {
         var txDefaultForm = new ChargingProfileForm();
         txDefaultForm.setDescription("tc067-tx-default");
         txDefaultForm.setStackLevel(0);
-        txDefaultForm.setChargingProfilePurpose(ocpp.cp._2015._10.ChargingProfilePurposeType.TX_DEFAULT_PROFILE);
-        txDefaultForm.setChargingProfileKind(ocpp.cp._2015._10.ChargingProfileKindType.ABSOLUTE);
-        txDefaultForm.setChargingRateUnit(ocpp.cp._2015._10.ChargingRateUnitType.W);
+        txDefaultForm.setChargingProfilePurpose(ChargingProfilePurposeType.TX_DEFAULT_PROFILE);
+        txDefaultForm.setChargingProfileKind(ChargingProfileKindType.ABSOLUTE);
+        txDefaultForm.setChargingRateUnit(ChargingRateUnitType.W);
         txDefaultForm.setDurationInSeconds(900);
+
         var txDefaultPeriod = new ChargingProfileForm.SchedulePeriod();
         txDefaultPeriod.setStartPeriodInSeconds(0);
         txDefaultPeriod.setPowerLimit(BigDecimal.valueOf(6.0));
         txDefaultForm.setSchedulePeriods(List.of(txDefaultPeriod));
+
         var txDefaultPk = chargingProfileRepository.add(txDefaultForm);
         var txDefaultDetails = chargingProfileRepository.getDetails(txDefaultPk);
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var setParams = new SetChargingProfileParams();
         setParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         setParams.setConnectorId(1);
         setParams.setChargingProfilePk(txDefaultPk);
-        var setFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.setChargingProfile(setParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        var setFuture = supplyAsyncUnchecked(() -> operationsService.setChargingProfile(setParams));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(txDefaultDetails, null)),
-            new ocpp.cp._2015._10.SetChargingProfileResponse().withStatus(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED)
+            new SetChargingProfileRequest().withConnectorId(1).withCsChargingProfiles(ChargingProfileDetailsMapper.mapToOcpp(txDefaultDetails, null)),
+            new SetChargingProfileResponse().withStatus(ChargingProfileStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ChargingProfileStatus.ACCEPTED, setFuture.join());
+        assertEquals(ChargingProfileStatus.ACCEPTED, successResponse(setFuture.join()));
 
         var clearById = new ClearChargingProfileParams();
         clearById.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         clearById.setFilterType(ClearChargingProfileFilterType.ChargingProfileId);
         clearById.setChargingProfilePk(txDefaultPk);
-        var clearByIdFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.clearChargingProfile(clearById).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        var clearByIdFuture = supplyAsyncUnchecked(() -> operationsService.clearChargingProfile(clearById));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ClearChargingProfileRequest().withId(txDefaultPk),
-            new ocpp.cp._2015._10.ClearChargingProfileResponse().withStatus(ocpp.cp._2015._10.ClearChargingProfileStatus.ACCEPTED)
+            new ClearChargingProfileRequest().withId(txDefaultPk),
+            new ClearChargingProfileResponse().withStatus(ClearChargingProfileStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ClearChargingProfileStatus.ACCEPTED, clearByIdFuture.join());
+        assertEquals(ClearChargingProfileStatus.ACCEPTED, successResponse(clearByIdFuture.join()));
 
         var clearAll = new ClearChargingProfileParams();
         clearAll.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         clearAll.setFilterType(ClearChargingProfileFilterType.OtherParameters);
-        var clearAllFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.clearChargingProfile(clearAll).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        var clearAllFuture = supplyAsyncUnchecked(() -> operationsService.clearChargingProfile(clearAll));
+
         chargePoint.expectRequest(
-            new ocpp.cp._2015._10.ClearChargingProfileRequest(),
-            new ocpp.cp._2015._10.ClearChargingProfileResponse().withStatus(ocpp.cp._2015._10.ClearChargingProfileStatus.ACCEPTED)
+            new ClearChargingProfileRequest(),
+            new ClearChargingProfileResponse().withStatus(ClearChargingProfileStatus.ACCEPTED)
         );
-        assertEquals(ocpp.cp._2015._10.ClearChargingProfileStatus.ACCEPTED, clearAllFuture.join());
+        assertEquals(ClearChargingProfileStatus.ACCEPTED, successResponse(clearAllFuture.join()));
 
         chargePoint.close();
     }
@@ -2512,12 +1957,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(
-            OcppVersion.V_16,
-            REGISTERED_CHARGE_BOX_ID,
-            PATH,
-            password
-        ).start();
+        var chargePoint = defaultStationWithPwd(password).start();
 
         expectGetConfCpoName(chargePoint);
 
@@ -2529,18 +1969,13 @@ public class Ocpp16JsonCsmsCertificationIT {
 
         var valueHex = HexFormat.of().formatHex(params.getValue().getBytes(StandardCharsets.UTF_8));
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.changeConfiguration(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
+
         chargePoint.expectRequest(
             new ChangeConfigurationRequest().withKey(AuthorizationKey.name()).withValue(valueHex),
             new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
         );
-        assertEquals(ConfigurationStatus.ACCEPTED, future.join());
+        assertEquals(ConfigurationStatus.ACCEPTED, successResponse(future.join()));
 
         chargePoint.close();
 
@@ -2552,12 +1987,7 @@ public class Ocpp16JsonCsmsCertificationIT {
         assertNotNull(record);
         assertTrue(passwordEncoder.matches(newPassword, record.getAuthPassword()));
 
-        chargePoint = new OcppJsonChargePoint(
-            OcppVersion.V_16,
-            REGISTERED_CHARGE_BOX_ID,
-            PATH,
-            newPassword
-        ).start();
+        chargePoint = defaultStationWithPwd(newPassword).start();
 
         expectGetConfCpoName(chargePoint);
 
@@ -2572,57 +2002,48 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_075_1_CSMS_InstallManufacturerRootCertificate() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var certificate = "-----BEGIN CERTIFICATE-----\\nMANUFACTURER-ROOT-" + getRandomString() + "\\n-----END CERTIFICATE-----";
+
         var installParams = new InstallCertificateParams();
         installParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-        installParams.setCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE);
+        installParams.setCertificateType(InstallCertificate.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE);
         installParams.setCertificate(certificate);
 
-        var installFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.installCertificate(installParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        chargePoint.expectRequest(
-            new ocpp._2022._02.security.InstallCertificate()
-                .withCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE)
-                .withCertificate(certificate),
-            new ocpp._2022._02.security.InstallCertificateResponse()
-                .withStatus(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
-        );
-        assertEquals(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, installFuture.join());
+        var installFuture = supplyAsyncUnchecked(() -> operationsService.installCertificate(installParams));
 
-        var hashData = new ocpp._2022._02.security.CertificateHashData()
-            .withHashAlgorithm(ocpp._2022._02.security.CertificateHashData.HashAlgorithmEnumType.SHA_256)
+        chargePoint.expectRequest(
+            new InstallCertificate()
+                .withCertificateType(InstallCertificate.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE)
+                .withCertificate(certificate),
+            new InstallCertificateResponse()
+                .withStatus(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
+        );
+        assertEquals(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, successResponse(installFuture.join()));
+
+        var hashData = new CertificateHashData()
+            .withHashAlgorithm(CertificateHashData.HashAlgorithmEnumType.SHA_256)
             .withIssuerNameHash("issuer-name-hash-manufacturer")
             .withIssuerKeyHash("issuer-key-hash-manufacturer")
             .withSerialNumber("serial-manufacturer");
 
         var getIdsParams = new GetInstalledCertificateIdsParams();
         getIdsParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-        getIdsParams.setCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE);
+        getIdsParams.setCertificateType(CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE);
 
-        var getIdsFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.getInstalledCertificateIds(getIdsParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var getIdsFuture = supplyAsyncUnchecked(() -> operationsService.getInstalledCertificateIds(getIdsParams));
+
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.GetInstalledCertificateIds()
-                .withCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE),
-            new ocpp._2022._02.security.GetInstalledCertificateIdsResponse()
-                .withStatus(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
+            new GetInstalledCertificateIds()
+                .withCertificateType(CertificateUseEnumType.MANUFACTURER_ROOT_CERTIFICATE),
+            new GetInstalledCertificateIdsResponse()
+                .withStatus(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
                 .withCertificateHashData(List.of(hashData))
         );
 
-        var getIdsResponse = getIdsFuture.join();
-        assertEquals(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, getIdsResponse.getStatus());
+        var getIdsResponse = successResponse(getIdsFuture.join());
+        assertEquals(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, getIdsResponse.getStatus());
         assertNotNull(getIdsResponse.getCertificateHashData());
         assertEquals(1, getIdsResponse.getCertificateHashData().size());
 
@@ -2631,56 +2052,45 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_075_2_CSMS_InstallCentralSystemRootCertificate() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var certificate = "-----BEGIN CERTIFICATE-----\\nCSMS-ROOT-" + getRandomString() + "\\n-----END CERTIFICATE-----";
+
         var installParams = new InstallCertificateParams();
         installParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         installParams.setCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
         installParams.setCertificate(certificate);
 
-        var installFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.installCertificate(installParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        chargePoint.expectRequest(
-            new ocpp._2022._02.security.InstallCertificate()
-                .withCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
-                .withCertificate(certificate),
-            new ocpp._2022._02.security.InstallCertificateResponse()
-                .withStatus(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
-        );
-        assertEquals(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, installFuture.join());
+        var installFuture = supplyAsyncUnchecked(() -> operationsService.installCertificate(installParams));
 
-        var hashData = new ocpp._2022._02.security.CertificateHashData()
-            .withHashAlgorithm(ocpp._2022._02.security.CertificateHashData.HashAlgorithmEnumType.SHA_256)
+        chargePoint.expectRequest(
+            new InstallCertificate()
+                .withCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
+                .withCertificate(certificate),
+            new InstallCertificateResponse()
+                .withStatus(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
+        );
+        assertEquals(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, successResponse(installFuture.join()));
+
+        var hashData = new CertificateHashData()
+            .withHashAlgorithm(CertificateHashData.HashAlgorithmEnumType.SHA_256)
             .withIssuerNameHash("issuer-name-hash-csms")
             .withIssuerKeyHash("issuer-key-hash-csms")
             .withSerialNumber("serial-csms");
 
         var getIdsParams = new GetInstalledCertificateIdsParams();
         getIdsParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-        getIdsParams.setCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
+        getIdsParams.setCertificateType(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
 
-        var getIdsFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.getInstalledCertificateIds(getIdsParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var getIdsFuture = supplyAsyncUnchecked(() -> operationsService.getInstalledCertificateIds(getIdsParams));
+
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.GetInstalledCertificateIds()
-                .withCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
-            new ocpp._2022._02.security.GetInstalledCertificateIdsResponse()
-                .withStatus(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
-                .withCertificateHashData(List.of(hashData))
+            new GetInstalledCertificateIds().withCertificateType(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
+            new GetInstalledCertificateIdsResponse().withStatus(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED).withCertificateHashData(List.of(hashData))
         );
-        var getIdsResponse = getIdsFuture.join();
-        assertEquals(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, getIdsResponse.getStatus());
+
+        var getIdsResponse = successResponse(getIdsFuture.join());
+        assertEquals(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, getIdsResponse.getStatus());
         assertNotNull(getIdsResponse.getCertificateHashData());
         assertEquals(1, getIdsResponse.getCertificateHashData().size());
 
@@ -2689,36 +2099,32 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_076_CSMS_DeleteSpecificInstalledCertificate() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         for (var hashAlgorithm : List.of(
-            ocpp._2022._02.security.CertificateHashData.HashAlgorithmEnumType.SHA_256,
-            ocpp._2022._02.security.CertificateHashData.HashAlgorithmEnumType.SHA_384,
-            ocpp._2022._02.security.CertificateHashData.HashAlgorithmEnumType.SHA_512
+            CertificateHashData.HashAlgorithmEnumType.SHA_256,
+            CertificateHashData.HashAlgorithmEnumType.SHA_384,
+            CertificateHashData.HashAlgorithmEnumType.SHA_512
         )) {
             var certificate = "-----BEGIN CERTIFICATE-----\\nCSMS-ROOT-" + hashAlgorithm.value() + "-" + getRandomString() + "\\n-----END CERTIFICATE-----";
+
             var installParams = new InstallCertificateParams();
             installParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-            installParams.setCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
+            installParams.setCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
             installParams.setCertificate(certificate);
 
-            var installFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return operationsService.installCertificate(installParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            chargePoint.expectRequest(
-                new ocpp._2022._02.security.InstallCertificate()
-                    .withCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
-                    .withCertificate(certificate),
-                new ocpp._2022._02.security.InstallCertificateResponse()
-                    .withStatus(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
-            );
-            assertEquals(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, installFuture.join());
+            var installFuture = supplyAsyncUnchecked(() -> operationsService.installCertificate(installParams));
 
-            var hashData = new ocpp._2022._02.security.CertificateHashData()
+            chargePoint.expectRequest(
+                new InstallCertificate()
+                    .withCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
+                    .withCertificate(certificate),
+                new InstallCertificateResponse()
+                    .withStatus(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED)
+            );
+            assertEquals(InstallCertificateResponse.InstallCertificateStatusEnumType.ACCEPTED, successResponse(installFuture.join()));
+
+            var hashData = new CertificateHashData()
                 .withHashAlgorithm(hashAlgorithm)
                 .withIssuerNameHash("issuer-name-" + hashAlgorithm.value().toLowerCase())
                 .withIssuerKeyHash("issuer-key-" + hashAlgorithm.value().toLowerCase())
@@ -2726,29 +2132,24 @@ public class Ocpp16JsonCsmsCertificationIT {
 
             var getIdsParams = new GetInstalledCertificateIdsParams();
             getIdsParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-            getIdsParams.setCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
+            getIdsParams.setCertificateType(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
 
-            var getIdsFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return operationsService.getInstalledCertificateIds(getIdsParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            var getIdsFuture = supplyAsyncUnchecked(() -> operationsService.getInstalledCertificateIds(getIdsParams));
+
             chargePoint.expectRequest(
-                new ocpp._2022._02.security.GetInstalledCertificateIds()
-                    .withCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
-                new ocpp._2022._02.security.GetInstalledCertificateIdsResponse()
-                    .withStatus(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
+                new GetInstalledCertificateIds()
+                    .withCertificateType(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
+                new GetInstalledCertificateIdsResponse()
+                    .withStatus(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
                     .withCertificateHashData(List.of(hashData))
             );
-            assertEquals(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, getIdsFuture.join().getStatus());
+            assertEquals(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, successResponse(getIdsFuture.join()).getStatus());
 
             var installedCertificateId = dslContext.select(CHARGE_BOX_CERTIFICATE_INSTALLED.ID)
                 .from(CHARGE_BOX_CERTIFICATE_INSTALLED)
                 .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
-                .and(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE.value()))
+                .and(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE.value()))
                 .orderBy(CHARGE_BOX_CERTIFICATE_INSTALLED.ID.desc())
                 .limit(1)
                 .fetchOne(CHARGE_BOX_CERTIFICATE_INSTALLED.ID);
@@ -2758,47 +2159,37 @@ public class Ocpp16JsonCsmsCertificationIT {
             deleteParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
             deleteParams.setInstalledCertificateId(installedCertificateId);
 
-            var deleteFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return operationsService.deleteCertificate(deleteParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            var deleteFuture = supplyAsyncUnchecked(() -> operationsService.deleteCertificate(deleteParams));
+
             chargePoint.expectRequest(
-                new ocpp._2022._02.security.DeleteCertificate()
-                    .withCertificateHashData(new ocpp._2022._02.security.CertificateHashDataType()
-                        .withHashAlgorithm(ocpp._2022._02.security.CertificateHashDataType.HashAlgorithmEnumType.fromValue(hashAlgorithm.value()))
+                new DeleteCertificate()
+                    .withCertificateHashData(new CertificateHashDataType()
+                        .withHashAlgorithm(CertificateHashDataType.HashAlgorithmEnumType.fromValue(hashAlgorithm.value()))
                         .withIssuerNameHash(hashData.getIssuerNameHash())
                         .withIssuerKeyHash(hashData.getIssuerKeyHash())
                         .withSerialNumber(hashData.getSerialNumber())),
-                new ocpp._2022._02.security.DeleteCertificateResponse()
-                    .withStatus(ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatusEnumType.ACCEPTED)
+                new DeleteCertificateResponse()
+                    .withStatus(DeleteCertificateResponse.DeleteCertificateStatusEnumType.ACCEPTED)
             );
-            assertEquals(ocpp._2022._02.security.DeleteCertificateResponse.DeleteCertificateStatusEnumType.ACCEPTED, deleteFuture.join());
+            assertEquals(DeleteCertificateResponse.DeleteCertificateStatusEnumType.ACCEPTED, successResponse(deleteFuture.join()));
 
-            var verifyFuture = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return operationsService.getInstalledCertificateIds(getIdsParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            var verifyFuture = supplyAsyncUnchecked(() -> operationsService.getInstalledCertificateIds(getIdsParams));
+
             chargePoint.expectRequest(
-                new ocpp._2022._02.security.GetInstalledCertificateIds()
-                    .withCertificateType(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
-                new ocpp._2022._02.security.GetInstalledCertificateIdsResponse()
-                    .withStatus(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
+                new GetInstalledCertificateIds()
+                    .withCertificateType(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE),
+                new GetInstalledCertificateIdsResponse()
+                    .withStatus(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED)
                     .withCertificateHashData(null)
             );
-            assertEquals(ocpp._2022._02.security.GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, verifyFuture.join().getStatus());
+            assertEquals(GetInstalledCertificateIdsResponse.GetInstalledCertificateStatusEnumType.ACCEPTED, successResponse(verifyFuture.join()).getStatus());
         }
 
         var remaining = dslContext.selectCount()
             .from(CHARGE_BOX_CERTIFICATE_INSTALLED)
             .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_INSTALLED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
-            .and(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(ocpp._2022._02.security.GetInstalledCertificateIds.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE.value()))
+            .and(CHARGE_BOX_CERTIFICATE_INSTALLED.CERTIFICATE_TYPE.eq(CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE.value()))
             .fetchOne(0, int.class);
         assertEquals(0, remaining);
 
@@ -2813,36 +2204,32 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_078_CSMS_InvalidCentralSystemCertificateSecurityEvent() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
 
         var certificate = "-----BEGIN CERTIFICATE-----\\nINVALID-CSMS-ROOT-" + getRandomString() + "\\n-----END CERTIFICATE-----";
+
         var installParams = new InstallCertificateParams();
         installParams.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-        installParams.setCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
+        installParams.setCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE);
         installParams.setCertificate(certificate);
 
-        var installFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.installCertificate(installParams).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var installFuture = supplyAsyncUnchecked(() -> operationsService.installCertificate(installParams));
+
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.InstallCertificate()
-                .withCertificateType(ocpp._2022._02.security.InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
+            new InstallCertificate()
+                .withCertificateType(InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE)
                 .withCertificate(certificate),
-            new ocpp._2022._02.security.InstallCertificateResponse()
-                .withStatus(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.REJECTED)
+            new InstallCertificateResponse()
+                .withStatus(InstallCertificateResponse.InstallCertificateStatusEnumType.REJECTED)
         );
-        assertEquals(ocpp._2022._02.security.InstallCertificateResponse.InstallCertificateStatusEnumType.REJECTED, installFuture.join());
+        assertEquals(InstallCertificateResponse.InstallCertificateStatusEnumType.REJECTED, successResponse(installFuture.join()));
 
         var securityEventResponse = chargePoint.send(
-            new ocpp._2022._02.security.SecurityEventNotification()
+            new SecurityEventNotification()
                 .withType("InvalidCentralSystemCertificate")
                 .withTimestamp(DateTime.now())
                 .withTechInfo("certificate rejected by charge point"),
-            ocpp._2022._02.security.SecurityEventNotificationResponse.class
+            SecurityEventNotificationResponse.class
         );
         assertNotNull(securityEventResponse);
 
@@ -2851,7 +2238,8 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_079_CSMS_GetSecurityLog() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var expectedJobId = dslContext.selectCount()
             .from(CHARGE_BOX_LOG_UPLOAD_JOB)
             .fetchOne(0, int.class) + 1;
@@ -2859,41 +2247,37 @@ public class Ocpp16JsonCsmsCertificationIT {
         var params = new GetLogParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setLocation("https://example.com/security-log/upload");
-        params.setLogType(ocpp._2022._02.security.GetLog.LogEnumType.SECURITY_LOG);
+        params.setLogType(GetLog.LogEnumType.SECURITY_LOG);
         params.setRetries(1);
         params.setRetryInterval(60);
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.getLog(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.getLog(params));
+
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.GetLog()
+            new GetLog()
                 .withRequestId(expectedJobId)
-                .withLogType(ocpp._2022._02.security.GetLog.LogEnumType.SECURITY_LOG)
+                .withLogType(GetLog.LogEnumType.SECURITY_LOG)
                 .withRetries(1)
                 .withRetryInterval(60)
-                .withLog(new ocpp._2022._02.security.LogParametersType().withRemoteLocation("https://example.com/security-log/upload")),
-            new ocpp._2022._02.security.GetLogResponse()
-                .withStatus(ocpp._2022._02.security.GetLogResponse.LogStatusEnumType.ACCEPTED)
+                .withLog(new LogParametersType().withRemoteLocation("https://example.com/security-log/upload")),
+            new GetLogResponse()
+                .withStatus(GetLogResponse.LogStatusEnumType.ACCEPTED)
                 .withFilename("security.log")
         );
-        assertEquals(ocpp._2022._02.security.GetLogResponse.LogStatusEnumType.ACCEPTED, future.join().getStatus());
+        assertEquals(GetLogResponse.LogStatusEnumType.ACCEPTED, successResponse(future.join()).getStatus());
 
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.LogStatusNotification()
+            new LogStatusNotification()
                 .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.LogStatusNotification.UploadLogStatusEnumType.UPLOADING),
-            ocpp._2022._02.security.LogStatusNotificationResponse.class
+                .withStatus(LogStatusNotification.UploadLogStatusEnumType.UPLOADING),
+            LogStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.LogStatusNotification()
+            new LogStatusNotification()
                 .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.LogStatusNotification.UploadLogStatusEnumType.UPLOADED),
-            ocpp._2022._02.security.LogStatusNotificationResponse.class
+                .withStatus(LogStatusNotification.UploadLogStatusEnumType.UPLOADED),
+            LogStatusNotificationResponse.class
         ));
 
         var eventCount = dslContext.selectCount()
@@ -2907,7 +2291,8 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_080_CSMS_SecureFirmwareUpdate() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var expectedJobId = dslContext.selectCount()
             .from(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
             .fetchOne(0, int.class) + 1;
@@ -2922,76 +2307,62 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setSignature("valid-signature-" + getRandomString());
         params.setSigningCertificate("-----BEGIN CERTIFICATE-----\\nSIGNING-CERT-" + getRandomString() + "\\n-----END CERTIFICATE-----");
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.signedUpdateFirmware(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.signedUpdateFirmware(params));
+
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.SignedUpdateFirmware()
+            new SignedUpdateFirmware()
                 .withRequestId(expectedJobId)
                 .withRetries(1)
                 .withRetryInterval(60)
-                .withFirmware(new ocpp._2022._02.security.FirmwareType()
+                .withFirmware(new FirmwareType()
                     .withLocation("https://example.com/fw/secure.bin")
                     .withRetrieveDateTime(params.getRetrieveDateTime())
                     .withInstallDateTime(params.getInstallDateTime())
                     .withSignature(params.getSignature())
                     .withSigningCertificate(params.getSigningCertificate())),
-            new ocpp._2022._02.security.SignedUpdateFirmwareResponse()
-                .withStatus(ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType.ACCEPTED)
+            new SignedUpdateFirmwareResponse()
+                .withStatus(UpdateFirmwareStatusEnumType.ACCEPTED)
         );
-        assertEquals(ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType.ACCEPTED, future.join());
+        assertEquals(UpdateFirmwareStatusEnumType.ACCEPTED, successResponse(future.join()));
 
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.DOWNLOADING),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.DOWNLOADING),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.DOWNLOADED),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.DOWNLOADED),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.SIGNATURE_VERIFIED),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.SIGNATURE_VERIFIED),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.INSTALLING),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.INSTALLING),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.INSTALL_REBOOTING),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.INSTALL_REBOOTING),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SecurityEventNotification().withType("FirmwareUpdated").withTimestamp(DateTime.now()),
-            ocpp._2022._02.security.SecurityEventNotificationResponse.class
+            new SecurityEventNotification().withType("FirmwareUpdated").withTimestamp(DateTime.now()),
+            SecurityEventNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new StatusNotificationRequest()
-                .withConnectorId(0)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now()),
+            statusNotification(0, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR),
             StatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.INSTALLED),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.INSTALLED),
+            SignedFirmwareStatusNotificationResponse.class
         ));
 
         var eventCount = dslContext.selectCount()
@@ -3005,7 +2376,8 @@ public class Ocpp16JsonCsmsCertificationIT {
 
     @Test
     public void test_TC_081_CSMS_SecureFirmwareUpdateInvalidSignature() {
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = defaultStation().start();
+
         var expectedJobId = dslContext.selectCount()
             .from(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
             .fetchOne(0, int.class) + 1;
@@ -3020,46 +2392,36 @@ public class Ocpp16JsonCsmsCertificationIT {
         params.setSignature("invalid-signature-" + getRandomString());
         params.setSigningCertificate("-----BEGIN CERTIFICATE-----\\nSIGNING-CERT-" + getRandomString() + "\\n-----END CERTIFICATE-----");
 
-        var future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.signedUpdateFirmware(params).getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var future = supplyAsyncUnchecked(() -> operationsService.signedUpdateFirmware(params));
         chargePoint.expectRequest(
-            new ocpp._2022._02.security.SignedUpdateFirmware()
+            new SignedUpdateFirmware()
                 .withRequestId(expectedJobId)
                 .withRetries(1)
                 .withRetryInterval(60)
-                .withFirmware(new ocpp._2022._02.security.FirmwareType()
+                .withFirmware(new FirmwareType()
                     .withLocation("https://example.com/fw/secure-invalid-signature.bin")
                     .withRetrieveDateTime(params.getRetrieveDateTime())
                     .withInstallDateTime(params.getInstallDateTime())
                     .withSignature(params.getSignature())
                     .withSigningCertificate(params.getSigningCertificate())),
-            new ocpp._2022._02.security.SignedUpdateFirmwareResponse()
-                .withStatus(ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType.ACCEPTED)
+            new SignedUpdateFirmwareResponse()
+                .withStatus(UpdateFirmwareStatusEnumType.ACCEPTED)
         );
-        assertEquals(ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType.ACCEPTED, future.join());
+        assertEquals(UpdateFirmwareStatusEnumType.ACCEPTED, successResponse(future.join()));
 
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.DOWNLOADING),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.DOWNLOADING),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.DOWNLOADED),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.DOWNLOADED),
+            SignedFirmwareStatusNotificationResponse.class
         ));
+
         assertNotNull(chargePoint.send(
-            new ocpp._2022._02.security.SignedFirmwareStatusNotification()
-                .withRequestId(expectedJobId)
-                .withStatus(ocpp._2022._02.security.SignedFirmwareStatusNotification.FirmwareStatusEnumType.INVALID_SIGNATURE),
-            ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse.class
+            new SignedFirmwareStatusNotification().withRequestId(expectedJobId).withStatus(FirmwareStatusEnumType.INVALID_SIGNATURE),
+            SignedFirmwareStatusNotificationResponse.class
         ));
 
         chargePoint.close();
@@ -3075,7 +2437,7 @@ public class Ocpp16JsonCsmsCertificationIT {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH, password).start();
+        var chargePoint = defaultStationWithPwd(password).start();
 
         expectGetConfCpoName(chargePoint);
 
@@ -3085,41 +2447,24 @@ public class Ocpp16JsonCsmsCertificationIT {
         changeConfig.setConfKey(SecurityProfile.name());
         changeConfig.setValue("2");
 
-        var changeConfigFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.changeConfiguration(changeConfig)
-                    .getSuccessResponsesByChargeBoxId()
-                    .get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var changeConfigFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(changeConfig));
         chargePoint.expectRequest(
-            new ChangeConfigurationRequest()
-                .withKey(SecurityProfile.name())
-                .withValue("2"),
+            new ChangeConfigurationRequest().withKey(SecurityProfile.name()).withValue("2"),
             new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
         );
-        assertEquals(ConfigurationStatus.ACCEPTED, changeConfigFuture.join());
+        assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
 
         var reset = new ResetParams();
         reset.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         reset.setResetType(ResetType.HARD);
 
-        var resetFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return operationsService.reset(reset)
-                    .getSuccessResponsesByChargeBoxId()
-                    .get(REGISTERED_CHARGE_BOX_ID);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var resetFuture = supplyAsyncUnchecked(() -> operationsService.reset(reset));
+
         chargePoint.expectRequest(
             new ResetRequest().withType(ResetType.HARD),
             new ResetResponse().withStatus(ResetStatus.ACCEPTED)
         );
-        assertEquals(ResetStatus.ACCEPTED, resetFuture.join());
+        assertEquals(ResetStatus.ACCEPTED, successResponse(resetFuture.join()));
 
         // disconnect and reconnect
         chargePoint.close();
@@ -3127,20 +2472,11 @@ public class Ocpp16JsonCsmsCertificationIT {
 
         expectGetConfCpoName(chargePoint);
 
-        var boot = chargePoint.send(
-            new BootNotificationRequest()
-                .withChargePointVendor(getRandomString())
-                .withChargePointModel(getRandomString()),
-            BootNotificationResponse.class
-        );
-        assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+        assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
         assertNotNull(chargePoint.send(
-            new StatusNotificationRequest()
-                .withConnectorId(0)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now()),
+            statusNotification(0, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR),
             StatusNotificationResponse.class
         ));
 
@@ -3157,26 +2493,15 @@ public class Ocpp16JsonCsmsCertificationIT {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(
-            OcppVersion.V_16,
-            REGISTERED_CHARGE_BOX_ID,
-            PATH,
-            password
-        ).start();
+        var chargePoint = defaultStationWithPwd(password).start();
 
         expectGetConfCpoName(chargePoint);
 
-        var boot = chargePoint.send(
-            new BootNotificationRequest().withChargePointVendor(getRandomString()).withChargePointModel(getRandomString()),
-            BootNotificationResponse.class
-        );
-        assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+        assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
+
         assertNotNull(chargePoint.send(
-            new StatusNotificationRequest()
-                .withConnectorId(0)
-                .withStatus(ChargePointStatus.AVAILABLE)
-                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                .withTimestamp(DateTime.now()),
+            statusNotification(0, ChargePointStatus.AVAILABLE, ChargePointErrorCode.NO_ERROR),
             StatusNotificationResponse.class
         ));
 
@@ -3208,12 +2533,56 @@ public class Ocpp16JsonCsmsCertificationIT {
         assertNotNull(responseHeaders);
         assertTrue(responseHeaders.contains("ocpp1.6"));
 
-        var boot = chargePoint.send(
-            new BootNotificationRequest().withChargePointVendor(getRandomString()).withChargePointModel(getRandomString()),
-            BootNotificationResponse.class
-        );
+        var boot = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+
         chargePoint.close();
+    }
+
+    private static BootNotificationRequest bootNotification() {
+        return new BootNotificationRequest()
+            .withChargePointVendor(getRandomString())
+            .withChargePointModel(getRandomString());
+    }
+
+    private static StatusNotificationRequest statusNotification(int connectorId,
+                                                                ChargePointStatus status,
+                                                                ChargePointErrorCode errorCode) {
+        return statusNotification(connectorId, status, errorCode, DateTime.now());
+    }
+
+    private static StatusNotificationRequest statusNotification(int connectorId,
+                                                                ChargePointStatus status,
+                                                                ChargePointErrorCode errorCode,
+                                                                DateTime timestamp) {
+        return new StatusNotificationRequest()
+            .withConnectorId(connectorId)
+            .withStatus(status)
+            .withErrorCode(errorCode)
+            .withTimestamp(timestamp);
+    }
+
+    private static StartTransactionRequest startTransaction(int connectorId, String idTag, int meterStart) {
+        return startTransaction(connectorId, idTag, meterStart, null);
+    }
+
+    private static StartTransactionRequest startTransaction(int connectorId, String idTag, int meterStart,
+                                                            @Nullable Integer reservationId) {
+        return new StartTransactionRequest()
+            .withConnectorId(connectorId)
+            .withIdTag(idTag)
+            .withReservationId(reservationId)
+            .withMeterStart(meterStart)
+            .withTimestamp(DateTime.now());
+    }
+
+    private static StopTransactionRequest stopTransaction(int transactionId, String idTag, int meterStop, Reason reason) {
+        return new StopTransactionRequest()
+            .withTransactionId(transactionId)
+            .withIdTag(idTag)
+            .withMeterStop(meterStop)
+            .withReason(reason)
+            .withTimestamp(DateTime.now());
     }
 
     /**
@@ -3230,6 +2599,35 @@ public class Ocpp16JsonCsmsCertificationIT {
             new GetConfigurationRequest().withKey(CpoName.name()),
             new GetConfigurationResponse().withConfigurationKey(List.of(kv))
         );
+    }
+
+    private static OcppJsonChargePoint defaultStation() {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+    }
+
+    private static OcppJsonChargePoint defaultStationWithPwd(String basicAuthPassword) {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH, basicAuthPassword);
+    }
+
+    @FunctionalInterface
+    private interface ThrowingSupplier<T> {
+        T get() throws Exception;
+    }
+
+    private static <T> CompletableFuture<T> supplyAsyncUnchecked(ThrowingSupplier<T> supplier) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return supplier.get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static <T> T successResponse(RestCallback<T> callback) {
+        assertNotNull(callback);
+        assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
+        return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
     }
 
 }

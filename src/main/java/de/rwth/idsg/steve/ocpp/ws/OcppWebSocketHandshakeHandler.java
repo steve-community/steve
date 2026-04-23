@@ -131,7 +131,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         }
 
         // Client cert checks for profile 3
-        if (profile == OcppSecurityProfile.Profile_3) {
+        if (profile.requiresClientTLS()) {
             var cert = certificateValidator.getCertificate(request);
             boolean valid = certificateValidator.validate(registration.get(), cert);
             if (!valid) {

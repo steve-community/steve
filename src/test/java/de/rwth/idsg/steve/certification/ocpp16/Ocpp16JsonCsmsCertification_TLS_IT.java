@@ -33,23 +33,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * OCPP 1.6 JSON certification security testcase TC_087_CSMS.
+ * OCPP 1.6 JSON certification security testcases TC_086_CSMS and TC_087_CSMS.
  */
 @Slf4j
-@ActiveProfiles(profiles = {"test", "test-TC_087_CSMS"})
+@ActiveProfiles(profiles = {"test", "test-tls"})
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-public class Ocpp16JsonCsmsCertification_TC_087_CSMS_IT extends AbstractOcpp16JsonCsms {
+public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
-    private static final String SECURE_PATH = "wss://localhost:8444/steve/websocket/CentralSystemService/";
+    private static final String SECURE_PATH = "wss://localhost:8443/steve/websocket/CentralSystemService/";
 
     @Autowired
     private DSLContext dslContext;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private ServerProperties serverProperties;
 
@@ -71,22 +74,16 @@ public class Ocpp16JsonCsmsCertification_TC_087_CSMS_IT extends AbstractOcpp16Js
     }
 
     @Test
-    public void test_TC_087_CSMS_TLS_ClientSideCertificate_ValidCertificate() {
+    public void test_TC_086_CSMS_TLS_ServerSideCertificate_ValidCertificate() {
+        var password = "0123456789abcdef0123456789abcdef";
+
         dslContext.update(CHARGE_BOX)
-            .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
-            .set(CHARGE_BOX.SECURITY_PROFILE, 3)
-            .set(CHARGE_BOX.CPO_NAME, CPO_NAME)
-            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, "SN-01-8043621")
+            .set(CHARGE_BOX.SECURITY_PROFILE, 2)
+            .set(CHARGE_BOX.AUTH_PASSWORD, passwordEncoder.encode(password))
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = new OcppJsonChargePoint(
-            OcppVersion.V_16,
-            REGISTERED_CHARGE_BOX_ID,
-            SECURE_PATH,
-            null,
-            serverProperties.getSsl()
-        ).start();
+        var chargePoint = defaultSecureStation().startWithProfile2(password, serverProperties.getSsl());
 
         expectGetConfCpoName(chargePoint);
 
@@ -96,5 +93,31 @@ public class Ocpp16JsonCsmsCertification_TC_087_CSMS_IT extends AbstractOcpp16Js
         sendAvailableStatusForAllConnectors(chargePoint);
 
         chargePoint.close();
+    }
+
+    @Test
+    public void test_TC_087_CSMS_TLS_ClientSideCertificate_ValidCertificate() {
+        dslContext.update(CHARGE_BOX)
+            .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
+            .set(CHARGE_BOX.SECURITY_PROFILE, 3)
+            .set(CHARGE_BOX.CPO_NAME, CPO_NAME)
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, "SN-01-8043621")
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
+            .execute();
+
+        var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
+
+        expectGetConfCpoName(chargePoint);
+
+        var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+        assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
+
+        sendAvailableStatusForAllConnectors(chargePoint);
+
+        chargePoint.close();
+    }
+
+    private static OcppJsonChargePoint defaultSecureStation() {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, SECURE_PATH);
     }
 }

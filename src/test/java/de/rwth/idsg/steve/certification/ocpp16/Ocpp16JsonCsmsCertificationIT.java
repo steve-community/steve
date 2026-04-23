@@ -2295,7 +2295,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = defaultStationWithPwd(password).start();
+        var chargePoint = defaultStation().startWithProfile1(password);
 
         expectGetConfCpoName(chargePoint);
 
@@ -2325,7 +2325,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         // disconnect and reconnect
         chargePoint.close();
-        chargePoint = defaultStationWithPwd(newPassword).start();
+        chargePoint = defaultStation().startWithProfile1(newPassword);
 
         expectGetConfCpoName(chargePoint);
 
@@ -2841,7 +2841,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        var chargePoint = defaultStationWithPwd(password).start();
+        var chargePoint = defaultStation().startWithProfile1(password);
 
         expectGetConfCpoName(chargePoint);
 
@@ -2886,7 +2886,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         // disconnect and reconnect
         {
             chargePoint.close();
-            chargePoint = defaultStationWithPwd(password).start();
+            chargePoint = defaultStation().startWithProfile1(password);
 
             expectGetConfCpoName(chargePoint);
 
@@ -2903,7 +2903,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         // step 13/14: reconnect with upgraded security profile is accepted again
         {
-            chargePoint = defaultStationWithPwd(password).start();
+            chargePoint = defaultStation().startWithProfile1(password);
             expectGetConfCpoName(chargePoint);
             chargePoint.close();
         }
@@ -2921,7 +2921,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         assertThrows(RuntimeException.class, () -> defaultStation().start());
 
-        var chargePoint = defaultStationWithPwd(password).start();
+        var chargePoint = defaultStation().startWithProfile1(password);
 
         expectGetConfCpoName(chargePoint);
 
@@ -2937,10 +2937,10 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     public void test_TC_088_CSMS_WebSocketSubprotocolNegotiation() {
         assertThrows(
             RuntimeException.class,
-            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, PATH, null).start()
+            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, PATH).start()
         );
 
-        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, PATH, null).start();
+        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, PATH).start();
 
         List<String> responseHeaders = chargePoint.getResponseHeader("Sec-WebSocket-Protocol");
         assertNotNull(responseHeaders);

@@ -203,10 +203,6 @@ public abstract class AbstractOcpp16JsonCsms {
         return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
     }
 
-    static OcppJsonChargePoint defaultStationWithPwd(String basicAuthPassword) {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH, basicAuthPassword);
-    }
-
     @FunctionalInterface
     interface ThrowingSupplier<T> {
         T get() throws Exception;

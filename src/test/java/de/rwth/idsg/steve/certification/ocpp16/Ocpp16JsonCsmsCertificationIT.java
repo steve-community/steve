@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.certification.ocpp16;
 
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
@@ -27,7 +26,6 @@ import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
-import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
@@ -79,7 +77,6 @@ import ocpp.cp._2015._10.*;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
-import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.ChargePointErrorCode;
 import ocpp.cs._2015._10.ChargePointStatus;
@@ -97,13 +94,9 @@ import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.Reason;
 import ocpp.cs._2015._10.RegistrationStatus;
-import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
-import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
-import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -125,12 +118,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfile;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_INSTALLED;
 import static jooq.steve.db.Tables.CHARGE_BOX_FIRMWARE_UPDATE_EVENT;
@@ -167,12 +157,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class Ocpp16JsonCsmsCertificationIT {
-
-    private static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
-
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
+public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
     @Autowired
     private DSLContext dslContext;
@@ -2949,18 +2934,6 @@ public class Ocpp16JsonCsmsCertificationIT {
     }
 
     @Test
-    @Disabled("Pending implementation")
-    public void test_TC_086_CSMS_PENDING() {
-        log.info("Skipping TC_086_CSMS until scenario harness is expanded");
-    }
-
-    @Test
-    @Disabled("Pending implementation")
-    public void test_TC_087_CSMS_PENDING() {
-        log.info("Skipping TC_087_CSMS until scenario harness is expanded");
-    }
-
-    @Test
     public void test_TC_088_CSMS_WebSocketSubprotocolNegotiation() {
         assertThrows(
             RuntimeException.class,
@@ -2977,180 +2950,6 @@ public class Ocpp16JsonCsmsCertificationIT {
         assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
         chargePoint.close();
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    private static BootNotificationRequest bootNotification() {
-        return new BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
-    }
-
-    private static StatusNotificationRequest statusNotification(int connectorId,
-                                                                ChargePointStatus status,
-                                                                ChargePointErrorCode errorCode) {
-        return statusNotification(connectorId, status, errorCode, DateTime.now());
-    }
-
-    private static StatusNotificationRequest statusNotification(int connectorId,
-                                                                ChargePointStatus status,
-                                                                ChargePointErrorCode errorCode,
-                                                                DateTime timestamp) {
-        return new StatusNotificationRequest()
-            .withConnectorId(connectorId)
-            .withStatus(status)
-            .withErrorCode(errorCode)
-            .withTimestamp(timestamp);
-    }
-
-    private static StartTransactionRequest startTransaction(int connectorId, String idTag, int meterStart) {
-        return startTransaction(connectorId, idTag, meterStart, null);
-    }
-
-    private static StartTransactionRequest startTransaction(int connectorId, String idTag, int meterStart,
-                                                            @Nullable Integer reservationId) {
-        return startTransaction(connectorId, idTag, meterStart, reservationId, DateTime.now());
-    }
-
-    private static StartTransactionRequest startTransaction(int connectorId, String idTag, int meterStart,
-                                                            @Nullable Integer reservationId, DateTime timestamp) {
-        return new StartTransactionRequest()
-            .withConnectorId(connectorId)
-            .withIdTag(idTag)
-            .withReservationId(reservationId)
-            .withMeterStart(meterStart)
-            .withTimestamp(timestamp);
-    }
-
-    private static StopTransactionRequest stopTransaction(int transactionId, String idTag, int meterStop, Reason reason) {
-        return stopTransaction(transactionId, idTag, meterStop, reason, DateTime.now());
-    }
-
-    private static StopTransactionRequest stopTransaction(int transactionId, String idTag, int meterStop, Reason reason,
-                                                          DateTime timestamp) {
-        return new StopTransactionRequest()
-            .withTransactionId(transactionId)
-            .withIdTag(idTag)
-            .withMeterStop(meterStop)
-            .withReason(reason)
-            .withTimestamp(timestamp);
-    }
-
-    private static KeyValue configurationKey(String key, boolean readonly, String value) {
-        return new KeyValue()
-            .withKey(key)
-            .withReadonly(readonly)
-            .withValue(value);
-    }
-
-    private static void sendAvailableStatusForAllConnectors(OcppJsonChargePoint chargePoint) {
-        sendStatusForAllConnectors(chargePoint, ChargePointStatus.AVAILABLE);
-    }
-
-    private static void sendUnavailableStatusForAllConnectors(OcppJsonChargePoint chargePoint) {
-        sendStatusForAllConnectors(chargePoint, ChargePointStatus.UNAVAILABLE);
-    }
-
-    private static void sendStatusForAllConnectors(OcppJsonChargePoint chargePoint, ChargePointStatus status) {
-        for (var connectorId : List.of(0, 1, 2)) {
-            var statusResponse = chargePoint.send(
-                statusNotification(connectorId, status, ChargePointErrorCode.NO_ERROR),
-                StatusNotificationResponse.class
-            );
-            assertNotNull(statusResponse);
-        }
-    }
-
-    private static void enterAuthorizedState(OcppJsonChargePoint chargePoint) {
-        var authorize = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
-        var authorizeResponse = chargePoint.send(authorize, AuthorizeResponse.class);
-
-        assertNotNull(authorizeResponse);
-        assertNotNull(authorizeResponse.getIdTagInfo());
-        assertEquals(AuthorizationStatus.ACCEPTED, authorizeResponse.getIdTagInfo().getStatus());
-    }
-
-    private static StartTransactionResponse enterChargingState(OcppJsonChargePoint chargePoint,
-                                                               int connectorId,
-                                                               String idTag,
-                                                               int meterStart) {
-        return enterChargingState(chargePoint, connectorId, idTag, meterStart, null);
-    }
-
-    private static StartTransactionResponse enterChargingState(OcppJsonChargePoint chargePoint,
-                                                               int connectorId,
-                                                               String idTag,
-                                                               int meterStart,
-                                                               @Nullable Integer reservationId) {
-        enterAuthorizedState(chargePoint);
-
-        assertNotNull(chargePoint.send(
-            statusNotification(connectorId, ChargePointStatus.PREPARING, ChargePointErrorCode.NO_ERROR),
-            StatusNotificationResponse.class
-        ));
-
-        var startTransactionResponse = chargePoint.send(
-            startTransaction(connectorId, idTag, meterStart, reservationId),
-            StartTransactionResponse.class
-        );
-        assertNotNull(startTransactionResponse);
-        assertNotNull(startTransactionResponse.getIdTagInfo());
-        assertEquals(AuthorizationStatus.ACCEPTED, startTransactionResponse.getIdTagInfo().getStatus());
-        assertTrue(startTransactionResponse.getTransactionId() > 0);
-
-        assertNotNull(chargePoint.send(
-            statusNotification(connectorId, ChargePointStatus.CHARGING, ChargePointErrorCode.NO_ERROR),
-            StatusNotificationResponse.class
-        ));
-        return startTransactionResponse;
-    }
-
-    /**
-     * SteVe started asking for this configuration after each connection. So, we need to anticipate this request
-     * in our test flows, since they are strict.
-     */
-    private static void expectGetConfCpoName(OcppJsonChargePoint chargePoint) {
-        KeyValue kv = configurationKey(CpoName.name(), false, "SteVe-CPO");
-
-        chargePoint.expectRequest(
-            new GetConfigurationRequest().withKey(CpoName.name()),
-            new GetConfigurationResponse().withConfigurationKey(List.of(kv))
-        );
-    }
-
-    private static OcppJsonChargePoint defaultStation() {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
-    }
-
-    private static OcppJsonChargePoint defaultStationWithPwd(String basicAuthPassword) {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH, basicAuthPassword);
-    }
-
-    @FunctionalInterface
-    private interface ThrowingSupplier<T> {
-        T get() throws Exception;
-    }
-
-    private static <T> CompletableFuture<T> supplyAsyncUnchecked(ThrowingSupplier<T> supplier) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return supplier.get();
-            } catch (Exception e) {
-                log.warn("Async operation failed", e);
-                throw new CompletionException("Async operation failed", e);
-            }
-        });
-    }
-
-    private static <T> T successResponse(RestCallback<T> callback) {
-        assertNotNull(callback);
-        assertTrue(callback.getExceptionsByChargeBoxId().isEmpty());
-        assertTrue(callback.getErrorResponsesByChargeBoxId().isEmpty());
-        assertTrue(callback.getSuccessResponsesByChargeBoxId().containsKey(REGISTERED_CHARGE_BOX_ID));
-        return callback.getSuccessResponsesByChargeBoxId().get(REGISTERED_CHARGE_BOX_ID);
     }
 
 }

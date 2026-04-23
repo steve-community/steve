@@ -35,6 +35,8 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -47,6 +49,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opentest4j.AssertionFailedError;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
@@ -72,6 +75,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jetty.websocket.api.Callback.NOOP;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -102,12 +106,20 @@ public class OcppJsonChargePoint {
         this(List.of(version.getValue()), chargeBoxId, pathPrefix, basicAuthPassword);
     }
 
+    public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix, String basicAuthPassword, Ssl serverSslConfig) {
+        this(List.of(version.getValue()), chargeBoxId, pathPrefix, basicAuthPassword, Objects.requireNonNull(serverSslConfig, "serverSslConfig must not be null"));
+    }
+
     public OcppJsonChargePoint(List<String> ocppVersions, String chargeBoxId, String pathPrefix, String basicAuthPassword) {
+        this(ocppVersions, chargeBoxId, pathPrefix, basicAuthPassword, null);
+    }
+
+    private OcppJsonChargePoint(List<String> ocppVersions, String chargeBoxId, String pathPrefix, String basicAuthPassword, @Nullable Ssl serverSslConfig) {
         this.versions = ocppVersions;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
         this.basicAuthPassword = basicAuthPassword;
-        this.client = new WebSocketClient();
+        this.client = createWebSocketClient(serverSslConfig);
         this.testerThread = Thread.currentThread();
         this.exchangeQueue = new ConcurrentLinkedDeque<>();
         this.closeHappenedSignal = new CountDownLatch(1);
@@ -456,6 +468,43 @@ public class OcppJsonChargePoint {
             s = s.substring(0, s.length() - 7);
         }
         return s;
+    }
+
+    /**
+     * Keep SSL scoped to this test client instance. Do not mutate global JVM SSL properties.
+     */
+    private static WebSocketClient createWebSocketClient(@Nullable Ssl serverSslConfig) {
+        if (serverSslConfig == null || !serverSslConfig.isEnabled()) {
+            return new WebSocketClient();
+        }
+
+        var sslContextFactory = new SslContextFactory.Client();
+
+        // Trust server certificate chain.
+        sslContextFactory.setTrustStorePath(serverSslConfig.getKeyStore());
+        sslContextFactory.setTrustStorePassword(serverSslConfig.getKeyStorePassword());
+        sslContextFactory.setTrustStoreType(serverSslConfig.getKeyStoreType());
+
+        // Optionally present client certificate for mTLS (security profile 3).
+        // For profile 2, trust-store properties are expected to be absent,
+        // and we must not configure client auth material.
+        {
+            if (hasText(serverSslConfig.getTrustStore())) {
+                sslContextFactory.setKeyStorePath(serverSslConfig.getTrustStore());
+            }
+
+            if (hasText(serverSslConfig.getTrustStorePassword())) {
+                sslContextFactory.setKeyStorePassword(serverSslConfig.getTrustStorePassword());
+            }
+
+            if (hasText(serverSslConfig.getTrustStoreType())) {
+                sslContextFactory.setKeyStoreType(serverSslConfig.getTrustStoreType());
+            }
+        }
+
+        var httpClient = new HttpClient();
+        httpClient.setSslContextFactory(sslContextFactory);
+        return new WebSocketClient(httpClient);
     }
 
     @Setter

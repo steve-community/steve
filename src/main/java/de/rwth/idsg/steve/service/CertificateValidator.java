@@ -65,14 +65,15 @@ public class CertificateValidator {
      * 3. Get from spring security
      */
     @Nullable
-    public X509Certificate getCertificate(ServerHttpRequest request) {
+    public X509Certificate getCertificate(ServerHttpRequest request, String chargeBoxId) {
         if (!StringUtils.isEmpty(clientCertHeaderFromProxy)) {
             String certPem = request.getHeaders().getFirst(clientCertHeaderFromProxy);
             if (!StringUtils.isEmpty(certPem)) {
                 try {
+                    log.debug("ChargeBoxId '{}': Found cert in HTTP headers under configured header", chargeBoxId);
                     return CertificateUtils.parseCertificate(certPem);
                 } catch (Exception e) {
-                    log.warn("Failed parsing the certificate", e);
+                    log.warn("ChargeBoxId '{}': Failed parsing the certificate from header", chargeBoxId, e);
                     return null;
                 }
             }
@@ -82,30 +83,36 @@ public class CertificateValidator {
         ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
         X509Certificate[] certs = (X509Certificate[]) casted.getServletRequest().getAttribute("jakarta.servlet.request.X509Certificate");
         if (certs != null) {
+            log.debug("ChargeBoxId '{}': Found cert in ServletServerHttpRequest", chargeBoxId);
             return certs[0];
         }
 
         // https://stackoverflow.com/a/26844985
         Object credentialsObject = SecurityContextHolder.getContext().getAuthentication().getCredentials();
         if (credentialsObject instanceof X509Certificate cert) {
+            log.debug("ChargeBoxId '{}': Found cert in SecurityContext of Spring", chargeBoxId);
             return cert;
         }
 
+        log.debug("ChargeBoxId '{}': Could not find cert", chargeBoxId);
         return null;
     }
 
     public boolean validate(ChargePointRegistration chargePointRegistration, X509Certificate certificate) {
+        String chargeBoxId = chargePointRegistration.chargeBoxId();
+
         if (certificate == null) {
-            log.error("Certificate is null");
+            log.error("ChargeBoxId '{}': Certificate is null", chargeBoxId);
             return false;
         }
 
         try {
             // Do OCPP-specific checks
             verifyOcppFields(chargePointRegistration, certificate);
+            log.debug("ChargeBoxId '{}': Successful cert validation", chargeBoxId);
             return true;
         } catch (Exception e) {
-            log.error("Certificate validation error", e);
+            log.error("ChargeBoxId '{}': Certificate validation error", chargeBoxId, e);
             return false;
         }
     }
@@ -116,6 +123,8 @@ public class CertificateValidator {
     }
 
     public void verifyOcppFields(ChargePointRegistration chargePointRegistration, X500Name subject) {
+        String chargeBoxId = chargePointRegistration.chargeBoxId();
+
         // A00.FR.404 :
         // The Central System SHALL verify that the certificate is owned by the CPO (or an
         // organization trusted by the CPO) by checking that the O (organizationName) RDN
@@ -128,12 +137,13 @@ public class CertificateValidator {
 
             String cpoName = chargePointRegistration.cpoName();
             if (StringUtils.isEmpty(cpoName)) {
-                throw new IllegalArgumentException("CPO name is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
+                throw new IllegalArgumentException("CPO name is not set for chargeBoxId: " + chargeBoxId);
             }
 
             if (!organizationName.contains(cpoName)) {
                 throw new IllegalArgumentException("Validation failed: organizationName does not contain CPO name");
             }
+            log.debug("ChargeBoxId '{}': Successful OrganizationName (CPO name) validation", chargeBoxId);
         }
 
         // A00.FR.405 :
@@ -148,12 +158,13 @@ public class CertificateValidator {
 
             String serialNumber = chargePointRegistration.serialNumber();
             if (StringUtils.isEmpty(serialNumber)) {
-                throw new IllegalArgumentException("Serial number is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
+                throw new IllegalArgumentException("Serial number is not set for chargeBoxId: " + chargeBoxId);
             }
 
             if (StringUtils.isEmpty(commonName) || !commonName.contains(serialNumber)) {
                 throw new IllegalArgumentException("Validation failed: commonName does not contain Serial Number of the Charge Point");
             }
+            log.debug("ChargeBoxId '{}': Successful CommonName (serial number) validation", chargeBoxId);
         }
     }
 }

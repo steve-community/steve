@@ -79,12 +79,15 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+        log.debug("Extracted chargeBoxId='{}'", chargeBoxId);
+
         boolean isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
+        log.debug("ChargeBoxId '{}' has a valid pattern", chargeBoxId);
 
         Optional<ChargePointRegistration> registration = chargePointService.getRegistration(chargeBoxId);
 
@@ -109,35 +112,43 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         OcppSecurityProfile profile = registration.get().securityProfile();
+        log.debug("ChargeBoxId '{}' is found in DB with security profile {}", chargeBoxId, profile.getValue());
 
         // Basic auth for profiles 1 and 2
         if (profile.requiresBasicAuth()) {
+            log.debug("ChargeBoxId '{}' is attempting Basic-Auth...", chargeBoxId);
             ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
 
             UsernamePasswordAuthenticationToken authentication;
             try {
                 authentication = converter.convert(casted.getServletRequest());
             } catch (Exception e) {
-                log.warn("Failed to extract Authentication from request", e);
+                log.warn("ChargeBoxId '{}': Failed to extract Authentication from request", chargeBoxId, e);
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
                 return false;
             }
 
             boolean valid = chargePointService.validateBasicAuth(registration.get(), authentication);
             if (!valid) {
+                log.debug("ChargeBoxId '{}': Rejecting handshake because Basic-Auth validation failed", chargeBoxId);
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
+
+            log.debug("ChargeBoxId '{}': Successful Basic-Auth", chargeBoxId);
         }
 
         // Client cert checks for profile 3
         if (profile.requiresClientTLS()) {
-            var cert = certificateValidator.getCertificate(request);
+            log.debug("ChargeBoxId '{}' is attempting mTLS...", chargeBoxId);
+            var cert = certificateValidator.getCertificate(request, chargeBoxId);
             boolean valid = certificateValidator.validate(registration.get(), cert);
             if (!valid) {
+                log.debug("ChargeBoxId '{}': Rejecting handshake because mTLS certificate validation failed", chargeBoxId);
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
+            log.debug("ChargeBoxId '{}': Successful mTLS", chargeBoxId);
         }
 
         // -------------------------------------------------------------------------
@@ -147,7 +158,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
 
         if (CollectionUtils.isEmpty(requestedProtocols)) {
-            log.error("No protocol (OCPP version) is specified.");
+            log.error("ChargeBoxId '{}': No protocol (OCPP version) is specified.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
@@ -155,7 +166,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         AbstractWebSocketEndpoint endpoint = selectEndpoint(requestedProtocols);
 
         if (endpoint == null) {
-            log.error("None of the requested protocols '{}' is supported", requestedProtocols);
+            log.error("ChargeBoxId '{}': None of the requested protocols '{}' is supported", chargeBoxId, requestedProtocols);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }

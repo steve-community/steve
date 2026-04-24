@@ -12,6 +12,8 @@
         <appender-ref ref="CONSOLE" />
     </root>
 
+    <logger name="de.rwth.idsg.steve" level="DEBUG"/>
+
     <!-- Disable the Jooq logo in logs -->
     <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
     <logger name="org.jooq.Constants" level="WARN" />

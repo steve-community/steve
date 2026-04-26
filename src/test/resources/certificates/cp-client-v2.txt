@@ -1,0 +1,3 @@
+contains
+- the one cert "cp-client" from cp-client.p12
+- csr-signing-ca-cert.pem such that all its future children can be trusted (after signing)

@@ -2333,12 +2333,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     }
 
     @Test
-    @Disabled("Pending implementation")
-    public void test_TC_074_CSMS_PENDING() {
-        log.info("Skipping TC_074_CSMS until scenario harness is expanded");
-    }
-
-    @Test
     public void test_TC_075_1_CSMS_InstallManufacturerRootCertificate() {
         var chargePoint = defaultStation().start();
 
@@ -2573,12 +2567,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         assertEquals(0, remaining);
 
         chargePoint.close();
-    }
-
-    @Test
-    @Disabled("Pending implementation")
-    public void test_TC_077_CSMS_PENDING() {
-        log.info("Skipping TC_077_CSMS until scenario harness is expanded");
     }
 
     @Test

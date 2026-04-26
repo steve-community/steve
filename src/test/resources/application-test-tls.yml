@@ -7,7 +7,7 @@ server:
     key-store-password: changeit
     client-auth: want
     trust-store-type: PKCS12
-    trust-store: src/test/resources/certificates/cp-client.p12
+    trust-store: src/test/resources/certificates/cp-client-v2.p12
     trust-store-password: changeit
     ciphers:
       - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
@@ -20,4 +20,10 @@ server:
 steve:
   ocpp:
     security:
-      profile: 3
+      csr-signing:
+        provider: local
+        provider-local:
+          certificate-validity-years: 1
+          ca-certificate-pem: src/test/resources/certificates/csr-signing-ca-cert.pem
+          ca-key-pem: src/test/resources/certificates/csr-signing-ca-key.pem
+          signature-algorithm-policy: auto

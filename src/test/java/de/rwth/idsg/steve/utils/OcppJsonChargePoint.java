@@ -219,7 +219,7 @@ public class OcppJsonChargePoint {
         result.setMessageId(null); // must and will be set later from actual incoming request
         result.setPayload(plannedResponse);
 
-        expectRequestInternal(expectedRequest, result);
+        expectRequestInternal(expectedRequest.getClass(), expectedRequest, result);
     }
 
     public void expectRequest(RequestType expectedRequest, ErrorCode plannedErrorCode) {
@@ -227,7 +227,20 @@ public class OcppJsonChargePoint {
         error.setMessageId(null); // must and will be set later from actual incoming request
         error.setErrorCode(plannedErrorCode);
 
-        expectRequestInternal(expectedRequest, error);
+        expectRequestInternal(expectedRequest.getClass(), expectedRequest, error);
+    }
+
+    /**
+     * in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+     * generated which we cannot anticipate before. but, we can return the request payload that just arrived
+     * to the caller, for the caller to do some after-the-fact validation.
+     */
+    public <T extends RequestType> T expectRequest(Class<T> requestClass, ResponseType plannedResponse) {
+        OcppJsonResult result = new OcppJsonResult();
+        result.setMessageId(null); // must and will be set later from actual incoming request
+        result.setPayload(plannedResponse);
+
+        return expectRequestInternal(requestClass, null, result);
     }
 
     private <T extends ResponseType> OcppJsonMessage sendInternal(@Nullable RequestType payload,
@@ -272,10 +285,12 @@ public class OcppJsonChargePoint {
         return ctx.getIncomingMessage();
     }
 
-    private void expectRequestInternal(RequestType expectedRequest, OcppJsonResponse preparedResponse) {
+    private <T extends RequestType> T expectRequestInternal(Class<T> requestClass,
+                                                            @Nullable RequestType expectedRequest,
+                                                            OcppJsonResponse preparedResponse) {
         OcppJsonCall call = new OcppJsonCall();
         call.setMessageId(null); // must and will be set later from actual incoming request
-        call.setAction(getOperationName(expectedRequest));
+        call.setAction(getOperationName(requestClass));
         call.setPayload(expectedRequest);
 
         JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
@@ -284,6 +299,7 @@ public class OcppJsonChargePoint {
         ExchangeContext ctx = new ExchangeContext(webSocketSession, chargeBoxId);
         ctx.setIncomingMessage(call);
         ctx.setOutgoingMessage(preparedResponse);
+        ctx.setRequestClass((Class<RequestType>) requestClass);
 
         exchangeQueue.add(ctx);
 
@@ -293,6 +309,7 @@ public class OcppJsonChargePoint {
             if (!completedInTime) {
                 throw new AssertionFailedError("Timed out waiting for expected request. action=" + call.getAction());
             }
+            return (T) call.getPayload();
         } catch (InterruptedException e) {
             if (testerThreadInterruptReason != null) {
                 throw testerThreadInterruptReason;
@@ -448,9 +465,20 @@ public class OcppJsonChargePoint {
             throw new RuntimeException("Unexpected action: " + action + ". Was expecting: " + preparedCall.getAction());
         }
 
-        var actualReqData = JsonObjectMapper.INSTANCE.getMapper().readValue(req, preparedCall.getPayload().getClass());
-        if (!Objects.equals(actualReqData.toString(), preparedCall.getPayload().toString())) {
-            throw new RuntimeException("Unexpected message: " + actualReqData + ". Was expecting: " + preparedCall.getPayload());
+        Class<RequestType> requestClass = exchangeContext.getRequestClass();
+        var actualReqData = JsonObjectMapper.INSTANCE.getMapper().readValue(req, requestClass);
+
+        // in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+        // generated which we cannot anticipate before. so we can do strict full-payload equality, only if it is set.
+        // in other cases, set the incoming request for the caller to validate after-the-fact.
+        //
+        RequestType payload = preparedCall.getPayload();
+        if (payload == null) {
+            preparedCall.setPayload(actualReqData);
+        } else {
+            if (!Objects.equals(actualReqData.toString(), payload.toString())) {
+                throw new RuntimeException("Unexpected message: " + actualReqData + ". Was expecting: " + payload);
+            }
         }
 
         preparedCall.setMessageId(messageId);
@@ -472,12 +500,16 @@ public class OcppJsonChargePoint {
     // Private static helpers
     // -------------------------------------------------------------------------
 
-    private static String getOperationName(RequestType requestType) {
-        String s = requestType.getClass().getSimpleName();
+    private static String getOperationName(Class<?> requestClass) {
+        String s = requestClass.getSimpleName();
         if (s.endsWith("Request")) {
             s = s.substring(0, s.length() - 7);
         }
         return s;
+    }
+
+    private static String getOperationName(RequestType requestType) {
+        return getOperationName(requestType.getClass());
     }
 
     /**
@@ -515,6 +547,7 @@ public class OcppJsonChargePoint {
     @Getter
     private static class ExchangeContext extends CommunicationContext {
 
+        private Class<RequestType> requestClass;
         private Class<ResponseType> responseClass;
         private CountDownLatch doneSignal = new CountDownLatch(1);
 

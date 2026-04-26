@@ -69,6 +69,7 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
@@ -338,14 +339,12 @@ public class CentralSystemService16_Service {
 
     public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
         try {
-            if (!certificateSigningService.isEnabled()) {
-                log.error("Certificate signing service is not enabled.");
-                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
-            }
-
-            var csr = parameters.getCsr();
-            if (csr == null || csr.trim().isEmpty()) {
-                log.error("Empty or null CSR received from '{}'", chargeBoxIdentity);
+            PKCS10CertificationRequest csr;
+            try {
+                var csrPem = parameters.getCsr();
+                csr = certificateSigningService.validateCSR(csrPem, chargeBoxIdentity);
+            } catch (Exception e) {
+                log.error("Could not validate CSR from '{}'", chargeBoxIdentity, e);
                 return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
             }
 
@@ -357,7 +356,7 @@ public class CentralSystemService16_Service {
              * subsequent process)
              */
             taskScheduler.schedule(
-                () -> certificateSigningService.processCSR(csr, chargeBoxIdentity),
+                () -> certificateSigningService.processAndSendToStation(csr, chargeBoxIdentity),
                 Instant.now().plusSeconds(5)
             );
 

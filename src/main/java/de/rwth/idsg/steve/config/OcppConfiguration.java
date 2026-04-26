@@ -26,13 +26,17 @@ import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
+import de.rwth.idsg.steve.service.CertificateSigningService;
+import de.rwth.idsg.steve.service.CertificateSigningServiceDisabled;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +50,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.11.2014
  */
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class OcppConfiguration {
@@ -54,6 +59,14 @@ public class OcppConfiguration {
     private final MessageHeaderInterceptor messageHeaderInterceptor;
 
     private final MessageIdInterceptor messageIdInterceptor = new MessageIdInterceptor();
+
+    @Bean
+    @ConditionalOnMissingBean(CertificateSigningService.class)
+    public CertificateSigningService certificateSigningService(SteveProperties props) {
+        String provider = props.getOcpp().getSecurity().getCsrSigning().getProvider();
+        log.info("Defaulting to CertificateSigningServiceDisabled, because steve.ocpp.security.csr-signing.provider={} is not activating a Spring Bean for CertificateSigningService", provider);
+        return new CertificateSigningServiceDisabled();
+    }
 
     @Bean
     @Conditional(OcppEnabledCondition.V12.Soap.class)

@@ -122,12 +122,17 @@ public class CertificateValidator {
         // in the subject field of the certificate contains the CPO name.
         {
             String organizationName = CertificateUtils.getOrganization(subject);
+            if (StringUtils.isEmpty(organizationName)) {
+                throw new IllegalArgumentException("Validation failed: O (organizationName) is empty");
+            }
+
             String cpoName = chargePointRegistration.cpoName();
             if (StringUtils.isEmpty(cpoName)) {
                 throw new IllegalArgumentException("CPO name is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
             }
-            if (!cpoName.equals(organizationName)) {
-                throw new IllegalArgumentException("Validation failed: organizationName is not equal to CPO name");
+
+            if (!organizationName.contains(cpoName)) {
+                throw new IllegalArgumentException("Validation failed: organizationName does not contain CPO name");
             }
         }
 
@@ -137,12 +142,17 @@ public class CertificateValidator {
         // contains the unique Serial Number of the Charge Point
         {
             String commonName = CertificateUtils.getCommonName(subject);
+            if (StringUtils.isEmpty(commonName)) {
+                throw new IllegalArgumentException("Validation failed: CN (commonName) is empty");
+            }
+
             String serialNumber = chargePointRegistration.serialNumber();
             if (StringUtils.isEmpty(serialNumber)) {
                 throw new IllegalArgumentException("Serial number is not set for chargeBoxId: " + chargePointRegistration.chargeBoxId());
             }
-            if (!serialNumber.equals(commonName)) {
-                throw new IllegalArgumentException("Validation failed: commonName is not equal to Serial Number of the Charge Point");
+
+            if (StringUtils.isEmpty(commonName) || !commonName.contains(serialNumber)) {
+                throw new IllegalArgumentException("Validation failed: commonName does not contain Serial Number of the Charge Point");
             }
         }
     }

@@ -18,9 +18,11 @@
  */
 package de.rwth.idsg.steve.service;
 
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+
 public interface CertificateSigningService {
 
-    boolean isEnabled();
+    PKCS10CertificationRequest validateCSR(String csrPem, String chargeBoxId);
 
-    void processCSR(String csrPem, String chargeBoxId);
+    void processAndSendToStation(PKCS10CertificationRequest csr, String chargeBoxId);
 }

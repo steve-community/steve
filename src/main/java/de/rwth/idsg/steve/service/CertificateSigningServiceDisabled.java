@@ -18,24 +18,19 @@
  */
 package de.rwth.idsg.steve.service;
 
-import jooq.steve.db.tables.records.CertificateRecord;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
-public abstract class CertificateSigningServiceAbstract implements CertificateSigningService {
+@Slf4j
+public class CertificateSigningServiceDisabled implements CertificateSigningService {
 
     @Override
-    public void processCSR(String csrPem, String chargeBoxId) {
-        try {
-            CertificateRecord record = this.signCertificate(csrPem, chargeBoxId);
-            this.sendCertificateSignedToStation(record, chargeBoxId);
-        } catch (Exception e) {
-            getLog().error(e.getMessage(), e);
-        }
+    public PKCS10CertificationRequest validateCSR(String csrPem, String chargeBoxId) {
+        throw new RuntimeException("validateCSR is not implemented");
     }
 
-    protected abstract Logger getLog();
-
-    protected abstract CertificateRecord signCertificate(String csrPem, String chargeBoxId) throws Exception;
-
-    protected abstract void sendCertificateSignedToStation(CertificateRecord record, String chargeBoxId);
+    @Override
+    public void processAndSendToStation(PKCS10CertificationRequest csr, String chargeBoxId) {
+        log.warn("processAndSendToStation is not implemented");
+    }
 }

@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -88,12 +89,34 @@ public class SteveProperties {
 
         @Data
         public static class Security {
-            private int profile;
-            private int certificateValidityYears;
             private String clientCertHeaderFromProxy;
+            private CsrSigning csrSigning = new CsrSigning();
 
-            public boolean requiresTls() {
-                return profile >= 2;
+            @Data
+            public static class CsrSigning {
+                private String provider;
+                private LocalCsrSigning providerLocal = new LocalCsrSigning();
+
+                @Data
+                public static class LocalCsrSigning {
+                    private Integer certificateValidityYears;
+                    private String caCertificatePem;
+                    private String caKeyPem;
+                    private String caChainPem;
+                    private SignatureAlgorithmPolicy signatureAlgorithmPolicy = SignatureAlgorithmPolicy.AUTO;
+
+                    public enum SignatureAlgorithmPolicy {
+                        AUTO,
+                        RSA_PSS,
+                        RSA_PKCS1
+                    }
+
+                    public boolean isValid() {
+                        return certificateValidityYears != null
+                            && !StringUtils.isBlank(caCertificatePem)
+                            && !StringUtils.isBlank(caKeyPem);
+                    }
+                }
             }
         }
     }

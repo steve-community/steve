@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.service.OcppOperationsService;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -40,7 +42,6 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -67,7 +68,6 @@ import java.time.Duration;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.parseCertificates;
-import static jooq.steve.db.Tables.CERTIFICATE;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -99,6 +99,8 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
     private OcppOperationsService operationsService;
     @Autowired
     private ServerProperties serverProperties;
+    @Autowired
+    private TaskStore taskStore;
 
     private __DatabasePreparer__ databasePreparer;
 
@@ -171,11 +173,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             assertNotNull(arrivedRequest.getCertificateChain());
             assertTrue(arrivedRequest.getCertificateChain().contains("BEGIN CERTIFICATE"));
 
-            Thread.sleep(Duration.ofSeconds(1));
-
-            var latestCertificateId = dslContext.select(DSL.max(CERTIFICATE.CERTIFICATE_ID))
-                .from(CERTIFICATE)
-                .fetchOne(0, Integer.class);
+            var latestCertificateId = getCertificateIdFromTask(arrivedRequest.getCertificateChain());
             assertNotNull(latestCertificateId);
 
             var accepted = dslContext.select(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED)
@@ -264,11 +262,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             assertNotNull(arrivedRequest.getCertificateChain());
             assertTrue(arrivedRequest.getCertificateChain().contains("BEGIN CERTIFICATE"));
 
-            Thread.sleep(Duration.ofSeconds(1));
-
-            var latestCertificateId = dslContext.select(DSL.max(CERTIFICATE.CERTIFICATE_ID))
-                .from(CERTIFICATE)
-                .fetchOne(0, Integer.class);
+            var latestCertificateId = getCertificateIdFromTask(arrivedRequest.getCertificateChain());
             assertNotNull(latestCertificateId);
 
             var accepted = dslContext.select(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED)
@@ -338,6 +332,25 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         sendAvailableStatusForAllConnectors(chargePoint);
 
         chargePoint.close();
+    }
+
+    private Integer getCertificateIdFromTask(String certificateChain) throws InterruptedException {
+        int attempt = 0;
+        int maxAttempts = 10;
+
+        while (attempt < maxAttempts) {
+            for (var task : taskStore.getFinished()) {
+                if (task instanceof CertificateSignedTask certTask) {
+                    if (certTask.getParams().getCertificateChain().equals(certificateChain)) {
+                        return certTask.getParams().getCertificateId();
+                    }
+                }
+            }
+            attempt++;
+            Thread.sleep(Duration.ofMillis(100));
+        }
+
+        return null;
     }
 
     private Ssl sslWithCustomTrustStore(String customTrustStore) {

@@ -88,10 +88,13 @@ public class CertificateValidator {
         }
 
         // https://stackoverflow.com/a/26844985
-        Object credentialsObject = SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        if (credentialsObject instanceof X509Certificate cert) {
-            log.debug("ChargeBoxId '{}': Found cert in SecurityContext of Spring", chargeBoxId);
-            return cert;
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            Object credentialsObject = authentication.getCredentials();
+            if (credentialsObject instanceof X509Certificate cert) {
+                log.debug("ChargeBoxId '{}': Found cert in SecurityContext of Spring", chargeBoxId);
+                return cert;
+            }
         }
 
         log.debug("ChargeBoxId '{}': Could not find cert", chargeBoxId);

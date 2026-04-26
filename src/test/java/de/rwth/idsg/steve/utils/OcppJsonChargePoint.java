@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.utils;
 import com.google.common.net.HttpHeaders;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -35,6 +36,8 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -47,6 +50,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opentest4j.AssertionFailedError;
+import org.springframework.boot.web.server.Ssl;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
@@ -84,30 +88,23 @@ public class OcppJsonChargePoint {
     private final List<String> versions;
     private final String chargeBoxId;
     private final String connectionPath;
-    private final String basicAuthPassword;
-    private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
     private final Deque<ExchangeContext> exchangeQueue;
 
     private final Thread testerThread;
     private RuntimeException testerThreadInterruptReason;
 
+    private WebSocketClient client;
     private Session session;
 
     public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
-        this(List.of(version.getValue()), chargeBoxId, pathPrefix, null);
+        this(List.of(version.getValue()), chargeBoxId, pathPrefix);
     }
 
-    public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix, String basicAuthPassword) {
-        this(List.of(version.getValue()), chargeBoxId, pathPrefix, basicAuthPassword);
-    }
-
-    public OcppJsonChargePoint(List<String> ocppVersions, String chargeBoxId, String pathPrefix, String basicAuthPassword) {
+    public OcppJsonChargePoint(List<String> ocppVersions, String chargeBoxId, String pathPrefix) {
         this.versions = ocppVersions;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
-        this.basicAuthPassword = basicAuthPassword;
-        this.client = new WebSocketClient();
         this.testerThread = Thread.currentThread();
         this.exchangeQueue = new ConcurrentLinkedDeque<>();
         this.closeHappenedSignal = new CountDownLatch(1);
@@ -118,16 +115,41 @@ public class OcppJsonChargePoint {
     // -------------------------------------------------------------------------
 
     public OcppJsonChargePoint start() {
+        return startWithProfile0();
+    }
+
+    public OcppJsonChargePoint startWithProfile0() {
+        return startInternal(null, null, OcppSecurityProfile.Profile_0);
+    }
+
+    public OcppJsonChargePoint startWithProfile1(@NotNull String basicAuthPassword) {
+        return startInternal(basicAuthPassword, null, OcppSecurityProfile.Profile_1);
+    }
+
+    public OcppJsonChargePoint startWithProfile2(@NotNull String basicAuthPassword, @NotNull Ssl serverSide) {
+        return startInternal(basicAuthPassword, serverSide, OcppSecurityProfile.Profile_2);
+    }
+
+    public OcppJsonChargePoint startWithProfile3(@NotNull Ssl clientAndServerSide) {
+        return startInternal(null, clientAndServerSide, OcppSecurityProfile.Profile_3);
+    }
+
+    private OcppJsonChargePoint startInternal(String basicAuthPassword, Ssl ssl, OcppSecurityProfile profile) {
         try {
             ClientUpgradeRequest request = new ClientUpgradeRequest(new URI(connectionPath));
             if (!CollectionUtils.isEmpty(versions)) {
                 request.setSubProtocols(versions);
             }
-            if (basicAuthPassword != null) {
+
+            if (profile.requiresBasicAuth()) {
+                Objects.requireNonNull(basicAuthPassword, "basicAuthPassword must be set");
                 String encoding = Base64.getEncoder().encodeToString((chargeBoxId + ":" + basicAuthPassword).getBytes(StandardCharsets.UTF_8));
                 request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
             }
+
+            client = createWebSocketClient(ssl, profile);
             client.start();
+
             Future<Session> connect = client.connect(this, request);
             this.session = connect.get(); // block until session is created
             return this;
@@ -197,7 +219,7 @@ public class OcppJsonChargePoint {
         result.setMessageId(null); // must and will be set later from actual incoming request
         result.setPayload(plannedResponse);
 
-        expectRequestInternal(expectedRequest, result);
+        expectRequestInternal(expectedRequest.getClass(), expectedRequest, result);
     }
 
     public void expectRequest(RequestType expectedRequest, ErrorCode plannedErrorCode) {
@@ -205,7 +227,20 @@ public class OcppJsonChargePoint {
         error.setMessageId(null); // must and will be set later from actual incoming request
         error.setErrorCode(plannedErrorCode);
 
-        expectRequestInternal(expectedRequest, error);
+        expectRequestInternal(expectedRequest.getClass(), expectedRequest, error);
+    }
+
+    /**
+     * in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+     * generated which we cannot anticipate before. but, we can return the request payload that just arrived
+     * to the caller, for the caller to do some after-the-fact validation.
+     */
+    public <T extends RequestType> T expectRequest(Class<T> requestClass, ResponseType plannedResponse) {
+        OcppJsonResult result = new OcppJsonResult();
+        result.setMessageId(null); // must and will be set later from actual incoming request
+        result.setPayload(plannedResponse);
+
+        return expectRequestInternal(requestClass, null, result);
     }
 
     private <T extends ResponseType> OcppJsonMessage sendInternal(@Nullable RequestType payload,
@@ -250,10 +285,12 @@ public class OcppJsonChargePoint {
         return ctx.getIncomingMessage();
     }
 
-    private void expectRequestInternal(RequestType expectedRequest, OcppJsonResponse preparedResponse) {
+    private <T extends RequestType> T expectRequestInternal(Class<T> requestClass,
+                                                            @Nullable RequestType expectedRequest,
+                                                            OcppJsonResponse preparedResponse) {
         OcppJsonCall call = new OcppJsonCall();
         call.setMessageId(null); // must and will be set later from actual incoming request
-        call.setAction(getOperationName(expectedRequest));
+        call.setAction(getOperationName(requestClass));
         call.setPayload(expectedRequest);
 
         JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
@@ -262,6 +299,7 @@ public class OcppJsonChargePoint {
         ExchangeContext ctx = new ExchangeContext(webSocketSession, chargeBoxId);
         ctx.setIncomingMessage(call);
         ctx.setOutgoingMessage(preparedResponse);
+        ctx.setRequestClass((Class<RequestType>) requestClass);
 
         exchangeQueue.add(ctx);
 
@@ -271,6 +309,7 @@ public class OcppJsonChargePoint {
             if (!completedInTime) {
                 throw new AssertionFailedError("Timed out waiting for expected request. action=" + call.getAction());
             }
+            return (T) call.getPayload();
         } catch (InterruptedException e) {
             if (testerThreadInterruptReason != null) {
                 throw testerThreadInterruptReason;
@@ -426,9 +465,20 @@ public class OcppJsonChargePoint {
             throw new RuntimeException("Unexpected action: " + action + ". Was expecting: " + preparedCall.getAction());
         }
 
-        var actualReqData = JsonObjectMapper.INSTANCE.getMapper().readValue(req, preparedCall.getPayload().getClass());
-        if (!Objects.equals(actualReqData.toString(), preparedCall.getPayload().toString())) {
-            throw new RuntimeException("Unexpected message: " + actualReqData + ". Was expecting: " + preparedCall.getPayload());
+        Class<RequestType> requestClass = exchangeContext.getRequestClass();
+        var actualReqData = JsonObjectMapper.INSTANCE.getMapper().readValue(req, requestClass);
+
+        // in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+        // generated which we cannot anticipate before. so we can do strict full-payload equality, only if it is set.
+        // in other cases, set the incoming request for the caller to validate after-the-fact.
+        //
+        RequestType payload = preparedCall.getPayload();
+        if (payload == null) {
+            preparedCall.setPayload(actualReqData);
+        } else {
+            if (!Objects.equals(actualReqData.toString(), payload.toString())) {
+                throw new RuntimeException("Unexpected message: " + actualReqData + ". Was expecting: " + payload);
+            }
         }
 
         preparedCall.setMessageId(messageId);
@@ -450,18 +500,54 @@ public class OcppJsonChargePoint {
     // Private static helpers
     // -------------------------------------------------------------------------
 
-    private static String getOperationName(RequestType requestType) {
-        String s = requestType.getClass().getSimpleName();
+    private static String getOperationName(Class<?> requestClass) {
+        String s = requestClass.getSimpleName();
         if (s.endsWith("Request")) {
             s = s.substring(0, s.length() - 7);
         }
         return s;
     }
 
+    private static String getOperationName(RequestType requestType) {
+        return getOperationName(requestType.getClass());
+    }
+
+    /**
+     * Keep SSL scoped to this test client instance. Do not mutate global JVM SSL properties.
+     */
+    private static WebSocketClient createWebSocketClient(Ssl serverSslConfig, OcppSecurityProfile profile) {
+        if (serverSslConfig == null || !serverSslConfig.isEnabled() || !profile.requiresServerTLS()) {
+            return new WebSocketClient();
+        }
+
+        var sslContextFactory = new SslContextFactory.Client();
+
+        // server-side certs for profiles 2 and 3
+        if (profile.requiresServerTLS()) {
+            // server's keystore is client's truststore
+            sslContextFactory.setTrustStorePath(serverSslConfig.getKeyStore());
+            sslContextFactory.setTrustStorePassword(serverSslConfig.getKeyStorePassword());
+            sslContextFactory.setTrustStoreType(serverSslConfig.getKeyStoreType());
+        }
+
+        // Optionally present client certificate for mTLS (security profile 3).
+        if (profile.requiresClientTLS()) {
+            // server's truststore is client's keystore
+            sslContextFactory.setKeyStorePath(serverSslConfig.getTrustStore());
+            sslContextFactory.setKeyStorePassword(serverSslConfig.getTrustStorePassword());
+            sslContextFactory.setKeyStoreType(serverSslConfig.getTrustStoreType());
+        }
+
+        var httpClient = new HttpClient();
+        httpClient.setSslContextFactory(sslContextFactory);
+        return new WebSocketClient(httpClient);
+    }
+
     @Setter
     @Getter
     private static class ExchangeContext extends CommunicationContext {
 
+        private Class<RequestType> requestClass;
         private Class<ResponseType> responseClass;
         private CountDownLatch doneSignal = new CountDownLatch(1);
 

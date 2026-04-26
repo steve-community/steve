@@ -68,4 +68,15 @@ public enum OcppSecurityProfile {
             default -> false;
         };
     }
+
+    public boolean requiresServerTLS() {
+        return switch (this) {
+            case Profile_2, Profile_3 -> true;
+            default -> false;
+        };
+    }
+
+    public boolean requiresClientTLS() {
+        return this == Profile_3;
+    }
 }

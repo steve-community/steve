@@ -138,7 +138,7 @@ public class ApplicationJsonTest {
     @Test
     public void testWithMissingVersion() {
         RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((List<String>) null, REGISTERED_CHARGE_BOX_ID, PATH, null);
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((List<String>) null, REGISTERED_CHARGE_BOX_ID, PATH);
             chargePoint.start();
         });
 
@@ -152,7 +152,7 @@ public class ApplicationJsonTest {
     @Test
     public void testWithWrongVersion() {
         RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(List.of("ocpp1234"), REGISTERED_CHARGE_BOX_ID, PATH, null);
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(List.of("ocpp1234"), REGISTERED_CHARGE_BOX_ID, PATH);
             chargePoint.start();
         });
 

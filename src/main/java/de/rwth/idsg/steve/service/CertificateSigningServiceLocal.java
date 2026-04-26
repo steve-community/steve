@@ -132,13 +132,13 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         try {
             csr = CertificateUtils.parseCsr(csrPem);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Cannot parse CSR from " + chargeBoxId);
+            throw new IllegalArgumentException("Cannot parse CSR from " + chargeBoxId, e);
         }
 
         try {
             validateCsr(csr, chargeBoxId);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not validate CSR from " + chargeBoxId);
+            throw new IllegalArgumentException("Could not validate CSR from " + chargeBoxId, e);
         }
 
         return csr;
@@ -149,7 +149,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         try {
             processAndSendToStationInternal(csr, chargeBoxId);
         } catch (Exception e) {
-            log.error("Exception happened", e);
+            log.error("Exception happened for {}", chargeBoxId, e);
         }
     }
 

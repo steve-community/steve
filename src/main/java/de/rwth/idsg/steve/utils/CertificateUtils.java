@@ -23,6 +23,7 @@ import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -238,6 +239,8 @@ public class CertificateUtils {
     }
 
     private static String normalizePemInput(String pem) {
+        if (pem == null) return null;
+
         String normalized = pem;
         // Nginx/proxy headers can be URL-encoded; PEM files typically are not.
         if (pem.contains("%")) {

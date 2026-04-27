@@ -254,7 +254,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                throw new SteveException.AlreadyExists("A user with idTag '%s' already exists.", u.getIdTag());
+                throw new SteveException.AlreadyExists("The idTag '%s' exists already.", u.getIdTag());
             } else {
                 throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
             }

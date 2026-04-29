@@ -87,7 +87,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
             Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxId);
-            boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
+            boolean allow = status.isPresent() && status.get() == RegistrationStatus.ACCEPTED;
             if (!allow) {
                 throw createAuthFault(opName);
             }

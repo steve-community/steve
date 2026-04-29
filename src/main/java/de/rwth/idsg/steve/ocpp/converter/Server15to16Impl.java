@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.AuthorizationStatus;
 import ocpp.cs._2012._06.AuthorizeResponse;
 import ocpp.cs._2012._06.BootNotificationResponse;
@@ -62,6 +63,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
+@Slf4j
 public enum Server15to16Impl implements Server15to16 {
     SINGLETON;
 
@@ -177,7 +179,7 @@ public enum Server15to16Impl implements Server15to16 {
         return new BootNotificationResponse()
                 .withCurrentTime(response.getCurrentTime())
                 .withHeartbeatInterval(response.getInterval())
-                .withStatus(RegistrationStatus.fromValue(response.getStatus().value()));
+                .withStatus(mapRegistrationStatus(response.getStatus()));
     }
 
     @Override
@@ -237,6 +239,20 @@ public enum Server15to16Impl implements Server15to16 {
     // -------------------------------------------------------------------------
     // Custom mapping, for situations where a unique mapping does not exists
     // -------------------------------------------------------------------------
+
+    private static RegistrationStatus mapRegistrationStatus(ocpp.cs._2015._10.RegistrationStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case ACCEPTED -> RegistrationStatus.ACCEPTED;
+            case PENDING -> {
+                log.warn("RegistrationStatus.PENDING does not exist in OCPP 1.2/1.5. Mapping to RegistrationStatus.REJECTED");
+                yield RegistrationStatus.REJECTED;
+            }
+            case REJECTED -> RegistrationStatus.REJECTED;
+        };
+    }
 
     /**
      * OCCUPIED was replaced with several more specific values. For now it will be replaced with "CHARGING",

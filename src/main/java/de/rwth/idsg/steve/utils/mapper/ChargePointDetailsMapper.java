@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -43,7 +44,7 @@ public final class ChargePointDetailsMapper {
         form.setDescription(chargeBox.getDescription());
         form.setInsertConnectorStatusAfterTransactionMsg(chargeBox.getInsertConnectorStatusAfterTransactionMsg());
         form.setAdminAddress(chargeBox.getAdminAddress());
-        form.setRegistrationStatus(chargeBox.getRegistrationStatus());
+        form.setRegistrationStatus(RegistrationStatus.fromValue(chargeBox.getRegistrationStatus()));
         form.setAddress(AddressMapper.recordToDto(cp.getAddress()));
 
         form.setSecurityProfile(OcppSecurityProfile.fromValue(chargeBox.getSecurityProfile()));

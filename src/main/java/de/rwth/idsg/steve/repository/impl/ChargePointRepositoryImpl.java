@@ -399,7 +399,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                        .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                        .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                        .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
-                       .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
+                       .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus().value())
                        .set(CHARGE_BOX.NOTE, form.getNote())
                        .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
                        .set(CHARGE_BOX.SECURITY_PROFILE, form.getSecurityProfile().getValue());
@@ -418,7 +418,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
        var query = ctx.update(CHARGE_BOX)
                       .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                       .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
-                      .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus())
+                      .set(CHARGE_BOX.REGISTRATION_STATUS, form.getRegistrationStatus().value())
                       .set(CHARGE_BOX.NOTE, form.getNote())
                       .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
                       .set(CHARGE_BOX.SECURITY_PROFILE, form.getSecurityProfile().getValue());

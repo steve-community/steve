@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
@@ -26,7 +25,6 @@ import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,10 +54,6 @@ public class ChargePointsController {
     protected final ChargePointService chargePointService;
 
     protected static final String PARAMS = "params";
-
-    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
-                                                                               .map(ocpp.cs._2012._06.RegistrationStatus::value)
-                                                                               .collect(Collectors.toList());
 
     private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
                                                                            .map(ocpp.cs._2015._10.RegistrationStatus::value)
@@ -114,27 +108,10 @@ public class ChargePointsController {
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
-        model.addAttribute("registrationStatusList", getRegistrationStatusList(cp.getChargeBox()));
+        model.addAttribute("registrationStatusList", ocpp16RegistrationStatusList);
         addCountryCodes(model);
 
         return "data-man/chargepointDetails";
-    }
-
-    private List<String> getRegistrationStatusList(ChargeBoxRecord chargeBoxRecord) {
-        if (chargeBoxRecord.getOcppProtocol() == null) {
-            return upToOcpp15RegistrationStatusList;
-        }
-
-        OcppProtocol protocol = OcppProtocol.fromCompositeValue(chargeBoxRecord.getOcppProtocol());
-        switch (protocol.getVersion()) {
-            case V_12:
-            case V_15:
-                return upToOcpp15RegistrationStatusList;
-            case V_16:
-                return ocpp16RegistrationStatusList;
-            default:
-                throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
-        }
     }
 
     @GetMapping(ADD_PATH)
@@ -230,8 +207,7 @@ public class ChargePointsController {
     private void setCommonAttributesForSingleAdd(Model model) {
         addCountryCodes(model);
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
-        // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
-        model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
+        model.addAttribute("registrationStatusList", ocpp16RegistrationStatusList);
     }
 
     private void add(ChargePointForm form) {

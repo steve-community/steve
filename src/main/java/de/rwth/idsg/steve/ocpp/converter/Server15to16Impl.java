@@ -241,6 +241,9 @@ public enum Server15to16Impl implements Server15to16 {
     // -------------------------------------------------------------------------
 
     private static RegistrationStatus mapRegistrationStatus(ocpp.cs._2015._10.RegistrationStatus status) {
+        if (status == null) {
+            return null;
+        }
         return switch (status) {
             case ACCEPTED -> RegistrationStatus.ACCEPTED;
             case PENDING -> {

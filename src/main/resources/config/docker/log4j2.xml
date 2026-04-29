@@ -23,6 +23,10 @@
         <AsyncLogger name="org.springframework.security" level="INFO"/>
         <AsyncLogger name="org.springframework.web.servlet" level="INFO"/>
 
+        <!-- Enable DEBUG logs for transaction waiting service -->
+        <AsyncLogger name="de.rwth.idsg.steve.service.TransactionWaitingService" level="DEBUG"/>
+        <AsyncLogger name="de.rwth.idsg.steve.web.api.TransactionStatusRestController" level="DEBUG"/>
+
         <AsyncLogger name="org.apache.jasper" level="WARN"/>
         <AsyncLogger name="org.apache.tomcat.util" level="WARN"/>
         <AsyncLogger name="jndi" level="WARN"/>

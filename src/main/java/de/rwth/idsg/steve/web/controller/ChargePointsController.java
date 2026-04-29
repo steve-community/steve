@@ -36,10 +36,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -54,10 +52,6 @@ public class ChargePointsController {
     protected final ChargePointService chargePointService;
 
     protected static final String PARAMS = "params";
-
-    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
-                                                                           .map(ocpp.cs._2015._10.RegistrationStatus::value)
-                                                                           .collect(Collectors.toList());
 
     // -------------------------------------------------------------------------
     // Paths
@@ -108,7 +102,6 @@ public class ChargePointsController {
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
-        model.addAttribute("registrationStatusList", ocpp16RegistrationStatusList);
         addCountryCodes(model);
 
         return "data-man/chargepointDetails";
@@ -207,7 +200,6 @@ public class ChargePointsController {
     private void setCommonAttributesForSingleAdd(Model model) {
         addCountryCodes(model);
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
-        model.addAttribute("registrationStatusList", ocpp16RegistrationStatusList);
     }
 
     private void add(ChargePointForm form) {

@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -167,7 +168,7 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
     private static ChargePointForm chargePointForm(String chargeBoxId) {
         var form = new ChargePointForm();
         form.setChargeBoxId(chargeBoxId);
-        form.setRegistrationStatus("Accepted");
+        form.setRegistrationStatus(RegistrationStatus.ACCEPTED);
         form.setInsertConnectorStatusAfterTransactionMsg(true);
         form.setAddress(new Address());
         return form;

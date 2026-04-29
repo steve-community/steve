@@ -102,7 +102,9 @@
                     </td>
                 </tr>
                 <tr><td>Registration status:</td><td>
-                    <form:select path="registrationStatus" items="${registrationStatusList}"/>
+                    <form:select path="registrationStatus">
+                        <form:options items="${registrationStatus}" itemLabel="value"/>
+                    </form:select>
                 </td></tr>
                 <tr>
                     <td>Security Profile:</td>

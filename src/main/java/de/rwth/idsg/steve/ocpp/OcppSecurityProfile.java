@@ -31,12 +31,15 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @Slf4j
 public enum OcppSecurityProfile {
-    Profile_0(0, "0: No HTTP basic authentication, no TLS"),
-    Profile_1(1, "1: HTTP basic authentication, no TLS"),
-    Profile_2(2, "2: HTTP basic authentication, TLS with server-side certificate"),
-    Profile_3(3, "3: TLS with client-side and server-side certificates (mutual TLS or mTLS)");
+    Profile_0(0, false, false, false, "0: No HTTP basic authentication, no TLS"),
+    Profile_1(1, false, false, true, "1: HTTP basic authentication, no TLS"),
+    Profile_2(2, true, false, true, "2: HTTP basic authentication, TLS with server-side certificate"),
+    Profile_3(3, true, true, false, "3: TLS with client-side and server-side certificates (mutual TLS or mTLS)");
 
     private final int value;
+    private final boolean serverTLS;
+    private final boolean clientTLS;
+    private final boolean basicAuth;
     private final String description;
 
     @Nullable
@@ -60,23 +63,5 @@ public enum OcppSecurityProfile {
             }
         }
         throw new IllegalArgumentException(String.valueOf(value));
-    }
-
-    public boolean requiresBasicAuth() {
-        return switch (this) {
-            case Profile_1, Profile_2 -> true;
-            default -> false;
-        };
-    }
-
-    public boolean requiresServerTLS() {
-        return switch (this) {
-            case Profile_2, Profile_3 -> true;
-            default -> false;
-        };
-    }
-
-    public boolean requiresClientTLS() {
-        return this == Profile_3;
     }
 }

@@ -141,7 +141,7 @@ public class OcppJsonChargePoint {
                 request.setSubProtocols(versions);
             }
 
-            if (profile.requiresBasicAuth()) {
+            if (profile.isBasicAuth()) {
                 Objects.requireNonNull(basicAuthPassword, "basicAuthPassword must be set");
                 String encoding = Base64.getEncoder().encodeToString((chargeBoxId + ":" + basicAuthPassword).getBytes(StandardCharsets.UTF_8));
                 request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
@@ -516,14 +516,14 @@ public class OcppJsonChargePoint {
      * Keep SSL scoped to this test client instance. Do not mutate global JVM SSL properties.
      */
     private static WebSocketClient createWebSocketClient(Ssl serverSslConfig, OcppSecurityProfile profile) {
-        if (serverSslConfig == null || !serverSslConfig.isEnabled() || !profile.requiresServerTLS()) {
+        if (serverSslConfig == null || !serverSslConfig.isEnabled() || !profile.isServerTLS()) {
             return new WebSocketClient();
         }
 
         var sslContextFactory = new SslContextFactory.Client();
 
         // server-side certs for profiles 2 and 3
-        if (profile.requiresServerTLS()) {
+        if (profile.isServerTLS()) {
             // server's keystore is client's truststore
             sslContextFactory.setTrustStorePath(serverSslConfig.getKeyStore());
             sslContextFactory.setTrustStorePassword(serverSslConfig.getKeyStorePassword());
@@ -531,7 +531,7 @@ public class OcppJsonChargePoint {
         }
 
         // Optionally present client certificate for mTLS (security profile 3).
-        if (profile.requiresClientTLS()) {
+        if (profile.isClientTLS()) {
             // server's truststore is client's keystore
             sslContextFactory.setKeyStorePath(serverSslConfig.getTrustStore());
             sslContextFactory.setKeyStorePassword(serverSslConfig.getTrustStorePassword());

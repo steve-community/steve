@@ -115,7 +115,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         log.debug("ChargeBoxId '{}' is found in DB with security profile {}", chargeBoxId, profile.getValue());
 
         // Basic auth for profiles 1 and 2
-        if (profile.requiresBasicAuth()) {
+        if (profile.isBasicAuth()) {
             log.debug("ChargeBoxId '{}' is attempting Basic-Auth...", chargeBoxId);
             ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
 
@@ -139,7 +139,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         }
 
         // Client cert checks for profile 3
-        if (profile.requiresClientTLS()) {
+        if (profile.isClientTLS()) {
             log.debug("ChargeBoxId '{}' is attempting mTLS...", chargeBoxId);
             var cert = certificateValidator.getCertificate(request, chargeBoxId);
             boolean valid = certificateValidator.validate(registration.get(), cert);

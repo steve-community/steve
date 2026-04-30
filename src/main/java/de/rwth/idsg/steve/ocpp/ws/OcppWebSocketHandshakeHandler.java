@@ -123,7 +123,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             try {
                 authentication = converter.convert(casted.getServletRequest());
             } catch (Exception e) {
-                log.warn("ChargeBoxId '{}': Failed to extract Authentication from request", chargeBoxId, e);
+                log.error("ChargeBoxId '{}': Failed to extract Authentication from request ({})", chargeBoxId, e.getMessage());
                 response.setStatusCode(HttpStatus.BAD_REQUEST);
                 return false;
             }

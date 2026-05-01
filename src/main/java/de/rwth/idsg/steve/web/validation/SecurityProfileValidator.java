@@ -39,7 +39,7 @@ public class SecurityProfileValidator implements ConstraintValidator<SecurityPro
         OcppSecurityProfile securityProfile = form.getSecurityProfile();
         String newAuthPassword = form.getAuthPassword();
 
-        if (!securityProfile.requiresBasicAuth()) {
+        if (!securityProfile.isBasicAuth()) {
             return true;
         }
 

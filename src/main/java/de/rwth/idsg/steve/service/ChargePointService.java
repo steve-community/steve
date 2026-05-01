@@ -237,7 +237,9 @@ public class ChargePointService {
 
         try {
             var matches = passwordEncoder.matches(rawPassword, encodedPassword);
-            if (!matches) {
+            if (matches) {
+                log.debug("Provided password for ChargeBoxId '{}' matches expected password from DB", chargeBoxId);
+            } else {
                 log.warn("Invalid password attempt for ChargeBoxId '{}'", chargeBoxId);
             }
             return matches;

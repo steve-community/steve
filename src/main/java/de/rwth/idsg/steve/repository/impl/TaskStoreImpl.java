@@ -80,6 +80,22 @@ public class TaskStoreImpl implements TaskStore {
     }
 
     @Override
+    public List<CommunicationTask> getFinished() {
+        return lookupTable.values()
+            .stream()
+            .filter(CommunicationTask::isFinished)
+            .toList();
+    }
+
+    @Override
+    public List<CommunicationTask> getUnfinished() {
+        return lookupTable.values()
+            .stream()
+            .filter(task -> !task.isFinished())
+            .toList();
+    }
+
+    @Override
     public void clearFinished() {
         removeTasks(entry -> entry.getValue().isFinished());
     }

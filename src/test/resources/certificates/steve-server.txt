@@ -1,0 +1,11 @@
+keytool -genkeypair \
+  -alias steve-server \
+  -keyalg RSA \
+  -keysize 2048 \
+  -sigalg SHA256withRSA \
+  -validity 1825 \
+  -storetype PKCS12 \
+  -keystore steve-server.p12 \
+  -storepass changeit \
+  -keypass changeit \
+  -dname "CN=localhost, OU=SteVe, O=Example, L=City, ST=State, C=DE"

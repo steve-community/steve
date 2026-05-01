@@ -31,6 +31,8 @@ public interface TaskStore {
     List<TaskOverview> getOverview();
     CommunicationTask get(Integer taskId);
     Integer add(CommunicationTask task);
+    List<CommunicationTask> getFinished();
+    List<CommunicationTask> getUnfinished();
     void clearFinished();
     void clearUnfinished();
 }

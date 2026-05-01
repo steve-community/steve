@@ -23,7 +23,9 @@ import jooq.steve.db.tables.records.ChargeBoxRecord;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Result;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static jooq.steve.db.Tables.CHARGE_BOX;
@@ -53,6 +54,20 @@ public class Issue1371Test {
 
     @Autowired
     private DSLContext dslContext;
+
+    private static final String TEST_CHARGE_BOX_ID = "CB-A5EK1234";
+
+    @BeforeEach
+    public void setup() {
+        dslContext.deleteFrom(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(TEST_CHARGE_BOX_ID))
+            .execute();
+    }
+
+    @AfterEach
+    public void teardown() {
+        setup();
+    }
 
     public static Stream<String> provideInputDateTimes() {
         return Stream.of(
@@ -87,25 +102,20 @@ public class Issue1371Test {
      * get the evaluated version back for further checks.
      */
     private DateTime insertAndGetDateTime(DateTime dtIn) {
-        String chargeBoxId = UUID.randomUUID().toString();
-
         // 1. insert
         dslContext.insertInto(CHARGE_BOX)
-            .set(CHARGE_BOX.CHARGE_BOX_ID, chargeBoxId)
+            .set(CHARGE_BOX.CHARGE_BOX_ID, TEST_CHARGE_BOX_ID)
             .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, dtIn)
             .execute();
 
         // 2. read
         Result<ChargeBoxRecord> rows = dslContext.selectFrom(CHARGE_BOX)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(TEST_CHARGE_BOX_ID))
             .fetch();
+        Assertions.assertNotNull(rows);
 
         ChargeBoxRecord chargeBoxRecord = rows.get(0);
-
-        // 2. clean-up
-        dslContext.deleteFrom(CHARGE_BOX)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-            .execute();
+        Assertions.assertNotNull(chargeBoxRecord);
 
         return chargeBoxRecord.getLastHeartbeatTimestamp();
     }

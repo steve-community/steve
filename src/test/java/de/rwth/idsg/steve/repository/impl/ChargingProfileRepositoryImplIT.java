@@ -160,6 +160,38 @@ public class ChargingProfileRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals(0, count);
     }
 
+    @Test
+    public void auditTimestamps() {
+        Integer profilePk = dslContext.insertInto(CHARGING_PROFILE)
+            .set(CHARGING_PROFILE.DESCRIPTION, "audit")
+            .set(CHARGING_PROFILE.STACK_LEVEL, 0)
+            .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, ocpp.cp._2015._10.ChargingProfilePurposeType.TX_PROFILE.value())
+            .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, ocpp.cp._2015._10.ChargingProfileKindType.ABSOLUTE.value())
+            .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, ocpp.cp._2015._10.ChargingRateUnitType.W.value())
+            .returning(CHARGING_PROFILE.CHARGING_PROFILE_PK)
+            .fetchOne()
+            .getChargingProfilePk();
+
+        var before = dslContext.select(CHARGING_PROFILE.CREATED_AT, CHARGING_PROFILE.UPDATED_AT)
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(CHARGING_PROFILE)
+            .set(CHARGING_PROFILE.DESCRIPTION, "audit-updated")
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .execute();
+
+        var after = dslContext.select(CHARGING_PROFILE.CREATED_AT, CHARGING_PROFILE.UPDATED_AT)
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(profilePk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
     private static ChargingProfileForm chargingProfileForm() {
         var form = new ChargingProfileForm();
         form.setDescription("it");

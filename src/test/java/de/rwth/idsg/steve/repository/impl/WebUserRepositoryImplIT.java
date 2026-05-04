@@ -242,6 +242,38 @@ public class WebUserRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals("[\"ROLE_LOAD\"]", loaded.getAuthorities().data());
     }
 
+    @Test
+    public void auditTimestamps() {
+        String username = uniqueUsername();
+        Integer pk = dslContext.insertInto(WEB_USER)
+            .set(WEB_USER.USERNAME, username)
+            .set(WEB_USER.PASSWORD, "pw")
+            .set(WEB_USER.ENABLED, true)
+            .set(WEB_USER.AUTHORITIES, json("[\"ROLE_AUDIT\"]"))
+            .returning(WEB_USER.WEB_USER_PK)
+            .fetchOne()
+            .getWebUserPk();
+
+        var before = dslContext.select(WEB_USER.CREATED_AT, WEB_USER.UPDATED_AT)
+            .from(WEB_USER)
+            .where(WEB_USER.WEB_USER_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(WEB_USER)
+            .set(WEB_USER.PASSWORD, "new-pw")
+            .where(WEB_USER.WEB_USER_PK.eq(pk))
+            .execute();
+
+        var after = dslContext.select(WEB_USER.CREATED_AT, WEB_USER.UPDATED_AT)
+            .from(WEB_USER)
+            .where(WEB_USER.WEB_USER_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
     private static String uniqueUsername() {
         return "repo_it_" + UUID.randomUUID().toString().replace("-", "");
     }

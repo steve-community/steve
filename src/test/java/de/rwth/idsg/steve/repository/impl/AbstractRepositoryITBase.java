@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
+import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.Assertions;
@@ -83,6 +84,29 @@ abstract class AbstractRepositoryITBase {
             t = t.getCause();
         }
         return false;
+    }
+
+    protected static void assertAuditTimestampsAreSet(DateTime createdAt, DateTime updatedAt) {
+        Assertions.assertNotNull(createdAt);
+        Assertions.assertNotNull(updatedAt);
+    }
+
+    protected static void assertAuditTimestampsAfterUpdate(DateTime createdAtBefore,
+                                                           DateTime updatedAtBefore,
+                                                           DateTime createdAtAfter,
+                                                           DateTime updatedAtAfter) {
+        Assertions.assertEquals(createdAtBefore, createdAtAfter);
+        Assertions.assertTrue(updatedAtAfter.isAfter(updatedAtBefore),
+            () -> "Expected updated_at to advance from " + updatedAtBefore + " to " + updatedAtAfter);
+    }
+
+    protected static void waitForTimestampTick() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assertions.fail("Interrupted while waiting for timestamp tick", e);
+        }
     }
 
     protected static void resetDatabase(DSLContext dslContext) {

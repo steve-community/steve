@@ -175,4 +175,33 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne(0, int.class);
         Assertions.assertEquals(0, count);
     }
+
+    @Test
+    public void auditTimestamps() {
+        String idTag = uniqueId("tag");
+        Integer pk = dslContext.insertInto(OCPP_TAG)
+            .set(OCPP_TAG.ID_TAG, idTag)
+            .returning(OCPP_TAG.OCPP_TAG_PK)
+            .fetchOne()
+            .getOcppTagPk();
+
+        var before = dslContext.select(OCPP_TAG.CREATED_AT, OCPP_TAG.UPDATED_AT)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(OCPP_TAG)
+            .set(OCPP_TAG.NOTE, "audit-update")
+            .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
+            .execute();
+
+        var after = dslContext.select(OCPP_TAG.CREATED_AT, OCPP_TAG.UPDATED_AT)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
 }

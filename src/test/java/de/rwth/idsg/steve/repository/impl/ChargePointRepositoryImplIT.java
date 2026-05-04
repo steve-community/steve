@@ -165,6 +165,35 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals(0, count);
     }
 
+    @Test
+    public void auditTimestamps() {
+        String chargeBoxId = uniqueId("cp");
+        Integer chargeBoxPk = dslContext.insertInto(CHARGE_BOX)
+            .set(CHARGE_BOX.CHARGE_BOX_ID, chargeBoxId)
+            .returning(CHARGE_BOX.CHARGE_BOX_PK)
+            .fetchOne()
+            .getChargeBoxPk();
+
+        var before = dslContext.select(CHARGE_BOX.CREATED_AT, CHARGE_BOX.UPDATED_AT)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(CHARGE_BOX)
+            .set(CHARGE_BOX.DESCRIPTION, "audit-update")
+            .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk))
+            .execute();
+
+        var after = dslContext.select(CHARGE_BOX.CREATED_AT, CHARGE_BOX.UPDATED_AT)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
     private static ChargePointForm chargePointForm(String chargeBoxId) {
         var form = new ChargePointForm();
         form.setChargeBoxId(chargeBoxId);

@@ -91,4 +91,32 @@ public class AddressRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne(0, int.class);
         Assertions.assertEquals(0, count);
     }
+
+    @Test
+    public void auditTimestamps() {
+        Integer pk = dslContext.insertInto(ADDRESS)
+            .set(ADDRESS.CITY, "Bonn")
+            .returning(ADDRESS.ADDRESS_PK)
+            .fetchOne()
+            .getAddressPk();
+
+        var before = dslContext.select(ADDRESS.CREATED_AT, ADDRESS.UPDATED_AT)
+            .from(ADDRESS)
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(ADDRESS)
+            .set(ADDRESS.CITY, "Munich")
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .execute();
+
+        var after = dslContext.select(ADDRESS.CREATED_AT, ADDRESS.UPDATED_AT)
+            .from(ADDRESS)
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
 }

@@ -155,6 +155,42 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals("CANCELLED", status);
     }
 
+    @Test
+    public void auditTimestamps() {
+        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(CONNECTOR.CONNECTOR_ID.eq(1))
+            .fetchOne(CONNECTOR.CONNECTOR_PK);
+
+        Integer id = dslContext.insertInto(RESERVATION)
+            .set(RESERVATION.CONNECTOR_PK, connectorPk)
+            .set(RESERVATION.ID_TAG, KNOWN_OCPP_TAG)
+            .set(RESERVATION.STATUS, "WAITING")
+            .returning(RESERVATION.RESERVATION_PK)
+            .fetchOne()
+            .getReservationPk();
+
+        var before = dslContext.select(RESERVATION.CREATED_AT, RESERVATION.UPDATED_AT)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(RESERVATION)
+            .set(RESERVATION.STATUS, "ACCEPTED")
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .execute();
+
+        var after = dslContext.select(RESERVATION.CREATED_AT, RESERVATION.UPDATED_AT)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(id))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
     private void useReservation(int reservationConnectorId, String idTagFromTransaction) {
         Integer id = repository.insert(insertReservationParams(reservationConnectorId));
         repository.accepted(id);

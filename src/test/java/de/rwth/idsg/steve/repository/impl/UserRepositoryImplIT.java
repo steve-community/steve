@@ -104,6 +104,34 @@ public class UserRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertEquals(0, count);
     }
 
+    @Test
+    public void auditTimestamps() {
+        Integer pk = dslContext.insertInto(USER)
+            .set(USER.FIRST_NAME, "Audit")
+            .returning(USER.USER_PK)
+            .fetchOne()
+            .getUserPk();
+
+        var before = dslContext.select(USER.CREATED_AT, USER.UPDATED_AT)
+            .from(USER)
+            .where(USER.USER_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAreSet(before.value1(), before.value2());
+
+        waitForTimestampTick();
+
+        dslContext.update(USER)
+            .set(USER.LAST_NAME, "Updated")
+            .where(USER.USER_PK.eq(pk))
+            .execute();
+
+        var after = dslContext.select(USER.CREATED_AT, USER.UPDATED_AT)
+            .from(USER)
+            .where(USER.USER_PK.eq(pk))
+            .fetchOne();
+        assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
     private static UserForm userForm() {
         var form = new UserForm();
         form.setFirstName("Repo");

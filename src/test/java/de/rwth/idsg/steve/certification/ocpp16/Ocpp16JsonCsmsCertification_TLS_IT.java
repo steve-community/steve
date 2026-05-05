@@ -18,10 +18,12 @@
  */
 package de.rwth.idsg.steve.certification.ocpp16;
 
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.service.OcppOperationsService;
+import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
@@ -89,16 +91,12 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    private static final String SECURE_PATH = "wss://localhost:8443/steve/websocket/CentralSystemService/";
-
     @Autowired
     private DSLContext dslContext;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OcppOperationsService operationsService;
-    @Autowired
-    private ServerProperties serverProperties;
     @Autowired
     private TaskStore taskStore;
 
@@ -407,7 +405,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         return p12Path;
     }
 
-    private static OcppJsonChargePoint defaultSecureStation() {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, SECURE_PATH);
+    private OcppJsonChargePoint defaultSecureStation() {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, Helpers.getJsonPath(serverProperties));
     }
 }

@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.OcppOperationsService;
+import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
@@ -2911,12 +2912,14 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
     @Test
     public void test_TC_088_CSMS_WebSocketSubprotocolNegotiation() {
+        String path = Helpers.getJsonPath(serverProperties);
+
         assertThrows(
             RuntimeException.class,
-            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, PATH).start()
+            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, path).start()
         );
 
-        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, path).start();
 
         List<String> responseHeaders = chargePoint.getResponseHeader("Sec-WebSocket-Protocol");
         assertNotNull(responseHeaders);

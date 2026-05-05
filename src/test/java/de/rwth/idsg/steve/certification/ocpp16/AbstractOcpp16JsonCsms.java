@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.RestCallback;
@@ -38,6 +39,8 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -51,12 +54,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Slf4j
 public abstract class AbstractOcpp16JsonCsms {
 
-    static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
-
     static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     static final String CPO_NAME = "SteVe-CPO";
+
+    @Autowired
+    ServerProperties serverProperties;
 
     static BootNotificationRequest bootNotification() {
         return new BootNotificationRequest()
@@ -183,8 +187,8 @@ public abstract class AbstractOcpp16JsonCsms {
         return startTransactionResponse;
     }
 
-    static OcppJsonChargePoint defaultStation() {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+    OcppJsonChargePoint defaultStation() {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, Helpers.getJsonPath(serverProperties));
     }
 
     @FunctionalInterface

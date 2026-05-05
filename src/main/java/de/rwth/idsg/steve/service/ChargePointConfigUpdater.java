@@ -33,6 +33,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ConfigurationStatus;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +42,12 @@ import java.util.List;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfile;
 
+/**
+ * Is excluded from test profile in order to not confuse ITs in {@link de.rwth.idsg.steve.certification.ocpp16} package.
+ */
 @Slf4j
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class ChargePointConfigUpdater {
 

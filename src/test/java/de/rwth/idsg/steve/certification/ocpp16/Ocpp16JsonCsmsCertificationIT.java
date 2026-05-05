@@ -102,7 +102,6 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -2297,8 +2296,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultStation().startWithProfile1(password);
 
-        expectGetConfCpoName(chargePoint);
-
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setKeyType(ChangeConfigurationParams.ConfigurationKeyType.PREDEFINED);
@@ -2326,8 +2323,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         // disconnect and reconnect
         chargePoint.close();
         chargePoint = defaultStation().startWithProfile1(newPassword);
-
-        expectGetConfCpoName(chargePoint);
 
         chargePoint.close();
     }
@@ -2831,8 +2826,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultStation().startWithProfile1(password);
 
-        expectGetConfCpoName(chargePoint);
-
         // change config
         {
             var changeConfig = new ChangeConfigurationParams();
@@ -2876,8 +2869,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             chargePoint.close();
             chargePoint = defaultStation().startWithProfile1(password);
 
-            expectGetConfCpoName(chargePoint);
-
             var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
             assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
@@ -2892,7 +2883,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         // step 13/14: reconnect with upgraded security profile is accepted again
         {
             chargePoint = defaultStation().startWithProfile1(password);
-            expectGetConfCpoName(chargePoint);
             chargePoint.close();
         }
     }
@@ -2910,8 +2900,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         assertThrows(RuntimeException.class, () -> defaultStation().start());
 
         var chargePoint = defaultStation().startWithProfile1(password);
-
-        expectGetConfCpoName(chargePoint);
 
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());

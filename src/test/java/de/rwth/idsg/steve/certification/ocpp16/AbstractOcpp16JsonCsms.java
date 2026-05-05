@@ -23,8 +23,6 @@ import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2015._10.GetConfigurationRequest;
-import ocpp.cp._2015._10.GetConfigurationResponse;
 import ocpp.cp._2015._10.KeyValue;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -46,7 +44,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -184,19 +181,6 @@ public abstract class AbstractOcpp16JsonCsms {
             StatusNotificationResponse.class
         ));
         return startTransactionResponse;
-    }
-
-    /**
-     * SteVe started asking for this configuration after each connection. So, we need to anticipate this request
-     * in our test flows, since they are strict.
-     */
-    static void expectGetConfCpoName(OcppJsonChargePoint chargePoint) {
-        KeyValue kv = configurationKey(CpoName.name(), false, CPO_NAME);
-
-        chargePoint.expectRequest(
-            new GetConfigurationRequest().withKey(CpoName.name()),
-            new GetConfigurationResponse().withConfigurationKey(List.of(kv))
-        );
     }
 
     static OcppJsonChargePoint defaultStation() {

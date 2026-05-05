@@ -134,8 +134,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         Ssl ssl = sslWithCustomTrustStore("src/test/resources/certificates/cp-client.p12");
         var chargePoint = defaultSecureStation().startWithProfile3(ssl);
 
-        expectGetConfCpoName(chargePoint);
-
         // ExtendedTriggerMessage
         {
             var params = new ExtendedTriggerMessageParams();
@@ -203,8 +201,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
         chargePoint = defaultSecureStation().startWithProfile3(newSsl);
 
-        expectGetConfCpoName(chargePoint);
-
         chargePoint.close();
     }
 
@@ -221,8 +217,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
-
-        expectGetConfCpoName(chargePoint);
 
         // 1-2) Trigger SignChargePointCertificate
         {
@@ -302,8 +296,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultSecureStation().startWithProfile2(password, serverProperties.getSsl());
 
-        expectGetConfCpoName(chargePoint);
-
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
@@ -323,8 +315,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
-
-        expectGetConfCpoName(chargePoint);
 
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());

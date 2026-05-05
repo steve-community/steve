@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.OcppOperationsService;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -39,8 +40,13 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -60,7 +66,30 @@ public abstract class AbstractOcpp16JsonCsms {
     static final String CPO_NAME = "SteVe-CPO";
 
     @Autowired
+    DSLContext dslContext;
+    @Autowired
     ServerProperties serverProperties;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    OcppOperationsService operationsService;
+
+    private __DatabasePreparer__ databasePreparer;
+
+    @BeforeEach
+    public void setup(TestInfo testInfo) {
+        log.info("----- START: {} -----", testInfo.getDisplayName());
+
+        dslContext.settings().setExecuteLogging(false);
+
+        databasePreparer = new __DatabasePreparer__(dslContext);
+        databasePreparer.prepare();
+    }
+
+    @AfterEach
+    public void teardown() {
+        databasePreparer.cleanUp();
+    }
 
     static BootNotificationRequest bootNotification() {
         return new BootNotificationRequest()
@@ -189,6 +218,14 @@ public abstract class AbstractOcpp16JsonCsms {
 
     OcppJsonChargePoint defaultStation() {
         return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, Helpers.getJsonPath(serverProperties));
+    }
+
+    /**
+     * Same as {@link #defaultStation()}, because WS connection URL is being determined dynamically within
+     * {@link Helpers#getJsonPath(ServerProperties)}
+     */
+    OcppJsonChargePoint defaultSecureStation() {
+        return defaultStation();
     }
 
     @FunctionalInterface

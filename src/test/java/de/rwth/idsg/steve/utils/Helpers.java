@@ -75,14 +75,8 @@ public class Helpers {
             ? "wss:/"
             : "ws:/";
 
-        // 127.0.0.1 or localhost matters for the SSL handshake
-        String addressFromConfig = serverProperties.getAddress().toString();
-        String address = addressFromConfig.equals("/127.0.0.1")
-            ? "/localhost"
-            : addressFromConfig;
-
         return prefix
-               + address
+               + serverProperties.getAddress()
                + ":"
                + serverProperties.getPort()
                + serverProperties.getServlet().getContextPath()

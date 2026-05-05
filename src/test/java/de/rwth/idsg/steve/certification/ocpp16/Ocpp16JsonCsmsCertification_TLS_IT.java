@@ -18,12 +18,8 @@
  */
 package de.rwth.idsg.steve.certification.ocpp16;
 
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.repository.TaskStore;
-import de.rwth.idsg.steve.service.OcppOperationsService;
-import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateSigned;
@@ -41,19 +37,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.jooq.DSLContext;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.Ssl;
-import org.springframework.boot.web.server.autoconfigure.ServerProperties;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.StringWriter;
@@ -89,35 +79,8 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    private static final String SECURE_PATH = "wss://localhost:8443/steve/websocket/CentralSystemService/";
-
-    @Autowired
-    private DSLContext dslContext;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private OcppOperationsService operationsService;
-    @Autowired
-    private ServerProperties serverProperties;
     @Autowired
     private TaskStore taskStore;
-
-    private __DatabasePreparer__ databasePreparer;
-
-    @BeforeEach
-    public void setup(TestInfo testInfo) {
-        log.info("----- START: {} -----", testInfo.getDisplayName());
-
-        dslContext.settings().setExecuteLogging(false);
-
-        databasePreparer = new __DatabasePreparer__(dslContext);
-        databasePreparer.prepare();
-    }
-
-    @AfterEach
-    public void teardown() {
-        databasePreparer.cleanUp();
-    }
 
     @Test
     public void test_TC_074_CSMS_SignCertificateRequestAccepted() throws Exception {
@@ -133,8 +96,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
         Ssl ssl = sslWithCustomTrustStore("src/test/resources/certificates/cp-client.p12");
         var chargePoint = defaultSecureStation().startWithProfile3(ssl);
-
-        expectGetConfCpoName(chargePoint);
 
         // ExtendedTriggerMessage
         {
@@ -203,8 +164,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
         chargePoint = defaultSecureStation().startWithProfile3(newSsl);
 
-        expectGetConfCpoName(chargePoint);
-
         chargePoint.close();
     }
 
@@ -221,8 +180,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
-
-        expectGetConfCpoName(chargePoint);
 
         // 1-2) Trigger SignChargePointCertificate
         {
@@ -302,8 +259,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultSecureStation().startWithProfile2(password, serverProperties.getSsl());
 
-        expectGetConfCpoName(chargePoint);
-
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
@@ -323,8 +278,6 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
-
-        expectGetConfCpoName(chargePoint);
 
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
@@ -415,9 +368,5 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         }
 
         return p12Path;
-    }
-
-    private static OcppJsonChargePoint defaultSecureStation() {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, SECURE_PATH);
     }
 }

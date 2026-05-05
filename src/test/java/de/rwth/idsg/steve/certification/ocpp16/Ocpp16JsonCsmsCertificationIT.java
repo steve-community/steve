@@ -22,8 +22,8 @@ import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.OcppOperationsService;
+import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -98,19 +98,13 @@ import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -160,30 +154,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
     @Autowired
-    private DSLContext dslContext;
-    @Autowired
-    private OcppOperationsService operationsService;
-    @Autowired
     private ChargingProfileRepository chargingProfileRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    private __DatabasePreparer__ databasePreparer;
-
-    @BeforeEach
-    public void setup(TestInfo testInfo) {
-        log.info("----- START: {} -----", testInfo.getDisplayName());
-
-        dslContext.settings().setExecuteLogging(false);
-
-        databasePreparer = new __DatabasePreparer__(dslContext);
-        databasePreparer.prepare();
-    }
-
-    @AfterEach
-    public void teardown() {
-        databasePreparer.cleanUp();
-    }
 
     @Test
     public void test_TC_001_CSMS_ColdBootChargePoint() {
@@ -2297,8 +2268,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultStation().startWithProfile1(password);
 
-        expectGetConfCpoName(chargePoint);
-
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
         params.setKeyType(ChangeConfigurationParams.ConfigurationKeyType.PREDEFINED);
@@ -2326,8 +2295,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         // disconnect and reconnect
         chargePoint.close();
         chargePoint = defaultStation().startWithProfile1(newPassword);
-
-        expectGetConfCpoName(chargePoint);
 
         chargePoint.close();
     }
@@ -2831,8 +2798,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultStation().startWithProfile1(password);
 
-        expectGetConfCpoName(chargePoint);
-
         // change config
         {
             var changeConfig = new ChangeConfigurationParams();
@@ -2876,8 +2841,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             chargePoint.close();
             chargePoint = defaultStation().startWithProfile1(password);
 
-            expectGetConfCpoName(chargePoint);
-
             var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
             assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
@@ -2892,7 +2855,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         // step 13/14: reconnect with upgraded security profile is accepted again
         {
             chargePoint = defaultStation().startWithProfile1(password);
-            expectGetConfCpoName(chargePoint);
             chargePoint.close();
         }
     }
@@ -2911,8 +2873,6 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var chargePoint = defaultStation().startWithProfile1(password);
 
-        expectGetConfCpoName(chargePoint);
-
         var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
         assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
 
@@ -2923,12 +2883,14 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
     @Test
     public void test_TC_088_CSMS_WebSocketSubprotocolNegotiation() {
+        String path = Helpers.getJsonPath(serverProperties);
+
         assertThrows(
             RuntimeException.class,
-            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, PATH).start()
+            () -> new OcppJsonChargePoint(List.of("ocpp0.1"), REGISTERED_CHARGE_BOX_ID, path).start()
         );
 
-        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, PATH).start();
+        var chargePoint = new OcppJsonChargePoint(List.of("ocpp0.1", "ocpp1.6"), REGISTERED_CHARGE_BOX_ID, path).start();
 
         List<String> responseHeaders = chargePoint.getResponseHeader("Sec-WebSocket-Protocol");
         assertNotNull(responseHeaders);

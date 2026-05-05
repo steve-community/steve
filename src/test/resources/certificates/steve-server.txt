@@ -8,4 +8,5 @@ keytool -genkeypair \
   -keystore steve-server.p12 \
   -storepass changeit \
   -keypass changeit \
-  -dname "CN=localhost, OU=SteVe, O=Example, L=City, ST=State, C=DE"
+  -dname "CN=127.0.0.1, OU=SteVe, O=Example, L=City, ST=State, C=DE" \
+  -ext "SAN=ip:127.0.0.1,dns:localhost"

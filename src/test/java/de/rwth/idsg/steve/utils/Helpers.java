@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.config.SteveProperties;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
@@ -70,18 +71,16 @@ public class Helpers {
      * only <code>ws:/</code> and <code>wss:/</code> because serverProperties.getAddress() starts with a slash.
      */
     public static String getJsonPath(ServerProperties serverProperties) {
-        String prefix = "ws:/";
-
-        if (serverProperties.getSsl().isEnabled()) {
-            prefix = "wss:/";
-        }
+        String prefix = serverProperties.getSsl().isEnabled()
+            ? "wss:/"
+            : "ws:/";
 
         return prefix
                + serverProperties.getAddress()
                + ":"
                + serverProperties.getPort()
                + serverProperties.getServlet().getContextPath()
-               + "/websocket/CentralSystemService/";
+               + WebSocketConfiguration.PATH_INFIX;
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

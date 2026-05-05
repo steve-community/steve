@@ -19,12 +19,12 @@
 package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.OcppOperationsService;
+import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2015._10.GetConfigurationRequest;
-import ocpp.cp._2015._10.GetConfigurationResponse;
 import ocpp.cp._2015._10.KeyValue;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -40,13 +40,19 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,12 +60,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Slf4j
 public abstract class AbstractOcpp16JsonCsms {
 
-    static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
-
     static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     static final String CPO_NAME = "SteVe-CPO";
+
+    @Autowired
+    DSLContext dslContext;
+    @Autowired
+    ServerProperties serverProperties;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    OcppOperationsService operationsService;
+
+    private __DatabasePreparer__ databasePreparer;
+
+    @BeforeEach
+    public void setup(TestInfo testInfo) {
+        log.info("----- START: {} -----", testInfo.getDisplayName());
+
+        dslContext.settings().setExecuteLogging(false);
+
+        databasePreparer = new __DatabasePreparer__(dslContext);
+        databasePreparer.prepare();
+    }
+
+    @AfterEach
+    public void teardown() {
+        databasePreparer.cleanUp();
+    }
 
     static BootNotificationRequest bootNotification() {
         return new BootNotificationRequest()
@@ -186,21 +216,16 @@ public abstract class AbstractOcpp16JsonCsms {
         return startTransactionResponse;
     }
 
-    /**
-     * SteVe started asking for this configuration after each connection. So, we need to anticipate this request
-     * in our test flows, since they are strict.
-     */
-    static void expectGetConfCpoName(OcppJsonChargePoint chargePoint) {
-        KeyValue kv = configurationKey(CpoName.name(), false, CPO_NAME);
-
-        chargePoint.expectRequest(
-            new GetConfigurationRequest().withKey(CpoName.name()),
-            new GetConfigurationResponse().withConfigurationKey(List.of(kv))
-        );
+    OcppJsonChargePoint defaultStation() {
+        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, Helpers.getJsonPath(serverProperties));
     }
 
-    static OcppJsonChargePoint defaultStation() {
-        return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+    /**
+     * Same as {@link #defaultStation()}, because WS connection URL is being determined dynamically within
+     * {@link Helpers#getJsonPath(ServerProperties)}
+     */
+    OcppJsonChargePoint defaultSecureStation() {
+        return defaultStation();
     }
 
     @FunctionalInterface

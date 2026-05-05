@@ -74,8 +74,7 @@ jobs:
 
       - name: Start the app and visit signin web page
         run: |
-          sudo apt-get install -y elinks
           java -Djava.net.preferIPv4Stack=true -jar target/steve.war &
           sleep 30
-          elinks -dump -no-references http://localhost:8080/steve/manager/signin
+          curl --fail --show-error --silent http://localhost:8080/steve/manager/signin > /tmp/steve-signin.html
           killall java

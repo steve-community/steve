@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
@@ -35,17 +34,13 @@ import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Result;
-import org.jooq.SelectQuery;
-import org.jooq.Table;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.rwth.idsg.steve.utils.CustomDSL.DATE_TIME_TYPE;
 import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -205,7 +200,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 // the last active transaction
                 timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp);
             } else {
-                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, nextTx.getStartTimestamp());
+                // startTimestamp is inclusive, nextTx.startTimestamp is exclusive
+                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp)
+                    .and(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.lessThan(nextTx.getStartTimestamp()));
             }
         } else {
             // finished transaction
@@ -216,58 +213,39 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
             .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
 
+        var connectorPkQuery = ctx.select(CONNECTOR.CONNECTOR_PK)
+            .from(CONNECTOR)
+            .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
-        SelectQuery<ConnectorMeterValueRecord> transactionQuery =
-                ctx.selectFrom(CONNECTOR_METER_VALUE)
-                   .where(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk))
-                   .and(unitCondition)
-                   .getQuery();
-
-        // Case 2: Fall back to filtering according to time windows
+        // Case 2: Fall back to filtering according to time windows. Timestamp fallback only considers rows
+        // not explicitly assigned to another transaction, because such rows can otherwise leak across
+        // zombie-transaction boundaries.
         //
-        SelectQuery<ConnectorMeterValueRecord> timestampQuery =
-                ctx.selectFrom(CONNECTOR_METER_VALUE)
-                   .where(CONNECTOR_METER_VALUE.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                   .from(CONNECTOR)
-                                                                   .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                   .and(CONNECTOR.CONNECTOR_ID.eq(connectorId))))
-                   .and(timestampCondition)
-                   .and(unitCondition)
-                   .getQuery();
-
-        // Actually, either case 1 applies or 2. If we retrieved values using 1, case 2 is should not be
-        // executed (best case). In worst case (1 returns empty list and we fall back to case 2) though,
-        // we make two db calls. Alternatively, we can pass both queries in one go, and make the db work.
-        //
-        // UNION removes all duplicate records
-        //
-        Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
-
-        Field<DateTime> dateTimeField = t1.field(2, DATE_TIME_TYPE);
+        var selectionCriteria = CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk)
+            .or(timestampCondition
+                .and(CONNECTOR_METER_VALUE.TRANSACTION_PK.isNull()
+                .and(CONNECTOR_METER_VALUE.CONNECTOR_PK.eq(connectorPkQuery))
+                )
+            );
 
         List<TransactionDetails.MeterValues> values =
-                ctx.select(
-                        dateTimeField,
-                        t1.field(3, String.class),
-                        t1.field(4, String.class),
-                        t1.field(5, String.class),
-                        t1.field(6, String.class),
-                        t1.field(7, String.class),
-                        t1.field(8, String.class),
-                        t1.field(9, String.class))
-                   .from(t1)
-                   .orderBy(dateTimeField)
+                ctx.selectFrom(CONNECTOR_METER_VALUE)
+                   .where(unitCondition)
+                   .and(selectionCriteria)
+                   .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(r.value1())
-                                                           .value(r.value2())
-                                                           .readingContext(r.value3())
-                                                           .format(r.value4())
-                                                           .measurand(r.value5())
-                                                           .location(r.value6())
-                                                           .unit(r.value7())
-                                                           .phase(r.value8())
+                                                           .valueTimestamp(r.getValueTimestamp())
+                                                           .value(r.getValue())
+                                                           .readingContext(r.getReadingContext())
+                                                           .format(r.getFormat())
+                                                           .measurand(r.getMeasurand())
+                                                           .location(r.getLocation())
+                                                           .unit(r.getUnit())
+                                                           .phase(r.getPhase())
                                                            .build())
                    .stream()
                    .filter(TransactionStopServiceHelper::isEnergyValue)

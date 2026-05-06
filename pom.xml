@@ -400,6 +400,10 @@
                                     <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
                                 </forcedType>
                                 <forcedType>
+                                    <name>JSON</name>
+                                    <includeExpression>.*\.CHARGE_BOX\.(OCPP_CONFIGURATION)</includeExpression>
+                                </forcedType>
+                                <forcedType>
                                     <userType>org.joda.time.DateTime</userType>
                                     <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
                                     <includeExpression>.*</includeExpression>

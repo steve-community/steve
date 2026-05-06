@@ -37,6 +37,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.jooq.JSON;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -89,7 +90,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
-            .set(CHARGE_BOX.CPO_NAME, CPO_NAME)
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
             .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
@@ -174,7 +175,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
-            .set(CHARGE_BOX.CPO_NAME, CPO_NAME)
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
             .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
@@ -272,7 +273,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
-            .set(CHARGE_BOX.CPO_NAME, CPO_NAME)
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
             .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, "SN-01-8043621")
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
@@ -346,6 +347,10 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate CSR", e);
         }
+    }
+
+    private static JSON cpoNameConfig() {
+        return JSON.json("{\"CpoName\":\"" + CPO_NAME + "\"}");
     }
 
     private static Path saveCertsToTempFile(List<X509Certificate> certs, CsrMaterial csrMaterial) throws Exception {

@@ -25,6 +25,8 @@ import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cp._2015._10.GetConfigurationRequest;
+import ocpp.cp._2015._10.GetConfigurationResponse;
 import ocpp.cp._2015._10.KeyValue;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -214,6 +216,18 @@ public abstract class AbstractOcpp16JsonCsms {
             StatusNotificationResponse.class
         ));
         return startTransactionResponse;
+    }
+
+    /**
+     * SteVe started sending them after each Change Configuration. So, the station needs expect them.
+     *
+     * https://github.com/steve-community/steve/pull/2039
+     */
+    static void expectGetConf(OcppJsonChargePoint chargePoint) {
+        chargePoint.expectRequest(
+            new GetConfigurationRequest().withKey(),
+            new GetConfigurationResponse()
+        );
     }
 
     OcppJsonChargePoint defaultStation() {

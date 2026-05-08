@@ -664,6 +664,8 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         assertEquals(ConfigurationStatus.ACCEPTED, successResponse(operationFuture.join()));
 
+        expectGetConf(chargePoint);
+
         chargePoint.close();
     }
 
@@ -2284,6 +2286,8 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         );
         assertEquals(ConfigurationStatus.ACCEPTED, successResponse(future.join()));
 
+        expectGetConf(chargePoint);
+
         var record = dslContext
             .selectFrom(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
@@ -2812,6 +2816,8 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
                 new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
             );
             assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
+
+            expectGetConf(chargePoint);
 
             var chargeBox = dslContext.selectFrom(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))

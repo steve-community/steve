@@ -48,6 +48,7 @@ import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.EventRepository;
@@ -113,6 +114,7 @@ import java.util.List;
 
 import static de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask.UpdateFirmwareResponseStatus;
 import static ocpp._2022._02.security.ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType;
+import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -162,6 +164,29 @@ public class ChargePointServiceClient {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
+
+        // after successfully changing config at station, get all configs from station
+        // for us to have the final snapshots of them (i.e. to update database)
+        task.addCallback(new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, ConfigurationStatus response) {
+                if (response == ACCEPTED) {
+                    var params = new GetConfigurationParams();
+                    params.setChargePointSelectList(params.getChargePointSelectList());
+                    getConfiguration(params);
+                }
+            }
+
+            @Override
+            public void success(String chargeBoxId, OcppJsonError error) {
+
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+
+            }
+        });
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())

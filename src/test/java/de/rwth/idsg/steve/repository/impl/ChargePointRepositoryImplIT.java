@@ -28,7 +28,6 @@ import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.jooq.DSLContext;
-import org.jooq.JSON;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,27 +59,6 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
         Assertions.assertNotNull(registration.get().ocppConfiguration());
         Assertions.assertTrue(registration.get().ocppConfiguration().isObject());
         Assertions.assertNull(registration.get().cpoName());
-    }
-
-    @Test
-    public void updateOcppConfigurationAfterChangePreservesExistingKeys() {
-        dslContext.update(CHARGE_BOX)
-            .set(CHARGE_BOX.OCPP_CONFIGURATION, JSON.json("{\"CpoName\":\"old\",\"vendor.foo\":\"bar\"}"))
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .execute();
-
-        assertNoDatabaseException(() ->
-            repository.updateOcppConfigurationAfterChange(KNOWN_CHARGE_BOX_ID, "CpoName", "new")
-        );
-
-        var config = dslContext.select(CHARGE_BOX.OCPP_CONFIGURATION)
-            .from(CHARGE_BOX)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .fetchOne(CHARGE_BOX.OCPP_CONFIGURATION);
-        var node = JsonObjectMapper.INSTANCE.getMapper().readTree(config.data());
-
-        Assertions.assertEquals("new", node.get("CpoName").asString());
-        Assertions.assertEquals("bar", node.get("vendor.foo").asString());
     }
 
     @Test

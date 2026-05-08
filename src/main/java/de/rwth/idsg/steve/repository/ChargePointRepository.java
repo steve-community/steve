@@ -27,7 +27,6 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -43,7 +42,6 @@ public interface ChargePointRepository {
     void updateBasicAuthPassword(String chargeBoxId, String encodedPwd);
     void updateSecurityProfile(String chargeBoxId, OcppSecurityProfile ocppSecurityProfile);
     void updateOcppConfiguration(String chargeBoxId, String jsonNode);
-    void updateOcppConfigurationAfterChange(String chargeBoxId, @NotNull String key, String value);
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 

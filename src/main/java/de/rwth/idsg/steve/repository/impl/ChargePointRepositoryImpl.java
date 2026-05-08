@@ -38,7 +38,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -132,28 +131,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             .set(CHARGE_BOX.OCPP_CONFIGURATION, JSON.json(jsonNode))
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
             .execute();
-    }
-
-    @Override
-    public void updateOcppConfigurationAfterChange(String chargeBoxId, @NotNull String key, String value) {
-        ctx.transaction(conf -> {
-            DSLContext tx = DSL.using(conf);
-
-            var storedConfig = tx.select(CHARGE_BOX.OCPP_CONFIGURATION)
-                .from(CHARGE_BOX)
-                .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-                .forUpdate()
-                .fetchOne(CHARGE_BOX.OCPP_CONFIGURATION);
-
-            var mapper = JsonObjectMapper.INSTANCE.getMapper();
-            var node = toObjectNode(storedConfig);
-            node.set(key, value == null ? mapper.nullNode() : mapper.stringNode(value));
-
-            tx.update(CHARGE_BOX)
-                .set(CHARGE_BOX.OCPP_CONFIGURATION, JSON.json(mapper.writeValueAsString(node)))
-                .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-                .execute();
-        });
     }
 
     @Override

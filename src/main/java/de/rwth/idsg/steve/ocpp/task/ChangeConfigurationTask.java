@@ -123,12 +123,9 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     private void updateDatabaseAfterAccepted(String chargeBoxId) {
         if (AuthorizationKey.name().equals(params.getKey())) {
             chargePointService.updateBasicAuthPassword(chargeBoxId, params.getValue());
-        }
 
-        if (SecurityProfile.name().equals(params.getKey())) {
+        } else if (SecurityProfile.name().equals(params.getKey())) {
             chargePointService.updateSecurityProfile(chargeBoxId, params.getValue());
         }
-
-        chargePointService.updateOcppConfigurationAfterChange(chargeBoxId, params.getKey(), params.getValue());
     }
 }

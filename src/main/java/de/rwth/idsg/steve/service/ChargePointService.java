@@ -67,8 +67,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.10.2025
@@ -125,18 +123,6 @@ public class ChargePointService {
             chargePointRepository.updateOcppConfiguration(chargeBoxId, jsonNode);
         } catch (Exception e) {
             log.error("Failed during updateOcppConfiguration, because: {}", e.getMessage(), e);
-        }
-    }
-
-    public void updateOcppConfigurationAfterChange(String chargeBoxId, String key, String value) {
-        if (StringUtils.isEmpty(key) || AuthorizationKey.name().equals(key)) {
-            return;  // AuthorizationKey is write-only, we should not store it like that
-        }
-
-        try {
-            chargePointRepository.updateOcppConfigurationAfterChange(chargeBoxId, key, value);
-        } catch (Exception e) {
-            log.error("Failed during updateOcppConfigurationAfterChange, because: {}", e.getMessage(), e);
         }
     }
 

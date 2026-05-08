@@ -21,14 +21,15 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.RequestResult;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.service.ChargePointService;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.List;
@@ -82,6 +83,8 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
+                updateCache(chargeBoxId, keyValues);
+
                 success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
@@ -95,24 +98,42 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
             try {
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
 
-                for (var conf : response.getConfigurationKey()) {
-                    if (ConfigurationKeyEnum.CpoName.name().equals(conf.getKey())) {
-                        log.info("Updating CpoName={} for chargeBoxId={}", conf.getValue(), chargeBoxId);
-                        chargePointService.updateCpoName(chargeBoxId, conf.getValue());
-                        break;
-                    }
-                }
-
                 List<KeyValue> keyValues = response.getConfigurationKey()
                                                    .stream()
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
+
+                updateCache(chargeBoxId, keyValues);
 
                 success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
+    }
+
+    /**
+     * Whenever we ask for all config keys (i.e. when no config key was selected), use the opportunity to update
+     * the database.
+     */
+    private void updateCache(String chargeBoxId, List<KeyValue> keyValues) {
+        boolean askedForAllConfigs = CollectionUtils.isEmpty(params.getAllKeys());
+        if (!askedForAllConfigs) {
+            return;
+        }
+
+        try {
+            var mapper = JsonObjectMapper.INSTANCE.getMapper();
+
+            var node = mapper.createObjectNode();
+            for (var entry : keyValues) {
+                node.set(entry.getKey(), mapper.stringNode(entry.getValue()));
+            }
+
+            chargePointService.updateOcppConfiguration(chargeBoxId, mapper.writeValueAsString(node));
+        } catch (Exception e) {
+            log.error("Failed during updateOcppConfiguration", e);
+        }
     }
 
     @RequiredArgsConstructor

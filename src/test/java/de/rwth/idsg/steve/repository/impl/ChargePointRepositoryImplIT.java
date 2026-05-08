@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
@@ -54,17 +56,47 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
     public void getRegistration() {
         var registration = assertNoDatabaseException(() -> repository.getRegistration(KNOWN_CHARGE_BOX_ID));
         Assertions.assertTrue(registration.isPresent());
+        Assertions.assertNotNull(registration.get().ocppConfiguration());
+        Assertions.assertTrue(registration.get().ocppConfiguration().isObject());
+        Assertions.assertNull(registration.get().cpoName());
     }
 
     @Test
-    public void updateCpoName() {
-        assertNoDatabaseException(() -> repository.updateCpoName(KNOWN_CHARGE_BOX_ID, "cpo"));
+    public void updateBasicAuthPassword() {
+        assertNoDatabaseException(() -> repository.updateBasicAuthPassword(KNOWN_CHARGE_BOX_ID, "encoded-password"));
 
-        String cpoName = dslContext.select(CHARGE_BOX.CPO_NAME)
+        String storedPassword = dslContext.select(CHARGE_BOX.AUTH_PASSWORD)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .fetchOne(CHARGE_BOX.CPO_NAME);
-        Assertions.assertEquals("cpo", cpoName);
+            .fetchOne(CHARGE_BOX.AUTH_PASSWORD);
+        Assertions.assertEquals("encoded-password", storedPassword);
+    }
+
+    @Test
+    public void updateSecurityProfile() {
+        assertNoDatabaseException(() -> repository.updateSecurityProfile(KNOWN_CHARGE_BOX_ID, OcppSecurityProfile.Profile_2));
+
+        Integer securityProfile = dslContext.select(CHARGE_BOX.SECURITY_PROFILE)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.SECURITY_PROFILE);
+        Assertions.assertEquals(OcppSecurityProfile.Profile_2.getValue(), securityProfile);
+    }
+
+    @Test
+    public void updateOcppConfiguration() {
+        assertNoDatabaseException(() ->
+            repository.updateOcppConfiguration(KNOWN_CHARGE_BOX_ID, "{\"CpoName\":\"cpo\",\"A\":\"B\"}")
+        );
+
+        var config = dslContext.select(CHARGE_BOX.OCPP_CONFIGURATION)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.OCPP_CONFIGURATION);
+        var node = JsonObjectMapper.INSTANCE.getMapper().readTree(config.data());
+
+        Assertions.assertEquals("cpo", node.get("CpoName").asString());
+        Assertions.assertEquals("B", node.get("A").asString());
     }
 
     @Test

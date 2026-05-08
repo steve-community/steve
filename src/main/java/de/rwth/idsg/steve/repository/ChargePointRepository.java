@@ -39,9 +39,9 @@ import java.util.Optional;
  */
 public interface ChargePointRepository {
     Optional<ChargePointRegistration> getRegistration(String chargeBoxId);
-    void updateCpoName(String chargeBoxId, String cpoName);
     void updateBasicAuthPassword(String chargeBoxId, String encodedPwd);
     void updateSecurityProfile(String chargeBoxId, OcppSecurityProfile ocppSecurityProfile);
+    void updateOcppConfiguration(String chargeBoxId, String jsonNode);
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 

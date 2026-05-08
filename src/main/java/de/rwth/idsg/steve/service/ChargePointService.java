@@ -105,14 +105,6 @@ public class ChargePointService {
         return chargePointRepository.getNonZeroConnectorIds(chargeBoxId);
     }
 
-    public void updateCpoName(String chargeBoxId, String cpoName) {
-        try {
-            chargePointRepository.updateCpoName(chargeBoxId, cpoName);
-        } catch (Exception e) {
-            log.error("Failed during updateCpoName, because: {}", e.getMessage(), e);
-        }
-    }
-
     public void updateBasicAuthPassword(String chargeBoxId, String authPassword) {
         String encodedPwd = StringUtils.isEmpty(authPassword)
             ? null
@@ -124,6 +116,14 @@ public class ChargePointService {
     public void updateSecurityProfile(String chargeBoxId, String securityProfile) {
         var ocppSecurityProfile = OcppSecurityProfile.fromValueNoException(securityProfile);
         chargePointRepository.updateSecurityProfile(chargeBoxId, ocppSecurityProfile);
+    }
+
+    public void updateOcppConfiguration(String chargeBoxId, String jsonNode) {
+        try {
+            chargePointRepository.updateOcppConfiguration(chargeBoxId, jsonNode);
+        } catch (Exception e) {
+            log.error("Failed during updateOcppConfiguration, because: {}", e.getMessage(), e);
+        }
     }
 
     public void addChargePointList(List<String> chargeBoxIdList) {

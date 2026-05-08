@@ -19,6 +19,9 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import org.jetbrains.annotations.NotNull;
+import tools.jackson.databind.node.ObjectNode;
 
 public record ChargePointRegistration(
     int chargeBoxPk,
@@ -26,7 +29,12 @@ public record ChargePointRegistration(
     String registrationStatus,
     OcppSecurityProfile securityProfile,
     String hashedAuthPassword,
-    String cpoName,
+    @NotNull ObjectNode ocppConfiguration,
     String serialNumber
 ) {
+
+    public String cpoName() {
+        var node = ocppConfiguration.get(ConfigurationKeyEnum.CpoName.name());
+        return node == null ? null : node.asString();
+    }
 }

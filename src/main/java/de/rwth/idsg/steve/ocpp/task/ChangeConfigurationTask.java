@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.CpoName;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfile;
 import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
 
@@ -122,10 +121,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     private void updateDatabaseAfterAccepted(String chargeBoxId) {
-        if (CpoName.name().equals(params.getKey())) {
-            chargePointService.updateCpoName(chargeBoxId, params.getValue());
-
-        } else if (AuthorizationKey.name().equals(params.getKey())) {
+        if (AuthorizationKey.name().equals(params.getKey())) {
             chargePointService.updateBasicAuthPassword(chargeBoxId, params.getValue());
 
         } else if (SecurityProfile.name().equals(params.getKey())) {

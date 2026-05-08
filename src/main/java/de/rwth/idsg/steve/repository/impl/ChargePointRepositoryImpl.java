@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
@@ -41,6 +42,7 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.JSON;
 import org.jooq.Record1;
 import org.jooq.Record5;
 import org.jooq.Result;
@@ -51,6 +53,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 import java.util.Map;
@@ -83,7 +86,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             CHARGE_BOX.REGISTRATION_STATUS,
                             CHARGE_BOX.SECURITY_PROFILE,
                             CHARGE_BOX.AUTH_PASSWORD,
-                            CHARGE_BOX.CPO_NAME,
+                            CHARGE_BOX.OCPP_CONFIGURATION,
                             CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER)
                         .from(CHARGE_BOX)
                         .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
@@ -94,24 +97,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             rec.value3(),
                             OcppSecurityProfile.fromValue(rec.value4()),
                             rec.value5(),
-                            rec.value6(),
+                            toObjectNode(rec.value6()),
                             rec.value7()
                         ));
 
         return status.isEmpty()
             ? Optional.empty()
             : Optional.ofNullable(status.getFirst());
-    }
-
-    @Override
-    public void updateCpoName(String chargeBoxId, String cpoName) {
-        if (StringUtils.isEmpty(cpoName)) {
-            return;
-        }
-        ctx.update(CHARGE_BOX)
-            .set(CHARGE_BOX.CPO_NAME, cpoName)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-            .execute();
     }
 
     @Override
@@ -129,6 +121,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
         ctx.update(CHARGE_BOX)
             .set(CHARGE_BOX.SECURITY_PROFILE, ocppSecurityProfile.getValue())
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+            .execute();
+    }
+
+    @Override
+    public void updateOcppConfiguration(String chargeBoxId, String jsonNode) {
+        ctx.update(CHARGE_BOX)
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, JSON.json(jsonNode))
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
             .execute();
     }
@@ -436,5 +436,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         ctx.delete(CHARGE_BOX)
            .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
            .execute();
+    }
+
+    private static ObjectNode toObjectNode(JSON value) {
+        var mapper = JsonObjectMapper.INSTANCE.getMapper();
+
+        if (value == null) {
+            return mapper.createObjectNode();
+        }
+
+        var node = mapper.readTree(value.data());
+        if (!node.isObject()) {
+            throw new SteveException("Existing OCPP configuration is not a JSON object"); // should not happen
+        }
+        return (ObjectNode) node;
     }
 }

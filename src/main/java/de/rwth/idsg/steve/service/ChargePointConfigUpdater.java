@@ -19,8 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.notification.OcppStationSecurityBasicAuthChanged;
@@ -28,7 +27,6 @@ import de.rwth.idsg.steve.service.notification.OcppStationSecurityProfileChanged
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,29 +57,18 @@ public class ChargePointConfigUpdater {
     private final ChargePointServiceClient chargePointServiceClient;
 
     @EventListener
-    public void getAndUpdateCpoName(OcppStationWebSocketConnected notification) {
+    public void getAllOcppConfigs(OcppStationWebSocketConnected notification) {
         try {
-            var ocppVersion = notification.getOcppVersion();
-            if (ocppVersion == OcppVersion.V_12 || ocppVersion == OcppVersion.V_15) {
+            // GetConfiguration was not there in Ocpp 1.2
+            if (notification.getOcppVersion() == OcppVersion.V_12) {
                 return;
             }
 
             var chargeBoxId = notification.getChargeBoxId();
-            var registration = chargePointService.getRegistrationDirect(chargeBoxId);
-            if (registration.isEmpty()) {
-                return;
-            }
+            var protocol = notification.getOcppVersion().toProtocol(OcppTransport.JSON);
 
-            // CpoName came with ocpp 1.6 security extension, which also introduced the security profiles. profile 0
-            // represents the old world before the security extension. since it is not relevant, skip this task.
-            if (registration.get().securityProfile() == OcppSecurityProfile.Profile_0) {
-                return;
-            }
-
-            // Send request to get CpoName. Default impl of GetConfigurationTask takes care of updating the database.
             var params = new GetConfigurationParams();
-            params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, chargeBoxId)));
-            params.setConfKeyList(List.of(ConfigurationKeyEnum.CpoName.name()));
+            params.setChargePointSelectList(List.of(new ChargePointSelect(protocol, chargeBoxId)));
             chargePointServiceClient.getConfiguration(params);
         } catch (Exception e) {
             log.error("Failed", e);

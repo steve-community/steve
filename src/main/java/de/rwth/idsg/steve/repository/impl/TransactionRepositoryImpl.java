@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.TransactionRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.CustomDSL.getTimeCondition;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
@@ -70,8 +71,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         return ctx.select(
                 TRANSACTION.TRANSACTION_PK,
-                CONNECTOR.CHARGE_BOX_ID,
-                CONNECTOR.CONNECTOR_ID,
+                EVSE.CHARGE_BOX_ID,
+                EVSE.EVSE_ID,
                 TRANSACTION.ID_TAG,
                 TRANSACTION.START_TIMESTAMP,
                 TRANSACTION.START_VALUE,
@@ -83,8 +84,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_EVENT_ACTOR,
                 USER_OCPP_TAG.USER_PK)
             .from(TRANSACTION)
-            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
-            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+            .join(EVSE).on(TRANSACTION.EVSE_PK.eq(EVSE.EVSE_PK))
+            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
             .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG))
             .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
             .where(conditions)
@@ -116,8 +117,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         ctx.select(
                 TRANSACTION.TRANSACTION_PK,
-                CONNECTOR.CHARGE_BOX_ID,
-                CONNECTOR.CONNECTOR_ID,
+                EVSE.CHARGE_BOX_ID,
+                EVSE.EVSE_ID,
                 TRANSACTION.ID_TAG,
                 USER_OCPP_TAG.USER_PK,
                 TRANSACTION.START_TIMESTAMP,
@@ -125,8 +126,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_TIMESTAMP,
                 TRANSACTION.STOP_VALUE)
             .from(TRANSACTION)
-            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
-            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+            .join(EVSE).on(TRANSACTION.EVSE_PK.eq(EVSE.EVSE_PK))
+            .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
             .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(TRANSACTION.ID_TAG))
             .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
             .where(conditions)
@@ -139,9 +140,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return ctx.select(TRANSACTION.TRANSACTION_PK)
                   .from(TRANSACTION)
-                  .join(CONNECTOR)
-                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .join(EVSE)
+                    .on(TRANSACTION.EVSE_PK.equal(EVSE.EVSE_PK))
+                    .and(EVSE.CHARGE_BOX_ID.equal(chargeBoxId))
+                    .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                   .fetch(TRANSACTION.TRANSACTION_PK);
     }
@@ -187,10 +189,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             //
             // "what is the subsequent transaction at the same chargebox and connector?"
             nextTx = ctx.selectFrom(TRANSACTION_START)
-                        .where(TRANSACTION_START.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                    .from(CONNECTOR)
-                                                                    .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                                                                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
+                        .where(TRANSACTION_START.EVSE_PK.eq(ctx.select(EVSE.EVSE_PK)
+                                                                    .from(EVSE)
+                                                                    .where(EVSE.CHARGE_BOX_ID.equal(chargeBoxId))
+                                                                    .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                                                                    .and(EVSE.EVSE_ID.equal(connectorId))))
                         .and(TRANSACTION_START.START_TIMESTAMP.greaterThan(startTimestamp))
                         .orderBy(TRANSACTION_START.START_TIMESTAMP)
                         .limit(1)
@@ -213,10 +216,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
             .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
 
-        var connectorPkQuery = ctx.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-            .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+        var connectorPkQuery = ctx.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(connectorId));
 
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
@@ -227,7 +231,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         var selectionCriteria = CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk)
             .or(timestampCondition
                 .and(CONNECTOR_METER_VALUE.TRANSACTION_PK.isNull()
-                .and(CONNECTOR_METER_VALUE.CONNECTOR_PK.eq(connectorPkQuery))
+                .and(CONNECTOR_METER_VALUE.EVSE_PK.eq(connectorPkQuery))
                 )
             );
 
@@ -274,16 +278,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private List<Condition> getConditions(TransactionQueryForm form) {
         List<Condition> conditions = new ArrayList<>();
 
+        conditions.add(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1));
+
         if (form.isTransactionPkSet()) {
             conditions.add(TRANSACTION.TRANSACTION_PK.in(form.getTransactionPk()));
         }
 
         if (form.isChargeBoxIdSet()) {
-            conditions.add(CONNECTOR.CHARGE_BOX_ID.in(form.getChargeBoxId()));
+            conditions.add(EVSE.CHARGE_BOX_ID.in(form.getChargeBoxId()));
         }
 
         if (form.isConnectorIdSet()) {
-            conditions.add(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
+            conditions.add(EVSE.EVSE_ID.eq(form.getConnectorId()));
         }
 
         if (form.isOcppIdTagSet()) {

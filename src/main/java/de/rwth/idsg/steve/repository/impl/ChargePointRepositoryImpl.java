@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +64,7 @@ import java.util.stream.Collectors;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 
 /**
@@ -257,53 +259,53 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
         // find out the latest timestamp for each connector
-        Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
+        Field<Integer> t1Pk = CONNECTOR_STATUS.EVSE_PK.as("t1_pk");
         Field<DateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
         Table<?> t1 = ctx.select(t1Pk, t1TsMax)
                          .from(CONNECTOR_STATUS)
-                         .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
+                         .groupBy(CONNECTOR_STATUS.EVSE_PK)
                          .asTable("t1");
 
         // get the status table with latest timestamps only
-        Field<Integer> t2Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t2_pk");
+        Field<Integer> t2Pk = CONNECTOR_STATUS.EVSE_PK.as("t2_pk");
         Field<DateTime> t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
         Field<String> t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
         Field<String> t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
         Table<?> t2 = ctx.selectDistinct(t2Pk, t2Ts, t2Status, t2Error)
                          .from(CONNECTOR_STATUS)
                          .join(t1)
-                            .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
+                            .on(CONNECTOR_STATUS.EVSE_PK.equal(t1.field(t1Pk)))
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1));
+
         // https://github.com/steve-community/steve/issues/691
-        Condition chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
+        conditions.add(CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value()));
 
         if (form != null && form.getChargeBoxId() != null) {
-            chargeBoxCondition = chargeBoxCondition.and(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        final Condition statusCondition;
-        if (form == null || form.getStatus() == null) {
-            statusCondition = DSL.noCondition();
-        } else {
-            statusCondition = t2.field(t2Status).eq(form.getStatus());
+        if (form != null && form.getStatus() != null) {
+            conditions.add(t2.field(t2Status).eq(form.getStatus()));
         }
 
         return ctx.select(
                         CHARGE_BOX.CHARGE_BOX_PK,
-                        CONNECTOR.CHARGE_BOX_ID,
-                        CONNECTOR.CONNECTOR_ID,
+                        EVSE.CHARGE_BOX_ID,
+                        EVSE.EVSE_ID,
                         t2.field(t2Ts),
                         t2.field(t2Status),
                         t2.field(t2Error),
                         CHARGE_BOX.OCPP_PROTOCOL)
                   .from(t2)
-                  .join(CONNECTOR)
-                        .on(CONNECTOR.CONNECTOR_PK.eq(t2.field(t2Pk)))
+                  .join(EVSE)
+                        .on(EVSE.EVSE_PK.eq(t2.field(t2Pk)))
                   .join(CHARGE_BOX)
-                        .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
-                  .where(chargeBoxCondition, statusCondition)
+                        .on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
+                  .where(conditions)
                   .orderBy(t2.field(t2Ts).desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()
@@ -321,11 +323,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public List<Integer> getNonZeroConnectorIds(String chargeBoxId) {
-        return ctx.select(CONNECTOR.CONNECTOR_ID)
-                  .from(CONNECTOR)
-                  .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                  .and(CONNECTOR.CONNECTOR_ID.notEqual(0))
-                  .fetch(CONNECTOR.CONNECTOR_ID);
+        return ctx.select(EVSE.EVSE_ID)
+                  .from(EVSE)
+                  .where(EVSE.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                  .and(EVSE.EVSE_ID.notEqual(0))
+                  .fetch(EVSE.EVSE_ID);
     }
 
     @Override

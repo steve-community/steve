@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
@@ -115,9 +116,10 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void used_chargePointWideReservationOnConnectorZero() {
-        dslContext.insertInto(CONNECTOR)
-            .set(CONNECTOR.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
-            .set(CONNECTOR.CONNECTOR_ID, 0)
+        dslContext.insertInto(EVSE)
+            .set(EVSE.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
+            .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
+            .set(EVSE.EVSE_ID, 0)
             .onDuplicateKeyIgnore()
             .execute();
 
@@ -157,14 +159,15 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void auditTimestamps() {
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
 
         Integer id = dslContext.insertInto(RESERVATION)
-            .set(RESERVATION.CONNECTOR_PK, connectorPk)
+            .set(RESERVATION.EVSE_PK, connectorPk)
             .set(RESERVATION.ID_TAG, KNOWN_OCPP_TAG)
             .set(RESERVATION.STATUS, "WAITING")
             .returning(RESERVATION.RESERVATION_PK)
@@ -195,15 +198,16 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
         Integer id = repository.insert(insertReservationParams(reservationConnectorId));
         repository.accepted(id);
 
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
         Assertions.assertNotNull(connectorPk);
 
         Integer transactionPk = dslContext.insertInto(TRANSACTION_START)
-            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.EVSE_PK, connectorPk)
             .set(TRANSACTION_START.ID_TAG, idTagFromTransaction)
             .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
             .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(1))

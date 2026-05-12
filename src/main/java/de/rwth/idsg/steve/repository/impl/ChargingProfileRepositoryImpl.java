@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
 import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +49,8 @@ import java.util.stream.Collectors;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
-import static jooq.steve.db.Tables.CONNECTOR;
 import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
+import static jooq.steve.db.Tables.EVSE;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
 /**
@@ -71,13 +72,14 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
         OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                     .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(EVSE.EVSE_PK)
+                                                                     .from(EVSE)
+                                                                     .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
+                                                                     .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                                                                     .and(EVSE.EVSE_ID.eq(connectorId));
 
         int count = ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
-                       .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
+                       .set(CONNECTOR_CHARGING_PROFILE.EVSE_PK, connectorPkSelect)
                        .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
                        .onDuplicateKeyIgnore()
                        .execute();
@@ -89,12 +91,13 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void clearProfile(int chargingProfilePk, String chargeBoxId) {
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId));
+        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(EVSE.EVSE_PK)
+                                                                     .from(EVSE)
+                                                                     .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
+                                                                     .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1));
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+           .where(CONNECTOR_CHARGING_PROFILE.EVSE_PK.in(connectorPkSelect))
            .and(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
            .execute();
     }
@@ -109,11 +112,12 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // Connector select
         // -------------------------------------------------------------------------
 
-        Condition connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
+        Condition connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : EVSE.EVSE_ID.eq(connectorId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(EVSE.EVSE_PK)
+                                                                     .from(EVSE)
+                                                                     .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
+                                                                     .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
                                                                      .and(connectorIdCondition);
 
         // -------------------------------------------------------------------------
@@ -142,7 +146,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // -------------------------------------------------------------------------
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+           .where(CONNECTOR_CHARGING_PROFILE.EVSE_PK.in(connectorPkSelect))
            .and(profilePkCondition)
            .execute();
     }
@@ -153,7 +157,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public List<ChargingProfileAssignment> getAssignments(ChargingProfileAssignmentQueryForm query) {
-        Condition conditions = DSL.trueCondition();
+        Condition conditions = EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1);
 
         if (query.getChargeBoxId() != null) {
             conditions = conditions.and(CHARGE_BOX.CHARGE_BOX_ID.eq(query.getChargeBoxId()));
@@ -170,20 +174,20 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         return ctx.select(
                         CHARGE_BOX.CHARGE_BOX_PK,
                         CHARGE_BOX.CHARGE_BOX_ID,
-                        CONNECTOR.CONNECTOR_ID,
+                        EVSE.EVSE_ID,
                         CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK,
                         CHARGING_PROFILE.DESCRIPTION)
                   .from(CONNECTOR_CHARGING_PROFILE)
-                  .join(CONNECTOR)
-                    .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                  .join(EVSE)
+                    .on(EVSE.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
                   .join(CHARGING_PROFILE)
                     .on(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK))
                   .join(CHARGE_BOX)
-                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
                   .where(conditions)
                   .orderBy(
                           CHARGE_BOX.CHARGE_BOX_ID,
-                          CONNECTOR.CONNECTOR_ID,
+                          EVSE.EVSE_ID,
                           CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK)
                   .fetch()
                   .map(k -> ChargingProfileAssignment.builder()
@@ -374,12 +378,12 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private void checkProfileUsage(int chargingProfilePk) {
-        List<String> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
+        List<String> r = ctx.select(EVSE.CHARGE_BOX_ID)
                             .from(CONNECTOR_CHARGING_PROFILE)
-                            .join(CONNECTOR)
-                            .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                            .join(EVSE)
+                            .on(EVSE.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
                             .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                            .fetch(CONNECTOR.CHARGE_BOX_ID);
+                            .fetch(EVSE.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
             throw new SteveException("Cannot modify this charging profile, since the following stations are still using it: %s", r);
         }

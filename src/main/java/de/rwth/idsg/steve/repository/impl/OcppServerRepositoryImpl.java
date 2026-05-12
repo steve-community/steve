@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.enums.TransactionStopFailedEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
@@ -53,9 +54,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
@@ -153,10 +154,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             // -------------------------------------------------------------------------
 
             ctx.insertInto(CONNECTOR_STATUS)
-               .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                      .from(CONNECTOR)
-                                                      .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                                                      .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()))
+               .set(CONNECTOR_STATUS.EVSE_PK, DSL.select(EVSE.EVSE_PK)
+                                                      .from(EVSE)
+                                                      .where(EVSE.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
+                                                      .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                                                      .and(EVSE.EVSE_ID.equal(p.getConnectorId()))
                )
                .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, p.getTimestamp())
                .set(CONNECTOR_STATUS.STATUS, p.getStatus())
@@ -201,7 +203,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         try {
-            batchInsertMeterValues(ctx, list, transaction.getConnectorPk(), transaction.getTransactionPk());
+            batchInsertMeterValues(ctx, list, transaction.getEvsePk(), transaction.getTransactionPk());
         } catch (Exception e) {
             log.error("Exception occurred", e);
         }
@@ -212,13 +214,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public TransactionRecord getTransaction(@NotNull String chargeBoxId, @Nullable Integer connectorId, int transactionId) {
         Condition connectorIdCondition = (connectorId == null)
             ? DSL.noCondition()
-            : DSL.condition(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+            : DSL.condition(EVSE.EVSE_ID.eq(connectorId));
 
         var records = ctx.select(TRANSACTION.fields())
             .from(TRANSACTION)
-            .join(CONNECTOR).on(TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK))
+            .join(EVSE).on(TRANSACTION.EVSE_PK.eq(EVSE.EVSE_PK))
             .where(TRANSACTION.TRANSACTION_PK.eq(transactionId))
-            .and(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
             .and(connectorIdCondition)
             .orderBy(TRANSACTION.START_TIMESTAMP.desc())
             .fetchInto(TRANSACTION);
@@ -239,10 +242,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public int insertTransaction(InsertTransactionParams p) {
 
         SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                DSL.select(CONNECTOR.CONNECTOR_PK)
-                   .from(CONNECTOR)
-                   .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                   .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
+                DSL.select(EVSE.EVSE_PK)
+                   .from(EVSE)
+                   .where(EVSE.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
+                   .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                   .and(EVSE.EVSE_ID.equal(p.getConnectorId()));
 
         // -------------------------------------------------------------------------
         // Step 1: Insert connector and idTag, if they are new to us
@@ -317,7 +321,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
             SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                    DSL.select(TRANSACTION_START.CONNECTOR_PK)
+                    DSL.select(TRANSACTION_START.EVSE_PK)
                        .from(TRANSACTION_START)
                        .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
@@ -367,7 +371,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         try {
             Record1<Integer> r = ctx.select(TRANSACTION_START.TRANSACTION_PK)
                                     .from(TRANSACTION_START)
-                                    .where(TRANSACTION_START.CONNECTOR_PK.eq(connectorPkQuery))
+                                    .where(TRANSACTION_START.EVSE_PK.eq(connectorPkQuery))
                                     .and(TRANSACTION_START.ID_TAG.eq(p.getIdTag()))
                                     .and(TRANSACTION_START.START_TIMESTAMP.eq(p.getStartTimestamp()))
                                     .and(TRANSACTION_START.START_VALUE.eq(p.getStartMeterValue()))
@@ -379,7 +383,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             Integer transactionId = ctx.insertInto(TRANSACTION_START)
                                        .set(TRANSACTION_START.EVENT_TIMESTAMP, p.getEventTimestamp())
-                                       .set(TRANSACTION_START.CONNECTOR_PK, connectorPkQuery)
+                                       .set(TRANSACTION_START.EVSE_PK, connectorPkQuery)
                                        .set(TRANSACTION_START.ID_TAG, p.getIdTag())
                                        .set(TRANSACTION_START.START_TIMESTAMP, p.getStartTimestamp())
                                        .set(TRANSACTION_START.START_VALUE, p.getStartMeterValue())
@@ -413,7 +417,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                        TransactionStatusUpdate statusUpdate) {
         try {
             ctx.insertInto(CONNECTOR_STATUS)
-               .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+               .set(CONNECTOR_STATUS.EVSE_PK, connectorPkQuery)
                .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
                .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
                .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
@@ -427,9 +431,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
     public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        int count = ctx.insertInto(CONNECTOR,
-                            CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
-                       .values(chargeBoxIdentity, connectorId)
+        int count = ctx.insertInto(EVSE,
+                            EVSE.CHARGE_BOX_ID, EVSE.EVSE_ID, EVSE.TOPOLOGY_SOURCE)
+                       .values(chargeBoxIdentity, connectorId, EvseTopologySource.ocpp1)
                        .onDuplicateKeyIgnore() // Important detail
                        .execute();
 
@@ -468,10 +472,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     private int getConnectorPkFromConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        return ctx.select(CONNECTOR.CONNECTOR_PK)
-                  .from(CONNECTOR)
-                  .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxIdentity))
-                  .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+        return ctx.select(EVSE.EVSE_PK)
+                  .from(EVSE)
+                  .where(EVSE.CHARGE_BOX_ID.equal(chargeBoxIdentity))
+                  .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                  .and(EVSE.EVSE_ID.equal(connectorId))
                   .fetchOne()
                   .value1();
     }
@@ -482,7 +487,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .flatMap(t -> t.getSampledValue()
                                    .stream()
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
-                                                .setConnectorPk(connectorPk)
+                                                .setEvsePk(connectorPk)
                                                 .setTransactionPk(transactionId)
                                                 .setValueTimestamp(t.getTimestamp())
                                                 .setValue(k.getValue())

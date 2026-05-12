@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
@@ -29,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.StringWriter;
 
-import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 
 /**
@@ -69,15 +70,16 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getDetails() {
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
 
         Integer txId = dslContext.insertInto(TRANSACTION_START)
             .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
-            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.EVSE_PK, connectorPk)
             .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
             .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(5))
             .set(TRANSACTION_START.START_VALUE, "100")
@@ -92,11 +94,12 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getDetailsForZombieTransactionDoesNotIncludeNextTransactionStartValue() {
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
 
         DateTime firstStart = DateTime.now().minusMinutes(20);
         DateTime nextStart = firstStart.plusMinutes(10);
@@ -105,14 +108,14 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
         insertTransactionStart(connectorPk, nextStart, "200");
 
         dslContext.insertInto(CONNECTOR_METER_VALUE)
-            .set(CONNECTOR_METER_VALUE.CONNECTOR_PK, connectorPk)
+            .set(CONNECTOR_METER_VALUE.EVSE_PK, connectorPk)
             .set(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP, firstStart.plusMinutes(5))
             .set(CONNECTOR_METER_VALUE.VALUE, "150")
             .set(CONNECTOR_METER_VALUE.UNIT, "Wh")
             .execute();
 
         dslContext.insertInto(CONNECTOR_METER_VALUE)
-            .set(CONNECTOR_METER_VALUE.CONNECTOR_PK, connectorPk)
+            .set(CONNECTOR_METER_VALUE.EVSE_PK, connectorPk)
             .set(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP, nextStart)
             .set(CONNECTOR_METER_VALUE.VALUE, "200")
             .set(CONNECTOR_METER_VALUE.UNIT, "Wh")
@@ -134,7 +137,7 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
     private Integer insertTransactionStart(Integer connectorPk, DateTime startTimestamp, String startValue) {
         return dslContext.insertInto(TRANSACTION_START)
             .set(TRANSACTION_START.EVENT_TIMESTAMP, startTimestamp)
-            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.EVSE_PK, connectorPk)
             .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
             .set(TRANSACTION_START.START_TIMESTAMP, startTimestamp)
             .set(TRANSACTION_START.START_VALUE, startValue)

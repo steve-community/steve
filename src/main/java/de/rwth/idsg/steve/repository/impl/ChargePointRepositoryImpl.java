@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
@@ -29,6 +28,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -53,7 +53,6 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             rec.value3(),
                             OcppSecurityProfile.fromValue(rec.value4()),
                             rec.value5(),
-                            toObjectNode(rec.value6()),
+                            JsonUtils.toObjectNode(rec.value6()),
                             rec.value7()
                         ));
 
@@ -438,17 +437,4 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
            .execute();
     }
 
-    private static ObjectNode toObjectNode(JSON value) {
-        var mapper = JsonObjectMapper.INSTANCE.getMapper();
-
-        if (value == null) {
-            return mapper.createObjectNode();
-        }
-
-        var node = mapper.readTree(value.data());
-        if (!node.isObject()) {
-            throw new SteveException("Existing OCPP configuration is not a JSON object"); // should not happen
-        }
-        return (ObjectNode) node;
-    }
 }

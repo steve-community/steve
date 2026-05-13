@@ -4,7 +4,6 @@ START TRANSACTION;
 -- Step 1: Refactor existing connector
 -- * CONNECTOR table to EVSE
 -- * CONNECTOR_PK/CONNECTOR_ID columns to EVSE_PK/EVSE_ID columns in EVSE table
--- * CONNECTOR_PK references to EVSE_PK in other tables
 --
 
 DROP VIEW IF EXISTS `transaction`;
@@ -45,6 +44,38 @@ ALTER TABLE evse
 
 ALTER TABLE evse
     ALTER COLUMN topology_source DROP DEFAULT;
+
+--
+-- Step 2: Add physical connector model under EVSE
+--
+
+CREATE TABLE evse_connector (
+    evse_connector_pk int(11) unsigned NOT NULL AUTO_INCREMENT,
+    evse_pk int(11) unsigned NOT NULL,
+    connector_id int(11) NOT NULL,
+    connector_type varchar(255) DEFAULT NULL,
+    connector_format varchar(255) DEFAULT NULL,
+    power_type varchar(255) DEFAULT NULL,
+    max_voltage int(11) DEFAULT NULL,
+    max_amperage int(11) DEFAULT NULL,
+    max_electric_power int(11) DEFAULT NULL,
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (evse_connector_pk),
+    UNIQUE KEY evse_connector_pk_UNIQUE (evse_connector_pk),
+    UNIQUE KEY evse_connector_epk_cid_UNIQUE (evse_pk, connector_id),
+    CONSTRAINT FK_evse_connector_evse_pk FOREIGN KEY (evse_pk)
+        REFERENCES evse (evse_pk) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+INSERT INTO evse_connector (evse_pk, connector_id)
+SELECT evse_pk, 1
+FROM evse
+WHERE evse_id <> 0;
+
+--
+-- Step 3: Refactor existing EVSE references
+--
 
 ALTER TABLE connector_charging_profile
     CHANGE COLUMN connector_pk evse_pk int(11) unsigned NOT NULL,

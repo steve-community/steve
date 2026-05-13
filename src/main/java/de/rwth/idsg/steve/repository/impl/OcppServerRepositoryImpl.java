@@ -57,6 +57,7 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.Evse.EVSE;
+import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
@@ -147,7 +148,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             DSLContext ctx = DSL.using(configuration);
 
             // Step 1
-            insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
+            insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), true);
 
             // -------------------------------------------------------------------------
             // Step 2: We store a log of connector statuses
@@ -182,7 +183,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             try {
                 DSLContext ctx = DSL.using(configuration);
 
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId, true);
                 int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
                 batchInsertMeterValues(ctx, list, connectorPk, transactionId);
             } catch (Exception e) {
@@ -252,7 +253,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 1: Insert connector and idTag, if they are new to us
         // -------------------------------------------------------------------------
 
-        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
+        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), false);
 
         // it is important to insert idTag before transaction, since the transaction table references it
         boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
@@ -430,15 +431,57 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
-    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        int count = ctx.insertInto(EVSE,
-                            EVSE.CHARGE_BOX_ID, EVSE.EVSE_ID, EVSE.TOPOLOGY_SOURCE)
-                       .values(chargeBoxIdentity, connectorId, EvseTopologySource.ocpp1)
-                       .onDuplicateKeyIgnore() // Important detail
-                       .execute();
+    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId, boolean inTransactionAlready) {
+        if (inTransactionAlready) {
+            insertIgnoreConnectorInternal(ctx, chargeBoxIdentity, connectorId);
+        } else {
+            ctx.transaction(configuration ->
+                insertIgnoreConnectorInternal(DSL.using(configuration), chargeBoxIdentity, connectorId)
+            );
+        }
+    }
 
-        if (count == 1) {
-            log.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
+    private static void insertIgnoreConnectorInternal(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+        var topology = ctx.select(EVSE.EVSE_PK, EVSE_CONNECTOR.EVSE_CONNECTOR_PK)
+            .from(CHARGE_BOX)
+            .leftJoin(EVSE)
+                .on(EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+                .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                .and(EVSE.EVSE_ID.eq(connectorId))
+            .leftJoin(EVSE_CONNECTOR)
+                .on(EVSE_CONNECTOR.EVSE_PK.eq(EVSE.EVSE_PK))
+                .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(1))
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxIdentity))
+            .forUpdate()
+            .fetchOne();
+
+        if (topology == null) {
+            throw new SteveException("Charge box with id '%s' not found", chargeBoxIdentity); // should not happen
+        }
+
+        Integer evsePk = topology.value1();
+        Integer evseConnectorPk = topology.value2();
+
+        if (evsePk == null) {
+            evsePk = ctx.insertInto(EVSE)
+                .set(EVSE.CHARGE_BOX_ID, chargeBoxIdentity)
+                .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
+                .set(EVSE.EVSE_ID, connectorId)
+                .returning(EVSE.EVSE_PK)
+                .fetchOne(EVSE.EVSE_PK);
+
+            log.debug("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
+        }
+
+        if (connectorId != 0 && evseConnectorPk == null) {
+            final int defaultEvseConnectorId = 1;
+
+            ctx.insertInto(EVSE_CONNECTOR)
+                .set(EVSE_CONNECTOR.EVSE_PK, evsePk)
+                .set(EVSE_CONNECTOR.CONNECTOR_ID, defaultEvseConnectorId)
+                .execute();
+
+            log.debug("The evse_connector {}/{}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId, defaultEvseConnectorId);
         }
     }
 

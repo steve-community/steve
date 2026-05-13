@@ -70,7 +70,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
-        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
+        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId, false);
 
         SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(EVSE.EVSE_PK)
                                                                      .from(EVSE)

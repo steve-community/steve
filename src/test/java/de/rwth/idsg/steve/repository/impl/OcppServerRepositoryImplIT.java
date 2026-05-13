@@ -41,6 +41,7 @@ import java.util.List;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.Evse.EVSE;
+import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
@@ -129,6 +130,24 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
             .from(CONNECTOR_STATUS)
             .fetchOne(0, int.class);
         Assertions.assertEquals(1, count);
+    }
+
+    @Test
+    public void insertConnectorStatusCreatesOcpp1PhysicalConnector() {
+        int ocpp1ConnectorId = 2;
+        assertNoDatabaseException(() -> repository.insertConnectorStatus(
+            connectorStatusParams(ocpp1ConnectorId)
+        ));
+
+        Integer physicalConnectorId = dslContext.select(EVSE_CONNECTOR.CONNECTOR_ID)
+            .from(EVSE_CONNECTOR)
+            .join(EVSE).on(EVSE.EVSE_PK.eq(EVSE_CONNECTOR.EVSE_PK))
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(ocpp1ConnectorId))
+            .fetchOne(EVSE_CONNECTOR.CONNECTOR_ID);
+
+        Assertions.assertEquals(1, physicalConnectorId);
     }
 
     @Test
@@ -261,9 +280,13 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     private static InsertConnectorStatusParams connectorStatusParams() {
+        return connectorStatusParams(1);
+    }
+
+    private static InsertConnectorStatusParams connectorStatusParams(int connectorId) {
         return InsertConnectorStatusParams.builder()
             .chargeBoxId(KNOWN_CHARGE_BOX_ID)
-            .connectorId(1)
+            .connectorId(connectorId)
             .timestamp(DateTime.now())
             .status("Available")
             .errorCode("NoError")

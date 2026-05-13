@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.utils.JsonUtils;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.Builder;
@@ -45,6 +47,10 @@ public final class ChargePoint {
     public static final class Details {
         private final ChargeBoxRecord chargeBox;
         private final AddressRecord address;
+
+        public String getCpoName() {
+            return JsonUtils.getPropertyValueAsString(chargeBox.getOcppConfiguration(), ConfigurationKeyEnum.CpoName.name());
+        }
     }
 
 }

@@ -18,12 +18,15 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -45,6 +48,27 @@ public final class ChargePoint {
     public static final class Details {
         private final ChargeBoxRecord chargeBox;
         private final AddressRecord address;
+
+        public String getCpoName() {
+            return getConfigValueSafely(chargeBox, ConfigurationKeyEnum.CpoName.name());
+        }
+
+        private static String getConfigValueSafely(ChargeBoxRecord chargeBox, String key) {
+            var value = chargeBox.getOcppConfiguration();
+            if (value == null) {
+                return null;
+            }
+
+            var mapper = JsonObjectMapper.INSTANCE.getMapper();
+            var node = mapper.readTree(value.data());
+            if (!node.isObject()) {
+                return null;
+            }
+
+            var ocppConfiguration = (ObjectNode) node;
+            var configNode = ocppConfiguration.get(key);
+            return configNode == null ? null : configNode.asString();
+        }
     }
 
 }

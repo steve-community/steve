@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
-import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.enums.EvseTopologySource;
@@ -44,7 +43,6 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -57,7 +55,6 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.Evse.EVSE;
-import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
@@ -148,19 +145,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             DSLContext ctx = DSL.using(configuration);
 
             // Step 1
-            insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), true);
+            var evsePk = Ocpp1ConnectorEvseBridge.insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), true);
 
             // -------------------------------------------------------------------------
             // Step 2: We store a log of connector statuses
             // -------------------------------------------------------------------------
 
             ctx.insertInto(CONNECTOR_STATUS)
-               .set(CONNECTOR_STATUS.EVSE_PK, DSL.select(EVSE.EVSE_PK)
-                                                      .from(EVSE)
-                                                      .where(EVSE.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                                                      .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-                                                      .and(EVSE.EVSE_ID.equal(p.getConnectorId()))
-               )
+               .set(CONNECTOR_STATUS.EVSE_PK, evsePk)
                .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, p.getTimestamp())
                .set(CONNECTOR_STATUS.STATUS, p.getStatus())
                .set(CONNECTOR_STATUS.ERROR_CODE, p.getErrorCode())
@@ -183,9 +175,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             try {
                 DSLContext ctx = DSL.using(configuration);
 
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId, true);
-                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+                var evsePk = Ocpp1ConnectorEvseBridge.insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId, true);
+                batchInsertMeterValues(ctx, list, evsePk, transactionId);
             } catch (Exception e) {
                 log.error("Exception occurred", e);
             }
@@ -242,18 +233,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public int insertTransaction(InsertTransactionParams p) {
 
-        SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                DSL.select(EVSE.EVSE_PK)
-                   .from(EVSE)
-                   .where(EVSE.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                   .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-                   .and(EVSE.EVSE_ID.equal(p.getConnectorId()));
-
         // -------------------------------------------------------------------------
         // Step 1: Insert connector and idTag, if they are new to us
         // -------------------------------------------------------------------------
 
-        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), false);
+        var evsePk = Ocpp1ConnectorEvseBridge.insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId(), false);
 
         // it is important to insert idTag before transaction, since the transaction table references it
         boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
@@ -262,7 +246,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 2: Insert transaction if it does not exist already
         // -------------------------------------------------------------------------
 
-        TransactionDataHolder data = insertIgnoreTransaction(p, connectorPkQuery);
+        TransactionDataHolder data = insertIgnoreTransaction(p, evsePk);
         int transactionId = data.transactionId;
 
         if (data.existsAlready) {
@@ -287,7 +271,16 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+            try {
+                ctx.insertInto(CONNECTOR_STATUS)
+                    .set(CONNECTOR_STATUS.EVSE_PK, evsePk)
+                    .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, p.getStartTimestamp())
+                    .set(CONNECTOR_STATUS.STATUS, p.getStatusUpdate().getStatus())
+                    .set(CONNECTOR_STATUS.ERROR_CODE, p.getStatusUpdate().getErrorCode())
+                    .execute();
+            } catch (Exception e) {
+                log.error("Exception occurred", e);
+            }
         }
 
         return transactionId;
@@ -321,12 +314,20 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                    DSL.select(TRANSACTION_START.EVSE_PK)
-                       .from(TRANSACTION_START)
-                       .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
+            var evsePkQuery = DSL.select(TRANSACTION_START.EVSE_PK)
+                .from(TRANSACTION_START)
+                .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
-            insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
+            try {
+                ctx.insertInto(CONNECTOR_STATUS)
+                    .set(CONNECTOR_STATUS.EVSE_PK, evsePkQuery)
+                    .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, p.getStopTimestamp())
+                    .set(CONNECTOR_STATUS.STATUS, p.getStatusUpdate().getStatus())
+                    .set(CONNECTOR_STATUS.ERROR_CODE, p.getStatusUpdate().getErrorCode())
+                    .execute();
+            } catch (Exception e) {
+                log.error("Exception occurred", e);
+            }
         }
     }
 
@@ -365,14 +366,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * problems the response of StartTransaction could not be delivered and station tries again later), we do not want
      * to insert this into database multiple times.
      */
-    private TransactionDataHolder insertIgnoreTransaction(InsertTransactionParams p,
-                                                          SelectConditionStep<Record1<Integer>> connectorPkQuery) {
+    private TransactionDataHolder insertIgnoreTransaction(InsertTransactionParams p, int evsePk) {
         Lock l = transactionTableLocks.get(p.getChargeBoxId());
         l.lock();
         try {
             Record1<Integer> r = ctx.select(TRANSACTION_START.TRANSACTION_PK)
                                     .from(TRANSACTION_START)
-                                    .where(TRANSACTION_START.EVSE_PK.eq(connectorPkQuery))
+                                    .where(TRANSACTION_START.EVSE_PK.eq(evsePk))
                                     .and(TRANSACTION_START.ID_TAG.eq(p.getIdTag()))
                                     .and(TRANSACTION_START.START_TIMESTAMP.eq(p.getStartTimestamp()))
                                     .and(TRANSACTION_START.START_VALUE.eq(p.getStartMeterValue()))
@@ -384,7 +384,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             Integer transactionId = ctx.insertInto(TRANSACTION_START)
                                        .set(TRANSACTION_START.EVENT_TIMESTAMP, p.getEventTimestamp())
-                                       .set(TRANSACTION_START.EVSE_PK, connectorPkQuery)
+                                       .set(TRANSACTION_START.EVSE_PK, evsePk)
                                        .set(TRANSACTION_START.ID_TAG, p.getIdTag())
                                        .set(TRANSACTION_START.START_TIMESTAMP, p.getStartTimestamp())
                                        .set(TRANSACTION_START.START_VALUE, p.getStartMeterValue())
@@ -400,88 +400,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             return new TransactionDataHolder(false, transactionId);
         } finally {
             l.unlock();
-        }
-    }
-
-    /**
-     * After a transaction start/stop event, a charging station _might_ send a connector status notification, but it is
-     * not required. With this, we make sure that the status is updated accordingly. Since we use the timestamp of the
-     * transaction data, we do not necessarily insert a "most recent" status.
-     *
-     * If the station sends a notification, we will have a more recent timestamp, and therefore the status of the
-     * notification will be used as current. Or, if this transaction data was sent to us for a failed push from the past
-     * and we have a "more recent" status, it will still be the current status.
-     */
-    private void insertConnectorStatus(DSLContext ctx,
-                                       SelectConditionStep<Record1<Integer>> connectorPkQuery,
-                                       DateTime timestamp,
-                                       TransactionStatusUpdate statusUpdate) {
-        try {
-            ctx.insertInto(CONNECTOR_STATUS)
-               .set(CONNECTOR_STATUS.EVSE_PK, connectorPkQuery)
-               .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
-               .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
-               .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
-               .execute();
-        } catch (Exception e) {
-            log.error("Exception occurred", e);
-        }
-    }
-
-    /**
-     * If the connector information was not received before, insert it. Otherwise, ignore.
-     */
-    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId, boolean inTransactionAlready) {
-        if (inTransactionAlready) {
-            insertIgnoreConnectorInternal(ctx, chargeBoxIdentity, connectorId);
-        } else {
-            ctx.transaction(configuration ->
-                insertIgnoreConnectorInternal(DSL.using(configuration), chargeBoxIdentity, connectorId)
-            );
-        }
-    }
-
-    private static void insertIgnoreConnectorInternal(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        var topology = ctx.select(EVSE.EVSE_PK, EVSE_CONNECTOR.EVSE_CONNECTOR_PK)
-            .from(CHARGE_BOX)
-            .leftJoin(EVSE)
-                .on(EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
-                .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-                .and(EVSE.EVSE_ID.eq(connectorId))
-            .leftJoin(EVSE_CONNECTOR)
-                .on(EVSE_CONNECTOR.EVSE_PK.eq(EVSE.EVSE_PK))
-                .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(1))
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxIdentity))
-            .forUpdate()
-            .fetchOne();
-
-        if (topology == null) {
-            throw new SteveException("Charge box with id '%s' not found", chargeBoxIdentity); // should not happen
-        }
-
-        Integer evsePk = topology.value1();
-        Integer evseConnectorPk = topology.value2();
-
-        if (evsePk == null) {
-            evsePk = ctx.insertInto(EVSE)
-                .set(EVSE.CHARGE_BOX_ID, chargeBoxIdentity)
-                .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
-                .set(EVSE.EVSE_ID, connectorId)
-                .returning(EVSE.EVSE_PK)
-                .fetchOne(EVSE.EVSE_PK);
-
-            log.debug("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
-        }
-
-        if (connectorId != 0 && evseConnectorPk == null) {
-            final int defaultEvseConnectorId = 1;
-
-            ctx.insertInto(EVSE_CONNECTOR)
-                .set(EVSE_CONNECTOR.EVSE_PK, evsePk)
-                .set(EVSE_CONNECTOR.CONNECTOR_ID, defaultEvseConnectorId)
-                .execute();
-
-            log.debug("The evse_connector {}/{}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId, defaultEvseConnectorId);
         }
     }
 
@@ -504,6 +422,15 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         return count == 1;
     }
 
+    /**
+     * After a transaction start/stop event, a charging station _might_ send a connector status notification, but it is
+     * not required. With this, we make sure that the status is updated accordingly. Since we use the timestamp of the
+     * transaction data, we do not necessarily insert a "most recent" status.
+     *
+     * If the station sends a notification, we will have a more recent timestamp, and therefore the status of the
+     * notification will be used as current. Or, if this transaction data was sent to us for a failed push from the past
+     * and we have a "more recent" status, it will still be the current status.
+     */
     private boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId) {
         Record1<Integer> r = ctx.selectOne()
                                 .from(CHARGE_BOX)
@@ -514,23 +441,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         return (r != null) && (r.value1() == 1);
     }
 
-    private int getConnectorPkFromConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        return ctx.select(EVSE.EVSE_PK)
-                  .from(EVSE)
-                  .where(EVSE.CHARGE_BOX_ID.equal(chargeBoxIdentity))
-                  .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-                  .and(EVSE.EVSE_ID.equal(connectorId))
-                  .fetchOne()
-                  .value1();
-    }
-
-    private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int connectorPk, Integer transactionId) {
+    private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int evsePk, Integer transactionId) {
         List<ConnectorMeterValueRecord> batch =
                 list.stream()
                     .flatMap(t -> t.getSampledValue()
                                    .stream()
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
-                                                .setEvsePk(connectorPk)
+                                                .setEvsePk(evsePk)
                                                 .setTransactionPk(transactionId)
                                                 .setValueTimestamp(t.getTimestamp())
                                                 .setValue(k.getValue())

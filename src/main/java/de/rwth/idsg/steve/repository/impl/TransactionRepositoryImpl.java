@@ -179,6 +179,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Condition timestampCondition;
         TransactionStartRecord nextTx = null;
 
+        var evsePkSelect = Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId, connectorId);
+
         if (stopTimestamp == null && stopValue == null) {
 
             // https://github.com/steve-community/steve/issues/97
@@ -189,11 +191,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             //
             // "what is the subsequent transaction at the same chargebox and connector?"
             nextTx = ctx.selectFrom(TRANSACTION_START)
-                        .where(TRANSACTION_START.EVSE_PK.eq(ctx.select(EVSE.EVSE_PK)
-                                                                    .from(EVSE)
-                                                                    .where(EVSE.CHARGE_BOX_ID.equal(chargeBoxId))
-                                                                    .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-                                                                    .and(EVSE.EVSE_ID.equal(connectorId))))
+                        .where(TRANSACTION_START.EVSE_PK.eq(evsePkSelect))
                         .and(TRANSACTION_START.START_TIMESTAMP.greaterThan(startTimestamp))
                         .orderBy(TRANSACTION_START.START_TIMESTAMP)
                         .limit(1)
@@ -216,12 +214,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
             .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
 
-        var connectorPkQuery = ctx.select(EVSE.EVSE_PK)
-            .from(EVSE)
-            .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
-            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
-            .and(EVSE.EVSE_ID.eq(connectorId));
-
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
         // Case 2: Fall back to filtering according to time windows. Timestamp fallback only considers rows
@@ -231,7 +223,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         var selectionCriteria = CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk)
             .or(timestampCondition
                 .and(CONNECTOR_METER_VALUE.TRANSACTION_PK.isNull()
-                .and(CONNECTOR_METER_VALUE.EVSE_PK.eq(connectorPkQuery))
+                .and(CONNECTOR_METER_VALUE.EVSE_PK.eq(evsePkSelect))
                 )
             );
 

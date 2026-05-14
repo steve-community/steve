@@ -63,6 +63,36 @@ table.res td {
 	width: auto;
 	word-wrap: break-word;
 }
+
+.deviceModel .connectorPanel {
+	margin: 10px 16px 16px 16px;
+	max-width: calc(100% - 32px);
+	overflow-x: auto;
+}
+.deviceModel table.evseConnectors {
+	table-layout: auto;
+	width: 100%;
+}
+.deviceModel table.evseConnectors select {
+	width: auto;
+	max-width: 100%;
+}
+.deviceModel table.evseConnectors input[type="number"] {
+	width: 110px;
+	max-width: 100%;
+}
+table.res.deviceModel tr.evseOdd {
+	background: #fcfaf2;
+}
+table.res.deviceModel tr.evseEven {
+	background: #fff;
+}
+table.res.deviceModel tr.evseOdd:hover, table.res.deviceModel tr.evseEven:hover {
+	background: #ebf4f9;
+}
+table.res.deviceModel tr.evseConnectorsRow {
+	background: #f7f7f7;
+}
 /*** Table for charge point details ***/
 table.cpd {
 	border-collapse: collapse;

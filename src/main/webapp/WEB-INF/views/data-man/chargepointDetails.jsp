@@ -19,6 +19,18 @@
 
 --%>
 <%@ include file="../00-header.jsp" %>
+<script type="text/javascript">
+    function toggleEvseConnectors(button, targetId) {
+        var row = document.getElementById(targetId);
+        if (row.style.display === 'none') {
+            row.style.display = '';
+            button.value = 'Hide \u25B2';
+        } else {
+            row.style.display = 'none';
+            button.value = 'View \u25BC';
+        }
+    }
+</script>
 <spring:hasBindErrors name="chargePointForm">
     <div class="error">
         Error while trying to update a charge point:
@@ -132,11 +144,98 @@
 
             <form:hidden path="address.addressPk" readonly="true"/>
             <%@ include file="00-address.jsp" %>
-
-            <c:set var="submitButtonName" value="update" />
-            <c:set var="submitButtonValue" value="Update" />
             <%@ include file="00-cp-misc.jsp" %>
 
+            <section><span>Device Model</span></section>
+            <table class="res deviceModel">
+                <thead>
+                <tr>
+                    <th>Topology</th>
+                    <th>EVSE ID</th>
+                    <th>External EVSE ID</th>
+                    <th>Connectors</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach items="${chargePointForm.deviceModelForm.evses}" var="evse" varStatus="evseStatus">
+                    <tr class="${evseStatus.index % 2 == 0 ? 'evseOdd' : 'evseEven'}">
+                        <td><encode:forHtml value="${evse.topologySource.literal}" /></td>
+                        <td>
+                            <form:hidden path="deviceModelForm.evses[${evseStatus.index}].evsePk"/>
+                            <form:hidden path="deviceModelForm.evses[${evseStatus.index}].evseId"/>
+                            <form:hidden path="deviceModelForm.evses[${evseStatus.index}].topologySource"/>
+                            <encode:forHtml value="${evse.evseId}" />
+                        </td>
+                        <td><form:input path="deviceModelForm.evses[${evseStatus.index}].evseIdExternal"/></td>
+                        <td>
+                            <input type="button"
+                                   value="View &#9660;"
+                                   onclick="toggleEvseConnectors(this, 'evse-connectors-${evseStatus.index}')">
+                        </td>
+                    </tr>
+                    <tr class="evseConnectorsRow" id="evse-connectors-${evseStatus.index}" style="display: none;">
+                        <td colspan="4">
+                            <div class="connectorPanel">
+                                <table class="res evseConnectors">
+                                    <thead>
+                                    <tr>
+                                        <th>Connector ID</th>
+                                        <th>Type</th>
+                                        <th>Format</th>
+                                        <th>Power Type</th>
+                                        <th>Max Voltage</th>
+                                        <th>Max Amperage</th>
+                                        <th>Max Power (in W)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <c:forEach items="${evse.connectors}" var="connector" varStatus="connectorStatus">
+                                        <tr>
+                                            <td>
+                                                <form:hidden path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].evseConnectorPk"/>
+                                                <form:hidden path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].connectorId"/>
+                                                <encode:forHtml value="${connector.connectorId}" />
+                                            </td>
+                                            <td>
+                                                <form:select path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].connectorType">
+                                                    <form:option value="" label=""/>
+                                                    <form:options itemLabel="text"/>
+                                                </form:select>
+                                            </td>
+                                            <td>
+                                                <form:select path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].connectorFormat">
+                                                    <form:option value="" label=""/>
+                                                    <form:options itemLabel="text"/>
+                                                </form:select>
+                                            </td>
+                                            <td>
+                                                <form:select path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].powerType">
+                                                    <form:option value="" label=""/>
+                                                    <form:options itemLabel="text"/>
+                                                </form:select>
+                                            </td>
+                                            <td><form:input type="number" min="1" step="1" path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].maxVoltage"/></td>
+                                            <td><form:input type="number" min="1" step="1" path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].maxAmperage"/></td>
+                                            <td><form:input type="number" min="1" step="1" path="deviceModelForm.evses[${evseStatus.index}].connectors[${connectorStatus.index}].maxElectricPower"/></td>
+                                        </tr>
+                                    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
+
+            <table class="userInput">
+                <tr><td></td>
+                    <td id="add_space">
+                        <input type="submit" name="update" value="Update">
+                        <input type="submit" name="backToOverview" value="Back to Overview">
+                    </td>
+                </tr>
+            </table>
     </form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

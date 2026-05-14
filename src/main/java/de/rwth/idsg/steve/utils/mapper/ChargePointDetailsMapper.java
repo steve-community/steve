@@ -19,13 +19,24 @@
 package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.ocpp.model.ConnectorFormat;
+import de.rwth.idsg.steve.ocpp.model.ConnectorType;
+import de.rwth.idsg.steve.ocpp.model.PowerType;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.web.dto.ChargePointDeviceModelForm;
+import de.rwth.idsg.steve.web.dto.ChargePointDeviceModelForm.EvseConnectorForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
+import jooq.steve.db.tables.records.EvseConnectorRecord;
+import jooq.steve.db.tables.records.EvseRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -51,6 +62,48 @@ public final class ChargePointDetailsMapper {
         form.setAuthPassword(null); // make sure that the pwd from record does not escape
         form.setHasAuthPassword(!StringUtils.isEmpty(chargeBox.getAuthPassword()));
 
+        form.setDeviceModelForm(createDeviceModelForm(cp));
+        return form;
+    }
+
+    private static ChargePointDeviceModelForm createDeviceModelForm(ChargePoint.Details cp) {
+        var evses = cp.getEvses()
+            .stream()
+            .map(evseRecord -> {
+                var evseConnectorRecords = cp.getEvseConnectorsByEvsePk().get(evseRecord.getEvsePk());
+                return toEvseForm(evseRecord, evseConnectorRecords);
+            }).toList();
+
+        var deviceModelForm = new ChargePointDeviceModelForm();
+        deviceModelForm.setEvses(evses);
+        return deviceModelForm;
+    }
+
+    private static ChargePointDeviceModelForm.EvseForm toEvseForm(EvseRecord evseRecord,
+                                                                  @Nullable List<EvseConnectorRecord> connectorRecords) {
+        List<EvseConnectorForm> connectors = (connectorRecords == null)
+            ? Collections.emptyList()
+            : connectorRecords.stream().map(ChargePointDetailsMapper::toEvseConnectorForm).toList();
+
+        var form = new ChargePointDeviceModelForm.EvseForm();
+        form.setEvsePk(evseRecord.getEvsePk());
+        form.setEvseId(evseRecord.getEvseId());
+        form.setTopologySource(evseRecord.getTopologySource());
+        form.setEvseIdExternal(evseRecord.getEvseIdExternal());
+        form.setConnectors(connectors);
+        return form;
+    }
+
+    private static EvseConnectorForm toEvseConnectorForm(EvseConnectorRecord rec) {
+        var form = new EvseConnectorForm();
+        form.setEvseConnectorPk(rec.getEvseConnectorPk());
+        form.setConnectorId(rec.getConnectorId());
+        form.setConnectorType(ConnectorType.fromNullable(rec.getConnectorType()));
+        form.setConnectorFormat(ConnectorFormat.fromNullable(rec.getConnectorFormat()));
+        form.setPowerType(PowerType.fromNullable(rec.getPowerType()));
+        form.setMaxVoltage(rec.getMaxVoltage());
+        form.setMaxAmperage(rec.getMaxAmperage());
+        form.setMaxElectricPower(rec.getMaxElectricPower());
         return form;
     }
 

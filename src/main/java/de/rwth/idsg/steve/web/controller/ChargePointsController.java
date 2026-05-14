@@ -146,6 +146,7 @@ public class ChargePointsController {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
             model.addAttribute("chargePointForm", chargePointForm);
+            model.addAttribute("cp", chargePointService.getDetails(chargePointForm.getChargeBoxPk()));
             return "data-man/chargepointDetails";
         }
 

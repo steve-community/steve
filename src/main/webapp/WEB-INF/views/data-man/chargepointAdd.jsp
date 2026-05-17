@@ -122,10 +122,16 @@
         </table>
 
         <%@ include file="00-address.jsp" %>
-
-        <c:set var="submitButtonName" value="add" />
-        <c:set var="submitButtonValue" value="Add" />
         <%@ include file="00-cp-misc.jsp" %>
+
+        <table class="userInput">
+            <tr><td></td>
+                <td id="add_space">
+                    <input type="submit" name="add" value="Add">
+                    <input type="submit" name="backToOverview" value="Back to Overview">
+                </td>
+            </tr>
+        </table>
 
     </form:form>
 </div></div>

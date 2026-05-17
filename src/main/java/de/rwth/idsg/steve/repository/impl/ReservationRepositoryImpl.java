@@ -25,26 +25,25 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
 import org.jooq.Record10;
 import org.jooq.RecordMapper;
-import org.jooq.Select;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 
@@ -65,8 +64,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(RESERVATION);
         selectQuery.addJoin(OCPP_TAG, OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG));
-        selectQuery.addJoin(CONNECTOR, CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK));
-        selectQuery.addJoin(CHARGE_BOX, CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID));
+        selectQuery.addJoin(EVSE, EVSE.EVSE_PK.eq(RESERVATION.EVSE_PK));
+        selectQuery.addJoin(CHARGE_BOX, EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID));
 
         selectQuery.addSelect(
                 RESERVATION.RESERVATION_PK,
@@ -78,7 +77,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 RESERVATION.START_DATETIME,
                 RESERVATION.EXPIRY_DATETIME,
                 RESERVATION.STATUS,
-                CONNECTOR.CONNECTOR_ID
+                EVSE.EVSE_ID
         );
 
         if (form.isReservationIdSet()) {
@@ -106,6 +105,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             selectQuery.addConditions(RESERVATION.STATUS.eq(form.getStatus().name()));
         }
 
+        selectQuery.addConditions(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1));
+
         processType(selectQuery, form);
 
         // Default order
@@ -116,11 +117,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {
+        var evsePkSelect = Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId);
+
         return ctx.select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
-                  .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                        .from(CONNECTOR)
-                                                        .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
+                  .where(RESERVATION.EVSE_PK.in(evsePkSelect))
                   .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
                   .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
@@ -131,16 +132,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // Check overlapping
         //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
-        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, params.getChargeBoxId(), params.getConnectorId());
-
-        SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                DSL.select(CONNECTOR.CONNECTOR_PK)
-                   .from(CONNECTOR)
-                   .where(CONNECTOR.CHARGE_BOX_ID.equal(params.getChargeBoxId()))
-                   .and(CONNECTOR.CONNECTOR_ID.equal(params.getConnectorId()));
+        var evsePk = Ocpp1ConnectorEvseBridge.insertIgnoreConnector(ctx, params.getChargeBoxId(), params.getConnectorId(), false);
 
         int reservationId = ctx.insertInto(RESERVATION)
-                               .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
+                               .set(RESERVATION.EVSE_PK, evsePk)
                                .set(RESERVATION.ID_TAG, params.getIdTag())
                                .set(RESERVATION.START_DATETIME, params.getStartTimestamp())
                                .set(RESERVATION.EXPIRY_DATETIME, params.getExpiryTimestamp())
@@ -194,12 +189,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // TC_049_CSMS: Reservation of a Charge Point
         // -------------------------------------------------------------------------
 
-        var chargePointWideConnectorPk = DSL.select(CONNECTOR.CONNECTOR_PK)
-                                            .from(CONNECTOR)
-                                            .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                            .and(CONNECTOR.CONNECTOR_ID.in(0, connectorId));
+        var chargePointWideEvsePk = Ocpp1ConnectorEvseBridge.evsePkSelect2(ctx, chargeBoxId, Set.of(0, connectorId));
 
-        var connectorCondition = RESERVATION.CONNECTOR_PK.in(chargePointWideConnectorPk);
+        var evseCondition = RESERVATION.EVSE_PK.in(chargePointWideEvsePk);
 
         // -------------------------------------------------------------------------
         // Execute
@@ -210,7 +202,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                        .set(RESERVATION.TRANSACTION_PK, transactionId)
                        .where(RESERVATION.RESERVATION_PK.equal(reservationId))
                        .and(idTagCondition)
-                       .and(connectorCondition)
+                       .and(evseCondition)
                        .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                        .execute();
 
@@ -223,17 +215,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public void cancelActiveReservations(String chargeBoxId, @NotNull Integer connectorId) {
         try {
-            var connectorSelect = DSL.select(CONNECTOR.CONNECTOR_PK)
-                                     .from(CONNECTOR)
-                                     .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId));
-
-            if (connectorId != 0) {
-                connectorSelect = connectorSelect.and(CONNECTOR.CONNECTOR_ID.equal(connectorId));
-            }
+            var evsePkSelect = (connectorId == 0)
+                ? Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId)
+                : Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId, connectorId);
 
             int count = ctx.update(RESERVATION)
                            .set(RESERVATION.STATUS, ReservationStatus.CANCELLED.name())
-                           .where(RESERVATION.CONNECTOR_PK.in(connectorSelect))
+                           .where(RESERVATION.EVSE_PK.in(evsePkSelect))
                            .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                            .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
                            .execute();

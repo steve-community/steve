@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ReservationRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
@@ -38,8 +39,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
+import static jooq.steve.db.tables.Evse.EVSE;
+import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
@@ -131,6 +133,24 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
+    public void insertConnectorStatusCreatesOcpp1PhysicalConnector() {
+        int ocpp1ConnectorId = 2;
+        assertNoDatabaseException(() -> repository.insertConnectorStatus(
+            connectorStatusParams(ocpp1ConnectorId)
+        ));
+
+        Integer physicalConnectorId = dslContext.select(EVSE_CONNECTOR.CONNECTOR_ID)
+            .from(EVSE_CONNECTOR)
+            .join(EVSE).on(EVSE.EVSE_PK.eq(EVSE_CONNECTOR.EVSE_PK))
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(ocpp1ConnectorId))
+            .fetchOne(EVSE_CONNECTOR.CONNECTOR_ID);
+
+        Assertions.assertEquals(1, physicalConnectorId);
+    }
+
+    @Test
     public void insertMeterValuesByConnectorAndTransactionId() {
         assertNoDatabaseException(() -> repository.insertMeterValues(KNOWN_CHARGE_BOX_ID, List.of(new MeterValue()), 1, 1));
     }
@@ -138,7 +158,7 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     @Test
     public void insertMeterValuesByTransactionRecord() {
         TransactionRecord transaction = new TransactionRecord();
-        transaction.setConnectorPk(1);
+        transaction.setEvsePk(1);
         transaction.setTransactionPk(1);
         assertNoDatabaseException(() -> repository.insertMeterValues(KNOWN_CHARGE_BOX_ID, List.of(new MeterValue()), transaction));
     }
@@ -166,16 +186,17 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insertTransaction_usesChargePointWideReservation() {
-        Integer connectorPkZero = dslContext.insertInto(CONNECTOR)
-            .set(CONNECTOR.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
-            .set(CONNECTOR.CONNECTOR_ID, 0)
-            .returning(CONNECTOR.CONNECTOR_PK)
+        Integer connectorPkZero = dslContext.insertInto(EVSE)
+            .set(EVSE.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
+            .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
+            .set(EVSE.EVSE_ID, 0)
+            .returning(EVSE.EVSE_PK)
             .fetchOne()
-            .getConnectorPk();
+            .getEvsePk();
         Assertions.assertNotNull(connectorPkZero);
 
         Integer reservationId = dslContext.insertInto(RESERVATION)
-            .set(RESERVATION.CONNECTOR_PK, connectorPkZero)
+            .set(RESERVATION.EVSE_PK, connectorPkZero)
             .set(RESERVATION.ID_TAG, KNOWN_OCPP_TAG)
             .set(RESERVATION.START_DATETIME, DateTime.now())
             .set(RESERVATION.EXPIRY_DATETIME, DateTime.now().plusHours(1))
@@ -231,16 +252,17 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     private void seedTransactionStart(int transactionId) {
-        Integer connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-            .from(CONNECTOR)
-            .where(CONNECTOR.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .and(CONNECTOR.CONNECTOR_ID.eq(1))
-            .fetchOne(CONNECTOR.CONNECTOR_PK);
+        Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
 
         dslContext.insertInto(TRANSACTION_START)
             .set(TRANSACTION_START.TRANSACTION_PK, transactionId)
             .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
-            .set(TRANSACTION_START.CONNECTOR_PK, connectorPk)
+            .set(TRANSACTION_START.EVSE_PK, connectorPk)
             .set(TRANSACTION_START.ID_TAG, KNOWN_OCPP_TAG)
             .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now())
             .set(TRANSACTION_START.START_VALUE, "1000")
@@ -258,9 +280,13 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     private static InsertConnectorStatusParams connectorStatusParams() {
+        return connectorStatusParams(1);
+    }
+
+    private static InsertConnectorStatusParams connectorStatusParams(int connectorId) {
         return InsertConnectorStatusParams.builder()
             .chargeBoxId(KNOWN_CHARGE_BOX_ID)
-            .connectorId(1)
+            .connectorId(connectorId)
             .timestamp(DateTime.now())
             .status("Available")
             .errorCode("NoError")

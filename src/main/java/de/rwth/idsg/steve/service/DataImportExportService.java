@@ -56,7 +56,8 @@ import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.CHARGE_BOX_SECURITY_EVENT;
 import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
-import static jooq.steve.db.Tables.CONNECTOR;
+import static jooq.steve.db.Tables.EVSE;
+import static jooq.steve.db.Tables.EVSE_CONNECTOR;
 import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.Tables.CONNECTOR_STATUS;
@@ -86,7 +87,8 @@ public class DataImportExportService {
         CHARGE_BOX_CERTIFICATE_SIGNED,
         CHARGING_PROFILE,
         CHARGING_SCHEDULE_PERIOD,
-        CONNECTOR,
+        EVSE,
+        EVSE_CONNECTOR,
         CONNECTOR_CHARGING_PROFILE,
         OCPP_TAG,
         SETTINGS,

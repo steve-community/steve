@@ -85,4 +85,7 @@ public class ChargePointForm {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private boolean hasAuthPassword;
+
+    @Valid
+    private ChargePointDeviceModelForm deviceModelForm = new ChargePointDeviceModelForm();
 }

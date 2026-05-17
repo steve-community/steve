@@ -22,10 +22,16 @@ import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
+import jooq.steve.db.tables.records.EvseConnectorRecord;
+import jooq.steve.db.tables.records.EvseRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
+import org.jooq.Result;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -47,6 +53,8 @@ public final class ChargePoint {
     public static final class Details {
         private final ChargeBoxRecord chargeBox;
         private final AddressRecord address;
+        private final List<EvseRecord> evses;
+        private final Map<Integer, Result<EvseConnectorRecord>> evseConnectorsByEvsePk;
 
         public String getCpoName() {
             return JsonUtils.getPropertyValueAsString(chargeBox.getOcppConfiguration(), ConfigurationKeyEnum.CpoName.name());

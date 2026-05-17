@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
+import jooq.steve.db.enums.EvseTopologySource;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
@@ -30,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
+import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 
 /**
@@ -113,9 +115,23 @@ abstract class AbstractRepositoryITBase {
         var preparer = new __DatabasePreparer__(dslContext);
         preparer.prepare();
 
-        dslContext.insertInto(CONNECTOR)
-            .set(CONNECTOR.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
-            .set(CONNECTOR.CONNECTOR_ID, 1)
+        dslContext.insertInto(EVSE)
+            .set(EVSE.CHARGE_BOX_ID, KNOWN_CHARGE_BOX_ID)
+            .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
+            .set(EVSE.EVSE_ID, 1)
+            .onDuplicateKeyIgnore()
+            .execute();
+
+        Integer evsePk = dslContext.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(1))
+            .fetchOne(EVSE.EVSE_PK);
+
+        dslContext.insertInto(EVSE_CONNECTOR)
+            .set(EVSE_CONNECTOR.EVSE_PK, evsePk)
+            .set(EVSE_CONNECTOR.CONNECTOR_ID, 1)
             .onDuplicateKeyIgnore()
             .execute();
 

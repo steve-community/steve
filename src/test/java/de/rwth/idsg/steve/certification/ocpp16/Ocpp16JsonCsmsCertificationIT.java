@@ -50,6 +50,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
+import jooq.steve.db.enums.EvseTopologySource;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateHashData;
 import ocpp._2022._02.security.CertificateHashDataType;
@@ -124,7 +125,7 @@ import static jooq.steve.db.Tables.CHARGE_BOX_LOG_UPLOAD_JOB;
 import static jooq.steve.db.Tables.RESERVATION;
 import static jooq.steve.db.Tables.TRANSACTION;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
-import static jooq.steve.db.tables.Connector.CONNECTOR;
+import static jooq.steve.db.tables.Evse.EVSE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static ocpp._2022._02.security.SignedUpdateFirmwareResponse.UpdateFirmwareStatusEnumType;
 import static ocpp.cp._2015._10.ReservationStatus.ACCEPTED;
@@ -1587,14 +1588,15 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             assertEquals(REGISTERED_OCPP_TAG, reservation.getIdTag());
             assertEquals(ReservationStatus.ACCEPTED.name(), reservation.getStatus());
 
-            var connectorPk = dslContext.select(CONNECTOR.CONNECTOR_PK)
-                .from(CONNECTOR)
-                .where(CONNECTOR.CHARGE_BOX_ID.equal(REGISTERED_CHARGE_BOX_ID))
-                .and(CONNECTOR.CONNECTOR_ID.equal(params.getConnectorId()))
+            var connectorPk = dslContext.select(EVSE.EVSE_PK)
+                .from(EVSE)
+                .where(EVSE.CHARGE_BOX_ID.equal(REGISTERED_CHARGE_BOX_ID))
+                .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+                .and(EVSE.EVSE_ID.equal(params.getConnectorId()))
                 .fetchOne();
 
             assertNotNull(connectorPk);
-            assertEquals(connectorPk.component1(), reservation.getConnectorPk());
+            assertEquals(connectorPk.component1(), reservation.getEvsePk());
         }
 
         assertNotNull(chargePoint.send(statusNotification(1, ChargePointStatus.RESERVED, ChargePointErrorCode.NO_ERROR), StatusNotificationResponse.class));

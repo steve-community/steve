@@ -50,10 +50,9 @@ public class ChargePointDeviceModelForm {
 
         // Internal database id
         @NotNull(message = "evsePk is required")
-        @Schema(accessMode = AccessMode.READ_ONLY)
         private Integer evsePk;
 
-        @Schema(accessMode = AccessMode.READ_ONLY)
+        @NotNull(message = "evseId is required")
         private Integer evseId;
 
         @Schema(accessMode = AccessMode.READ_ONLY)
@@ -72,10 +71,9 @@ public class ChargePointDeviceModelForm {
 
         // Internal database id
         @NotNull(message = "evseConnectorPk is required")
-        @Schema(accessMode = AccessMode.READ_ONLY)
         private Integer evseConnectorPk;
 
-        @Schema(accessMode = AccessMode.READ_ONLY)
+        @NotNull(message = "connectorId is required")
         private Integer connectorId;
 
         // editable fields

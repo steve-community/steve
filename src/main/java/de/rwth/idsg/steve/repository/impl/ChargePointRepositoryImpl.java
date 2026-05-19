@@ -459,6 +459,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             return;
         }
 
+        // EVSE scoping:
         // chargeBoxId comes from a readonly form input and can still be tampered with in the request. A submit with
         // chargeBoxPk for station A and chargeBoxId for station B would update station A's normal fields while applying
         // device-model changes to station B's EVSEs/connectors. Let's make sure that chargeBox ID and PK belong to the
@@ -473,21 +474,25 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             return;
         }
 
-        // to prevent evsePk claims in this form not belonging to the parent chargeBoxId
-        var evsePkSelect = ctx.select(EVSE.EVSE_PK)
-            .from(EVSE)
-            .where(EVSE.CHARGE_BOX_ID.eq(chargeBoxId));
-
         for (var evse : evses) {
             ctx.update(EVSE)
                 .set(EVSE.EVSE_ID_EXTERNAL, blankToNull(evse.getEvseIdExternal()))
                 .where(EVSE.EVSE_PK.eq(evse.getEvsePk()))
+                .and(EVSE.EVSE_ID.eq(evse.getEvseId()))
                 .and(EVSE.CHARGE_BOX_ID.eq(chargeBoxId))
                 .execute();
 
             if (evse.getConnectors() == null) {
                 continue;
             }
+
+            // EVSE-connector scoping:
+            // to prevent evsePk claims in this form not belonging to the parent chargeBoxId
+            var evsePkSelect = ctx.select(EVSE.EVSE_PK)
+                .from(EVSE)
+                .where(EVSE.EVSE_PK.eq(evse.getEvsePk()))
+                .and(EVSE.EVSE_ID.eq(evse.getEvseId()))
+                .and(EVSE.CHARGE_BOX_ID.eq(chargeBoxId));
 
             for (var connector : evse.getConnectors()) {
                 ctx.update(EVSE_CONNECTOR)
@@ -498,7 +503,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                     .set(EVSE_CONNECTOR.MAX_AMPERAGE, connector.getMaxAmperage())
                     .set(EVSE_CONNECTOR.MAX_ELECTRIC_POWER, connector.getMaxElectricPower())
                     .where(EVSE_CONNECTOR.EVSE_CONNECTOR_PK.eq(connector.getEvseConnectorPk()))
-                    .and(EVSE_CONNECTOR.EVSE_PK.eq(evse.getEvsePk()))
+                    .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(connector.getConnectorId()))
                     .and(EVSE_CONNECTOR.EVSE_PK.in(evsePkSelect))
                     .execute();
             }

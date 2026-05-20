@@ -43,7 +43,7 @@ import static de.rwth.idsg.steve.ocpp.OcppSecurityProfile.Profile_0;
 @Setter
 @ToString
 @SecurityProfileValid
-public class ChargePointForm {
+public class ChargePointFormForCreate {
 
     // Internal database id
     private Integer chargeBoxPk;
@@ -85,7 +85,4 @@ public class ChargePointForm {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private boolean hasAuthPassword;
-
-    @Valid
-    private ChargePointDeviceModelForm deviceModelForm = new ChargePointDeviceModelForm();
 }

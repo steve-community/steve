@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.ocpp.model.PowerType;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.web.dto.ChargePointDeviceModelForm;
 import de.rwth.idsg.steve.web.dto.ChargePointDeviceModelForm.EvseConnectorForm;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import jooq.steve.db.tables.records.EvseConnectorRecord;
 import jooq.steve.db.tables.records.EvseRecord;
@@ -45,10 +45,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChargePointDetailsMapper {
 
-    public static ChargePointForm mapToForm(ChargePoint.Details cp) {
+    public static ChargePointFormForUpdate mapToForm(ChargePoint.Details cp) {
         ChargeBoxRecord chargeBox = cp.getChargeBox();
 
-        ChargePointForm form = new ChargePointForm();
+        ChargePointFormForUpdate form = new ChargePointFormForUpdate();
         form.setChargeBoxPk(chargeBox.getChargeBoxPk());
         form.setChargeBoxId(chargeBox.getChargeBoxId());
         form.setNote(chargeBox.getNote());

@@ -24,7 +24,8 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +57,7 @@ public interface ChargePointRepository {
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
     void addChargePointList(List<String> chargeBoxIdList);
-    int addChargePoint(ChargePointForm form);
-    void updateChargePoint(ChargePointForm form);
+    int addChargePoint(ChargePointFormForCreate form);
+    void updateChargePoint(ChargePointFormForUpdate form);
     void deleteChargePoint(int chargeBoxPk);
 }

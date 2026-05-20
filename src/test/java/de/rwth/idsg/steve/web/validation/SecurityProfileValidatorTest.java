@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.service.ChargePointService;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -81,7 +81,7 @@ public class SecurityProfileValidatorTest {
                                     boolean isValid) {
         OcppSecurityProfile securityProfile = OcppSecurityProfile.fromValue(securityProfileNumber);
 
-        ChargePointForm form = new ChargePointForm();
+        ChargePointFormForCreate form = new ChargePointFormForCreate();
         form.setSecurityProfile(securityProfile);
         form.setAuthPassword(authPassword);
 

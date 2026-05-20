@@ -23,7 +23,8 @@ import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.web.dto.Address;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -168,7 +169,7 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void updateChargePoint() {
-        var form = chargePointForm(KNOWN_CHARGE_BOX_ID);
+        var form = chargePointFormForUpdate(KNOWN_CHARGE_BOX_ID);
         Integer chargeBoxPk = dslContext.select(CHARGE_BOX.CHARGE_BOX_PK)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
@@ -226,8 +227,12 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
         assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
     }
 
-    private static ChargePointForm chargePointForm(String chargeBoxId) {
-        var form = new ChargePointForm();
+    private static ChargePointFormForCreate chargePointForm(String chargeBoxId) {
+        return chargePointFormForUpdate(chargeBoxId);
+    }
+
+    private static ChargePointFormForUpdate chargePointFormForUpdate(String chargeBoxId) {
+        var form = new ChargePointFormForUpdate();
         form.setChargeBoxId(chargeBoxId);
         form.setRegistrationStatus(RegistrationStatus.ACCEPTED);
         form.setInsertConnectorStatusAfterTransactionMsg(true);

@@ -29,7 +29,8 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.JsonUtils;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.enums.EvseTopologySource;
@@ -361,7 +362,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public int addChargePoint(ChargePointForm form) {
+    public int addChargePoint(ChargePointFormForCreate form) {
         return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
@@ -376,7 +377,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void updateChargePoint(ChargePointForm form) {
+    public void updateChargePoint(ChargePointFormForUpdate form) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
@@ -415,7 +416,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk));
     }
 
-    private int addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
+    private int addChargePointInternal(DSLContext ctx, ChargePointFormForCreate form, Integer addressPk) {
         var query = ctx.insertInto(CHARGE_BOX)
                        .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                        .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
@@ -435,7 +436,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                     .getChargeBoxPk();
     }
 
-    private static void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
+    private static void updateChargePointInternal(DSLContext ctx, ChargePointFormForUpdate form, Integer addressPk) {
        var query = ctx.update(CHARGE_BOX)
                       .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                       .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
@@ -453,7 +454,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
              .execute();
     }
 
-    private static void updateDeviceModel(DSLContext ctx, ChargePointForm form) {
+    private static void updateDeviceModel(DSLContext ctx, ChargePointFormForUpdate form) {
         var evses = form.getDeviceModelForm().getEvses();
         if (CollectionUtils.isEmpty(evses)) {
             return;

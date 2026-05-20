@@ -23,7 +23,8 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -98,7 +99,7 @@ public class ChargePointsController {
     @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
         ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
-        ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
+        ChargePointFormForUpdate form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
@@ -109,13 +110,13 @@ public class ChargePointsController {
 
     @GetMapping(ADD_PATH)
     public String addGet(Model model) {
-        model.addAttribute("chargePointForm", new ChargePointForm());
+        model.addAttribute("chargePointForm", new ChargePointFormForCreate());
         setCommonAttributesForSingleAdd(model);
         return "data-man/chargepointAdd";
     }
 
     @PostMapping(params = "add", value = ADD_SINGLE_PATH)
-    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointFormForCreate chargePointForm,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
@@ -132,7 +133,7 @@ public class ChargePointsController {
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
             addCountryCodes(model);
-            model.addAttribute("chargePointForm", new ChargePointForm());
+            model.addAttribute("chargePointForm", new ChargePointFormForCreate());
             return "data-man/chargepointAdd";
         }
 
@@ -141,7 +142,7 @@ public class ChargePointsController {
     }
 
     @PostMapping(params = "update", value = UPDATE_PATH)
-    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointFormForUpdate chargePointForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
@@ -203,7 +204,7 @@ public class ChargePointsController {
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
     }
 
-    private void add(ChargePointForm form) {
+    private void add(ChargePointFormForCreate form) {
         chargePointService.addChargePoint(form);
         chargePointService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }

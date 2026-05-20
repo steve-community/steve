@@ -38,7 +38,8 @@ import de.rwth.idsg.steve.service.notification.OcppStationSecurityBasicAuthChang
 import de.rwth.idsg.steve.service.notification.OcppStationSecurityProfileChanged;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
@@ -130,12 +131,12 @@ public class ChargePointService {
         chargePointRepository.addChargePointList(chargeBoxIdList);
     }
 
-    public int addChargePoint(ChargePointForm form) {
+    public int addChargePoint(ChargePointFormForCreate form) {
         encodePasswordIfNeeded(form);
         return chargePointRepository.addChargePoint(form);
     }
 
-    public void updateChargePoint(ChargePointForm form) {
+    public void updateChargePoint(ChargePointFormForUpdate form) {
         var chargeBoxId = form.getChargeBoxId();
         var newRawPassword = form.getAuthPassword();
         var newSecurityProfile = form.getSecurityProfile();
@@ -182,7 +183,7 @@ public class ChargePointService {
         }
     }
 
-    private void encodePasswordIfNeeded(ChargePointForm form) {
+    private void encodePasswordIfNeeded(ChargePointFormForCreate form) {
         String encodedPwd = StringUtils.isEmpty(form.getAuthPassword())
             ? null
             : passwordEncoder.encode(form.getAuthPassword());

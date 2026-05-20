@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.validation;
 
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.service.ChargePointService;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -30,12 +30,12 @@ import jakarta.validation.ConstraintValidatorContext;
 
 @Component
 @RequiredArgsConstructor
-public class SecurityProfileValidator implements ConstraintValidator<SecurityProfileValid, ChargePointForm> {
+public class SecurityProfileValidator implements ConstraintValidator<SecurityProfileValid, ChargePointFormForCreate> {
 
     private final ChargePointService chargePointService;
 
     @Override
-    public boolean isValid(ChargePointForm form, ConstraintValidatorContext context) {
+    public boolean isValid(ChargePointFormForCreate form, ConstraintValidatorContext context) {
         OcppSecurityProfile securityProfile = form.getSecurityProfile();
         String newAuthPassword = form.getAuthPassword();
 

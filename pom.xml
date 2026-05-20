@@ -532,6 +532,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>tools.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+        </dependency>
         <!-- Needed for Joda fields in de.rwth.idsg.steve.web.api -->
         <dependency>
             <groupId>tools.jackson.datatype</groupId>

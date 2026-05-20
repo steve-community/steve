@@ -43,6 +43,10 @@
     </center>
     <br>
     <section><span>Intermediate Meter Values</span></section>
+    <form action="${ctxPath}/manager/transactions/details/${details.transaction.id}/meterValues.csv" method="get">
+        <input type="submit" value="Download CSV">
+    </form>
+    <br>
     <table class="res">
         <thead>
         <tr>

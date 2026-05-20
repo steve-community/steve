@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tools.jackson.dataformat.csv.CsvMapper;
+import tools.jackson.dataformat.csv.CsvSchema;
 
 import java.io.Writer;
 import java.util.Comparator;
@@ -56,12 +58,23 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final OcppServerRepository ocppServerRepository;
 
+    private final CsvMapper csvMapper = CsvMapper.builder().findAndAddModules().build();
+    private final CsvSchema schema = csvMapper.schemaFor(TransactionDetails.MeterValues.class)
+        .withHeader()
+        .withNullValue("\"\""); // to be consistent with JOOQ's CSV behavior
+
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return transactionRepository.getTransactions(form);
     }
 
     public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
         transactionRepository.writeTransactionsCSV(form, writer);
+    }
+
+    public void writeTransactionMeterValuesCSV(int transactionPk, Writer writer) {
+        try (var seqWriter = csvMapper.writer(schema).writeValues(writer)) {
+            seqWriter.writeAll(getDetails(transactionPk).getValues());
+        }
     }
 
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {

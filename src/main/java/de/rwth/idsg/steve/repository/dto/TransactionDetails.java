@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +47,16 @@ public class TransactionDetails {
     @JsonIgnore
     private final TransactionStartRecord nextTransactionStart;
 
+    @JsonPropertyOrder(value = {
+        "valueTimestamp",
+        "value",
+        "readingContext",
+        "format",
+        "measurand",
+        "location",
+        "unit",
+        "phase"
+    })
     @Getter
     @Builder
     public static class MeterValues {

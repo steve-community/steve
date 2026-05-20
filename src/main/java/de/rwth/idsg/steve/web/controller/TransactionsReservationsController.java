@@ -64,6 +64,7 @@ public class TransactionsReservationsController {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
+    private static final String TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH = TRANSACTIONS_DETAILS_PATH + "/meterValues.csv";
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -92,6 +93,17 @@ public class TransactionsReservationsController {
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
         model.addAttribute("details", transactionService.getDetails(transactionPk));
         return "data-man/transactionDetails";
+    }
+
+    @RequestMapping(value = TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH)
+    public void getTransactionDetailsMeterValuesCsv(@PathVariable("transactionPk") int transactionPk,
+                                                    HttpServletResponse response) throws IOException {
+        String fileName = "transaction_%s_meter_values.csv".formatted(transactionPk);
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
+        response.setContentType("text/csv");
+        response.setHeader(headerKey, headerValue);
+        transactionService.writeTransactionMeterValuesCSV(transactionPk, response.getWriter());
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)

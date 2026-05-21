@@ -40,7 +40,7 @@ public interface TransactionRepository {
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
-    TransactionDetails getDetails(int transactionPk);
+    TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly);
 
     Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to);
 }

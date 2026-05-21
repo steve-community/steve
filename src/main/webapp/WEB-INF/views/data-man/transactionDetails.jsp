@@ -43,9 +43,19 @@
     </center>
     <br>
     <section><span>Intermediate Meter Values</span></section>
-    <form action="${ctxPath}/manager/transactions/details/${details.transaction.id}/meterValues.csv" method="get">
-        <input type="submit" value="Download CSV">
-    </form>
+    <div style="text-align: center;">
+        <form action="${ctxPath}/manager/transactions/details/${details.transaction.id}" method="get" style="display: inline-block;">
+            <select name="energyValuesOnly" style="width: 180px;">
+                <option value="true" <c:if test="${energyValuesOnly}">selected</c:if>>Energy values only</option>
+                <option value="false" <c:if test="${not energyValuesOnly}">selected</c:if>>All meter values</option>
+            </select>
+            <input type="submit" value="Apply">
+        </form>
+        <form action="${ctxPath}/manager/transactions/details/${details.transaction.id}/meterValues.csv" method="get" style="display: inline-block;">
+            <input type="hidden" name="energyValuesOnly" value="${energyValuesOnly}">
+            <input type="submit" value="Download CSV">
+        </form>
+    </div>
     <br>
     <table class="res">
         <thead>

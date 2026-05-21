@@ -87,7 +87,7 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne()
             .getTransactionPk();
 
-        var details = assertNoDatabaseException(() -> repository.getDetails(txId));
+        var details = assertNoDatabaseException(() -> repository.getDetails(txId, true));
         Assertions.assertNotNull(details);
         Assertions.assertEquals(txId, details.getTransaction().getId());
     }
@@ -121,7 +121,7 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
             .set(CONNECTOR_METER_VALUE.UNIT, "Wh")
             .execute();
 
-        var details = assertNoDatabaseException(() -> repository.getDetails(firstTxId));
+        var details = assertNoDatabaseException(() -> repository.getDetails(firstTxId, true));
 
         Assertions.assertEquals(1, details.getValues().size());
         Assertions.assertEquals("150", details.getValues().getFirst().getValue());

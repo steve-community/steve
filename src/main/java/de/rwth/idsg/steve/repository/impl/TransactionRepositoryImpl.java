@@ -149,7 +149,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk) {
+    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
 
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
@@ -210,10 +210,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, stopTimestamp);
         }
 
-        // https://github.com/steve-community/steve/issues/1514
-        Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
-            .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
-
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
         // Case 2: Fall back to filtering according to time windows. Timestamp fallback only considers rows
@@ -227,10 +223,20 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 )
             );
 
+        List<Condition> conditions = new ArrayList<>();
+        conditions.add(selectionCriteria);
+
+        if (energyValuesOnly) {
+            // https://github.com/steve-community/steve/issues/1514
+            Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
+                .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
+
+            conditions.add(unitCondition);
+        }
+
         List<TransactionDetails.MeterValues> values =
                 ctx.selectFrom(CONNECTOR_METER_VALUE)
-                   .where(unitCondition)
-                   .and(selectionCriteria)
+                   .where(conditions)
                    .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
@@ -244,7 +250,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .phase(r.getPhase())
                                                            .build())
                    .stream()
-                   .filter(TransactionStopServiceHelper::isEnergyValue)
+                   .filter(v -> {
+                       if (energyValuesOnly) {
+                           return TransactionStopServiceHelper.isEnergyValue(v);
+                       }
+                       return true;
+                   })
                    .toList();
 
         return new TransactionDetails(transaction, values, nextTx);

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -90,20 +91,24 @@ public class TransactionsReservationsController {
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
-    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionService.getDetails(transactionPk));
+    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk,
+                                        @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
+                                        Model model) {
+        model.addAttribute("details", transactionService.getDetails(transactionPk, energyValuesOnly));
+        model.addAttribute("energyValuesOnly", energyValuesOnly);
         return "data-man/transactionDetails";
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH)
     public void getTransactionDetailsMeterValuesCsv(@PathVariable("transactionPk") int transactionPk,
+                                                    @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
                                                     HttpServletResponse response) throws IOException {
         String fileName = "transaction_%s_meter_values.csv".formatted(transactionPk);
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
         response.setContentType("text/csv");
         response.setHeader(headerKey, headerValue);
-        transactionService.writeTransactionMeterValuesCSV(transactionPk, response.getWriter());
+        transactionService.writeTransactionMeterValuesCSV(transactionPk, energyValuesOnly, response.getWriter());
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)

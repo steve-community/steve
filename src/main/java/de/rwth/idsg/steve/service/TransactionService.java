@@ -71,9 +71,9 @@ public class TransactionService {
         transactionRepository.writeTransactionsCSV(form, writer);
     }
 
-    public void writeTransactionMeterValuesCSV(int transactionPk, Writer writer) {
+    public void writeTransactionMeterValuesCSV(int transactionPk, boolean energyValuesOnly, Writer writer) {
         try (var seqWriter = csvMapper.writer(schema).writeValues(writer)) {
-            seqWriter.writeAll(getDetails(transactionPk).getValues());
+            seqWriter.writeAll(getDetails(transactionPk, energyValuesOnly).getValues());
         }
     }
 
@@ -81,8 +81,8 @@ public class TransactionService {
         return transactionRepository.getActiveTransactionIds(chargeBoxId);
     }
 
-    public TransactionDetails getDetails(int transactionPk) {
-        return transactionRepository.getDetails(transactionPk);
+    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
+        return transactionRepository.getDetails(transactionPk, energyValuesOnly);
     }
 
     public Transaction getTransaction(int transactionPk) {
@@ -125,7 +125,7 @@ public class TransactionService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk);
+        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, true);
         Transaction thisTx = thisTxDetails.getTransaction();
 
         // early exit, if transaction is already stopped

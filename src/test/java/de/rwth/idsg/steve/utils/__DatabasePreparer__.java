@@ -133,7 +133,7 @@ public class __DatabasePreparer__ {
 
     public TransactionDetails getDetails(int transactionPk) {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
-        return impl.getDetails(transactionPk);
+        return impl.getDetails(transactionPk, true);
     }
 
     public OcppTagActivityRecord getOcppTagRecord(String idTag) {

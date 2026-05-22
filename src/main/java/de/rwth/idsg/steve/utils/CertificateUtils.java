@@ -42,6 +42,7 @@ import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
@@ -146,6 +147,18 @@ public class CertificateUtils {
             return "SHA256withECDSA";
         }
         throw new IllegalArgumentException("Unsupported signing private key algorithm: " + keyAlgorithm);
+    }
+
+    public static boolean isRSAFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return publicKey instanceof RSAPublicKey && "RSA".equalsIgnoreCase(privateKey.getAlgorithm());
+    }
+
+    public static boolean isECDSAFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return publicKey instanceof ECPublicKey && ("EC".equalsIgnoreCase(privateKey.getAlgorithm()) || "ECDSA".equalsIgnoreCase(privateKey.getAlgorithm()));
+    }
+
+    public static boolean isSameKeyFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return isRSAFamily(publicKey, privateKey) || isECDSAFamily(publicKey, privateKey);
     }
 
     public static String certificatesToPEM(List<X509Certificate> chain) throws Exception {

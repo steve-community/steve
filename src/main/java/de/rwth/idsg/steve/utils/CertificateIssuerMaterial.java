@@ -27,7 +27,10 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.CertificateUtils.isECDSAFamily;
+import static de.rwth.idsg.steve.utils.CertificateUtils.isRSAFamily;
 import static de.rwth.idsg.steve.utils.CertificateUtils.resolveSignatureAlgorithm;
+import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,6 +43,21 @@ public record CertificateIssuerMaterial(
     List<X509Certificate> issuerCertificateChain,
     String certificateSignatureAlgorithm
 ) {
+
+    public void validateFamily() {
+        switch (name) {
+            case RSA -> {
+                if (!isRSAFamily(caCertificate.getPublicKey(), caPrivateKey)) {
+                    throw new IllegalArgumentException("Configured '" + name + "' entry does not contain '" + name + "' CA certificate and/or private-key");
+                }
+            }
+            case ECDSA -> {
+                if (!isECDSAFamily(caCertificate.getPublicKey(), caPrivateKey)) {
+                    throw new IllegalArgumentException("Configured '" + name + "' entry does not contain '" + name + "' CA certificate and/or private-key");
+                }
+            }
+        }
+    }
 
     public void validateCaCertificate() throws Exception {
         if (caCertificate.getBasicConstraints() < 0) {
@@ -54,12 +72,12 @@ public record CertificateIssuerMaterial(
         String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
         byte[] dummyProbeData = "certificate-key-pair-check".getBytes(StandardCharsets.UTF_8);
 
-        Signature signer = Signature.getInstance(checkAlgorithm);
+        Signature signer = Signature.getInstance(checkAlgorithm, PROVIDER_NAME);
         signer.initSign(caPrivateKey);
         signer.update(dummyProbeData);
         byte[] signature = signer.sign();
 
-        Signature verifier = Signature.getInstance(checkAlgorithm);
+        Signature verifier = Signature.getInstance(checkAlgorithm, PROVIDER_NAME);
         verifier.initVerify(caCertificate.getPublicKey());
         verifier.update(dummyProbeData);
 

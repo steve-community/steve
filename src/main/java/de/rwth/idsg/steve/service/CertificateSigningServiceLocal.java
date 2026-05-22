@@ -54,7 +54,6 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -66,6 +65,7 @@ import java.util.EnumMap;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.certificatesToPEM;
+import static de.rwth.idsg.steve.utils.CertificateUtils.isSameKeyFamily;
 import static de.rwth.idsg.steve.utils.CertificateUtils.resolveSignatureAlgorithm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static jooq.steve.db.enums.CertificateSignatureAlgorithm.ECDSA;
@@ -295,6 +295,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
             certificateSignatureAlgorithm
         );
 
+        issuer.validateFamily();
         issuer.validateCaCertificate();
         issuer.validateCertificateChain();
 
@@ -333,11 +334,6 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
                 + " from chargeBoxId="
                 + chargeBoxId
         );
-    }
-
-    private static boolean isSameKeyFamily(PublicKey publicKey, PrivateKey privateKey) {
-        return (publicKey instanceof RSAPublicKey && "RSA".equalsIgnoreCase(privateKey.getAlgorithm()))
-            || (publicKey instanceof ECPublicKey && ("EC".equalsIgnoreCase(privateKey.getAlgorithm()) || "ECDSA".equalsIgnoreCase(privateKey.getAlgorithm())));
     }
 
     private List<X509Certificate> loadIssuerCertificateChain(ResourceLoader resourceLoader,

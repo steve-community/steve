@@ -100,10 +100,8 @@ public class SteveProperties {
                 @Data
                 public static class LocalCsrSigning {
                     private Integer certificateValidityYears;
-                    private String caCertificatePem;
-                    private String caKeyPem;
-                    private String caChainPem;
-                    private SignatureAlgorithmPolicy signatureAlgorithmPolicy = SignatureAlgorithmPolicy.AUTO;
+                    private IssuerConfig rsa = new IssuerConfig();
+                    private IssuerConfig ecdsa = new IssuerConfig();
 
                     public enum SignatureAlgorithmPolicy {
                         AUTO,
@@ -112,9 +110,33 @@ public class SteveProperties {
                     }
 
                     public boolean isValid() {
-                        return certificateValidityYears != null
-                            && !StringUtils.isBlank(caCertificatePem)
-                            && !StringUtils.isBlank(caKeyPem);
+                        return certificateValidityYears != null && (IssuerConfig.isValid(rsa) || IssuerConfig.isValid(ecdsa));
+                    }
+
+                    @Data
+                    public static class IssuerConfig {
+                        private String caCertificatePem;
+                        private String caKeyPem;
+
+                        /**
+                         * Optional PEM bundle for issuer chain in order:
+                         * signing cert -> intermediate(s) -> root.
+                         * If omitted, only caCertificatePem is sent as issuer chain.
+                         */
+                        private String caChainPem;
+
+                        /**
+                         * Signature algorithm policy for locally signed charge point certificates:
+                         * - auto: RSA => RSA-PSS (SHA256withRSAandMGF1), EC => ECDSA (SHA256withECDSA)
+                         * - rsa-pkcs1: RSA => PKCS#1 v1.5 (SHA256WithRSA), EC => ECDSA (SHA256withECDSA)
+                         */
+                        private SignatureAlgorithmPolicy signatureAlgorithmPolicy = SignatureAlgorithmPolicy.AUTO;
+
+                        public static boolean isValid(IssuerConfig issuer) {
+                            return issuer != null
+                                && !StringUtils.isBlank(issuer.caCertificatePem)
+                                && !StringUtils.isBlank(issuer.caKeyPem);
+                        }
                     }
                 }
             }

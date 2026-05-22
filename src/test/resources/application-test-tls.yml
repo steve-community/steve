@@ -24,6 +24,7 @@ steve:
         provider: local
         provider-local:
           certificate-validity-years: 1
-          ca-certificate-pem: src/test/resources/certificates/csr-signing-ca-cert.pem
-          ca-key-pem: src/test/resources/certificates/csr-signing-ca-key.pem
-          signature-algorithm-policy: auto
+          rsa:
+            ca-certificate-pem: src/test/resources/certificates/csr-signing-ca-cert.pem
+            ca-key-pem: src/test/resources/certificates/csr-signing-ca-key.pem
+            signature-algorithm-policy: auto

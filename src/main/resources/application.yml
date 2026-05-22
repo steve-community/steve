@@ -69,13 +69,15 @@ steve:
         # CSR signing configuration for provider=local. This is intentionally separate from server.ssl.
         provider-local:
           certificate-validity-years: 1
-          ca-certificate-pem:
-          ca-key-pem:
-          # Optional PEM bundle for issuer chain in order:
-          # signing cert -> intermediate(s) -> root
-          # If omitted, only ca-certificate-pem is sent as issuer chain.
-          ca-chain-pem:
-          # Signature algorithm policy for locally signed charge point certificates:
-          # - auto: RSA => RSA-PSS (SHA256withRSAandMGF1), EC => ECDSA (SHA256withECDSA)
-          # - rsa-pkcs1: RSA => PKCS#1 v1.5 (SHA256WithRSA), EC => ECDSA (SHA256withECDSA)
-          signature-algorithm-policy: auto
+          # Selection currently defaults to CSR key family; station-capability based policy belongs in
+          # CertificateSigningServiceLocal#selectIssuer.
+          rsa:
+            ca-certificate-pem:
+            ca-key-pem:
+            ca-chain-pem:
+            signature-algorithm-policy: auto
+          ecdsa:
+            ca-certificate-pem:
+            ca-key-pem:
+            ca-chain-pem:
+            signature-algorithm-policy: auto

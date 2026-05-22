@@ -1,0 +1,17 @@
+# Use openssl req -x509 to generate a self-signed ECDSA CA cert + private key directly in PEM format.
+
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -sha256 -days 3650 -nodes \
+  -keyout src/test/resources/certificates/csr-signing-ecdsa-ca-key.pem \
+  -out src/test/resources/certificates/csr-signing-ecdsa-ca-cert.pem \
+  -subj "/CN=SteVe Test ECDSA CSR Signing CA/O=SteVe Test CA/OU=QA/C=DE" \
+  -addext "basicConstraints=critical,CA:TRUE" \
+  -addext "keyUsage=critical,keyCertSign,cRLSign,digitalSignature"
+
+# Verify the results with:
+
+openssl x509 -in src/test/resources/certificates/csr-signing-ecdsa-ca-cert.pem -noout -text
+
+# and check it shows:
+# - Basic Constraints: CA:TRUE
+# - Key Usage: Digital Signature, Certificate Sign, CRL Sign
+# - Public Key Algorithm: id-ecPublicKey

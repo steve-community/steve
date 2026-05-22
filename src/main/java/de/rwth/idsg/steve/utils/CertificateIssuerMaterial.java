@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.config.SteveProperties;
 import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 
 import java.nio.charset.StandardCharsets;
@@ -52,7 +51,7 @@ public record CertificateIssuerMaterial(
             throw new IllegalArgumentException("Configured CA certificate for issuer '" + name + "' must allow keyCertSign in keyUsage");
         }
 
-        String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey, SteveProperties.Ocpp.Security.CsrSigning.LocalCsrSigning.SignatureAlgorithmPolicy.RSA_PKCS1);
+        String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
         byte[] dummyProbeData = "certificate-key-pair-check".getBytes(StandardCharsets.UTF_8);
 
         Signature signer = Signature.getInstance(checkAlgorithm);

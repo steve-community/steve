@@ -75,9 +75,7 @@ steve:
             ca-certificate-pem:
             ca-key-pem:
             ca-chain-pem:
-            signature-algorithm-policy: auto
           ecdsa:
             ca-certificate-pem:
             ca-key-pem:
             ca-chain-pem:
-            signature-algorithm-policy: auto

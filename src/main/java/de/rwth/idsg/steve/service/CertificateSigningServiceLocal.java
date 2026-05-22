@@ -285,7 +285,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         var caCertificate = resolveResource(resourceLoader, issuerConfig.getCaCertificatePem(), CertificateUtils::parseCertificate);
         var caPrivateKey = resolveResource(resourceLoader, issuerConfig.getCaKeyPem(), CertificateUtils::parsePrivateKeyViaBouncyCastle);
         var issuerCertificateChain = loadIssuerCertificateChain(resourceLoader, caCertificate, issuerConfig.getCaChainPem());
-        var certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey, issuerConfig.getSignatureAlgorithmPolicy());
+        var certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
 
         var issuer = new CertificateIssuerMaterial(
             name,

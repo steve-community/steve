@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.config.SteveProperties.Ocpp.Security.CsrSigning.LocalCsrSigning.SignatureAlgorithmPolicy;
 import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -138,24 +137,13 @@ public class CertificateUtils {
         }
     }
 
-    public static String resolveSignatureAlgorithm(PrivateKey privateKey,
-                                                   SignatureAlgorithmPolicy signatureAlgorithmPolicy) {
-        var policy = (signatureAlgorithmPolicy == null)
-            ? SignatureAlgorithmPolicy.AUTO
-            : signatureAlgorithmPolicy;
-
+    public static String resolveSignatureAlgorithm(PrivateKey privateKey) {
         String keyAlgorithm = privateKey.getAlgorithm();
         if ("RSA".equalsIgnoreCase(keyAlgorithm)) {
-            return switch (policy) {
-                case AUTO, RSA_PSS -> "SHA256withRSAandMGF1";
-                case RSA_PKCS1 -> "SHA256WithRSA";
-            };
+            return "SHA256withRSAandMGF1";
         }
         if ("EC".equalsIgnoreCase(keyAlgorithm) || "ECDSA".equalsIgnoreCase(keyAlgorithm)) {
             return "SHA256withECDSA";
-        }
-        if ("DSA".equalsIgnoreCase(keyAlgorithm)) {
-            return "SHA256withDSA";
         }
         throw new IllegalArgumentException("Unsupported signing private key algorithm: " + keyAlgorithm);
     }

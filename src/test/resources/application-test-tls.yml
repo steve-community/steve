@@ -27,8 +27,6 @@ steve:
           rsa:
             ca-certificate-pem: src/test/resources/certificates/csr-signing-rsa-ca-cert.pem
             ca-key-pem: src/test/resources/certificates/csr-signing-rsa-ca-key.pem
-            signature-algorithm-policy: auto
           ecdsa:
             ca-certificate-pem: src/test/resources/certificates/csr-signing-ecdsa-ca-cert.pem
             ca-key-pem: src/test/resources/certificates/csr-signing-ecdsa-ca-key.pem
-            signature-algorithm-policy: auto

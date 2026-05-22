@@ -103,12 +103,6 @@ public class SteveProperties {
                     private IssuerConfig rsa = new IssuerConfig();
                     private IssuerConfig ecdsa = new IssuerConfig();
 
-                    public enum SignatureAlgorithmPolicy {
-                        AUTO,
-                        RSA_PSS,
-                        RSA_PKCS1
-                    }
-
                     public boolean isValid() {
                         return certificateValidityYears != null && (IssuerConfig.isValid(rsa) || IssuerConfig.isValid(ecdsa));
                     }
@@ -124,13 +118,6 @@ public class SteveProperties {
                          * If omitted, only caCertificatePem is sent as issuer chain.
                          */
                         private String caChainPem;
-
-                        /**
-                         * Signature algorithm policy for locally signed charge point certificates:
-                         * - auto: RSA => RSA-PSS (SHA256withRSAandMGF1), EC => ECDSA (SHA256withECDSA)
-                         * - rsa-pkcs1: RSA => PKCS#1 v1.5 (SHA256WithRSA), EC => ECDSA (SHA256withECDSA)
-                         */
-                        private SignatureAlgorithmPolicy signatureAlgorithmPolicy = SignatureAlgorithmPolicy.AUTO;
 
                         public static boolean isValid(IssuerConfig issuer) {
                             return issuer != null

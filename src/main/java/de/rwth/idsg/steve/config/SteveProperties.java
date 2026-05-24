@@ -100,21 +100,30 @@ public class SteveProperties {
                 @Data
                 public static class LocalCsrSigning {
                     private Integer certificateValidityYears;
-                    private String caCertificatePem;
-                    private String caKeyPem;
-                    private String caChainPem;
-                    private SignatureAlgorithmPolicy signatureAlgorithmPolicy = SignatureAlgorithmPolicy.AUTO;
-
-                    public enum SignatureAlgorithmPolicy {
-                        AUTO,
-                        RSA_PSS,
-                        RSA_PKCS1
-                    }
+                    private IssuerConfig rsa = new IssuerConfig();
+                    private IssuerConfig ecdsa = new IssuerConfig();
 
                     public boolean isValid() {
-                        return certificateValidityYears != null
-                            && !StringUtils.isBlank(caCertificatePem)
-                            && !StringUtils.isBlank(caKeyPem);
+                        return certificateValidityYears != null && (IssuerConfig.isValid(rsa) || IssuerConfig.isValid(ecdsa));
+                    }
+
+                    @Data
+                    public static class IssuerConfig {
+                        private String caCertificatePem;
+                        private String caKeyPem;
+
+                        /**
+                         * Optional PEM bundle for issuer chain in order:
+                         * signing cert -> intermediate(s) -> root.
+                         * If omitted, only caCertificatePem is sent as issuer chain.
+                         */
+                        private String caChainPem;
+
+                        public static boolean isValid(IssuerConfig issuer) {
+                            return issuer != null
+                                && !StringUtils.isBlank(issuer.caCertificatePem)
+                                && !StringUtils.isBlank(issuer.caKeyPem);
+                        }
                     }
                 }
             }

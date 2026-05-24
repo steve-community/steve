@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.config.SteveProperties.Ocpp.Security.CsrSigning.LocalCsrSigning.SignatureAlgorithmPolicy;
 import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,6 +42,7 @@ import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
@@ -138,26 +138,27 @@ public class CertificateUtils {
         }
     }
 
-    public static String resolveSignatureAlgorithm(PrivateKey privateKey,
-                                                   SignatureAlgorithmPolicy signatureAlgorithmPolicy) {
-        var policy = (signatureAlgorithmPolicy == null)
-            ? SignatureAlgorithmPolicy.AUTO
-            : signatureAlgorithmPolicy;
-
+    public static String resolveSignatureAlgorithm(PrivateKey privateKey) {
         String keyAlgorithm = privateKey.getAlgorithm();
         if ("RSA".equalsIgnoreCase(keyAlgorithm)) {
-            return switch (policy) {
-                case AUTO, RSA_PSS -> "SHA256withRSAandMGF1";
-                case RSA_PKCS1 -> "SHA256WithRSA";
-            };
+            return "SHA256withRSAandMGF1";
         }
         if ("EC".equalsIgnoreCase(keyAlgorithm) || "ECDSA".equalsIgnoreCase(keyAlgorithm)) {
             return "SHA256withECDSA";
         }
-        if ("DSA".equalsIgnoreCase(keyAlgorithm)) {
-            return "SHA256withDSA";
-        }
         throw new IllegalArgumentException("Unsupported signing private key algorithm: " + keyAlgorithm);
+    }
+
+    public static boolean isRSAFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return publicKey instanceof RSAPublicKey && "RSA".equalsIgnoreCase(privateKey.getAlgorithm());
+    }
+
+    public static boolean isECDSAFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return publicKey instanceof ECPublicKey && ("EC".equalsIgnoreCase(privateKey.getAlgorithm()) || "ECDSA".equalsIgnoreCase(privateKey.getAlgorithm()));
+    }
+
+    public static boolean isSameKeyFamily(PublicKey publicKey, PrivateKey privateKey) {
+        return isRSAFamily(publicKey, privateKey) || isECDSAFamily(publicKey, privateKey);
     }
 
     public static String certificatesToPEM(List<X509Certificate> chain) throws Exception {

@@ -19,16 +19,17 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.config.SteveProperties;
-import de.rwth.idsg.steve.config.SteveProperties.Ocpp.Security.CsrSigning.LocalCsrSigning.SignatureAlgorithmPolicy;
+import de.rwth.idsg.steve.config.SteveProperties.Ocpp.Security.CsrSigning.LocalCsrSigning.IssuerConfig;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.utils.CertificateIssuerMaterial;
 import de.rwth.idsg.steve.utils.CertificateUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.CertificateSignedParams;
+import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import jooq.steve.db.tables.records.CertificateRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -43,6 +44,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ResourceLoader;
@@ -52,21 +54,22 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.certificatesToPEM;
+import static de.rwth.idsg.steve.utils.CertificateUtils.isSameKeyFamily;
 import static de.rwth.idsg.steve.utils.CertificateUtils.resolveSignatureAlgorithm;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static jooq.steve.db.enums.CertificateSignatureAlgorithm.ECDSA;
+import static jooq.steve.db.enums.CertificateSignatureAlgorithm.RSA;
 import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
 
 @Slf4j
@@ -82,10 +85,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
     private final ChargePointServiceClient chargePointServiceClient;
     private final CertificateValidator certificateValidator;
 
-    private final X509Certificate caCertificate;
-    private final PrivateKey caPrivateKey;
-    private final List<X509Certificate> issuerCertificateChain;
-    private final String certificateSignatureAlgorithm;
+    private final EnumMap<CertificateSignatureAlgorithm, CertificateIssuerMaterial> issuers = new EnumMap<>(CertificateSignatureAlgorithm.class);
     private final int certificateValidityYears;
 
     private final SecureRandom secureRandom = new SecureRandom();
@@ -106,21 +106,11 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
             throw new IllegalArgumentException("Local CSR signing is not fully configured");
         }
 
-        this.caCertificate = resolveResource(resourceLoader, csrSigningProps.getCaCertificatePem(), CertificateUtils::parseCertificate);
-        this.caPrivateKey = resolveResource(resourceLoader, csrSigningProps.getCaKeyPem(), CertificateUtils::parsePrivateKeyViaBouncyCastle);
-        validateCaMaterial();
+        loadIssuer(resourceLoader, RSA, csrSigningProps.getRsa());
+        loadIssuer(resourceLoader, ECDSA, csrSigningProps.getEcdsa());
 
-        this.issuerCertificateChain = loadIssuerCertificateChain(resourceLoader, csrSigningProps.getCaChainPem());
-        validateIssuerCertificateChain();
-
-        this.certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey, csrSigningProps.getSignatureAlgorithmPolicy());
         this.certificateValidityYears = csrSigningProps.getCertificateValidityYears();
-
-        log.info(
-            "Initialized successfully. Loaded CA certificate: {}. Signature algorithm: {}",
-            caCertificate.getSubjectX500Principal().getName(),
-            certificateSignatureAlgorithm
-        );
+        log.info("Initialized successfully");
     }
 
     @Override
@@ -155,7 +145,10 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
     }
 
     private void processAndSendToStationInternal(PKCS10CertificationRequest csr, String chargeBoxId) throws Exception {
-        X509Certificate signedCert = signCertificate(csr);
+        var issuer = selectIssuer(csr, chargeBoxId);
+        var issuerCertificateChain = issuer.issuerCertificateChain();
+
+        X509Certificate signedCert = signCertificate(csr, issuer);
 
         // Chain Order: Always order certificates from end-entity → intermediates (if any) → root
         var chain = new ArrayList<X509Certificate>(1 + issuerCertificateChain.size());
@@ -221,7 +214,11 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         log.info("CSR validated for charge point '{}'", chargeBoxId);
     }
 
-    private X509Certificate signCertificate(PKCS10CertificationRequest csr) throws Exception {
+    private X509Certificate signCertificate(PKCS10CertificationRequest csr, CertificateIssuerMaterial issuerMaterial) throws Exception {
+        var caCertificate = issuerMaterial.caCertificate();
+        var certificateSignatureAlgorithm = issuerMaterial.certificateSignatureAlgorithm();
+        var caPrivateKey = issuerMaterial.caPrivateKey();
+
         // Preserve exact issuer DN encoding from the configured CA certificate.
         // Rebuilding from String can alter RDN ordering/encoding and break issuer matching in TLS.
         // https://stackoverflow.com/a/12645265
@@ -241,7 +238,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         PublicKey csrPublicKey = new JcaPEMKeyConverter().setProvider(PROVIDER_NAME).getPublicKey(publicKeyInfo);
 
         var certBuilder = new X509v3CertificateBuilder(issuer, serial, notBefore, notAfter, subject, publicKeyInfo);
-        addCertificateExtensions(certBuilder, publicKeyInfo, csrPublicKey);
+        addCertificateExtensions(certBuilder, publicKeyInfo, csrPublicKey, issuerMaterial);
 
         var signer = new JcaContentSignerBuilder(certificateSignatureAlgorithm)
             .setProvider(PROVIDER_NAME)
@@ -256,7 +253,8 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
 
     private void addCertificateExtensions(X509v3CertificateBuilder certBuilder,
                                           SubjectPublicKeyInfo publicKeyInfo,
-                                          PublicKey csrPublicKey) throws Exception {
+                                          PublicKey csrPublicKey,
+                                          CertificateIssuerMaterial issuerMaterial) throws Exception {
         int keyUsageFlags = KeyUsage.digitalSignature;
         if (csrPublicKey instanceof RSAPublicKey) {
             keyUsageFlags |= KeyUsage.keyEncipherment;
@@ -274,77 +272,76 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
         certBuilder.addExtension(Extension.extendedKeyUsage, false, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
         certBuilder.addExtension(Extension.subjectKeyIdentifier, false, extensionUtils.createSubjectKeyIdentifier(publicKeyInfo));
-        certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extensionUtils.createAuthorityKeyIdentifier(caCertificate.getPublicKey()));
+        certBuilder.addExtension(Extension.authorityKeyIdentifier, false, extensionUtils.createAuthorityKeyIdentifier(issuerMaterial.caCertificate().getPublicKey()));
     }
 
-    private void validateCaMaterial() throws Exception {
-        if (caCertificate.getBasicConstraints() < 0) {
-            throw new IllegalArgumentException("Configured CA certificate is not a CA certificate (basicConstraints CA=true required)");
+    private void loadIssuer(ResourceLoader resourceLoader,
+                            CertificateSignatureAlgorithm name,
+                            @Nullable IssuerConfig issuerConfig) throws Exception {
+        if (!IssuerConfig.isValid(issuerConfig)) {
+            return;
         }
 
-        boolean[] keyUsage = caCertificate.getKeyUsage();
-        if (keyUsage == null || keyUsage.length <= 5 || !keyUsage[5]) {
-            throw new IllegalArgumentException("Configured CA certificate must allow keyCertSign in keyUsage");
-        }
+        var caCertificate = resolveResource(resourceLoader, issuerConfig.getCaCertificatePem(), CertificateUtils::parseCertificate);
+        var caPrivateKey = resolveResource(resourceLoader, issuerConfig.getCaKeyPem(), CertificateUtils::parsePrivateKeyViaBouncyCastle);
+        var issuerCertificateChain = loadIssuerCertificateChain(resourceLoader, caCertificate, issuerConfig.getCaChainPem());
+        var certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
 
-        String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey, SignatureAlgorithmPolicy.RSA_PKCS1);
-        byte[] probe = new byte[32];
-        secureRandom.nextBytes(probe);
+        var issuer = new CertificateIssuerMaterial(
+            name,
+            caCertificate,
+            caPrivateKey,
+            issuerCertificateChain,
+            certificateSignatureAlgorithm
+        );
 
-        Signature signer = Signature.getInstance(checkAlgorithm);
-        signer.initSign(caPrivateKey);
-        signer.update(probe);
-        byte[] signature = signer.sign();
+        issuer.validateFamily();
+        issuer.validateCaCertificate();
+        issuer.validateCertificateChain();
 
-        Signature verifier = Signature.getInstance(checkAlgorithm);
-        verifier.initVerify(caCertificate.getPublicKey());
-        verifier.update(probe);
+        issuers.put(name, issuer);
 
-        if (!verifier.verify(signature)) {
-            throw new IllegalArgumentException("Configured CA private key does not match configured CA certificate public key");
-        }
+        log.info(
+            "Loaded local CSR signing issuer. CA certificate: {}. Signature algorithm: {}",
+            issuer.caCertificate().getSubjectX500Principal().getName(),
+            issuer.certificateSignatureAlgorithm()
+        );
     }
 
-    private List<X509Certificate> loadIssuerCertificateChain(ResourceLoader resourceLoader, String caChainPem) throws Exception {
+    /**
+     * Future station-capability policy belongs here. Until then, use the CSR key type as a safe default
+     * when both issuer families are available. A single configured issuer can sign any supported CSR key type.
+     */
+    private CertificateIssuerMaterial selectIssuer(PKCS10CertificationRequest csr, String chargeBoxId) throws Exception {
+        if (issuers.size() == 1) {
+            return issuers.values().iterator().next();
+        }
+
+        var csrPublicKey = new JcaPEMKeyConverter()
+            .setProvider(PROVIDER_NAME)
+            .getPublicKey(csr.getSubjectPublicKeyInfo());
+
+        for (CertificateIssuerMaterial issuer : issuers.values()) {
+            if (issuer != null && isSameKeyFamily(csrPublicKey, issuer.caPrivateKey())) {
+                log.debug("Selected local CSR signing issuer '{}' for chargeBoxId '{}'", issuer.name(), chargeBoxId);
+                return issuer;
+            }
+        }
+
+        throw new IllegalArgumentException(
+            "No local CSR signing issuer configured for CSR public key algorithm "
+                + csrPublicKey.getAlgorithm()
+                + " from chargeBoxId="
+                + chargeBoxId
+        );
+    }
+
+    private List<X509Certificate> loadIssuerCertificateChain(ResourceLoader resourceLoader,
+                                                            X509Certificate caCertificate,
+                                                            String caChainPem) throws Exception {
         return StringUtils.isBlank(caChainPem)
             ? List.of(caCertificate)
             : resolveResource(resourceLoader, caChainPem, CertificateUtils::parseCertificates);
-    }
-
-    private void validateIssuerCertificateChain() throws Exception {
-        if (issuerCertificateChain.isEmpty()) {
-            throw new IllegalArgumentException("Configured issuer certificate chain is empty");
-        }
-
-        if (!Arrays.equals(issuerCertificateChain.getFirst().getEncoded(), caCertificate.getEncoded())) {
-            throw new IllegalArgumentException("Configured issuer certificate chain must start with the configured CA certificate");
-        }
-
-        for (int i = 0; i < issuerCertificateChain.size() - 1; i++) {
-            var child = issuerCertificateChain.get(i);
-            var issuer = issuerCertificateChain.get(i + 1);
-
-            String messagePrefix = "Configured issuer certificate chain contains non-CA issuer at position " + (i + 1);
-
-            if (issuer.getBasicConstraints() < 0) {
-                throw new IllegalArgumentException(messagePrefix + " (basicConstraints CA=true required)");
-            }
-
-            boolean[] keyUsage = issuer.getKeyUsage();
-            if (keyUsage != null && (keyUsage.length <= 5 || !keyUsage[5])) {
-                throw new IllegalArgumentException(messagePrefix + " (keyCertSign required when keyUsage is present)");
-            }
-
-            if (!child.getIssuerX500Principal().equals(issuer.getSubjectX500Principal())) {
-                throw new IllegalArgumentException("Configured issuer certificate chain is not ordered correctly at position " + i);
-            }
-
-            try {
-                child.verify(issuer.getPublicKey());
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Configured issuer certificate chain has invalid signature link at position " + i, e);
-            }
-        }
     }
 
     private static <T> T resolveResource(ResourceLoader resourceLoader, String location, ThrowingFunction<String, T> converter) throws Exception {

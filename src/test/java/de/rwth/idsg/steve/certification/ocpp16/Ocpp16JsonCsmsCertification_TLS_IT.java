@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.repository.TaskStore;
+import de.rwth.idsg.steve.utils.CertificateUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
+import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateSigned;
 import ocpp._2022._02.security.CertificateSignedResponse;
@@ -55,7 +57,9 @@ import java.security.KeyPairGenerator;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.parseCertificates;
@@ -84,7 +88,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
     private TaskStore taskStore;
 
     @Test
-    public void test_TC_074_CSMS_SignCertificateRequestAccepted() throws Exception {
+    public void test_TC_074_CSMS_SignCertificateRequestAccepted_RSA() throws Exception {
         var serialNumber = "SN-01-8043621";
 
         dslContext.update(CHARGE_BOX)
@@ -95,77 +99,32 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
-        Ssl ssl = sslWithCustomTrustStore("src/test/resources/certificates/cp-client.p12");
-        var chargePoint = defaultSecureStation().startWithProfile3(ssl);
+        assertTc074SignCertificateFlow(
+            createRsaCsrMaterial(serialNumber, CPO_NAME),
+            serialNumber,
+            CertificateSignatureAlgorithm.RSA,
+            2048
+        );
+    }
 
-        // ExtendedTriggerMessage
-        {
-            var params = new ExtendedTriggerMessageParams();
-            params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
-            params.setTriggerMessage(ExtendedTriggerMessage.MessageTriggerEnumType.SIGN_CHARGE_POINT_CERTIFICATE);
+    @Test
+    public void test_TC_074_CSMS_SignCertificateRequestAccepted_ECDSA() throws Exception {
+        var serialNumber = "SN-01-8043621";
 
-            var triggerFuture = supplyAsyncUnchecked(() -> operationsService.extendedTriggerMessage(params));
+        dslContext.update(CHARGE_BOX)
+            .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
+            .set(CHARGE_BOX.SECURITY_PROFILE, 3)
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
+            .execute();
 
-            chargePoint.expectRequest(
-                new ExtendedTriggerMessage()
-                    .withRequestedMessage(ExtendedTriggerMessage.MessageTriggerEnumType.SIGN_CHARGE_POINT_CERTIFICATE),
-                new ExtendedTriggerMessageResponse()
-                    .withStatus(ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType.ACCEPTED)
-            );
-
-            var triggerStatus = successResponse(triggerFuture.join());
-            assertEquals(ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType.ACCEPTED.value(), triggerStatus.value());
-        }
-
-        // SignCertificate + CertificateSigned
-        var csrMaterial = createCsrMaterial(serialNumber, CPO_NAME);
-        CertificateSigned arrivedRequest;
-        {
-            var signCertificateResponse = chargePoint.send(
-                new SignCertificate().withCsr(csrMaterial.csrPem),
-                SignCertificateResponse.class
-            );
-            assertNotNull(signCertificateResponse);
-            assertEquals(SignCertificateResponse.GenericStatusEnumType.ACCEPTED, signCertificateResponse.getStatus());
-
-            arrivedRequest = chargePoint.expectRequest(
-                CertificateSigned.class,
-                new CertificateSignedResponse().withStatus(CertificateSignedResponse.CertificateSignedStatusEnumType.ACCEPTED)
-            );
-            assertNotNull(arrivedRequest.getCertificateChain());
-            assertTrue(arrivedRequest.getCertificateChain().contains("BEGIN CERTIFICATE"));
-
-            var latestCertificateId = getCertificateIdFromTask(arrivedRequest.getCertificateChain());
-            assertNotNull(latestCertificateId);
-
-            var accepted = dslContext.select(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED)
-                .from(CHARGE_BOX_CERTIFICATE_SIGNED)
-                .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_SIGNED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
-                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
-                .and(CHARGE_BOX_CERTIFICATE_SIGNED.CERTIFICATE_ID.eq(latestCertificateId))
-                .orderBy(CHARGE_BOX_CERTIFICATE_SIGNED.RESPONDED_AT.desc())
-                .limit(1)
-                .fetchOne(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED);
-            assertEquals(Boolean.TRUE, accepted);
-        }
-
-        chargePoint.close();
-
-        // Build new temp client keystore
-        Ssl newSsl;
-        {
-            var certs = parseCertificates(arrivedRequest.getCertificateChain());
-            var p12Path = saveCertsToTempFile(certs, csrMaterial);
-
-            // this new chain contains signing-ca-cert (parent) and a newly generated cert for station (child)
-            String newTrustStorePath = p12Path.toAbsolutePath().toString();
-
-            newSsl = sslWithCustomTrustStore(newTrustStorePath);
-        }
-
-        chargePoint = defaultSecureStation().startWithProfile3(newSsl);
-
-        chargePoint.close();
+        assertTc074SignCertificateFlow(
+            createEcdsaCsrMaterial(serialNumber, CPO_NAME),
+            serialNumber,
+            CertificateSignatureAlgorithm.ECDSA,
+            224
+        );
     }
 
     @Test
@@ -204,7 +163,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         // 3-4) Charge point sends SignCertificate, CSMS accepts
         {
             var signCertificateResponse = chargePoint.send(
-                new SignCertificate().withCsr(createCsrMaterial(serialNumber, CPO_NAME).csrPem),
+                new SignCertificate().withCsr(createRsaCsrMaterial(serialNumber, CPO_NAME).csrPem),
                 SignCertificateResponse.class
             );
             assertNotNull(signCertificateResponse);
@@ -322,35 +281,158 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         return ssl;
     }
 
+    private void assertTc074SignCertificateFlow(CsrMaterial csrMaterial,
+                                                String serialNumber,
+                                                CertificateSignatureAlgorithm expectedSignatureAlgorithm,
+                                                int expectedMinKeySize) throws Exception {
+        Ssl ssl = sslWithCustomTrustStore("src/test/resources/certificates/cp-client.p12");
+        var chargePoint = defaultSecureStation().startWithProfile3(ssl);
+
+        // ExtendedTriggerMessage
+        {
+            var params = new ExtendedTriggerMessageParams();
+            params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
+            params.setTriggerMessage(ExtendedTriggerMessage.MessageTriggerEnumType.SIGN_CHARGE_POINT_CERTIFICATE);
+
+            var triggerFuture = supplyAsyncUnchecked(() -> operationsService.extendedTriggerMessage(params));
+
+            chargePoint.expectRequest(
+                new ExtendedTriggerMessage()
+                    .withRequestedMessage(ExtendedTriggerMessage.MessageTriggerEnumType.SIGN_CHARGE_POINT_CERTIFICATE),
+                new ExtendedTriggerMessageResponse()
+                    .withStatus(ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType.ACCEPTED)
+            );
+
+            var triggerStatus = successResponse(triggerFuture.join());
+            assertEquals(ExtendedTriggerMessageResponse.TriggerMessageStatusEnumType.ACCEPTED.value(), triggerStatus.value());
+        }
+
+        // SignCertificate + CertificateSigned
+        CertificateSigned arrivedRequest;
+        {
+            var signCertificateResponse = chargePoint.send(
+                new SignCertificate().withCsr(csrMaterial.csrPem),
+                SignCertificateResponse.class
+            );
+            assertNotNull(signCertificateResponse);
+            assertEquals(SignCertificateResponse.GenericStatusEnumType.ACCEPTED, signCertificateResponse.getStatus());
+
+            arrivedRequest = chargePoint.expectRequest(
+                CertificateSigned.class,
+                new CertificateSignedResponse().withStatus(CertificateSignedResponse.CertificateSignedStatusEnumType.ACCEPTED)
+            );
+            assertNotNull(arrivedRequest.getCertificateChain());
+            assertTrue(arrivedRequest.getCertificateChain().contains("BEGIN CERTIFICATE"));
+            assertCertificateChainMatchesTc074(
+                arrivedRequest.getCertificateChain(),
+                csrMaterial,
+                serialNumber,
+                expectedSignatureAlgorithm,
+                expectedMinKeySize
+            );
+
+            var latestCertificateId = getCertificateIdFromTask(arrivedRequest.getCertificateChain());
+            assertNotNull(latestCertificateId);
+
+            var accepted = dslContext.select(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED)
+                .from(CHARGE_BOX_CERTIFICATE_SIGNED)
+                .join(CHARGE_BOX).on(CHARGE_BOX_CERTIFICATE_SIGNED.CHARGE_BOX_PK.eq(CHARGE_BOX.CHARGE_BOX_PK))
+                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
+                .and(CHARGE_BOX_CERTIFICATE_SIGNED.CERTIFICATE_ID.eq(latestCertificateId))
+                .orderBy(CHARGE_BOX_CERTIFICATE_SIGNED.RESPONDED_AT.desc())
+                .limit(1)
+                .fetchOne(CHARGE_BOX_CERTIFICATE_SIGNED.ACCEPTED);
+            assertEquals(Boolean.TRUE, accepted);
+        }
+
+        chargePoint.close();
+
+        // Build new temp client keystore
+        Ssl newSsl;
+        {
+            var certs = parseCertificates(arrivedRequest.getCertificateChain());
+            var p12Path = saveCertsToTempFile(certs, csrMaterial);
+
+            // this new chain contains signing-ca-cert (parent) and a newly generated cert for station (child)
+            String newTrustStorePath = p12Path.toAbsolutePath().toString();
+
+            newSsl = sslWithCustomTrustStore(newTrustStorePath);
+        }
+
+        chargePoint = defaultSecureStation().startWithProfile3(newSsl);
+        chargePoint.close();
+    }
+
     private record CsrMaterial(
         String csrPem,
         KeyPair keyPair
     ) {
     }
 
-    private static CsrMaterial createCsrMaterial(String serialNumber, String cpoName) {
+    private static CsrMaterial createRsaCsrMaterial(String serialNumber, String cpoName) {
         try {
             var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
             keyPairGenerator.initialize(2048);
             var keyPair = keyPairGenerator.generateKeyPair();
 
-            var subject = new X500Name("CN=" + serialNumber + ",O=" + cpoName);
-            var csrBuilder = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic());
-            var signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
-            var csr = csrBuilder.build(signer);
-
-            try (var writer = new StringWriter(); var pemWriter = new JcaPEMWriter(writer)) {
-                pemWriter.writeObject(csr);
-                pemWriter.flush();
-                return new CsrMaterial(writer.toString(), keyPair);
-            }
+            return createCsrMaterial(serialNumber, cpoName, keyPair, "SHA256withRSA");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate CSR", e);
+            throw new RuntimeException("Failed to generate RSA CSR", e);
+        }
+    }
+
+    private static CsrMaterial createEcdsaCsrMaterial(String serialNumber, String cpoName) {
+        try {
+            var keyPairGenerator = KeyPairGenerator.getInstance("EC");
+            keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"));
+            var keyPair = keyPairGenerator.generateKeyPair();
+
+            return createCsrMaterial(serialNumber, cpoName, keyPair, "SHA256withECDSA");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate ECDSA CSR", e);
+        }
+    }
+
+    private static CsrMaterial createCsrMaterial(String serialNumber,
+                                                String cpoName,
+                                                KeyPair keyPair,
+                                                String signatureAlgorithm) throws Exception {
+        var subject = new X500Name("CN=" + serialNumber + ",O=" + cpoName);
+        var csrBuilder = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic());
+        var signer = new JcaContentSignerBuilder(signatureAlgorithm).build(keyPair.getPrivate());
+        var csr = csrBuilder.build(signer);
+
+        try (var writer = new StringWriter(); var pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(csr);
+            pemWriter.flush();
+            return new CsrMaterial(writer.toString(), keyPair);
         }
     }
 
     private static JSON cpoNameConfig() {
         return JSON.json("{\"CpoName\":\"" + CPO_NAME + "\"}");
+    }
+
+    private static void assertCertificateChainMatchesTc074(String certificateChain,
+                                                           CsrMaterial csrMaterial,
+                                                           String serialNumber,
+                                                           CertificateSignatureAlgorithm expectedSignatureAlgorithm,
+                                                           int expectedMinKeySize) throws Exception {
+        var certs = parseCertificates(certificateChain);
+        assertTrue(certs.size() >= 2, "certificateChain should contain leaf certificate and issuer certificate");
+
+        var clientCert = certs.getFirst();
+        var issuerCert = certs.get(1);
+
+        assertTrue(
+            Arrays.equals(clientCert.getPublicKey().getEncoded(), csrMaterial.keyPair().getPublic().getEncoded()),
+            "client certificate public key must match CSR public key"
+        );
+
+        clientCert.verify(issuerCert.getPublicKey());
+        assertEquals(expectedSignatureAlgorithm, CertificateUtils.getSignatureAlgorithm(clientCert));
+        assertEquals(serialNumber, CertificateUtils.getCommonName(clientCert));
+        assertTrue(CertificateUtils.getKeySize(clientCert) >= expectedMinKeySize, "client certificate key is smaller than expected");
     }
 
     private static Path saveCertsToTempFile(List<X509Certificate> certs, CsrMaterial csrMaterial) throws Exception {

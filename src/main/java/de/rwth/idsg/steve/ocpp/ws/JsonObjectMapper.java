@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.rwth.idsg.ocpp.jaxb.validation.BeanValidationModule;
-import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
@@ -59,7 +58,6 @@ public enum JsonObjectMapper {
             .enable(FAIL_ON_NULL_FOR_PRIMITIVES)
             .enable(WRITE_BIGDECIMAL_AS_PLAIN)
             .disable(FAIL_ON_UNKNOWN_PROPERTIES)
-            .addModule(new CustomStringModule())
             .addModule(new Ocpp12JacksonModule())
             .addModule(new Ocpp15JacksonModule())
             .addModule(new Ocpp16JacksonModule())

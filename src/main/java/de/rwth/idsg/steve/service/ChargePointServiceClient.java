@@ -155,8 +155,16 @@ public class ChargePointServiceClient {
             ? new HashSet<>()
             : new HashSet<>(params.getChargeBoxIdList());
 
-        // deduplicate if IDs and rich objects overlap
+        // ChargePointSelect uses @EqualsAndHashCode over ocppProtocol+chargeBoxId+endpointAddress, so the same
+        // chargeBoxId can still appear multiple times when other fields differ. This can trigger duplicate OCPP
+        // calls and causes CommunicationTask to overwrite per-chargeBoxId results while still counting duplicates
+        // in resultSize.
         var existingIds = stationSet.stream().map(ChargePointSelect::getChargeBoxId).collect(Collectors.toSet());
+        if (stationSet.size() != existingIds.size()) {
+            throw new SteveException.BadRequest("Duplicate stations with differing details");
+        }
+
+        // also deduplicate if IDs and rich objects overlap
         idSet.removeAll(existingIds);
 
         // convert IDs into rich objects and add

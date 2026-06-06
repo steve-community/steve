@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,9 @@ public class BackgroundService {
     }
 
     public Runner forFirst(List<ChargePointSelect> list) {
+        if (list.size() != 1) {
+            throw new SteveException.BadRequest("This operation is for one station only");
+        }
         return new BackgroundSingleRunner(list.get(0));
     }
 

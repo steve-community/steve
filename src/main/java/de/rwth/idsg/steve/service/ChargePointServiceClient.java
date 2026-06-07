@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
@@ -226,7 +227,7 @@ public class ChargePointServiceClient {
 
             task.addCallback(new OcppCallback<>() {
                 @Override
-                public void success(String chargeBoxId, ConfigurationStatus response) {
+                public void success(CommunicationTask<?, ConfigurationStatus> task, String chargeBoxId, ConfigurationStatus response) {
                     if (response == ACCEPTED) {
                         var params = new GetConfigurationParams();
                         params.setChargePointSelectList(ocpp15AndAboveStations);
@@ -235,12 +236,12 @@ public class ChargePointServiceClient {
                 }
 
                 @Override
-                public void success(String chargeBoxId, OcppJsonError error) {
+                public void success(CommunicationTask<?, ConfigurationStatus> task, String chargeBoxId, OcppJsonError error) {
 
                 }
 
                 @Override
-                public void failed(String chargeBoxId, Exception e) {
+                public void failed(CommunicationTask<?, ConfigurationStatus> task, String chargeBoxId, Exception e) {
 
                 }
             });

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import lombok.Getter;
@@ -49,19 +50,19 @@ public class RestCallback<T> implements OcppCallback<T> {
     private boolean finished = false;
 
     @Override
-    public void success(String chargeBoxId, T response) {
+    public void success(CommunicationTask<?, T> task, String chargeBoxId, T response) {
         successResponsesByChargeBoxId.put(chargeBoxId, response);
         countDownLatch.countDown();
     }
 
     @Override
-    public void success(String chargeBoxId, OcppJsonError error) {
+    public void success(CommunicationTask<?, T> task, String chargeBoxId, OcppJsonError error) {
         errorResponsesByChargeBoxId.put(chargeBoxId, error);
         countDownLatch.countDown();
     }
 
     @Override
-    public void failed(String chargeBoxId, Exception e) {
+    public void failed(CommunicationTask<?, T> task, String chargeBoxId, Exception e) {
         exceptionsByChargeBoxId.put(chargeBoxId, e);
         countDownLatch.countDown();
     }

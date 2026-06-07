@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
@@ -47,9 +48,9 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, Reserva
 
     @Override
     public OcppCallback<ReservationStatus> defaultCallback() {
-        return new DefaultOcppCallback<ReservationStatus>() {
+        return new OcppCallback<>() {
             @Override
-            public void success(String chargeBoxId, ReservationStatus response) {
+            public void success(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, ReservationStatus response) {
                 addNewResponse(chargeBoxId, response.value());
 
                 if (ReservationStatus.ACCEPTED == response) {
@@ -60,13 +61,13 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, Reserva
             }
 
             @Override
-            public void success(String chargeBoxId, OcppJsonError error) {
+            public void success(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, OcppJsonError error) {
                 addNewError(chargeBoxId, error.toString());
                 delete();
             }
 
             @Override
-            public void failed(String chargeBoxId, Exception e) {
+            public void failed(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, Exception e) {
                 addNewError(chargeBoxId, e.getMessage());
                 delete();
             }

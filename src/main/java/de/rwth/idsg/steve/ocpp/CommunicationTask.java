@@ -135,7 +135,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public void success(String chargeBoxId, RESPONSE response) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.success(chargeBoxId, response);
+                c.success(this, chargeBoxId, response);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -145,7 +145,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public void failed(String chargeBoxId, Exception exception) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.failed(chargeBoxId, exception);
+                c.failed(this, chargeBoxId, exception);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -159,7 +159,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public void success(String chargeBoxId, OcppJsonError error) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.success(chargeBoxId, error);
+                c.success(this, chargeBoxId, error);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -193,12 +193,17 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         public abstract void success(String chargeBoxId, RES response);
 
         @Override
-        public void success(String chargeBoxId, OcppJsonError error) {
+        public void success(CommunicationTask<?, RES> task, String chargeBoxId, RES response) {
+            success(chargeBoxId, response);
+        }
+
+        @Override
+        public void success(CommunicationTask<?, RES> task, String chargeBoxId, OcppJsonError error) {
             addNewResponse(chargeBoxId, error.toString());
         }
 
         @Override
-        public void failed(String chargeBoxId, Exception e) {
+        public void failed(CommunicationTask<?, RES> task, String chargeBoxId, Exception e) {
             addNewError(chargeBoxId, e.getMessage());
         }
     }

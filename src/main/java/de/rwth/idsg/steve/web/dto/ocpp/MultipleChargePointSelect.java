@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -60,6 +61,7 @@ public class MultipleChargePointSelect implements ChargePointSelection {
         ),
         minItems = 1
     )
+    @ChargeBoxId
     private List<String> chargeBoxIdList = Collections.emptyList();
 
     @JsonIgnore

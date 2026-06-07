@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  * @since 29.12.2014
  */
 @RequiredArgsConstructor
+@EqualsAndHashCode
 @Getter
 public final class ChargePointSelect {
     private final OcppProtocol ocppProtocol;

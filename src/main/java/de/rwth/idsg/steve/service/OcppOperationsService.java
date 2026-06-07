@@ -19,13 +19,11 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
@@ -80,7 +78,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
@@ -94,7 +91,6 @@ public class OcppOperationsService {
 
     private static final Duration STATION_RESPONSE_TIMEOUT = Duration.ofSeconds(30);
 
-    private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
     private final OcppTagService ocppTagService;
     private final TransactionService transactionService;
@@ -205,8 +201,6 @@ public class OcppOperationsService {
         validateChargingProfile(params.getChargingProfilePk());
         validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
 
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
         RestCallback<ChargingProfileStatus> callback = createCallback(params);
         int taskId = chargePointServiceClient.setChargingProfile(task, callback);
 
@@ -248,23 +242,6 @@ public class OcppOperationsService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    /**
-     * TODO: Improve this method. We make multiple calls to the database to get charge points for each version.
-     */
-    private List<ChargePointSelect> fetchChargePoints(List<String> chargeBoxIdList) {
-        List<ChargePointSelect> returnList = new ArrayList<>();
-
-        for (OcppVersion version : OcppVersion.values()) {
-            var temp = chargePointService.getChargePointsWithIds(version, chargeBoxIdList);
-            returnList.addAll(temp);
-        }
-
-        if (returnList.isEmpty()) {
-            throw new SteveException.BadRequest("No stations are eligible for communication. Ensure that the chargeBox IDs are correct and the stations are online.");
-        }
-
-        return returnList;
-    }
 
     private void validateIdTags(List<String> idTagList) {
         if (CollectionUtils.isEmpty(idTagList)) {
@@ -352,8 +329,6 @@ public class OcppOperationsService {
         P params,
         BiFunction<P, RestCallback<T>, Integer> function
     ) throws Exception {
-        params.setChargePointSelectList(fetchChargePoints(params.getChargeBoxIdList()));
-
         RestCallback<T> callback = createCallback(params);
         int taskId = function.apply(params, callback);
 

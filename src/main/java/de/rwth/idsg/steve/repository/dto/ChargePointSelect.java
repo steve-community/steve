@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * @since 29.12.2014
  */
 @RequiredArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "chargeBoxId")
 @Getter
 public final class ChargePointSelect {
     private final OcppProtocol ocppProtocol;

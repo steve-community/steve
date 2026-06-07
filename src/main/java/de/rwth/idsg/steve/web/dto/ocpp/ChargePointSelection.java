@@ -33,4 +33,6 @@ public interface ChargePointSelection {
     void setChargePointSelectList(List<ChargePointSelect> chargePointSelectList);
 
     List<String> getChargeBoxIdList();
+
+    void setChargeBoxIdList(List<String> chargeBoxIdList);
 }

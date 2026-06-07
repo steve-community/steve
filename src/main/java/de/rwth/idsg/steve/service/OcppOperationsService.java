@@ -201,6 +201,8 @@ public class OcppOperationsService {
         validateChargingProfile(params.getChargingProfilePk());
         validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
 
+        chargePointServiceClient.prepareAndCheck(params);
+
         RestCallback<ChargingProfileStatus> callback = createCallback(params);
         int taskId = chargePointServiceClient.setChargingProfile(task, callback);
 
@@ -329,6 +331,8 @@ public class OcppOperationsService {
         P params,
         BiFunction<P, RestCallback<T>, Integer> function
     ) throws Exception {
+        chargePointServiceClient.prepareAndCheck(params);
+
         RestCallback<T> callback = createCallback(params);
         int taskId = function.apply(params, callback);
 

@@ -115,6 +115,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -144,8 +145,15 @@ public class ChargePointServiceClient {
     private final TaskStore taskStore;
     private final ChargePointServiceInvokerImpl invoker;
 
-    private void prepareAndCheck(ChargePointSelection params) {
-        // deduplicate rich objects
+    /**
+     * Note: calls coming from OcppOperationsService are calling this method twice with the current flow (one from
+     * OcppOperationsService, and then within this class internally). Second call is cheap, but design is not nice
+     * nevertheless. We should refactor this when we stop using ChargePointSelect from web UI, and both REST and web UI
+     * starting points just have chargeBoxIds (List of Strings) which we then transform into ChargePointSelect as an
+     * intermediate step.
+     */
+    void prepareAndCheck(ChargePointSelection params) {
+        // deduplicate rich objects (by IDs)
         Set<ChargePointSelect> stationSet = (params.getChargePointSelectList() == null)
             ? new HashSet<>()
             : new HashSet<>(params.getChargePointSelectList());
@@ -155,16 +163,8 @@ public class ChargePointServiceClient {
             ? new HashSet<>()
             : new HashSet<>(params.getChargeBoxIdList());
 
-        // ChargePointSelect uses @EqualsAndHashCode over ocppProtocol+chargeBoxId+endpointAddress, so the same
-        // chargeBoxId can still appear multiple times when other fields differ. This can trigger duplicate OCPP
-        // calls and causes CommunicationTask to overwrite per-chargeBoxId results while still counting duplicates
-        // in resultSize.
-        var existingIds = stationSet.stream().map(ChargePointSelect::getChargeBoxId).collect(Collectors.toSet());
-        if (stationSet.size() != existingIds.size()) {
-            throw new SteveException.BadRequest("Duplicate stations with differing details");
-        }
-
         // also deduplicate if IDs and rich objects overlap
+        var existingIds = stationSet.stream().map(ChargePointSelect::getChargeBoxId).collect(Collectors.toSet());
         idSet.removeAll(existingIds);
 
         // convert IDs into rich objects and add
@@ -180,6 +180,7 @@ public class ChargePointServiceClient {
             throw new SteveException.BadRequest("No stations are eligible for communication. Ensure that the chargeBox IDs are correct and the stations are online.");
         }
 
+        params.setChargeBoxIdList(Collections.emptyList());
         params.setChargePointSelectList(new ArrayList<>(stationSet));
     }
 

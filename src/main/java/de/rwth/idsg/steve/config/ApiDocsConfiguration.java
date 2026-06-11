@@ -63,6 +63,8 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.api-docs.path", API_DOCS_PATH);
         // Same for swagger ui
         System.setProperty("springdoc.swagger-ui.path", "/manager/swagger-ui/index.html");
+        // Do not expose internal (web UI-related old-school AJAX-type) APIs
+        System.setProperty("springdoc.paths-to-exclude", "/manager/**");
         // Sort controllers alphabetically by their path
         System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
         // Sort endpoints (within a controller) alphabetically by their path

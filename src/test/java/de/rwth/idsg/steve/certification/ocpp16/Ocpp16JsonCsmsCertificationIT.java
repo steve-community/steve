@@ -655,17 +655,17 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         params.setConfKey("MeterValueSampleInterval");
         params.setValue("60");
 
-        var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
-
         var changeConfigReq = new ChangeConfigurationRequest()
             .withKey("MeterValueSampleInterval")
             .withValue("60");
         var changeConfigRes = new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED);
-        chargePoint.expectRequest(changeConfigReq, changeConfigRes);
+        var changeConfigExchange = chargePoint.planRequest(changeConfigReq, changeConfigRes);
+        var getConfExchange = planGetConf(chargePoint);
 
+        var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
+        changeConfigExchange.await();
         assertEquals(ConfigurationStatus.ACCEPTED, successResponse(operationFuture.join()));
-
-        expectGetConf(chargePoint);
+        getConfExchange.await();
 
         chargePoint.close();
     }
@@ -2280,15 +2280,16 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
         var valueHex = HexFormat.of().formatHex(params.getValue().getBytes(StandardCharsets.UTF_8));
 
-        var future = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
-
-        chargePoint.expectRequest(
+        var changeConfigExchange = chargePoint.planRequest(
             new ChangeConfigurationRequest().withKey(AuthorizationKey.name()).withValue(valueHex),
             new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
         );
-        assertEquals(ConfigurationStatus.ACCEPTED, successResponse(future.join()));
+        var getConfExchange = planGetConf(chargePoint);
 
-        expectGetConf(chargePoint);
+        var future = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
+        changeConfigExchange.await();
+        assertEquals(ConfigurationStatus.ACCEPTED, successResponse(future.join()));
+        getConfExchange.await();
 
         var record = dslContext
             .selectFrom(CHARGE_BOX)
@@ -2812,14 +2813,16 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             changeConfig.setConfKey(SecurityProfile.name());
             changeConfig.setValue("2");
 
-            var changeConfigFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(changeConfig));
-            chargePoint.expectRequest(
+            var changeConfigExchange = chargePoint.planRequest(
                 new ChangeConfigurationRequest().withKey(SecurityProfile.name()).withValue("2"),
                 new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
             );
-            assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
+            var getConfExchange = planGetConf(chargePoint);
 
-            expectGetConf(chargePoint);
+            var changeConfigFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(changeConfig));
+            changeConfigExchange.await();
+            assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
+            getConfExchange.await();
 
             var chargeBox = dslContext.selectFrom(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))

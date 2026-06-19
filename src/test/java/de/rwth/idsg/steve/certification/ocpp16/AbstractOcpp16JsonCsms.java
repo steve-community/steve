@@ -224,7 +224,11 @@ public abstract class AbstractOcpp16JsonCsms {
      * https://github.com/steve-community/steve/pull/2039
      */
     static void expectGetConf(OcppJsonChargePoint chargePoint) {
-        chargePoint.expectRequest(
+        planGetConf(chargePoint).await();
+    }
+
+    static OcppJsonChargePoint.ExchangeContext<GetConfigurationRequest, GetConfigurationResponse> planGetConf(OcppJsonChargePoint chargePoint) {
+        return chargePoint.planRequest(
             new GetConfigurationRequest().withKey(),
             new GetConfigurationResponse()
         );

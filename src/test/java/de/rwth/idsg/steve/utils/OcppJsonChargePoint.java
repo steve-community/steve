@@ -33,6 +33,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -286,7 +287,7 @@ public class OcppJsonChargePoint {
 
         // wait for the response to arrive and be processed
         try {
-            boolean completedInTime = ctx.doneSignal.await(30, TimeUnit.SECONDS);
+            boolean completedInTime = ctx.getDoneSignal().await(30, TimeUnit.SECONDS);
             if (!completedInTime) {
                 throw new AssertionFailedError("Timed out waiting for response. action=" + action + ", messageId=" + messageId);
             }
@@ -395,7 +396,7 @@ public class OcppJsonChargePoint {
         result.setPayload(res);
 
         exchangeContext.setIncomingMessage(result);
-        exchangeContext.doneSignal.countDown();
+        exchangeContext.getDoneSignal().countDown();
     }
 
     private void handleError(String messageId, JsonParser parser) throws Exception {
@@ -431,7 +432,7 @@ public class OcppJsonChargePoint {
         }
 
         exchangeContext.setIncomingMessage(error);
-        exchangeContext.doneSignal.countDown();
+        exchangeContext.getDoneSignal().countDown();
     }
 
     private void handleCall(String messageId, JsonParser parser) {
@@ -496,7 +497,7 @@ public class OcppJsonChargePoint {
             log.error("Exception", e);
         }
 
-        exchangeContext.doneSignal.countDown();
+        exchangeContext.getDoneSignal().countDown();
     }
 
     // -------------------------------------------------------------------------
@@ -546,13 +547,13 @@ public class OcppJsonChargePoint {
         return new WebSocketClient(httpClient);
     }
 
-    @Setter
-    @Getter
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     public final class ExchangeContext<REQ extends RequestType, RES extends ResponseType> extends CommunicationContext {
 
         private Class<REQ> requestClass;
         private Class<RES> responseClass;
-        private CountDownLatch doneSignal = new CountDownLatch(1);
+        private final CountDownLatch doneSignal = new CountDownLatch(1);
 
         public ExchangeContext(@NotNull WebSocketSession session, @NotNull String chargeBoxId) {
             super(session, chargeBoxId);

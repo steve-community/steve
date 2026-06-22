@@ -50,7 +50,7 @@ jobs:
         options: --health-cmd="${{ matrix.database.healthCmd }}" --health-interval=10s --health-timeout=5s --health-retries=6
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Java ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:

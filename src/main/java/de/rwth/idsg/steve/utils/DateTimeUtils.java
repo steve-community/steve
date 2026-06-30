@@ -22,11 +22,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -40,14 +37,6 @@ public final class DateTimeUtils {
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
-
-    private static final PeriodFormatter PERIOD_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroNever()
-            .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
-            .appendHours().appendSuffix(" hour", " hours").appendSeparator(" ")
-            .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
-            .appendSeconds().appendSuffix(" second", " seconds")
-            .toFormatter();
 
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
@@ -80,7 +69,24 @@ public final class DateTimeUtils {
     }
 
     public static String timeElapsed(DateTime from, DateTime to) {
-        return PERIOD_FORMATTER.print(new Period(from, to));
+        if (from == null || to == null) {
+            return "";
+        }
+
+        long totalSeconds = Math.max(0, TimeUnit.MILLISECONDS.toSeconds(to.getMillis() - from.getMillis()));
+        long days = TimeUnit.SECONDS.toDays(totalSeconds);
+        long hours = TimeUnit.SECONDS.toHours(totalSeconds) % 24;
+        long minutes = TimeUnit.SECONDS.toMinutes(totalSeconds) % 60;
+        long seconds = totalSeconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+
+        appendTimePart(sb, days, "day");
+        appendTimePart(sb, hours, "hour");
+        appendTimePart(sb, minutes, "minute");
+        appendTimePart(sb, seconds, "second");
+
+        return sb.isEmpty() ? "0 seconds" : sb.toString();
     }
 
     public static long getOffsetFromUtcInSeconds() {
@@ -101,5 +107,23 @@ public final class DateTimeUtils {
 
     public static OffsetDateTime toOffsetDateTime(DateTime dt, ZoneId zoneId) {
         return OffsetDateTime.ofInstant(dt.toDate().toInstant(), zoneId);
+    }
+
+    private static void appendTimePart(StringBuilder sb, long value, String unit) {
+        if (value == 0) {
+            return;
+        }
+
+        if (!sb.isEmpty()) {
+            sb.append(' ');
+        }
+
+        sb.append(value)
+            .append(' ')
+            .append(unit);
+
+        if (value != 1) {
+            sb.append('s');
+        }
     }
 }

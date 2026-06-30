@@ -221,7 +221,7 @@ public class TransactionService {
                                                  .format(v.getFormat())
                                                  .measurand(v.getMeasurand())
                                                  .location(v.getLocation())
-                                                 .unit(v.getUnit())
+                                                 .unit(UnitOfMeasure.WH.value())
                                                  .phase(v.getPhase())
                                                  .build();
         }

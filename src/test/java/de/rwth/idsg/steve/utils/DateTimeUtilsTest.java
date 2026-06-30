@@ -29,6 +29,36 @@ import java.time.ZoneOffset;
 public class DateTimeUtilsTest {
 
     @Test
+    public void testTimeElapsed_convertsWeeksToDays() {
+        DateTime from = DateTime.parse("2026-06-23T07:23:00.000+02:00");
+        DateTime to = DateTime.parse("2026-06-30T15:24:03.000+02:00");
+
+        String result = DateTimeUtils.timeElapsed(from, to);
+
+        Assertions.assertEquals("7 days 8 hours 1 minute 3 seconds", result);
+    }
+
+    @Test
+    public void testTimeElapsed_convertsWeeksAndDaysToDays() {
+        DateTime from = DateTime.parse("2026-06-01T00:00:00.000Z");
+        DateTime to = DateTime.parse("2026-06-13T02:03:04.000Z");
+
+        String result = DateTimeUtils.timeElapsed(from, to);
+
+        Assertions.assertEquals("12 days 2 hours 3 minutes 4 seconds", result);
+    }
+
+    @Test
+    public void testTimeElapsed_convertsMonthsToDays() {
+        DateTime from = DateTime.parse("2026-01-01T00:00:00.000Z");
+        DateTime to = DateTime.parse("2026-02-01T04:00:00.000Z");
+
+        String result = DateTimeUtils.timeElapsed(from, to);
+
+        Assertions.assertEquals("31 days 4 hours", result);
+    }
+
+    @Test
     public void testToDateTime_nullInput() {
         DateTime result = DateTimeUtils.toDateTime(null);
         Assertions.assertNull(result);

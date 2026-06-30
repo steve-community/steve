@@ -27,6 +27,8 @@ import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
 import java.util.UUID;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SessionContextStoreTest {
@@ -102,6 +104,58 @@ public class SessionContextStoreTest {
             Assertions.assertEquals(0, sizeAfterRemove);
             Assertions.assertEquals(0, store.getSize("foo"));
         }
+    }
+
+    @Test
+    public void testCloseSession() throws Exception {
+        var store = new SessionContextStoreImpl(
+            WsSessionSelectStrategyEnum.ALWAYS_LAST,
+            new NoOpTaskScheduler(),
+            new FutureResponseContextStoreImpl()
+        );
+
+        var session1 = getMockSession();
+        var session2 = getMockSession();
+
+        store.add("foo", session1);
+        store.add("foo", session2);
+
+        boolean closed = store.closeSession("foo", session1.getId());
+
+        Assertions.assertTrue(closed);
+        verify(session1).close();
+        verify(session2, never()).close();
+    }
+
+    @Test
+    public void testCloseSession_doesNotScanOtherChargeBoxIds() throws Exception {
+        var store = new SessionContextStoreImpl(
+            WsSessionSelectStrategyEnum.ALWAYS_LAST,
+            new NoOpTaskScheduler(),
+            new FutureResponseContextStoreImpl()
+        );
+
+        var session = getMockSession();
+
+        store.add("foo", session);
+
+        boolean closed = store.closeSession("bar", session.getId());
+
+        Assertions.assertFalse(closed);
+        verify(session, never()).close();
+    }
+
+    @Test
+    public void testCloseSession_unknownSession() {
+        var store = new SessionContextStoreImpl(
+            WsSessionSelectStrategyEnum.ALWAYS_LAST,
+            new NoOpTaskScheduler(),
+            new FutureResponseContextStoreImpl()
+        );
+
+        boolean closed = store.closeSession("foo", "unknown-session");
+
+        Assertions.assertFalse(closed);
     }
 
     private static JettyWebSocketSession getMockSession() {

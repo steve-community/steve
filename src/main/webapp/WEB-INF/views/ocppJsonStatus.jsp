@@ -60,9 +60,9 @@ Connection Status for JSON Charge Points
                 <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectionDuration}</td>
                 <td>
                     <form:form action="${ctxPath}/manager/home/ocppJsonStatus/disconnect" method="post">
-                        <input type="hidden" name="version" value="${s.version}"/>
-                        <input type="hidden" name="chargeBoxId" value="${s.chargeBoxId}"/>
-                        <input type="hidden" name="sessionId" value="${s.sessionId}"/>
+                        <input type="hidden" name="version" value="<encode:forHtmlAttribute value='${s.version}' />"/>
+                        <input type="hidden" name="chargeBoxId" value="<encode:forHtmlAttribute value='${s.chargeBoxId}' />"/>
+                        <input type="hidden" name="sessionId" value="<encode:forHtmlAttribute value='${s.sessionId}' />"/>
                         <input type="submit" class="redSubmit" value="Disconnect" title="Close this connection/session"/>
                     </form:form>
                 </td>

@@ -177,7 +177,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 WebSocketSession session = sessionContext.getSession();
                 if (session.getId().equals(sessionId)) {
                     try {
-                        log.info("Closing session '{}' for chargeBoxId '{}'", chargeBoxId, sessionId);
+                        log.info("Closing session '{}' for chargeBoxId '{}'", sessionId, chargeBoxId);
                         session.close();
                         return true;
                     } catch (IOException e) {

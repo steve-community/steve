@@ -363,6 +363,10 @@ public class ChargePointService {
         return returnList;
     }
 
+    public boolean closeOcppJsonSession(OcppVersion version, String chargeBoxId, String sessionId) {
+        return sessionContextStoreHolder.getOrCreate(version).closeSession(chargeBoxId, sessionId);
+    }
+
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
     }
@@ -425,6 +429,7 @@ public class ChargePointService {
 
             for (var ctx : sessionContexts) {
                 DateTime openSince = ctx.getOpenSince();
+                String sessionId = ctx.getSession().getId();
 
                 Integer chargeBoxPk = primaryKeyLookup.get(chargeBoxId);
                 if (chargeBoxPk == null) {
@@ -432,6 +437,7 @@ public class ChargePointService {
                 }
 
                 OcppJsonStatus status = OcppJsonStatus.builder()
+                    .sessionId(sessionId)
                     .chargeBoxPk(chargeBoxPk)
                     .chargeBoxId(chargeBoxId)
                     .connectedSinceDT(openSince)

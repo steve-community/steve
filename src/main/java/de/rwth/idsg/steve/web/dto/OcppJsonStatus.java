@@ -32,9 +32,12 @@ import org.joda.time.DateTime;
 @Builder
 @ToString
 public final class OcppJsonStatus {
+    private final String sessionId;
     private final Integer chargeBoxPk;
-    private final String chargeBoxId, connectedSince;
-    private final String connectionDuration;
+    private final String chargeBoxId;
     private final OcppVersion version;
+
     private final DateTime connectedSinceDT;
+    private final String connectedSince;
+    private final String connectionDuration;
 }

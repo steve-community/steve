@@ -32,13 +32,14 @@ Connection Status for JSON Charge Points
                 This indicates that charge point has opened more than one actual connection.</span>
         </a>
 </span></section>
-    <table class="res">
+    <table class="res action">
         <thead>
             <tr>
                 <th data-sort="string">ChargeBox ID</th>
                 <th data-sort="string">OCPP Version</th>
                 <th data-sort="date">Connected Since</th>
-                <th data-sort="string">Connection Duration</th>
+                <th data-sort="date">Connection Duration</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -56,7 +57,15 @@ Connection Status for JSON Charge Points
                 </td>
                 <td>${s.version.value}</td>
                 <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectedSince}</td>
-                <td>${s.connectionDuration}</td>
+                <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectionDuration}</td>
+                <td>
+                    <form:form action="${ctxPath}/manager/home/ocppJsonStatus/disconnect" method="post">
+                        <input type="hidden" name="version" value="<encode:forHtmlAttribute value='${s.version}' />"/>
+                        <input type="hidden" name="chargeBoxId" value="<encode:forHtmlAttribute value='${s.chargeBoxId}' />"/>
+                        <input type="hidden" name="sessionId" value="<encode:forHtmlAttribute value='${s.sessionId}' />"/>
+                        <input type="submit" class="redSubmit" value="Disconnect" title="Close this connection/session"/>
+                    </form:form>
+                </td>
             </tr>
         </c:forEach>
         </tbody>

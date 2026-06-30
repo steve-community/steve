@@ -163,6 +163,38 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
+    public boolean closeSession(String chargeBoxId, String sessionId) {
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                log.warn("Could not find chargeBoxId '{}' while closing session '{}'", chargeBoxId, sessionId);
+                return false;
+            }
+
+            for (SessionContext sessionContext : endpointDeque) {
+                WebSocketSession session = sessionContext.getSession();
+                if (session.getId().equals(sessionId)) {
+                    try {
+                        log.info("Closing session '{}' for chargeBoxId '{}'", sessionId, chargeBoxId);
+                        session.close();
+                        return true;
+                    } catch (IOException e) {
+                        log.error("Error while closing session '{}' for chargeBoxId '{}'", sessionId, chargeBoxId, e);
+                        return false;
+                    }
+                }
+            }
+
+            log.warn("Could not find session '{}' for chargeBoxId '{}'", sessionId, chargeBoxId);
+            return false;
+        } finally {
+            l.unlock();
+        }
+    }
+
+    @Override
     public void closeSessions(String chargeBoxId) {
         Lock l = locks.get(chargeBoxId);
         l.lock();

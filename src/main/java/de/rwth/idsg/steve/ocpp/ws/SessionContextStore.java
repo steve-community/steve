@@ -46,6 +46,8 @@ public interface SessionContextStore {
 
     Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId);
 
+    boolean closeSession(String chargeBoxId, String sessionId);
+
     void closeSessions(String chargeBoxId);
 
     int getSize(String chargeBoxId);

@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhDouble;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
 
 /**
@@ -154,7 +155,7 @@ public class TransactionService {
         // 1. intermediate meter values have priority (most accurate data)
         // -------------------------------------------------------------------------
 
-        TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues);
+        TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues, thisTx);
         if (last != null) {
             return TerminationValues.builder()
                                     .stopValue(floatingStringToIntString(last.getValue()))
@@ -194,12 +195,17 @@ public class TransactionService {
     }
 
     @Nullable
-    private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
-        TransactionDetails.MeterValues v =
-                values.stream()
-                      .filter(TransactionStopServiceHelper::isEnergyValue)
-                      .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
-                      .orElse(null);
+    static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values,
+                                                             Transaction thisTx) {
+        var treatedValues = values.stream()
+            .filter(TransactionStopServiceHelper::isEnergyValue)
+            .sorted(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
+            .toList();
+
+        TransactionDetails.MeterValues v = findLastMeterValueFromMonotonicStreak(
+            treatedValues,
+            Double.parseDouble(thisTx.getStartValue())
+        );
 
         // if the list of values is empty, we fall to this case, as well.
         if (v == null) {
@@ -215,12 +221,46 @@ public class TransactionService {
                                                  .format(v.getFormat())
                                                  .measurand(v.getMeasurand())
                                                  .location(v.getLocation())
-                                                 .unit(v.getUnit())
+                                                 .unit(UnitOfMeasure.WH.value())
                                                  .phase(v.getPhase())
                                                  .build();
-        } else {
-            return v;
         }
+
+        return v;
+    }
+
+    @Nullable
+    private static TransactionDetails.MeterValues findLastMeterValueFromMonotonicStreak(List<TransactionDetails.MeterValues> values,
+                                                                                        double startValueWh) {
+        TransactionDetails.MeterValues lastMatchingValue = null;
+        Double previousValueWh = null;
+        int currentStreakLength = 0;
+        boolean firstStreak = true;
+
+        for (TransactionDetails.MeterValues value : values) {
+            double valueWh = toWh(value);
+
+            if (previousValueWh != null && valueWh < previousValueWh) {
+                firstStreak = false;
+                currentStreakLength = 1;
+            } else {
+                currentStreakLength++;
+            }
+
+            if (valueWh >= startValueWh && (firstStreak || currentStreakLength > 1)) {
+                lastMatchingValue = value;
+            }
+
+            previousValueWh = valueWh;
+        }
+
+        return lastMatchingValue;
+    }
+
+    private static double toWh(TransactionDetails.MeterValues meterValue) {
+        return UnitOfMeasure.K_WH.value().equals(meterValue.getUnit())
+            ? kWhStringToWhDouble(meterValue.getValue())
+            : Double.parseDouble(meterValue.getValue());
     }
 
     @Builder

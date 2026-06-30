@@ -49,9 +49,12 @@ public class TransactionStopServiceHelper {
         return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
     }
 
+    public static double kWhStringToWhDouble(String s) {
+        return Double.parseDouble(s) * 1000;
+    }
+
     public static String kWhStringToWhString(String s) {
-        double kWhValue = Double.parseDouble(s);
-        return Double.toString(kWhValue * 1000);
+        return Double.toString(kWhStringToWhDouble(s));
     }
 
     public static boolean isEnergyValue(TransactionDetails.MeterValues v) {

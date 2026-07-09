@@ -74,8 +74,10 @@ steve:
           rsa:
             ca-certificate-pem:
             ca-key-pem:
+            ca-key-password:
             ca-chain-pem:
           ecdsa:
             ca-certificate-pem:
             ca-key-pem:
+            ca-key-password:
             ca-chain-pem:

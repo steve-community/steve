@@ -30,11 +30,15 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
@@ -118,6 +122,12 @@ public class CertificateUtils {
     }
 
     public static PrivateKey parsePrivateKeyViaBouncyCastle(String privateKeyPem) throws Exception {
+        return parsePrivateKeyViaBouncyCastle(privateKeyPem, null);
+    }
+
+    public static PrivateKey parsePrivateKeyViaBouncyCastle(String privateKeyPem, String password) throws Exception {
+        char[] passwordAsChar = (password == null) ? null : password.toCharArray();
+
         try (var reader = new StringReader(privateKeyPem);
              var pemParser = new PEMParser(reader)) {
             var parsedObj = pemParser.readObject();
@@ -133,8 +143,22 @@ public class CertificateUtils {
             if (parsedObj instanceof PEMKeyPair keyPair) {
                 return converter.getKeyPair(keyPair).getPrivate();
             }
+            if (parsedObj instanceof PKCS8EncryptedPrivateKeyInfo pkcs8) {
+                var decryptor = new JceOpenSSLPKCS8DecryptorProviderBuilder()
+                    .setProvider(PROVIDER_NAME)
+                    .build(passwordAsChar);
 
-            throw new IllegalArgumentException("Unsupported private key PEM format");
+                return converter.getPrivateKey(pkcs8.decryptPrivateKeyInfo(decryptor));
+            }
+            if (parsedObj instanceof PEMEncryptedKeyPair encryptedKeyPair) {
+                var decryptor = new JcePEMDecryptorProviderBuilder()
+                    .setProvider(PROVIDER_NAME)
+                    .build(passwordAsChar);
+
+                return converter.getKeyPair(encryptedKeyPair.decryptKeyPair(decryptor)).getPrivate();
+            }
+
+            throw new IllegalArgumentException("Unsupported private key PEM format: " + parsedObj.getClass().getName());
         }
     }
 

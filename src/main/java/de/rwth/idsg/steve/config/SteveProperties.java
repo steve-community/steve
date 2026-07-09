@@ -111,6 +111,7 @@ public class SteveProperties {
                     public static class IssuerConfig {
                         private String caCertificatePem;
                         private String caKeyPem;
+                        private String caKeyPassword;
 
                         /**
                          * Optional PEM bundle for issuer chain in order:

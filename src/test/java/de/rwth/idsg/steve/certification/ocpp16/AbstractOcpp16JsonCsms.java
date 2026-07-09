@@ -66,6 +66,7 @@ public abstract class AbstractOcpp16JsonCsms {
     static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     static final String CPO_NAME = "SteVe-CPO";
+    static final String SERIAL_NUMBER = "SN-01-8043621";
 
     @Autowired
     DSLContext dslContext;
@@ -96,7 +97,8 @@ public abstract class AbstractOcpp16JsonCsms {
     static BootNotificationRequest bootNotification() {
         return new BootNotificationRequest()
             .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+            .withChargePointModel(getRandomString())
+            .withChargePointSerialNumber(SERIAL_NUMBER);
     }
 
     static StatusNotificationRequest statusNotification(int connectorId,
@@ -230,7 +232,7 @@ public abstract class AbstractOcpp16JsonCsms {
     static OcppJsonChargePoint.ExchangeContext<GetConfigurationRequest, GetConfigurationResponse> planGetConf(OcppJsonChargePoint chargePoint) {
         return chargePoint.planRequest(
             new GetConfigurationRequest().withKey(),
-            new GetConfigurationResponse()
+            new GetConfigurationResponse().withConfigurationKey(configurationKey("CpoName", false, CPO_NAME))
         );
     }
 

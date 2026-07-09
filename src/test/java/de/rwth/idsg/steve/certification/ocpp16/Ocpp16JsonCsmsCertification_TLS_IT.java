@@ -21,7 +21,9 @@ package de.rwth.idsg.steve.certification.ocpp16;
 import de.rwth.idsg.steve.ocpp.task.CertificateSignedTask;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.utils.CertificateUtils;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ExtendedTriggerMessageParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.CertificateSigned;
@@ -32,6 +34,13 @@ import ocpp._2022._02.security.SecurityEventNotification;
 import ocpp._2022._02.security.SecurityEventNotificationResponse;
 import ocpp._2022._02.security.SignCertificate;
 import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp.cp._2015._10.ChangeConfigurationRequest;
+import ocpp.cp._2015._10.ChangeConfigurationResponse;
+import ocpp.cp._2015._10.ConfigurationStatus;
+import ocpp.cp._2015._10.ResetRequest;
+import ocpp.cp._2015._10.ResetResponse;
+import ocpp.cp._2015._10.ResetStatus;
+import ocpp.cp._2015._10.ResetType;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -63,10 +72,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CertificateUtils.parseCertificates;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfile;
 import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -89,19 +101,17 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
     @Test
     public void test_TC_074_CSMS_SignCertificateRequestAccepted_RSA() throws Exception {
-        var serialNumber = "SN-01-8043621";
-
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
             .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
-            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, SERIAL_NUMBER)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
         assertTc074SignCertificateFlow(
-            createRsaCsrMaterial(serialNumber, CPO_NAME),
-            serialNumber,
+            createRsaCsrMaterial(SERIAL_NUMBER, CPO_NAME),
+            SERIAL_NUMBER,
             CertificateSignatureAlgorithm.RSA,
             2048
         );
@@ -109,19 +119,17 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
     @Test
     public void test_TC_074_CSMS_SignCertificateRequestAccepted_ECDSA() throws Exception {
-        var serialNumber = "SN-01-8043621";
-
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
             .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
-            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, SERIAL_NUMBER)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
         assertTc074SignCertificateFlow(
-            createEcdsaCsrMaterial(serialNumber, CPO_NAME),
-            serialNumber,
+            createEcdsaCsrMaterial(SERIAL_NUMBER, CPO_NAME),
+            SERIAL_NUMBER,
             CertificateSignatureAlgorithm.ECDSA,
             224
         );
@@ -129,13 +137,11 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
     @Test
     public void test_TC_077_CSMS_InvalidChargePointCertificateSecurityEvent() throws InterruptedException {
-        var serialNumber = "SN-01-8043621";
-
         dslContext.update(CHARGE_BOX)
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
             .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
-            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, serialNumber)
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, SERIAL_NUMBER)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 
@@ -163,7 +169,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         // 3-4) Charge point sends SignCertificate, CSMS accepts
         {
             var signCertificateResponse = chargePoint.send(
-                new SignCertificate().withCsr(createRsaCsrMaterial(serialNumber, CPO_NAME).csrPem),
+                new SignCertificate().withCsr(createRsaCsrMaterial(SERIAL_NUMBER, CPO_NAME).csrPem),
                 SignCertificateResponse.class
             );
             assertNotNull(signCertificateResponse);
@@ -207,6 +213,91 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
         chargePoint.close();
     }
 
+    /**
+     * Testing the upgrade from profile 2 to 3.
+     */
+    @Test
+    public void test_TC_083_CSMS_UpgradeChargePointSecurityProfileAccepted() {
+        String password = "0123456789abcdef0123456789abcdef";
+
+        dslContext.update(CHARGE_BOX)
+            .set(CHARGE_BOX.SECURITY_PROFILE, 2)
+            .set(CHARGE_BOX.AUTH_PASSWORD, passwordEncoder.encode(password)) // needed for profile 2
+            .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig()) // will be needed for profile 3
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, SERIAL_NUMBER) // will be needed for profile 3
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
+            .execute();
+
+        var chargePoint = defaultSecureStation().startWithProfile2(password, serverProperties.getSsl());
+
+        // change config
+        {
+            var changeConfig = new ChangeConfigurationParams();
+            changeConfig.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
+            changeConfig.setKeyType(ChangeConfigurationParams.ConfigurationKeyType.PREDEFINED);
+            changeConfig.setConfKey(SecurityProfile.name());
+            changeConfig.setValue("3");
+
+            var changeConfigExchange = chargePoint.planRequest(
+                new ChangeConfigurationRequest().withKey(SecurityProfile.name()).withValue("3"),
+                new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
+            );
+            var getConfExchange = planGetConf(chargePoint);
+
+            var changeConfigFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(changeConfig));
+            changeConfigExchange.await();
+            assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
+            getConfExchange.await();
+
+            var chargeBox = dslContext.selectFrom(CHARGE_BOX)
+                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
+                .fetchOne();
+
+            assertNotNull(chargeBox);
+            assertEquals(3, chargeBox.getSecurityProfile());
+            assertNotNull(chargeBox.getChargePointSerialNumber());
+            assertNotNull(chargeBox.getOcppConfiguration());
+            assertFalse(chargeBox.getOcppConfiguration().data().isEmpty());
+        }
+
+        // reset
+        {
+            var reset = new ResetParams();
+            reset.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
+            reset.setResetType(ResetType.HARD);
+
+            var resetFuture = supplyAsyncUnchecked(() -> operationsService.reset(reset));
+
+            chargePoint.expectRequest(
+                new ResetRequest().withType(ResetType.HARD),
+                new ResetResponse().withStatus(ResetStatus.ACCEPTED)
+            );
+            assertEquals(ResetStatus.ACCEPTED, successResponse(resetFuture.join()));
+        }
+
+        // disconnect and reconnect
+        {
+            chargePoint.close();
+            chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
+
+            var bootResp = chargePoint.send(bootNotification(), BootNotificationResponse.class);
+            assertEquals(RegistrationStatus.ACCEPTED, bootResp.getStatus());
+
+            sendAvailableStatusForAllConnectors(chargePoint);
+
+            chargePoint.close();
+        }
+
+        // step 11/12: reconnect with old security profile must be rejected
+        assertThrows(RuntimeException.class, () -> defaultSecureStation().startWithProfile2(password, serverProperties.getSsl()));
+
+        // step 13/14: reconnect with upgraded security profile is accepted again
+        {
+            chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
+            chargePoint.close();
+        }
+    }
+
     @Test
     public void test_TC_086_CSMS_TLS_ServerSideCertificate_ValidCertificate() {
         var password = "0123456789abcdef0123456789abcdef";
@@ -233,7 +324,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .set(CHARGE_BOX.AUTH_PASSWORD, (String) null)
             .set(CHARGE_BOX.SECURITY_PROFILE, 3)
             .set(CHARGE_BOX.OCPP_CONFIGURATION, cpoNameConfig())
-            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, "SN-01-8043621")
+            .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, SERIAL_NUMBER)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))
             .execute();
 

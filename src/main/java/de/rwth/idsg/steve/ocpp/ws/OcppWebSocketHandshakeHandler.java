@@ -111,6 +111,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // 2. Check Ocpp security profiles (if needed)
         // -------------------------------------------------------------------------
 
+        boolean isSecure = isSecure(request);
         OcppSecurityProfile profile = registration.get().securityProfile();
         log.debug("ChargeBoxId '{}' is found in DB with security profile {}", chargeBoxId, profile.getValue());
 
@@ -118,6 +119,13 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         if (profile.isBasicAuth()) {
             log.debug("ChargeBoxId '{}' is attempting Basic-Auth...", chargeBoxId);
             ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+
+            // prevent profile 1 type behavior when profile 2 is configured
+            if (profile == OcppSecurityProfile.Profile_2 && !isSecure) {
+                log.warn("ChargeBoxId '{}' is trying to connect via plain WS, even though it is configured for profile 2. Rejecting.", chargeBoxId);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
 
             UsernamePasswordAuthenticationToken authentication;
             try {
@@ -185,5 +193,18 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             }
         }
         return null;
+    }
+
+    private static boolean isSecure(ServerHttpRequest request) {
+        var headers = request.getHeaders();
+
+        // if behind a TLS-terminating proxy, consider forwarded headers first
+        var forwardedProto = headers.getFirst("X-Forwarded-Proto");
+        if ("https".equalsIgnoreCase(forwardedProto) || "wss".equalsIgnoreCase(forwardedProto)) {
+            return true;
+        }
+
+        var scheme = request.getURI().getScheme();
+        return "https".equalsIgnoreCase(scheme) || "wss".equalsIgnoreCase(scheme);
     }
 }

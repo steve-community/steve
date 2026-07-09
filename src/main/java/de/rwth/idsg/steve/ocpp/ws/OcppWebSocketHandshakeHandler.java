@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -58,6 +59,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointService chargePointService;
     private final CertificateValidator certificateValidator;
+    private final String protocolHeaderFromProxy;
 
     private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
 
@@ -195,13 +197,13 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         return null;
     }
 
-    private static boolean isSecure(ServerHttpRequest request) {
-        var headers = request.getHeaders();
-
+    private boolean isSecure(ServerHttpRequest request) {
         // if behind a TLS-terminating proxy, consider forwarded headers first
-        var forwardedProto = headers.getFirst("X-Forwarded-Proto");
-        if ("https".equalsIgnoreCase(forwardedProto) || "wss".equalsIgnoreCase(forwardedProto)) {
-            return true;
+        if (!StringUtils.isEmpty(protocolHeaderFromProxy)) {
+            String forwardedProto = request.getHeaders().getFirst(protocolHeaderFromProxy);
+            if ("https".equalsIgnoreCase(forwardedProto) || "wss".equalsIgnoreCase(forwardedProto)) {
+                return true;
+            }
         }
 
         var scheme = request.getURI().getScheme();

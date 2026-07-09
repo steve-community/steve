@@ -90,6 +90,7 @@ public class SteveProperties {
         @Data
         public static class Security {
             private String clientCertHeaderFromProxy;
+            private String protocolHeaderFromProxy;
             private CsrSigning csrSigning = new CsrSigning();
 
             @Data

@@ -47,6 +47,7 @@ import java.util.List;
 @Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
+    private final SteveProperties steveProperties;
     private final ChargePointService chargePointService;
     private final ChargeBoxIdValidator chargeBoxIdValidator;
     private final List<AbstractWebSocketEndpoint> endpoints;
@@ -64,7 +65,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
             handshakeHandler(),
             endpoints,
             chargePointService,
-            certificateValidator
+            certificateValidator,
+            steveProperties.getOcpp().getSecurity().getProtocolHeaderFromProxy()
         );
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")

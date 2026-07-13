@@ -60,6 +60,8 @@ steve:
     # OCPP 1.6 security config.
     # Note: security profile (0..3) is a per-charge-point state in DB, not a global application property.
     security:
+      # the custom header with original protocol info forwarded by proxy
+      protocol-header-from-proxy:
       # Relevant for stations with profile 3
       # See de.rwth.idsg.steve.service.CertificateValidator for documentation
       client-cert-header-from-proxy:

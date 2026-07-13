@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -58,6 +59,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointService chargePointService;
     private final CertificateValidator certificateValidator;
+    private final String protocolHeaderFromProxy;
 
     private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
 
@@ -111,6 +113,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // 2. Check Ocpp security profiles (if needed)
         // -------------------------------------------------------------------------
 
+        boolean isSecure = isSecure(request);
         OcppSecurityProfile profile = registration.get().securityProfile();
         log.debug("ChargeBoxId '{}' is found in DB with security profile {}", chargeBoxId, profile.getValue());
 
@@ -118,6 +121,13 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         if (profile.isBasicAuth()) {
             log.debug("ChargeBoxId '{}' is attempting Basic-Auth...", chargeBoxId);
             ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+
+            // prevent profile 1 type behavior when profile 2 is configured
+            if (profile == OcppSecurityProfile.Profile_2 && !isSecure) {
+                log.warn("ChargeBoxId '{}' is trying to connect via plain WS, even though it is configured for profile 2. Rejecting.", chargeBoxId);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
 
             UsernamePasswordAuthenticationToken authentication;
             try {
@@ -185,5 +195,18 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             }
         }
         return null;
+    }
+
+    private boolean isSecure(ServerHttpRequest request) {
+        // if behind a TLS-terminating proxy, consider forwarded headers first
+        if (!StringUtils.isEmpty(protocolHeaderFromProxy)) {
+            String forwardedProto = request.getHeaders().getFirst(protocolHeaderFromProxy);
+            if ("https".equalsIgnoreCase(forwardedProto) || "wss".equalsIgnoreCase(forwardedProto)) {
+                return true;
+            }
+        }
+
+        var scheme = request.getURI().getScheme();
+        return "https".equalsIgnoreCase(scheme) || "wss".equalsIgnoreCase(scheme);
     }
 }

@@ -18,12 +18,19 @@
  */
 package de.rwth.idsg.steve.service.notification;
 
-import lombok.Data;
+import ocpp.cs._2015._10.ChargePointErrorCode;
+import ocpp.cs._2015._10.ChargePointStatus;
+import org.joda.time.DateTime;
 
-@Data
-public class OcppStationStatusFailure {
+public record OcppStationStatusUpdate(
+    String chargeBoxId,
+    int connectorId,
+    ChargePointStatus status,
+    ChargePointErrorCode errorCode,
+    DateTime timestamp
+) {
 
-  private final String chargeBoxId;
-  private final int connectorId;
-  private final String errorCode;
+    public String errorCodeValue() {
+        return (errorCode == null) ? "" : errorCode.value();
+    }
 }

@@ -23,7 +23,7 @@ import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
@@ -41,6 +41,7 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnect
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
+import static ocpp.cs._2015._10.ChargePointStatus.FAULTED;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -93,13 +94,17 @@ public class NotificationService {
     }
 
     @EventListener
-    public void ocppStationStatusFailure(OcppStationStatusFailure notification) {
+    public void ocppStationStatusFailure(OcppStationStatusUpdate notification) {
+        if (notification.status() != FAULTED) {
+            return;
+        }
+
         if (isDisabled(OcppStationStatusFailure)) {
             return;
         }
 
-        String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(notification.getConnectorId(), notification.getChargeBoxId());
-        String body = "Status Error Code: '%s'".formatted(notification.getErrorCode());
+        String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(notification.connectorId(), notification.chargeBoxId());
+        String body = "Status Error Code: '%s'".formatted(notification.errorCodeValue());
 
         mailService.sendAsync(subject, addTimestamp(body));
     }

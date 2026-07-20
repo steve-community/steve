@@ -29,4 +29,8 @@ public record OcppStationStatusUpdate(
     ChargePointErrorCode errorCode,
     DateTime timestamp
 ) {
+
+    public String errorCodeValue() {
+        return (errorCode == null) ? "" : errorCode.value();
+    }
 }

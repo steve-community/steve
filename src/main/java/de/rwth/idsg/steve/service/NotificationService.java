@@ -104,7 +104,7 @@ public class NotificationService {
         }
 
         String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(notification.connectorId(), notification.chargeBoxId());
-        String body = "Status Error Code: '%s'".formatted(notification.errorCode().value());
+        String body = "Status Error Code: '%s'".formatted(notification.errorCodeValue());
 
         mailService.sendAsync(subject, addTimestamp(body));
     }

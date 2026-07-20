@@ -80,7 +80,7 @@ public class NotificationServiceForUser {
                 user.getName(),
                 event.connectorId(),
                 event.chargeBoxId(),
-                event.errorCode().value()
+                event.errorCodeValue()
             );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));

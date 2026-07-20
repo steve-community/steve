@@ -22,8 +22,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
@@ -35,6 +34,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static ocpp.cs._2015._10.ChargePointStatus.FAULTED;
+import static ocpp.cs._2015._10.ChargePointStatus.SUSPENDED_EV;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -51,10 +53,13 @@ public class NotificationServiceForUser {
 
     @Async
     @EventListener
-    public void ocppStationStatusFailure(OcppStationStatusFailure event) {
+    public void ocppStationStatusFailure(OcppStationStatusUpdate event) {
+        if (event.status() != FAULTED) {
+            return;
+        }
         log.debug("Processing: {}", event);
 
-        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
+        var transaction = transactionService.getLatestActiveTransaction(event.chargeBoxId(), event.connectorId());
         if (transaction == null) {
             return;
         }
@@ -65,17 +70,51 @@ public class NotificationServiceForUser {
         }
 
         String subject = "Connector '%s' of charging station '%s' is FAULTED".formatted(
-            event.getConnectorId(),
-            event.getChargeBoxId()
+            event.connectorId(),
+            event.chargeBoxId()
         );
 
         // send email if user with eMail address found
         String bodyUserMail =
             "User: %s \n\n Connector %d of charging station %s notifies FAULTED! \n\n Error code: %s".formatted(
                 user.getName(),
-                event.getConnectorId(),
-                event.getChargeBoxId(),
-                event.getErrorCode()
+                event.connectorId(),
+                event.chargeBoxId(),
+                event.errorCode().value()
+            );
+
+        mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
+    }
+
+    @Async
+    @EventListener
+    public void ocppStationStatusSuspendedEV(OcppStationStatusUpdate event) {
+        if (event.status() != SUSPENDED_EV) {
+            return;
+        }
+        log.debug("Processing: {}", event);
+
+        var transaction = transactionService.getLatestActiveTransaction(event.chargeBoxId(), event.connectorId());
+        if (transaction == null) {
+            return;
+        }
+
+        var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
+        if (user == null) {
+            return;
+        }
+
+        String subject = "EV stopped charging at charging station %s, Connector %d".formatted(
+            event.chargeBoxId(),
+            event.connectorId()
+        );
+
+        // send email if user with eMail address found
+        String bodyUserMail =
+            "User: %s \n\n Connector %d of charging station %s notifies Suspended_EV".formatted(
+                user.getName(),
+                event.connectorId(),
+                event.chargeBoxId()
             );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
@@ -104,37 +143,6 @@ public class NotificationServiceForUser {
                 event.getTransactionId(),
                 event.getParams().getConnectorId(),
                 event.getParams().getChargeBoxId()
-            );
-
-        mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));
-    }
-
-    @Async
-    @EventListener
-    public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV event) {
-        log.debug("Processing: {}", event);
-
-        var transaction = transactionService.getLatestActiveTransaction(event.getChargeBoxId(), event.getConnectorId());
-        if (transaction == null) {
-            return;
-        }
-
-        var user = userService.getUserForMail(transaction.getOcppIdTag(), NotificationFeature.OcppStationStatusSuspendedEV);
-        if (user == null) {
-            return;
-        }
-
-        String subject = "EV stopped charging at charging station %s, Connector %d".formatted(
-            event.getChargeBoxId(),
-            event.getConnectorId()
-        );
-
-        // send email if user with eMail address found
-        String bodyUserMail =
-            "User: %s \n\n Connector %d of charging station %s notifies Suspended_EV".formatted(
-                user.getName(),
-                event.getConnectorId(),
-                event.getChargeBoxId()
             );
 
         mailService.send(subject, addTimestamp(bodyUserMail), List.of(user.getEmail()));

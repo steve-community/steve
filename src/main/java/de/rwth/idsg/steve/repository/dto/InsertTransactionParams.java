@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 /**
@@ -31,11 +32,11 @@ import org.joda.time.DateTime;
 @Builder
 @ToString
 public class InsertTransactionParams {
-    private final String chargeBoxId;
+    @NotNull private final String chargeBoxId;
     private final int connectorId;
-    private final String idTag;
-    private final DateTime startTimestamp;
-    private final String startMeterValue;
+    @NotNull private final String idTag;
+    @NotNull private final DateTime startTimestamp;
+    @NotNull private final String startMeterValue;
 
     private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStart;
 
@@ -43,7 +44,7 @@ public class InsertTransactionParams {
     private final Integer reservationId;
 
     // this came after splitting transaction table into two tables (start and stop)
-    private final DateTime eventTimestamp;
+    @NotNull private final DateTime eventTimestamp;
 
     /**
      * https://github.com/steve-community/steve/issues/1414

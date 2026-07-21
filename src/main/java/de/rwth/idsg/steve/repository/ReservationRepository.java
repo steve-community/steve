@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,7 @@ public interface ReservationRepository {
 
     void accepted(int reservationId);
     void cancelled(int reservationId);
-    void used(@NotNull String chargeBoxId, int connectorId, @NotNull String idTagFromTransaction, int reservationId, int transactionId);
+    void used(int transactionId, @NotNull InsertTransactionParams params);
 
     /**
      * Cancels all active reservations for a charge box. When connectorId is 0,

@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
@@ -140,6 +141,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                                .set(RESERVATION.START_DATETIME, params.getStartTimestamp())
                                .set(RESERVATION.EXPIRY_DATETIME, params.getExpiryTimestamp())
                                .set(RESERVATION.STATUS, ReservationStatus.WAITING.name())
+                               .set(RESERVATION.STATUS_TIMESTAMP, DateTime.now())
                                .returning(RESERVATION.RESERVATION_PK)
                                .fetchOne()
                                .getReservationPk();
@@ -168,7 +170,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(@NotNull String chargeBoxId, int connectorId, @NotNull String idTagFromTransaction, int reservationId, int transactionId) {
+    public void used(int transactionId, @NotNull InsertTransactionParams params) {
+        if (!params.isSetReservationId()) {
+            return;
+        }
 
         // -------------------------------------------------------------------------
         // 1. idTagFromTransaction can either be the exact same idTag that reserved or the parent of this idTag
@@ -178,9 +183,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         var selectChildrenOfParent = DSL.select(OCPP_TAG.ID_TAG)
             .from(OCPP_TAG)
-            .where(OCPP_TAG.PARENT_ID_TAG.eq(idTagFromTransaction));
+            .where(OCPP_TAG.PARENT_ID_TAG.eq(params.getIdTag()));
 
-        var idTagCondition = RESERVATION.ID_TAG.equal(idTagFromTransaction).or(RESERVATION.ID_TAG.in(selectChildrenOfParent));
+        var idTagCondition = RESERVATION.ID_TAG.equal(params.getIdTag()).or(RESERVATION.ID_TAG.in(selectChildrenOfParent));
 
         // -------------------------------------------------------------------------
         // 2. incoming connectorId is where the transaction started. but reservation can be on a specific connector
@@ -189,7 +194,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // TC_049_CSMS: Reservation of a Charge Point
         // -------------------------------------------------------------------------
 
-        var chargePointWideEvsePk = Ocpp1ConnectorEvseBridge.evsePkSelect2(ctx, chargeBoxId, Set.of(0, connectorId));
+        var chargePointWideEvsePk = Ocpp1ConnectorEvseBridge.evsePkSelect2(
+            ctx,
+            params.getChargeBoxId(),
+            Set.of(0, params.getConnectorId())
+        );
 
         var evseCondition = RESERVATION.EVSE_PK.in(chargePointWideEvsePk);
 
@@ -199,8 +208,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         int count = ctx.update(RESERVATION)
                        .set(RESERVATION.STATUS, ReservationStatus.USED.name())
+                       .set(RESERVATION.STATUS_TIMESTAMP, params.getStartTimestamp())
                        .set(RESERVATION.TRANSACTION_PK, transactionId)
-                       .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                       .where(RESERVATION.RESERVATION_PK.equal(params.getReservationId()))
                        .and(idTagCondition)
                        .and(evseCondition)
                        .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
@@ -208,7 +218,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         if (count != 1) {
             log.warn("Could not mark the reservation '{}' as used: Problems occurred due to sent reservation id, " +
-                    "charge box connector, user id tag or the reservation was used already.", reservationId);
+                    "charge box connector, user id tag or the reservation was used already.", params.getReservationId());
         }
     }
 
@@ -221,6 +231,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             int count = ctx.update(RESERVATION)
                            .set(RESERVATION.STATUS, ReservationStatus.CANCELLED.name())
+                           .set(RESERVATION.STATUS_TIMESTAMP, DateTime.now())
                            .where(RESERVATION.EVSE_PK.in(evsePkSelect))
                            .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                            .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
@@ -262,7 +273,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         try {
             ctx.update(RESERVATION)
                .set(RESERVATION.STATUS, status.name())
+               .set(RESERVATION.STATUS_TIMESTAMP, DateTime.now())
                .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+               .and(RESERVATION.STATUS.ne(status.name()))
                .execute();
         } catch (DataAccessException e) {
             log.error("Updating of reservationId '{}' to status '{}' FAILED.", reservationId, status, e);

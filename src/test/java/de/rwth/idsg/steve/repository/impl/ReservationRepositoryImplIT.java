@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import jooq.steve.db.enums.EvseTopologySource;
 import org.joda.time.DateTime;
@@ -63,14 +64,19 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void insert() {
+        DateTime beforeInsert = DateTime.now();
         Integer id = assertNoDatabaseException(() -> repository.insert(insertReservationParams(1)));
+        DateTime afterInsert = DateTime.now();
         Assertions.assertNotNull(id);
 
-        Integer count = dslContext.selectCount()
+        var reservation = dslContext.select(RESERVATION.STATUS, RESERVATION.STATUS_TIMESTAMP)
             .from(RESERVATION)
             .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(0, int.class);
-        Assertions.assertEquals(1, count);
+            .fetchOne();
+        Assertions.assertNotNull(reservation);
+        Assertions.assertEquals("WAITING", reservation.value1());
+        Assertions.assertFalse(reservation.value2().isBefore(beforeInsert));
+        Assertions.assertFalse(reservation.value2().isAfter(afterInsert));
     }
 
     @Test
@@ -88,25 +94,42 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
     @Test
     public void accepted() {
         Integer id = repository.insert(insertReservationParams(1));
+        DateTime waitingTimestamp = getStatusTimestamp(id);
+        waitForTimestampTick();
+
         assertNoDatabaseException(() -> repository.accepted(id));
 
-        String status = dslContext.select(RESERVATION.STATUS)
+        var reservation = dslContext.select(RESERVATION.STATUS, RESERVATION.STATUS_TIMESTAMP)
             .from(RESERVATION)
             .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(RESERVATION.STATUS);
-        Assertions.assertEquals("ACCEPTED", status);
+            .fetchOne();
+        Assertions.assertNotNull(reservation);
+        Assertions.assertEquals("ACCEPTED", reservation.value1());
+        Assertions.assertTrue(reservation.value2().isAfter(waitingTimestamp));
+
+        DateTime acceptedTimestamp = reservation.value2();
+        waitForTimestampTick();
+        repository.accepted(id);
+
+        Assertions.assertEquals(acceptedTimestamp, getStatusTimestamp(id));
     }
 
     @Test
     public void cancelled() {
         Integer id = repository.insert(insertReservationParams(1));
+        repository.accepted(id);
+        DateTime acceptedTimestamp = getStatusTimestamp(id);
+        waitForTimestampTick();
+
         assertNoDatabaseException(() -> repository.cancelled(id));
 
-        String status = dslContext.select(RESERVATION.STATUS)
+        var reservation = dslContext.select(RESERVATION.STATUS, RESERVATION.STATUS_TIMESTAMP)
             .from(RESERVATION)
             .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(RESERVATION.STATUS);
-        Assertions.assertEquals("CANCELLED", status);
+            .fetchOne();
+        Assertions.assertNotNull(reservation);
+        Assertions.assertEquals("CANCELLED", reservation.value1());
+        Assertions.assertTrue(reservation.value2().isAfter(acceptedTimestamp));
     }
 
     @Test
@@ -147,14 +170,18 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
     public void cancelActiveReservations() {
         Integer id = repository.insert(insertReservationParams(1));
         repository.accepted(id);
+        DateTime acceptedTimestamp = getStatusTimestamp(id);
+        waitForTimestampTick();
 
         assertNoDatabaseException(() -> repository.cancelActiveReservations(KNOWN_CHARGE_BOX_ID, 1));
 
-        String status = dslContext.select(RESERVATION.STATUS)
+        var reservation = dslContext.select(RESERVATION.STATUS, RESERVATION.STATUS_TIMESTAMP)
             .from(RESERVATION)
             .where(RESERVATION.RESERVATION_PK.eq(id))
-            .fetchOne(RESERVATION.STATUS);
-        Assertions.assertEquals("CANCELLED", status);
+            .fetchOne();
+        Assertions.assertNotNull(reservation);
+        Assertions.assertEquals("CANCELLED", reservation.value1());
+        Assertions.assertTrue(reservation.value2().isAfter(acceptedTimestamp));
     }
 
     @Test
@@ -206,17 +233,28 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne(EVSE.EVSE_PK);
         Assertions.assertNotNull(connectorPk);
 
+        DateTime transactionStartTimestamp = DateTime.now().minusMinutes(1);
         Integer transactionPk = dslContext.insertInto(TRANSACTION_START)
             .set(TRANSACTION_START.EVSE_PK, connectorPk)
             .set(TRANSACTION_START.ID_TAG, idTagFromTransaction)
             .set(TRANSACTION_START.EVENT_TIMESTAMP, DateTime.now())
-            .set(TRANSACTION_START.START_TIMESTAMP, DateTime.now().minusMinutes(1))
+            .set(TRANSACTION_START.START_TIMESTAMP, transactionStartTimestamp)
             .set(TRANSACTION_START.START_VALUE, "100")
             .returning(TRANSACTION_START.TRANSACTION_PK)
             .fetchOne()
             .getTransactionPk();
 
-        assertNoDatabaseException(() -> repository.used(KNOWN_CHARGE_BOX_ID, 1, idTagFromTransaction, id, transactionPk));
+        InsertTransactionParams params = InsertTransactionParams.builder()
+            .chargeBoxId(KNOWN_CHARGE_BOX_ID)
+            .connectorId(1)
+            .idTag(idTagFromTransaction)
+            .reservationId(id)
+            .startTimestamp(transactionStartTimestamp)
+            .startMeterValue("100")
+            .eventTimestamp(DateTime.now())
+            .build();
+
+        assertNoDatabaseException(() -> repository.used(transactionPk, params));
 
         String status = dslContext.select(RESERVATION.STATUS)
             .from(RESERVATION)
@@ -229,6 +267,14 @@ public class ReservationRepositoryImplIT extends AbstractRepositoryITBase {
             .where(RESERVATION.RESERVATION_PK.eq(id))
             .fetchOne(RESERVATION.TRANSACTION_PK);
         Assertions.assertEquals(transactionPk, linkedTransactionPk);
+        Assertions.assertEquals(transactionStartTimestamp, getStatusTimestamp(id));
+    }
+
+    private DateTime getStatusTimestamp(int reservationId) {
+        return dslContext.select(RESERVATION.STATUS_TIMESTAMP)
+            .from(RESERVATION)
+            .where(RESERVATION.RESERVATION_PK.eq(reservationId))
+            .fetchOne(RESERVATION.STATUS_TIMESTAMP);
     }
 
     private static InsertReservationParams insertReservationParams(int connectorId) {

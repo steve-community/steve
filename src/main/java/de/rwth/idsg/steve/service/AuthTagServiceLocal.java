@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.dto.AuthTagContext;
@@ -47,6 +48,11 @@ public class AuthTagServiceLocal implements AuthTagService {
     @Override
     public IdTagInfo decideStatus(String idTag, AuthTagContext authTagContext,
                                   String chargeBoxId, @Nullable Integer connectorId) {
+        if (Strings.isNullOrEmpty(idTag)) {
+            // should not happen, indicator for impl error
+            throw new IllegalArgumentException("Null/empty idTag");
+        }
+
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);

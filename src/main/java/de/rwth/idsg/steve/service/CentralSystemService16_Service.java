@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
@@ -28,6 +29,7 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
@@ -224,7 +226,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
         IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                true,
+                AuthTagContext.StationStartTx,
                 chargeBoxIdentity,
                 parameters.getConnectorId(),
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
@@ -260,9 +262,11 @@ public class CentralSystemService16_Service {
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+        IdTagInfo idTagInfo = Strings.isNullOrEmpty(parameters.getIdTag())
+            ? null
+            : ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                AuthTagContext.StationStopTx,
                 chargeBoxIdentity,
                 null,
                 () -> null
@@ -307,7 +311,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                AuthTagContext.StationAuth,
                 chargeBoxIdentity,
                 null,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)

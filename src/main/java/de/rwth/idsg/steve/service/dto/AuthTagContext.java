@@ -16,14 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service;
+package de.rwth.idsg.steve.service.dto;
 
-import de.rwth.idsg.steve.service.dto.AuthTagContext;
-import ocpp.cs._2015._10.IdTagInfo;
-import org.jetbrains.annotations.Nullable;
+/**
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @since 25.07.2026
+ */
+public enum AuthTagContext {
+    // these come from station via OCPP
+    StationAuth,
+    StationStartTx,
+    StationStopTx,
 
-public interface AuthTagService {
-
-    IdTagInfo decideStatus(String idTag, AuthTagContext authTagContext,
-                           String chargeBoxId, @Nullable Integer connectorId);
+    // these come either from web UI or APIs of SteVe
+    LocalRemoteStart,
+    LocalReserveNow
 }

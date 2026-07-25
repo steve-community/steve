@@ -18,12 +18,14 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import de.rwth.idsg.steve.web.dto.RestCallback;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
@@ -119,7 +121,7 @@ public class OcppOperationsService {
     }
 
     public RestCallback<RemoteStartStopStatus> remoteStartTransaction(RemoteStartTransactionParams params) throws Exception {
-        validateIdTag(params.getIdTag(), true, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
+        validateIdTag(params.getIdTag(), AuthTagContext.LocalRemoteStart, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         validateChargingProfile(params.getChargingProfilePk());
         return execute(params, chargePointServiceClient::remoteStartTransaction);
     }
@@ -146,7 +148,7 @@ public class OcppOperationsService {
     // -------------------------------------------------------------------------
 
     public RestCallback<ReservationStatus> reserveNow(ReserveNowParams params) throws Exception {
-        validateIdTag(params.getIdTag(), false, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
+        validateIdTag(params.getIdTag(), AuthTagContext.LocalReserveNow, params.getChargeBoxIdList().getFirst(), params.getConnectorId());
         return execute(params, chargePointServiceClient::reserveNow);
     }
 
@@ -256,14 +258,16 @@ public class OcppOperationsService {
         }
     }
 
-    private void validateIdTag(String idTag, boolean isStartTransactionReqContext, String chargeBoxId, Integer connectorId) {
+    private void validateIdTag(String idTag, AuthTagContext authTagContext, String chargeBoxId, Integer connectorId) {
         // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
-            idTag,
-            isStartTransactionReqContext,
-            chargeBoxId,
-            connectorId,
-            () -> null
+        IdTagInfo idTagInfo = Strings.isNullOrEmpty(idTag)
+            ? null
+            : ocppTagService.getIdTagInfo(
+                idTag,
+                authTagContext,
+                chargeBoxId,
+                connectorId,
+                () -> null
         );
 
         if (idTagInfo == null || idTagInfo.getStatus() != AuthorizationStatus.ACCEPTED) {

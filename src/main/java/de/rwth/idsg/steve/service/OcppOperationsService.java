@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
@@ -259,12 +260,14 @@ public class OcppOperationsService {
 
     private void validateIdTag(String idTag, AuthTagContext authTagContext, String chargeBoxId, Integer connectorId) {
         // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
-            idTag,
-            authTagContext,
-            chargeBoxId,
-            connectorId,
-            () -> null
+        IdTagInfo idTagInfo = Strings.isNullOrEmpty(idTag)
+            ? null
+            : ocppTagService.getIdTagInfo(
+                idTag,
+                authTagContext,
+                chargeBoxId,
+                connectorId,
+                () -> null
         );
 
         if (idTagInfo == null || idTagInfo.getStatus() != AuthorizationStatus.ACCEPTED) {

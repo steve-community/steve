@@ -43,7 +43,7 @@ public class AuthTagServiceLocal implements AuthTagService {
 
     @Override
     public IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
+                                  String chargeBoxId, @Nullable Integer connectorId) {
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);

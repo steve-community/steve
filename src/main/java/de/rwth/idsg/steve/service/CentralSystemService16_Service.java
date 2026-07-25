@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
@@ -260,7 +261,9 @@ public class CentralSystemService16_Service {
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+        IdTagInfo idTagInfo = Strings.isNullOrEmpty(parameters.getIdTag())
+            ? null
+            : ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
                 chargeBoxIdentity,

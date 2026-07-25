@@ -18,10 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
-
-import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
@@ -40,6 +36,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -105,13 +104,8 @@ public class OcppTagService {
         invalidOcppTagService.removeAll(idTagList);
     }
 
-    @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
-        if (Strings.isNullOrEmpty(idTag)) {
-            return null;
-        }
-
+    public IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,
+                                  String chargeBoxId, @Nullable Integer connectorId) {
         IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
 
         if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
@@ -121,9 +115,8 @@ public class OcppTagService {
         return idTagInfo;
     }
 
-    @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
+    public IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,
+                                  String chargeBoxId, @Nullable Integer connectorId,
                                   Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);

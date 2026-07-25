@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
@@ -104,9 +105,9 @@ public class OcppTagService {
         invalidOcppTagService.removeAll(idTagList);
     }
 
-    public IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,
+    public IdTagInfo getIdTagInfo(String idTag, AuthTagContext authTagContext,
                                   String chargeBoxId, @Nullable Integer connectorId) {
-        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, authTagContext, chargeBoxId, connectorId);
 
         if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
             invalidOcppTagService.processNewUnidentified(idTag);
@@ -115,11 +116,12 @@ public class OcppTagService {
         return idTagInfo;
     }
 
-    public IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,
+    @Nullable
+    public IdTagInfo getIdTagInfo(String idTag, AuthTagContext authTagContext,
                                   String chargeBoxId, @Nullable Integer connectorId,
                                   Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
+            return getIdTagInfo(idTag, authTagContext, chargeBoxId, connectorId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();

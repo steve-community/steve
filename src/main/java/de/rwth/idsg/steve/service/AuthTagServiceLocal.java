@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import static de.rwth.idsg.steve.service.dto.AuthTagContext.LocalRemoteStart;
+import static de.rwth.idsg.steve.service.dto.AuthTagContext.StationStartTx;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
@@ -42,7 +45,7 @@ public class AuthTagServiceLocal implements AuthTagService {
     private final SettingsRepository settingsRepository;
 
     @Override
-    public IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
+    public IdTagInfo decideStatus(String idTag, AuthTagContext authTagContext,
                                   String chargeBoxId, @Nullable Integer connectorId) {
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         if (record == null) {
@@ -67,6 +70,7 @@ public class AuthTagServiceLocal implements AuthTagService {
         }
 
         // https://github.com/steve-community/steve/issues/219
+        boolean isStartTransactionReqContext = (authTagContext == StationStartTx || authTagContext == LocalRemoteStart);
         if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
             return new IdTagInfo()

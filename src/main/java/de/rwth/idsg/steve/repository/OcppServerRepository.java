@@ -55,5 +55,5 @@ public interface OcppServerRepository {
     @Nullable TransactionRecord getTransaction(@NotNull String chargeBoxId, @Nullable Integer connectorId, int transactionId);
     int insertTransaction(InsertTransactionParams params);
     void updateTransaction(UpdateTransactionParams params);
-    void updateTransactionAsFailed(UpdateTransactionParams params, Exception exception);
+    void updateTransactionAsFailed(UpdateTransactionParams params, List<String> failReasons);
 }

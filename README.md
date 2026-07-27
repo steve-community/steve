@@ -17,6 +17,14 @@ If you are going to deploy it we are happy to see the [logo](website/logo/manage
 While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. 
 Read more in [the company announcement](https://github.com/steve-community/steve/issues/1643) and [the public launch post](https://powerfill.io/blog/from-university-project-to-enterprise-platform).
 
+> [!IMPORTANT]
+> ⚡ **OCPP 1.6 certification for Powerfill** 🎉
+>
+> Powerfill's OCPP backend has received [Open Charge Alliance (OCA) certification](https://openchargealliance.org/participants/powerfill-technologies-ltd/) for _OCPP 1.6 Core + C (Smart Charging) + S (Advanced Security)_.
+> Powerfill incorporates SteVe's OCPP protocol implementation without modifying its logic or behavior.
+> SteVe's OCPP implementation has therefore been independently validated through its integration into the certified Powerfill backend.
+> The certificate formally applies only to the certified Powerfill backend and version, not to SteVe as a standalone, open-source distribution or to other SteVe builds and deployments.
+
 ### Charge Point Support
 
 Electric charge points using the following OCPP versions are supported:

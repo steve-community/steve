@@ -88,7 +88,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Slf4j
 @ActiveProfiles(profiles = {"test", "test-tls"})
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(
+    properties = "steve.ocpp.octt-quirks-enabled=true",
+    webEnvironment = WebEnvironment.DEFINED_PORT
+)
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
 
@@ -242,12 +245,10 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
                 new ChangeConfigurationRequest().withKey(SecurityProfile.name()).withValue("3"),
                 new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
             );
-            var getConfExchange = planGetConf(chargePoint);
 
             var changeConfigFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(changeConfig));
             changeConfigExchange.await();
             assertEquals(ConfigurationStatus.ACCEPTED, successResponse(changeConfigFuture.join()));
-            getConfExchange.await();
 
             var chargeBox = dslContext.selectFrom(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(REGISTERED_CHARGE_BOX_ID))

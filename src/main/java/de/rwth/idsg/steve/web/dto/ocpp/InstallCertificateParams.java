@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import de.rwth.idsg.steve.utils.CertificateUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,4 +41,8 @@ public class InstallCertificateParams extends MultipleChargePointSelect {
     @Size(max = 5_500, message = "Certificate must not exceed {max} characters")
     @Schema(description = "PEM-encoded X.509 certificate")
     private String certificate;
+
+    public void setCertificate(String certificate) {
+        this.certificate = CertificateUtils.normalizePemInput(certificate);
+    }
 }

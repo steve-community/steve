@@ -53,9 +53,11 @@ import java.security.cert.X509Certificate;
 public class CertificateValidator {
 
     private final String clientCertHeaderFromProxy;
+    private final boolean octtQuirksEnabled;
 
     public CertificateValidator(SteveProperties steveProperties) {
         clientCertHeaderFromProxy = steveProperties.getOcpp().getSecurity().getClientCertHeaderFromProxy();
+        octtQuirksEnabled = steveProperties.getOcpp().isOcttQuirksEnabled();
     }
 
     /**
@@ -126,6 +128,14 @@ public class CertificateValidator {
     }
 
     public void verifyOcppFields(ChargePointRegistration chargePointRegistration, X500Name subject) {
+        if (octtQuirksEnabled) {
+            // there was no way to get the CpoName from station-emulating OCTT.
+            // it does not send the key in the GetConfiguration. so, when the time came to compare
+            // the values in CSR with something we know in advance... we don't know the reference info.
+            // therefore, we are deciding to disable validating O (organizationName) and CN (commonName) of certs.
+            return;
+        }
+
         String chargeBoxId = chargePointRegistration.chargeBoxId();
 
         // A00.FR.404 :

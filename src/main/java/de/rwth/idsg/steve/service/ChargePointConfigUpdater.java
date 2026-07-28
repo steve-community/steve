@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -49,6 +50,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfi
 @RequiredArgsConstructor
 public class ChargePointConfigUpdater {
 
+    private final SteveProperties steveProperties;
     private final ChargePointService chargePointService;
 
     // use this when we need to wait for the response to process it
@@ -58,6 +60,12 @@ public class ChargePointConfigUpdater {
 
     @EventListener
     public void getAllOcppConfigs(OcppStationWebSocketConnected notification) {
+        if (steveProperties.getOcpp().isOcttQuirksEnabled()) {
+            // disable sending this after a successful WS connection, even though it is not illegal
+            // according to OCPP. it throws OCTT off, because it does not expect it.
+            return;
+        }
+
         try {
             // GetConfiguration was not there in Ocpp 1.2
             if (notification.getOcppVersion() == OcppVersion.V_12) {

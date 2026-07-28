@@ -22,7 +22,6 @@ import jooq.steve.db.enums.CertificateSignatureAlgorithm;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -41,9 +40,9 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -162,10 +161,14 @@ public class CertificateUtils {
         }
     }
 
-    public static String resolveSignatureAlgorithm(PrivateKey privateKey) {
+    public static String resolveSignatureAlgorithm(PrivateKey privateKey, boolean octtQuirksEnabled) {
         String keyAlgorithm = privateKey.getAlgorithm();
         if ("RSA".equalsIgnoreCase(keyAlgorithm)) {
-            return "SHA256withRSAandMGF1";
+            // The spec (OCPP 1.6 security whitepaper edition 3) prescribes to use "RSA-PSS" for the RSA world.
+            // This corresponds to SHA256withRSAandMGF1 in Bouncy Castle.
+            // However, this was incompatible with OCTT.
+            // Therefore, we downgrade to the legacy SHA256withRSA. Sad but true.
+            return octtQuirksEnabled ? "SHA256withRSA" : "SHA256withRSAandMGF1";
         }
         if ("EC".equalsIgnoreCase(keyAlgorithm) || "ECDSA".equalsIgnoreCase(keyAlgorithm)) {
             return "SHA256withECDSA";
@@ -263,14 +266,48 @@ public class CertificateUtils {
         }
     }
 
-    private static String normalizePemInput(String pem) {
+    public static String normalizePemInput(String pem) {
         if (pem == null) return null;
 
         String normalized = pem;
         // Nginx/proxy headers can be URL-encoded; PEM files typically are not.
         if (pem.contains("%")) {
-            normalized = URLDecoder.decode(pem, StandardCharsets.UTF_8);
+            try {
+                normalized = percentDecode(pem);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Could not parse PEM", e);
+            }
         }
-        return normalized.replace("\t", "\n");
+
+        return normalized
+            .replace("\t", "\n")
+            .replace("\r\n", "\n")
+            .replace('\r', '\n');
+    }
+
+    private static String percentDecode(String input) {
+        var decoded = new StringBuilder(input.length());
+        var bytes = new ByteArrayOutputStream();
+
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            if (ch != '%') {
+                decoded.append(ch);
+                continue;
+            }
+
+            bytes.reset();
+            while (i < input.length() && input.charAt(i) == '%') {
+                if (i + 2 >= input.length()) {
+                    throw new IllegalArgumentException("Incomplete percent-encoded sequence in PEM input");
+                }
+                bytes.write(Integer.parseInt(input.substring(i + 1, i + 3), 16));
+                i += 3;
+            }
+            i--;
+            decoded.append(bytes.toString(StandardCharsets.UTF_8));
+        }
+
+        return decoded.toString();
     }
 }

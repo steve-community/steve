@@ -150,7 +150,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Slf4j
 @ActiveProfiles(profiles = "test")
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(
+    properties = "steve.ocpp.octt-quirks-enabled=true",
+    webEnvironment = WebEnvironment.DEFINED_PORT
+)
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
 
@@ -660,12 +663,10 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             .withValue("60");
         var changeConfigRes = new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED);
         var changeConfigExchange = chargePoint.planRequest(changeConfigReq, changeConfigRes);
-        var getConfExchange = planGetConf(chargePoint);
 
         var operationFuture = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
         changeConfigExchange.await();
         assertEquals(ConfigurationStatus.ACCEPTED, successResponse(operationFuture.join()));
-        getConfExchange.await();
 
         chargePoint.close();
     }
@@ -2284,12 +2285,10 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             new ChangeConfigurationRequest().withKey(AuthorizationKey.name()).withValue(valueHex),
             new ChangeConfigurationResponse().withStatus(ConfigurationStatus.ACCEPTED)
         );
-        var getConfExchange = planGetConf(chargePoint);
 
         var future = supplyAsyncUnchecked(() -> operationsService.changeConfiguration(params));
         changeConfigExchange.await();
         assertEquals(ConfigurationStatus.ACCEPTED, successResponse(future.join()));
-        getConfExchange.await();
 
         var record = dslContext
             .selectFrom(CHARGE_BOX)

@@ -59,7 +59,7 @@ public record CertificateIssuerMaterial(
         }
     }
 
-    public void validateCaCertificate() throws Exception {
+    public void validateCaCertificate(boolean octtQuirksEnabled) throws Exception {
         if (caCertificate.getBasicConstraints() < 0) {
             throw new IllegalArgumentException("Configured CA certificate for issuer '" + name + "' is not a CA certificate (basicConstraints CA=true required)");
         }
@@ -69,7 +69,7 @@ public record CertificateIssuerMaterial(
             throw new IllegalArgumentException("Configured CA certificate for issuer '" + name + "' must allow keyCertSign in keyUsage");
         }
 
-        String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
+        String checkAlgorithm = resolveSignatureAlgorithm(caPrivateKey, octtQuirksEnabled);
         byte[] dummyProbeData = "certificate-key-pair-check".getBytes(StandardCharsets.UTF_8);
 
         Signature signer = Signature.getInstance(checkAlgorithm, PROVIDER_NAME);

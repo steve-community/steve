@@ -161,10 +161,14 @@ public class CertificateUtils {
         }
     }
 
-    public static String resolveSignatureAlgorithm(PrivateKey privateKey) {
+    public static String resolveSignatureAlgorithm(PrivateKey privateKey, boolean octtQuirksEnabled) {
         String keyAlgorithm = privateKey.getAlgorithm();
         if ("RSA".equalsIgnoreCase(keyAlgorithm)) {
-            return "SHA256withRSAandMGF1";
+            // The spec (OCPP 1.6 security whitepaper edition 3) prescribes to use "RSA-PSS" for the RSA world.
+            // This corresponds to SHA256withRSAandMGF1 in Bouncy Castle.
+            // However, this was incompatible with OCTT.
+            // Therefore, we downgrade to the legacy SHA256withRSA. Sad but true.
+            return octtQuirksEnabled ? "SHA256withRSA" : "SHA256withRSAandMGF1";
         }
         if ("EC".equalsIgnoreCase(keyAlgorithm) || "ECDSA".equalsIgnoreCase(keyAlgorithm)) {
             return "SHA256withECDSA";

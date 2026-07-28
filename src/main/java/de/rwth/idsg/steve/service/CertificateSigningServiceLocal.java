@@ -85,6 +85,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
     private final ChargePointService chargePointService;
     private final ChargePointServiceClient chargePointServiceClient;
     private final CertificateValidator certificateValidator;
+    private final boolean octtQuirksEnabled;
 
     private final EnumMap<CertificateSignatureAlgorithm, CertificateIssuerMaterial> issuers = new EnumMap<>(CertificateSignatureAlgorithm.class);
     private final int certificateValidityYears;
@@ -101,6 +102,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         this.chargePointService = chargePointService;
         this.chargePointServiceClient = chargePointServiceClient;
         this.certificateValidator = certificateValidator;
+        this.octtQuirksEnabled = steveProperties.getOcpp().isOcttQuirksEnabled();
 
         var csrSigningProps = steveProperties.getOcpp().getSecurity().getCsrSigning().getProviderLocal();
         if (!csrSigningProps.isValid()) {
@@ -286,7 +288,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         var caCertificate = resolveResource(resourceLoader, issuerConfig.getCaCertificatePem(), CertificateUtils::parseCertificate);
         var caPrivateKey = resolveResource(resourceLoader, issuerConfig.getCaKeyPem(), pem -> parsePrivateKeyViaBouncyCastle(pem, issuerConfig.getCaKeyPassword()));
         var issuerCertificateChain = loadIssuerCertificateChain(resourceLoader, caCertificate, issuerConfig.getCaChainPem());
-        var certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey);
+        var certificateSignatureAlgorithm = resolveSignatureAlgorithm(caPrivateKey, octtQuirksEnabled);
 
         var issuer = new CertificateIssuerMaterial(
             name,
@@ -297,7 +299,7 @@ public class CertificateSigningServiceLocal implements CertificateSigningService
         );
 
         issuer.validateFamily();
-        issuer.validateCaCertificate();
+        issuer.validateCaCertificate(octtQuirksEnabled);
         issuer.validateCertificateChain();
 
         issuers.put(name, issuer);

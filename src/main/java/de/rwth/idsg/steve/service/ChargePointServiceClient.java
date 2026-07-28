@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
@@ -142,6 +143,7 @@ public class ChargePointServiceClient {
     private final CertificateRepository certificateRepository;
     private final EventRepository eventRepository;
 
+    private final SteveProperties steveProperties;
     private final TaskExecutor taskExecutor;
     private final TaskStore taskStore;
     private final ChargePointServiceInvokerImpl invoker;
@@ -218,7 +220,10 @@ public class ChargePointServiceClient {
 
         // after successfully changing config at station, get all configs from station
         // for us to have the final snapshots of them (i.e. to update database).
-        {
+        //
+        // however, do this only when NOT working with OCTT, because this message throws OCTT off.
+        if (!steveProperties.getOcpp().isOcttQuirksEnabled()) {
+
             // GetConfiguration was not there in Ocpp 1.2
             var ocpp15AndAboveStations = params.getChargePointSelectList()
                 .stream()

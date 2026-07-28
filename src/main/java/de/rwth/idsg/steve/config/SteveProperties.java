@@ -68,6 +68,7 @@ public class SteveProperties {
         boolean autoRegisterUnknownStations;
         String chargeBoxIdValidationRegex;
         Protocols enabledProtocols;
+        boolean octtQuirksEnabled;
         Security security = new Security();
 
         @Data

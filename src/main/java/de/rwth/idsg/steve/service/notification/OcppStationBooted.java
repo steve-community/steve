@@ -23,7 +23,7 @@ import lombok.Data;
 import ocpp.cs._2015._10.RegistrationStatus;
 
 @Data
-public class OccpStationBooted {
+public class OcppStationBooted {
 
   private final String chargeBoxId;
   private final Optional<RegistrationStatus> status;

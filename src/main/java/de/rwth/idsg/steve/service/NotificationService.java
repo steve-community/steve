@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
@@ -55,7 +55,7 @@ public class NotificationService {
     private final MailService mailService;
 
     @EventListener
-    public void ocppStationBooted(OccpStationBooted notification) {
+    public void ocppStationBooted(OcppStationBooted notification) {
         if (isDisabled(OcppStationBooted)) {
             return;
         }

@@ -29,7 +29,7 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.dto.AuthTagContext;
-import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
@@ -105,7 +105,7 @@ public class CentralSystemService16_Service {
                                                      OcppProtocol ocppProtocol) {
 
         Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxIdentity);
-        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
+        applicationEventPublisher.publishEvent(new OcppStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {

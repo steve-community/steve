@@ -272,7 +272,11 @@ public class CertificateUtils {
         String normalized = pem;
         // Nginx/proxy headers can be URL-encoded; PEM files typically are not.
         if (pem.contains("%")) {
-            normalized = percentDecode(pem);
+            try {
+                normalized = percentDecode(pem);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Could not parse PEM", e);
+            }
         }
 
         return normalized

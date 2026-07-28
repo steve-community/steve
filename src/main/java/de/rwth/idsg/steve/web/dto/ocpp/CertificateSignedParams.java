@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import de.rwth.idsg.steve.utils.CertificateUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,4 +38,8 @@ public class CertificateSignedParams extends MultipleChargePointSelect {
     @Size(max = 10_000, message = "Certificate chain must not exceed {max} characters")
     @Schema(description = "PEM-encoded certificate chain (signed certificate + CA certificate)")
     private String certificateChain;
+
+    public void setCertificateChain(String certificateChain) {
+        this.certificateChain = CertificateUtils.normalizePemInput(certificateChain);
+    }
 }

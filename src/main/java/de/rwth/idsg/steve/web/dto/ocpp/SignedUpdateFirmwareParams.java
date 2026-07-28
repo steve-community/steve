@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import de.rwth.idsg.steve.utils.CertificateUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,4 +46,8 @@ public class SignedUpdateFirmwareParams extends UpdateFirmwareParams {
     @Future(message = "Install Date/Time must be in future")
     @Schema(description = "When charge point should install the downloaded firmware")
     private DateTime installDateTime;
+
+    public void setSigningCertificate(String signingCertificate) {
+        this.signingCertificate = CertificateUtils.normalizePemInput(signingCertificate);
+    }
 }

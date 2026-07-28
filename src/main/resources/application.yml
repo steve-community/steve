@@ -48,6 +48,9 @@ steve:
     ws-session-select-strategy: ${ws.session.select.strategy}
     auto-register-unknown-stations: ${auto.register.unknown.stations}
     charge-box-id-validation-regex: ${charge-box-id.validation.regex}
+
+    # Enables compatibility workarounds for OCTT-based OCA certification testing.
+    # These workarounds alter otherwise OCPP-compliant behavior to accommodate OCTT-specific expectations.
     octt-quirks-enabled: false
 
     # Which transport (SOAP and JSON-over-WebSocket) of which OCPP version (1.2, 1.5 and 1.6) should we enable?

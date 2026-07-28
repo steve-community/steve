@@ -305,7 +305,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .execute();
         } catch (Exception e) {
             log.error("Exception occurred", e);
-            updateTransactionAsFailed(p, e);
+            updateTransactionAsFailed(p, List.of(Throwables.getStackTraceAsString(e)));
         }
 
         // -------------------------------------------------------------------------
@@ -332,7 +332,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateTransactionAsFailed(UpdateTransactionParams p, Exception e) {
+    public void updateTransactionAsFailed(UpdateTransactionParams p, List<String> failReasons) {
         try {
             ctx.insertInto(TRANSACTION_STOP_FAILED)
                 .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
@@ -342,12 +342,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())
                 .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())
                 .set(TRANSACTION_STOP_FAILED.STOP_REASON, p.getStopReason())
-                .set(TRANSACTION_STOP_FAILED.FAIL_REASON, Throwables.getStackTraceAsString(e))
+                .set(TRANSACTION_STOP_FAILED.FAIL_REASON, String.join(",", failReasons))
                 .execute();
         } catch (Exception ex) {
             // This is where we give up and just log
             log.error("Exception occurred", ex);
-            log.error("Original exception", e);
         }
     }
 

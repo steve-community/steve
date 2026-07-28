@@ -242,13 +242,16 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     @Test
     public void updateTransactionAsFailed() {
         int txId = repository.insertTransaction(insertTransactionParams());
-        assertNoDatabaseException(() -> repository.updateTransactionAsFailed(updateTransactionParams(txId), new RuntimeException("it")));
+        assertNoDatabaseException(() -> repository.updateTransactionAsFailed(
+            updateTransactionParams(txId),
+            List.of("first reason", "second reason")
+        ));
 
-        Integer count = dslContext.selectCount()
+        String failReason = dslContext.select(TRANSACTION_STOP_FAILED.FAIL_REASON)
             .from(TRANSACTION_STOP_FAILED)
             .where(TRANSACTION_STOP_FAILED.TRANSACTION_PK.eq(txId))
-            .fetchOne(0, int.class);
-        Assertions.assertEquals(1, count);
+            .fetchOne(TRANSACTION_STOP_FAILED.FAIL_REASON);
+        Assertions.assertEquals("first reason,second reason", failReason);
     }
 
     private void seedTransactionStart(int transactionId) {

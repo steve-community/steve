@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -150,9 +149,9 @@ public class CentralSystemService16_Service {
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
 
-        var exception = serviceValidator.validateStatusNotification(parameters);
-        if (exception != null) {
-            log.warn("StatusNotification validation failed: {}", exception.getMessage(), exception);
+        var results = serviceValidator.validateStatusNotification(parameters);
+        if (results.hasHardErrors()) {
+            return new StatusNotificationResponse();
         }
 
         // Optional field
@@ -193,16 +192,14 @@ public class CentralSystemService16_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
 
-        SteveException exception;
-        if (transactionId == null) {
-            exception = serviceValidator.validateMeterValues(parameters);
-        } else {
-            var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, parameters.getConnectorId(), transactionId);
-            exception = serviceValidator.validateMeterValues(parameters, transaction);
-        }
-
-        if (exception != null) {
-            log.warn("MeterValues validation failed: {}", exception.getMessage(), exception);
+        var results = (transactionId == null)
+            ? serviceValidator.validateMeterValues(parameters)
+            : serviceValidator.validateMeterValues(
+                parameters,
+                ocppServerRepository.getTransaction(chargeBoxIdentity, parameters.getConnectorId(), transactionId)
+            );
+        if (results.hasHardErrors()) {
+            return new MeterValuesResponse();
         }
 
         ocppServerRepository.insertMeterValues(
@@ -243,10 +240,7 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
-        var exception = serviceValidator.validateStart(parameters);
-        if (exception != null) {
-            log.warn("StartTransaction validation failed: {}", exception.getMessage(), exception);
-        }
+        serviceValidator.validateStart(parameters);
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
@@ -284,17 +278,16 @@ public class CentralSystemService16_Service {
                                        .build();
 
         var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, null, transactionId);
-        var exception = serviceValidator.validateStop(transaction, parameters);
+        var results = serviceValidator.validateStop(transaction, parameters);
 
-        if (exception == null) {
+        if (results.hasHardErrors()) {
+            ocppServerRepository.updateTransactionAsFailed(params, results.getHardErrors());
+            // TODO: we need to handle meter values of invalid stops differently. will come later.
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
+        } else {
             ocppServerRepository.updateTransaction(params);
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
             applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
-        } else {
-            log.warn("StopTransaction validation failed: {}", exception.getMessage(), exception);
-            ocppServerRepository.updateTransactionAsFailed(params, exception);
-            // TODO: we need to handle meter values of invalid stops differently. will come later.
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
         }
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
@@ -369,9 +362,9 @@ public class CentralSystemService16_Service {
 
     public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
                                                                        String chargeBoxIdentity) {
-        var exception = serviceValidator.validateSecurityEvent(parameters);
-        if (exception != null) {
-            log.warn("SecurityEvent validation failed: {}", exception.getMessage(), exception);
+        var results = serviceValidator.validateSecurityEvent(parameters);
+        if (results.hasHardErrors()) {
+            return new SecurityEventNotificationResponse();
         }
 
         try {

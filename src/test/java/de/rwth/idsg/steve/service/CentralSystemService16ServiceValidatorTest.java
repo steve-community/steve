@@ -61,7 +61,7 @@ public class CentralSystemService16ServiceValidatorTest {
     }
 
     @Test
-    public void validateStart_meterStartNegative_returnsSoftError() {
+    public void validateStart_meterStartNegative_returnsHardError() {
         var result = validator.validateStart(startParams(1, -1, new DateTime(NOW.toEpochMilli())));
 
         assertHardErrors(result, "StartTransaction.meterStart must not be negative");

@@ -630,7 +630,7 @@
         <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
-            <version>8.5.18</version>
+            <version>8.5.19</version>
         </dependency>
         <dependency>
             <groupId>org.owasp.encoder</groupId>

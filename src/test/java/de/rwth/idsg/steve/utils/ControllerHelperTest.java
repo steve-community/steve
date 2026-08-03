@@ -26,11 +26,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TimeZoneIdsProviderTest {
+public class ControllerHelperTest {
 
     @Test
-    public void getTimeZoneIds() {
-        Map<String, String> timeZoneIds = TimeZoneIdsProvider.getTimeZoneIds();
+    public void countryDropdown() {
+        Map<String, String> countries = ControllerHelper.COUNTRY_DROPDOWN;
+        List<String> countryNames = new ArrayList<>(countries.values());
+
+        Assertions.assertEquals(ControllerHelper.EMPTY_OPTION, countries.get(""));
+        Assertions.assertEquals("Germany", countries.get("DE"));
+        Assertions.assertFalse(countries.containsKey("EU"));
+
+        List<String> sortedCountryNames = countryNames.subList(1, countryNames.size()).stream().sorted().toList();
+        Assertions.assertEquals(sortedCountryNames, countryNames.subList(1, countryNames.size()));
+    }
+
+    @Test
+    public void timeZoneDropdown() {
+        Map<String, String> timeZoneIds = ControllerHelper.TIME_ZONE_DROPDOWN;
         List<String> keys = new ArrayList<>(timeZoneIds.keySet());
 
         Assertions.assertEquals("", keys.getFirst());

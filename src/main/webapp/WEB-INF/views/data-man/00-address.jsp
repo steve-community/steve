@@ -28,6 +28,7 @@
 	<tr><td>Country:</td><td><form:select path="address.country" items="${countryCodes}"/></td></tr>
 	<tr><td>Latitude:</td><td><form:input path="address.latitude"/></td></tr>
 	<tr><td>Longitude:</td><td><form:input path="address.longitude"/></td></tr>
+	<tr><td>Time Zone:</td><td><form:select path="address.timeZone" items="${timeZones}"/></td></tr>
 
     <%--
       Extract the address object using spring:bind to make it accessible for JSTL conditionals.

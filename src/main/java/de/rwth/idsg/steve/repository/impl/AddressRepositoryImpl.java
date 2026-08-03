@@ -101,6 +101,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
                       .set(ADDRESS.LATITUDE, ad.getLatitude())
                       .set(ADDRESS.LONGITUDE, ad.getLongitude())
+                      .set(ADDRESS.TIME_ZONE, ad.getTimeZone())
                       .returning(ADDRESS.ADDRESS_PK)
                       .fetchOne()
                       .getAddressPk();
@@ -118,6 +119,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                        .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
                        .set(ADDRESS.LATITUDE, ad.getLatitude())
                        .set(ADDRESS.LONGITUDE, ad.getLongitude())
+                       .set(ADDRESS.TIME_ZONE, ad.getTimeZone())
                        .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
                        .execute();
 

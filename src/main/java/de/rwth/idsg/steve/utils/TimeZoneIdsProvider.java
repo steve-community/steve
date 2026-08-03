@@ -20,36 +20,25 @@ package de.rwth.idsg.steve.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 
-import java.util.HashMap;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.utils.CountryCodesProvider.getCountryCodes;
-import static de.rwth.idsg.steve.utils.TimeZoneIdsProvider.getTimeZoneIds;
+import static de.rwth.idsg.steve.utils.ControllerHelper.EMPTY_OPTION;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 25.11.2015
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ControllerHelper {
+public final class TimeZoneIdsProvider {
 
-    public static final String EMPTY_OPTION = "-- Empty --";
-
-    public static final Map<String, String> COUNTRY_DROPDOWN = getCountryCodes();
-    public static final Map<String, String> TIME_ZONE_DROPDOWN = getTimeZoneIds();
-
-    public static Map<String, String> idTagEnhancer(List<String> idTagList) {
-        Map<String, String> map = new HashMap<>(idTagList.size() + 1);
+    public static Map<String, String> getTimeZoneIds() {
+        var availableZoneIds = ZoneId.getAvailableZoneIds();
+        Map<String, String> map = new LinkedHashMap<>(availableZoneIds.size() + 1);
         map.put("", EMPTY_OPTION);
 
-        for (String s : idTagList) {
-            map.put(s, s);
-        }
+        availableZoneIds.stream()
+            .sorted()
+            .forEach(id -> map.put(id, id));
+
         return map;
     }
-
-
 }

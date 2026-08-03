@@ -63,15 +63,27 @@ public class AddressRepositoryImplIT extends AbstractRepositoryITBase {
         var address = new Address();
         address.setCity("Cologne");
         address.setStreet("Main");
+        address.setTimeZone("Europe/Berlin");
 
         Integer pk = assertNoDatabaseException(() -> repository.updateOrInsert(dslContext, address));
         Assertions.assertNotNull(pk);
 
-        String city = dslContext.select(ADDRESS.CITY)
+        var record = dslContext.select(ADDRESS.CITY, ADDRESS.TIME_ZONE)
             .from(ADDRESS)
             .where(ADDRESS.ADDRESS_PK.eq(pk))
-            .fetchOne(ADDRESS.CITY);
-        Assertions.assertEquals("Cologne", city);
+            .fetchOne();
+        Assertions.assertEquals("Cologne", record.value1());
+        Assertions.assertEquals("Europe/Berlin", record.value2());
+
+        address.setAddressPk(pk);
+        address.setTimeZone("Europe/Paris");
+        assertNoDatabaseException(() -> repository.updateOrInsert(dslContext, address));
+
+        String timeZone = dslContext.select(ADDRESS.TIME_ZONE)
+            .from(ADDRESS)
+            .where(ADDRESS.ADDRESS_PK.eq(pk))
+            .fetchOne(ADDRESS.TIME_ZONE);
+        Assertions.assertEquals("Europe/Paris", timeZone);
     }
 
     @Test

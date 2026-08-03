@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -52,32 +53,28 @@ public final class ControllerHelper {
         return map;
     }
 
-    private static Map<String, String> createCountryDropdown() {
-        CountryCode[] codes = CountryCode.values();
-        Arrays.sort(codes, Comparator.comparing(CountryCode::getName));
-
-        Map<String, String> map = new LinkedHashMap<>(codes.length + 1);
-        map.put("", EMPTY_OPTION);
-
-        for (CountryCode c : codes) {
-            if (shouldInclude(c)) {
-                map.put(c.getAlpha2(), c.getName());
-            }
-        }
-        return map;
-    }
-
     /**
      * There are some invalid codes like {@link CountryCode#UNDEFINED} and {@link CountryCode#EU},
      * or some countries are listed twice {@link CountryCode#FI} - {@link CountryCode#SF} and
      * {@link CountryCode#GB} - {@link CountryCode#UK} which are confusing. We filter these out.
      */
-    private static boolean shouldInclude(CountryCode c) {
-        return c.getAssignment() == CountryCode.Assignment.OFFICIALLY_ASSIGNED;
+    private static Map<String, String> createCountryDropdown() {
+        var codes = CountryCode.values();
+
+        Map<String, String> map = new LinkedHashMap<>(codes.length + 1);
+        map.put("", EMPTY_OPTION);
+
+        Arrays.stream(codes)
+            .filter(c -> c.getAssignment() == CountryCode.Assignment.OFFICIALLY_ASSIGNED)
+            .sorted(Comparator.comparing(CountryCode::getName))
+            .forEach(c -> map.put(c.getAlpha2(), c.getName()));
+
+        return Collections.unmodifiableMap(map);
     }
 
     private static Map<String, String> createTimeZoneDropdown() {
         var availableZoneIds = ZoneId.getAvailableZoneIds();
+
         Map<String, String> map = new LinkedHashMap<>(availableZoneIds.size() + 1);
         map.put("", EMPTY_OPTION);
 
@@ -85,7 +82,7 @@ public final class ControllerHelper {
             .sorted()
             .forEach(id -> map.put(id, id));
 
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
 }

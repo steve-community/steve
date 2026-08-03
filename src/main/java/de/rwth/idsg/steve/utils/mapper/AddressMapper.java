@@ -42,6 +42,7 @@ public final class AddressMapper {
             address.setCountry(CountryCode.getByCode(record.getCountry()));
             address.setLatitude(record.getLatitude());
             address.setLongitude(record.getLongitude());
+            address.setTimeZone(record.getTimeZone());
         }
         return address;
     }

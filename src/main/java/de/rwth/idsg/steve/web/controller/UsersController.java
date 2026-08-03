@@ -143,6 +143,7 @@ public class UsersController {
         idTagList.addAll(fromDB);
 
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
+        model.addAttribute("timeZones", ControllerHelper.TIME_ZONE_DROPDOWN);
         model.addAttribute("idTagList", idTagList);
         model.addAttribute("features", NotificationFeature.getUserValues());
     }

@@ -19,9 +19,11 @@
 package de.rwth.idsg.steve.web.dto;
 
 import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.validation.TimeZoneId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Range;
 
 import java.math.BigDecimal;
@@ -50,15 +52,23 @@ public class Address {
     @Range(min = -180, max = 180, message = "Longitude must be between {min} and {max}")
     private BigDecimal longitude;
 
+    @TimeZoneId
+    private String timeZone;
+
     public boolean isEmpty() {
         return addressPk == null
-                && street == null
-                && houseNumber == null
-                && zipCode == null
-                && city == null
+                && StringUtils.isEmpty(street)
+                && StringUtils.isEmpty(houseNumber)
+                && StringUtils.isEmpty(zipCode)
+                && StringUtils.isEmpty(city)
                 && country == null
                 && latitude == null
-                && longitude == null;
+                && longitude == null
+                && StringUtils.isEmpty(timeZone);
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = StringUtils.isEmpty(timeZone) ? null : timeZone;
     }
 
     /**

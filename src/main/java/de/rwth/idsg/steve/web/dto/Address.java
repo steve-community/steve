@@ -57,14 +57,14 @@ public class Address {
 
     public boolean isEmpty() {
         return addressPk == null
-                && street == null
-                && houseNumber == null
-                && zipCode == null
-                && city == null
+                && StringUtils.isEmpty(street)
+                && StringUtils.isEmpty(houseNumber)
+                && StringUtils.isEmpty(zipCode)
+                && StringUtils.isEmpty(city)
                 && country == null
                 && latitude == null
                 && longitude == null
-                && timeZone == null;
+                && StringUtils.isEmpty(timeZone);
     }
 
     public void setTimeZone(String timeZone) {

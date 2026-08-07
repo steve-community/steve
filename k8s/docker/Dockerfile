@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk AS base
+FROM eclipse-temurin:25-jdk AS base
 MAINTAINER daynnnnn
 
 # Setting environment variables

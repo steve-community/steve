@@ -55,7 +55,7 @@ See [dedicated Wiki page](https://github.com/steve-community/steve/wiki/OCPP-1.6
 ### System Requirements
 
 SteVe requires 
-* JDK 21 or newer
+* JDK 25 or newer
 * Maven 
 * MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11-L35) supported versions.
 

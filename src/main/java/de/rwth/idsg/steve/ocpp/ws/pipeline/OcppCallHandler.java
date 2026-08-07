@@ -44,7 +44,7 @@ public interface OcppCallHandler extends Consumer<CommunicationContext> {
             response = dispatch(call.getPayload(), context.getChargeBoxId());
         } catch (Exception e) {
             getLogger().error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, e.getMessage()));
+            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
             return;
         }
 

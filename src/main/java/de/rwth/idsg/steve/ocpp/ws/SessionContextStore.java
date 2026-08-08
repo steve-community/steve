@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Deque;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,11 +32,23 @@ import java.util.concurrent.ScheduledFuture;
  */
 public interface SessionContextStore {
 
-    void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
+    /**
+     * @return whether this is the first session for this chargeBoxId.
+     */
+    boolean add(String chargeBoxId, WebSocketSession session);
 
-    void remove(String chargeBoxId, WebSocketSession session);
+    /**
+     * @return whether this was the last session for this chargeBoxId.
+     */
+    boolean remove(String chargeBoxId, WebSocketSession session);
 
     WebSocketSession getSession(String chargeBoxId);
+
+    Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId);
+
+    boolean closeSession(String chargeBoxId, String sessionId);
+
+    void closeSessions(String chargeBoxId);
 
     int getSize(String chargeBoxId);
 
@@ -44,5 +56,5 @@ public interface SessionContextStore {
 
     List<String> getChargeBoxIdList();
 
-    Map<String, Deque<SessionContext>> getACopy();
+    Map<String, Collection<SessionContext>> getReadOnlyMap();
 }

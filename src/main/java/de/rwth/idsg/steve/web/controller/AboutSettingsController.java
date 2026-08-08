@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,25 +19,35 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
+import de.rwth.idsg.steve.config.SteveProperties;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.service.DataImportExportService;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
+import de.rwth.idsg.steve.web.dto.DataExportForm;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import java.io.IOException;
 
 /**
  * One controller for about and settings pages
@@ -45,14 +55,17 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
-    @Autowired private GenericRepository genericRepository;
-    @Autowired private LogController logController;
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private MailService mailService;
-    @Autowired private ReleaseCheckService releaseCheckService;
+    private final GenericRepository genericRepository;
+    private final LogController logController;
+    private final SettingsRepository settingsRepository;
+    private final MailService mailService;
+    private final ReleaseCheckService releaseCheckService;
+    private final SteveProperties steveProperties;
+    private final DataImportExportService dataImportExportService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -65,19 +78,29 @@ public class AboutSettingsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
-    public String getAbout(Model model) {
-        model.addAttribute("version", CONFIG.getSteveVersion());
+    @GetMapping(ABOUT_PATH)
+    public String getAbout(Model model, @RequestHeader(HttpHeaders.HOST) String host, HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String contextPath = request.getContextPath();
+
+        model.addAttribute("version", steveProperties.getVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        model.addAttribute("endpointInfo", EndpointInfo.fromRequest(scheme, host, contextPath));
+
+        var enabledProtocols = steveProperties.getOcpp().getEnabledProtocols();
+        var vals = OcppProtocol.getCompositeValuesOfEnabledOcppProtocols(enabledProtocols);
+        model.addAttribute("enabledOcppProtocols", String.join(", ", vals));
+
+        model.addAttribute("exportForm", new DataExportForm());
+        model.addAttribute("masterDataTableNames", String.join(", ", dataImportExportService.getMasterDataTableNames()));
         return "about";
     }
 
-    @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
+    @GetMapping(SETTINGS_PATH)
     public String getSettings(Model model) {
         SettingsForm form = settingsRepository.getForm();
         model.addAttribute("features", NotificationFeature.values());
@@ -85,7 +108,7 @@ public class AboutSettingsController {
         return "settings";
     }
 
-    @RequestMapping(params = "change", value = SETTINGS_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "change", value = SETTINGS_PATH)
     public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -97,7 +120,7 @@ public class AboutSettingsController {
         return "redirect:/manager/settings";
     }
 
-    @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "testMail", value = SETTINGS_PATH)
     public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                            BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -109,5 +132,17 @@ public class AboutSettingsController {
         mailService.sendTestMail();
 
         return "redirect:/manager/settings";
+    }
+
+    @GetMapping(value = ABOUT_PATH + "/export")
+    public void exportZip(@ModelAttribute("exportForm") DataExportForm exportForm,
+                          HttpServletResponse response) throws IOException {
+        dataImportExportService.exportZip(response, exportForm.getExportType());
+    }
+
+    @PostMapping(value = ABOUT_PATH + "/import")
+    public String importZip(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        dataImportExportService.importZip(file);
+        return "redirect:/manager/home";
     }
 }

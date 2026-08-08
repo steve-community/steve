@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,13 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -41,8 +35,20 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.TreeNode;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
+import jakarta.validation.ConstraintViolationException;
+import java.time.Instant;
 import java.util.function.Consumer;
 
 /**
@@ -58,6 +64,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
     private final FutureResponseContextStore futureResponseContextStore;
+    private final SessionContextStore sessionContextStore;
     private final TypeStore typeStore;
 
     /**
@@ -66,33 +73,21 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     @Override
     public void accept(CommunicationContext context) {
-        try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
+        try (JsonParser parser = mapper.createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
             int messageTypeNr = parser.getIntValue();
 
             parser.nextToken();
-            String messageId = parser.getText();
+            String messageId = parser.getString();
 
-            MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
-            switch (messageType) {
-                case CALL:
-                    handleCall(context, messageId, parser);
-                    break;
-
-                case CALL_RESULT:
-                    handleResult(context, messageId, parser);
-                    break;
-
-                case CALL_ERROR:
-                    handleError(context, messageId, parser);
-                    break;
-
-                default:
-                    throw new SteveException("Unknown enum type");
+            switch (MessageType.fromTypeNr(messageTypeNr)) {
+                case CALL -> handleCall(context, messageId, parser);
+                case CALL_RESULT -> handleResult(context, messageId, parser);
+                case CALL_ERROR -> handleError(context, messageId, parser);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
         }
     }
@@ -105,12 +100,31 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs.
      */
     private void handleCall(CommunicationContext context, String messageId, JsonParser parser) {
+        // Enforce OCPP CALL messageId as a non-empty JSON string.
+        // messageId must be a usable request identifier, so null or empty should be treated as invalid.
+        // Token-type check avoids accepting VALUE_NULL cases that can be exposed as text like "null" by streaming accessors.
+        JsonToken messageIdToken = parser.currentToken();
+        if (messageIdToken != JsonToken.VALUE_STRING || StringUtils.isEmpty(messageId)) {
+            context.setOutgoingMessage(ErrorFactory.invalidMessageId(messageIdToken == JsonToken.VALUE_STRING ? messageId : null));
+            return;
+        }
+
+        Boolean success = sessionContextStore.registerIncomingCallId(context.getChargeBoxId(), context.getSession(), messageId);
+        if (success == null) {
+            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, context.getSession().getId());
+            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
+            return;
+        } else if (!success) {
+            context.setOutgoingMessage(ErrorFactory.duplicateCallMessageId(messageId));
+            return;
+        }
+
         // parse action
         String action;
         try {
             parser.nextToken();
-            action = parser.getText();
-        } catch (IOException e) {
+            action = parser.getString();
+        } catch (JacksonException e) {
             log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.genericDeserializeError(messageId, e.getMessage()));
             return;
@@ -135,9 +149,13 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
 
             req = mapper.treeToValue(requestPayload, clazz);
-        } catch (IOException e) {
+        } catch (ConstraintViolationException | DatabindException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));
+            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, getDetails(e)));
+            return;
+        } catch (JacksonException e) {
+            log.error("Exception occurred", e);
+            context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, null));
             return;
         }
 
@@ -154,20 +172,15 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
+        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
+        validate(context, responseContext);
 
         ResponseType res;
         try {
             parser.nextToken();
             JsonNode responsePayload = parser.readValueAsTree();
             res = mapper.treeToValue(responsePayload, responseContext.getResponseClass());
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new SteveException("Deserialization of incoming response payload failed", e);
         }
 
@@ -176,7 +189,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.createResultHandler(responseContext.getTask());
     }
 
     /**
@@ -184,23 +196,18 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
-        }
+        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
+        validate(context, responseContext);
 
         ErrorCode code;
         String desc;
         String details = null;
         try {
             parser.nextToken();
-            code = ErrorCode.fromValue(parser.getText());
+            code = ErrorCode.fromValue(parser.getString());
 
             parser.nextToken();
-            desc = parser.getText();
+            desc = parser.getString();
 
             // From spec:
             // ErrorDescription - Should be filled in if possible, otherwise a clear empty string "".
@@ -217,7 +224,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 details = mapper.writeValueAsString(detailsNode);
             }
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new SteveException("Deserialization of incoming error message failed", e);
         }
 
@@ -228,7 +235,32 @@ public class Deserializer implements Consumer<CommunicationContext> {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.createErrorHandler(responseContext.getTask());
     }
 
+    private static String getDetails(Exception e) {
+        if (e instanceof ConstraintViolationException || e.getCause() instanceof ConstraintViolationException) {
+            return "Violation of field constraints";
+        }
+        if (e instanceof DatabindException) {
+            return "Invalid payload value (cannot understand one field)";
+        }
+        return null;
+    }
+
+    /**
+     * Ensures incoming responses map only to active, non-stale calls.
+     * Unknown or expired correlations are rejected to prevent accidental matching.
+     */
+    private static void validate(CommunicationContext cc, FutureResponseContext frc) {
+        if (frc == null) {
+            throw new SteveException("A response message was received to a not-sent call");
+        }
+
+        // set this before throwing the next exception, because IncomingPipeline will need it to handle and propagate.
+        cc.setFutureResponseContext(frc);
+
+        if (frc.hasTimedOut(Instant.now())) {
+            throw new SteveException("A response message was received to an expired call");
+        }
+    }
 }

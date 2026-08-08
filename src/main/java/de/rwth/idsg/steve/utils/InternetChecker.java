@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -49,7 +48,7 @@ public final class InternetChecker {
     );
 
     static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
+        System.setProperty("http.agent", "SteVe (github)");
     }
 
     /**

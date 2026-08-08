@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,20 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.RequestResult;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.xml.ws.AsyncHandler;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,19 +39,21 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
+@Slf4j
+public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ConfigurationKeyValues> {
 
-    private static final Joiner JOINER = Joiner.on(", ");
+    private final ChargePointService chargePointService;
 
-    public GetConfigurationTask(GetConfigurationParams params) {
+    public GetConfigurationTask(GetConfigurationParams params, ChargePointService chargePointService) {
         super(params);
+        this.chargePointService = chargePointService;
     }
 
     @Override
-    public OcppCallback<ResponseWrapper> defaultCallback() {
-        return new DefaultOcppCallback<ResponseWrapper>() {
+    public OcppCallback<ConfigurationKeyValues> defaultCallback() {
+        return new DefaultOcppCallback<ConfigurationKeyValues>() {
             @Override
-            public void success(String chargeBoxId, ResponseWrapper response) {
+            public void success(String chargeBoxId, ConfigurationKeyValues response) {
                 addNewResponse(chargeBoxId, "OK");
 
                 RequestResult result = getResultMap().get(chargeBoxId);
@@ -79,7 +83,9 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
+                updateCache(chargeBoxId, keyValues);
+
+                success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -91,27 +97,50 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         return res -> {
             try {
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
+
                 List<KeyValue> keyValues = response.getConfigurationKey()
                                                    .stream()
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
+                updateCache(chargeBoxId, keyValues);
+
+                success(chargeBoxId, new ConfigurationKeyValues(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
     }
 
-    @Getter
-    public static class ResponseWrapper {
-        private final List<KeyValue> configurationKeys;
-        private final String unknownKeys;
-
-        private ResponseWrapper(List<KeyValue> configurationKeys, List<String> unknownKeys) {
-            this.configurationKeys = configurationKeys;
-            this.unknownKeys = JOINER.join(unknownKeys);
+    /**
+     * Whenever we ask for all config keys (i.e. when no config key was selected), use the opportunity to update
+     * the database.
+     */
+    private void updateCache(String chargeBoxId, List<KeyValue> keyValues) {
+        boolean askedForAllConfigs = CollectionUtils.isEmpty(params.getAllKeys());
+        if (!askedForAllConfigs) {
+            return;
         }
+
+        try {
+            var mapper = JsonObjectMapper.INSTANCE.getMapper();
+
+            var node = mapper.createObjectNode();
+            for (var entry : keyValues) {
+                node.set(entry.getKey(), mapper.stringNode(entry.getValue()));
+            }
+
+            chargePointService.updateOcppConfiguration(chargeBoxId, mapper.writeValueAsString(node));
+        } catch (Exception e) {
+            log.error("Failed during updateOcppConfiguration", e);
+        }
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ConfigurationKeyValues {
+        private final List<KeyValue> configurationKeys;
+        private final List<String> unknownKeys;
     }
 
     @Getter

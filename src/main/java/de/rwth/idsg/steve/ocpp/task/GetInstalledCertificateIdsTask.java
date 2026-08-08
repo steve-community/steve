@@ -1,0 +1,89 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2026 SteVe Community Team
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package de.rwth.idsg.steve.ocpp.task;
+
+import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.repository.CertificateRepository;
+import de.rwth.idsg.steve.web.dto.ocpp.GetInstalledCertificateIdsParams;
+import ocpp._2022._02.security.CertificateHashData;
+import ocpp._2022._02.security.GetInstalledCertificateIds;
+import ocpp._2022._02.security.GetInstalledCertificateIdsResponse;
+import org.springframework.util.CollectionUtils;
+
+import jakarta.xml.ws.AsyncHandler;
+import java.util.Collections;
+import java.util.List;
+
+public class GetInstalledCertificateIdsTask extends Ocpp16AndAboveTask<GetInstalledCertificateIdsParams, GetInstalledCertificateIdsResponse> {
+
+    private final CertificateRepository certificateRepository;
+
+    public GetInstalledCertificateIdsTask(GetInstalledCertificateIdsParams params,
+                                          CertificateRepository certificateRepository) {
+        super(params);
+        this.certificateRepository = certificateRepository;
+    }
+
+    @Override
+    public OcppCallback<GetInstalledCertificateIdsResponse> defaultCallback() {
+        return new DefaultOcppCallback<GetInstalledCertificateIdsResponse>() {
+            @Override
+            public void success(String chargeBoxId, GetInstalledCertificateIdsResponse response) {
+                var status = response.getStatus().value();
+
+                List<CertificateHashData> certificateHashData = (response.getCertificateHashData() == null)
+                    ? Collections.emptyList()
+                    : response.getCertificateHashData();
+
+                addNewResponse(chargeBoxId, status + " (" + certificateHashData.size() + " certificates)");
+            }
+        };
+    }
+
+    @Override
+    public GetInstalledCertificateIds getOcpp16Request() {
+        var request = new GetInstalledCertificateIds();
+        request.setCertificateType(params.getCertificateType());
+        return request;
+    }
+
+    @Override
+    public AsyncHandler<GetInstalledCertificateIdsResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                var response = res.get();
+                String certType = params.getCertificateType().value();
+
+                // Always delete existing certificates to reflect the current state on the charge point.
+                // - if certificateHashData null/empty -> station has no certs -> delete if we have some leftovers
+                // - if certificateHashData has certs -> delete anyway, since we will re-insert current snapshot
+                certificateRepository.deleteInstalledCertificates(chargeBoxId, certType);
+
+                if (!CollectionUtils.isEmpty(response.getCertificateHashData())) {
+                    certificateRepository.insertInstalledCertificates(chargeBoxId, certType, response.getCertificateHashData());
+                }
+
+                success(chargeBoxId, response);
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+}

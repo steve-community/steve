@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,14 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -34,8 +36,10 @@ public class User {
     @Getter
     @Builder
     public static final class Overview {
-        private final Integer userPk, ocppTagPk;
-        private final String ocppIdTag, name, phone, email;
+        private final Integer userPk;
+        private final String name, phone, email;
+        private final List<OcppTagEntry> ocppTagEntries;
+        private final List<NotificationFeature> notificationFeatures;
     }
 
     @Getter
@@ -43,6 +47,14 @@ public class User {
     public static final class Details {
         private final UserRecord userRecord;
         private final AddressRecord address;
-        private Optional<String> ocppIdTag;
+        private final List<OcppTagEntry> ocppTagEntries;
     }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class OcppTagEntry {
+        private final Integer ocppTagPk;
+        private final String idTag;
+    }
+
 }

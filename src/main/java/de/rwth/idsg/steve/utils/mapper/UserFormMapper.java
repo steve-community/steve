@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve.utils.mapper;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserSex;
 import jooq.steve.db.tables.records.UserRecord;
@@ -43,10 +43,11 @@ public final class UserFormMapper {
         form.setBirthDay(userRecord.getBirthDay());
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
-        form.setEMail(userRecord.getEMail());
+        form.setEmail(userRecord.getEMail());
+        form.setNotificationFeatures(NotificationFeature.splitFeatures(userRecord.getNotificationFeatures()));
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
-        form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
+        form.setIdTagList(details.getOcppTagEntries().stream().map(User.OcppTagEntry::getIdTag).toList());
 
         return form;
     }

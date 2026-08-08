@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,9 @@
  */
 package de.rwth.idsg.steve.service;
 
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
-
-import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
@@ -40,6 +37,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -65,6 +65,14 @@ public class OcppTagService {
 
     public List<String> getIdTags() {
         return ocppTagRepository.getIdTags();
+    }
+
+    public List<String> getIdTags(List<String> idTagList) {
+        return ocppTagRepository.getIdTags(idTagList);
+    }
+
+    public List<String> getIdTagsWithoutUser() {
+        return ocppTagRepository.getIdTagsWithoutUser();
     }
 
     public List<String> getActiveIdTags() {
@@ -97,14 +105,9 @@ public class OcppTagService {
         invalidOcppTagService.removeAll(idTagList);
     }
 
-    @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
-        if (Strings.isNullOrEmpty(idTag)) {
-            return null;
-        }
-
-        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
+    public IdTagInfo getIdTagInfo(String idTag, AuthTagContext authTagContext,
+                                  String chargeBoxId, @Nullable Integer connectorId) {
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, authTagContext, chargeBoxId, connectorId);
 
         if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
             invalidOcppTagService.processNewUnidentified(idTag);
@@ -114,11 +117,11 @@ public class OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
-        Supplier<IdTagInfo> supplierWhenException) {
+    public IdTagInfo getIdTagInfo(String idTag, AuthTagContext authTagContext,
+                                  String chargeBoxId, @Nullable Integer connectorId,
+                                  Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
+            return getIdTagInfo(idTag, authTagContext, chargeBoxId, connectorId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
@@ -144,7 +147,9 @@ public class OcppTagService {
     }
 
     public void deleteOcppTag(int ocppTagPk) {
+        var details = getRecord(ocppTagPk);
         ocppTagRepository.deleteOcppTag(ocppTagPk);
+        log.info("Deleted Ocpp Tag with ocppTagPk={} and ocppTagId={}", ocppTagPk, details.getIdTag());
     }
 
     // -------------------------------------------------------------------------

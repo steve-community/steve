@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,28 +25,30 @@ import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
+
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 26.11.2015
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    @Autowired protected OcppTagService ocppTagService;
+    protected final OcppTagService ocppTagService;
 
     protected static final String PARAMS = "params";
 
@@ -71,19 +73,19 @@ public class OcppTagsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String get(Model model) {
         initList(model, new OcppTagQueryForm());
         return "data-man/ocppTags";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) OcppTagQueryForm params, Model model) {
         initList(model, params);
         return "data-man/ocppTags";
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
         OcppTagActivityRecord record = ocppTagService.getRecord(ocppTagPk);
         OcppTagForm form = OcppTagFormMapper.toForm(record);
@@ -94,7 +96,7 @@ public class OcppTagsController {
         return "data-man/ocppTagDetails";
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
         setTags(model);
         model.addAttribute("ocppTagForm", new OcppTagForm());
@@ -102,7 +104,7 @@ public class OcppTagsController {
         return "data-man/ocppTagAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_SINGLE_PATH)
     public String addSinglePost(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -115,7 +117,7 @@ public class OcppTagsController {
         return toOverview();
     }
 
-    @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
+    @PostMapping(ADD_BATCH_PATH)
     public String addBatchPost(@Valid @ModelAttribute("batchInsertForm") OcppTagBatchInsertForm form,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -128,7 +130,7 @@ public class OcppTagsController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -140,19 +142,19 @@ public class OcppTagsController {
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
         ocppTagService.deleteOcppTag(ocppTagPk);
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_ADD_PATH)
     public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
         ocppTagService.addOcppTagList(Collections.singletonList(idTag));
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_REMOVE_PATH)
     public String removeUnknownIdTag(@PathVariable("idTag") String idTag) {
         ocppTagService.removeUnknown(Collections.singletonList(idTag));
         return toOverview();
@@ -174,12 +176,12 @@ public class OcppTagsController {
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_SINGLE_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }

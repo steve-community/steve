@@ -1,0 +1,4 @@
+contains
+- the one cert "cp-client" from cp-client.p12
+- csr-signing-rsa-ca-cert.pem such that all its future RSA-signed children can be trusted (after signing)
+- csr-signing-ecdsa-ca-cert.pem such that all its future ECDSA-signed children can be trusted (after signing)

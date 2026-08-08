@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,10 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.net.HttpHeaders;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -41,31 +33,48 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.opentest4j.AssertionFailedError;
+import org.springframework.boot.web.server.Ssl;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.TreeNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
+import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 
@@ -77,44 +86,258 @@ import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 @WebSocket
 public class OcppJsonChargePoint {
 
-    private final String version;
+    private final List<String> versions;
     private final String chargeBoxId;
     private final String connectionPath;
-    private final Map<String, ResponseContext> responseContextMap;
-    private final Map<String, RequestContext> requestContextMap;
-    private final MessageDeserializer deserializer;
-    private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
+    private final Deque<ExchangeContext<?, ?>> exchangeQueue;
 
     private final Thread testerThread;
     private RuntimeException testerThreadInterruptReason;
 
-    private CountDownLatch receivedMessagesSignal;
+    private WebSocketClient client;
     private Session session;
 
     public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
-        this(version.getValue(), chargeBoxId, pathPrefix);
+        this(List.of(version.getValue()), chargeBoxId, pathPrefix);
     }
 
-    public OcppJsonChargePoint(String ocppVersion, String chargeBoxId, String pathPrefix) {
-        this.version = ocppVersion;
+    public OcppJsonChargePoint(List<String> ocppVersions, String chargeBoxId, String pathPrefix) {
+        this.versions = ocppVersions;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
-        this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
-        this.requestContextMap = new HashMap<>();
-        this.deserializer = new MessageDeserializer();
-        this.client = new WebSocketClient();
-        this.closeHappenedSignal = new CountDownLatch(1);
         this.testerThread = Thread.currentThread();
+        this.exchangeQueue = new ConcurrentLinkedDeque<>();
+        this.closeHappenedSignal = new CountDownLatch(1);
     }
+
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
+
+    public OcppJsonChargePoint start() {
+        return startWithProfile0();
+    }
+
+    public OcppJsonChargePoint startWithProfile0() {
+        return startInternal(null, null, OcppSecurityProfile.Profile_0);
+    }
+
+    public OcppJsonChargePoint startWithProfile1(@NotNull String basicAuthPassword) {
+        return startInternal(basicAuthPassword, null, OcppSecurityProfile.Profile_1);
+    }
+
+    public OcppJsonChargePoint startWithProfile2(@NotNull String basicAuthPassword, @NotNull Ssl serverSide) {
+        return startInternal(basicAuthPassword, serverSide, OcppSecurityProfile.Profile_2);
+    }
+
+    public OcppJsonChargePoint startWithProfile3(@NotNull Ssl clientAndServerSide) {
+        return startInternal(null, clientAndServerSide, OcppSecurityProfile.Profile_3);
+    }
+
+    private OcppJsonChargePoint startInternal(String basicAuthPassword, Ssl ssl, OcppSecurityProfile profile) {
+        try {
+            ClientUpgradeRequest request = new ClientUpgradeRequest(new URI(connectionPath));
+            if (!CollectionUtils.isEmpty(versions)) {
+                request.setSubProtocols(versions);
+            }
+
+            if (profile.isBasicAuth()) {
+                Objects.requireNonNull(basicAuthPassword, "basicAuthPassword must be set");
+                String encoding = Base64.getEncoder().encodeToString((chargeBoxId + ":" + basicAuthPassword).getBytes(StandardCharsets.UTF_8));
+                request.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
+            }
+
+            client = createWebSocketClient(ssl, profile);
+            client.start();
+
+            Future<Session> connect = client.connect(this, request);
+            this.session = connect.get(); // block until session is created
+            return this;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    public List<String> getResponseHeader(String headerName) {
+        return session.getUpgradeResponse().getHeaders(headerName);
+    }
+
+    public void close() {
+        try {
+            if (!exchangeQueue.isEmpty()) {
+                throw new RuntimeException("Did not exchange all planned communications");
+            }
+            session.close(StatusCode.NORMAL, "Finished", NOOP);
+            boolean closedInTime = closeHappenedSignal.await(30, TimeUnit.SECONDS);
+            if (!closedInTime) {
+                try {
+                    client.stop();
+                } catch (Exception stopException) {
+                    log.warn("Failed to stop websocket client after close timeout", stopException);
+                }
+                throw new RuntimeException("Timed out waiting for websocket close event");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Request/response planning
+    // -------------------------------------------------------------------------
+
+    public <RES extends ResponseType> RES send(RequestType payload, Class<RES> responseClass) {
+        return send(payload, getOperationName(payload), responseClass);
+    }
+
+    public <RES extends ResponseType> RES send(@Nullable RequestType payload, String action, Class<RES> responseClass) {
+        var incoming = sendInternal(payload, action, responseClass);
+
+        if (incoming instanceof OcppJsonResult result) {
+            if (responseClass.isInstance(result.getPayload())) {
+                return (RES) result.getPayload();
+            } else {
+                throw new AssertionFailedError("Response payload is not expected class type");
+            }
+        } else {
+            throw new AssertionFailedError("Was expecting OcppJsonResult");
+        }
+    }
+
+    public OcppJsonError send(RequestType payload) {
+        var incoming = sendInternal(payload, getOperationName(payload), null);
+
+        if (incoming instanceof OcppJsonError error) {
+            return error;
+        } else {
+            throw new AssertionFailedError("Was expecting OcppJsonError");
+        }
+    }
+
+    public void expectRequest(RequestType expectedRequest, ResponseType plannedResponse) {
+        planRequest(expectedRequest, plannedResponse).await();
+    }
+
+    public void expectRequest(RequestType expectedRequest, ErrorCode plannedErrorCode) {
+        planRequest(expectedRequest, plannedErrorCode).await();
+    }
+
+    /**
+     * in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+     * generated which we cannot anticipate before. but, we can return the request payload that just arrived
+     * to the caller, for the caller to do some after-the-fact validation.
+     */
+    public <REQ extends RequestType, RES extends ResponseType> REQ expectRequest(Class<REQ> requestClass, RES plannedResponse) {
+        return planRequest(requestClass, plannedResponse).await();
+    }
+
+    public <REQ extends RequestType, RES extends ResponseType> ExchangeContext<REQ, RES> planRequest(REQ expectedRequest, RES plannedResponse) {
+        OcppJsonResult result = new OcppJsonResult();
+        result.setMessageId(null); // must and will be set later from actual incoming request
+        result.setPayload(plannedResponse);
+
+        return planRequestInternal((Class<REQ>) expectedRequest.getClass(), expectedRequest, result);
+    }
+
+    public <REQ extends RequestType, RES extends ResponseType> ExchangeContext<REQ, RES> planRequest(REQ expectedRequest, ErrorCode plannedErrorCode) {
+        OcppJsonError error = new OcppJsonError();
+        error.setMessageId(null); // must and will be set later from actual incoming request
+        error.setErrorCode(plannedErrorCode);
+
+        return planRequestInternal((Class<REQ>) expectedRequest.getClass(), expectedRequest, error);
+    }
+
+    /**
+     * For chained CSMS-to-CP calls, plan all expected requests first and await them afterwards.
+     */
+    public <REQ extends RequestType, RES extends ResponseType> ExchangeContext<REQ, RES> planRequest(Class<REQ> requestClass, RES plannedResponse) {
+        OcppJsonResult result = new OcppJsonResult();
+        result.setMessageId(null); // must and will be set later from actual incoming request
+        result.setPayload(plannedResponse);
+
+        return planRequestInternal(requestClass, null, result);
+    }
+
+    private <REQ extends RequestType, RES extends ResponseType> OcppJsonMessage sendInternal(@Nullable REQ payload,
+                                                                                             @NotNull String action,
+                                                                                             @Nullable Class<RES> responseClass) {
+        String messageId = UUID.randomUUID().toString();
+
+        OcppJsonCall call = new OcppJsonCall();
+        call.setMessageId(messageId);
+        call.setPayload(payload);
+        call.setAction(action);
+
+        JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
+        webSocketSession.initializeNativeSession(session);
+
+        ExchangeContext<REQ, RES> ctx = new ExchangeContext<>(webSocketSession, chargeBoxId);
+        ctx.setOutgoingMessage(call);
+        ctx.setResponseClass(responseClass);
+        exchangeQueue.add(ctx);
+
+        Serializer.INSTANCE.accept(ctx);
+
+        try {
+            session.sendText(ctx.getOutgoingString(), NOOP);
+        } catch (Exception e) {
+            log.error("Exception", e);
+        }
+
+        // wait for the response to arrive and be processed
+        try {
+            boolean completedInTime = ctx.getDoneSignal().await(30, TimeUnit.SECONDS);
+            if (!completedInTime) {
+                throw new AssertionFailedError("Timed out waiting for response. action=" + action + ", messageId=" + messageId);
+            }
+        } catch (InterruptedException e) {
+            if (testerThreadInterruptReason != null) {
+                throw testerThreadInterruptReason;
+            }
+            throw new RuntimeException(e);
+        }
+
+        return ctx.getIncomingMessage();
+    }
+
+    private <REQ extends RequestType, RES extends ResponseType> ExchangeContext<REQ, RES> planRequestInternal(Class<REQ> requestClass,
+                                                                                                              @Nullable REQ expectedRequest,
+                                                                                                              OcppJsonResponse preparedResponse) {
+        OcppJsonCall call = new OcppJsonCall();
+        call.setMessageId(null); // must and will be set later from actual incoming request
+        call.setAction(getOperationName(requestClass));
+        call.setPayload(expectedRequest);
+
+        JettyWebSocketSession webSocketSession = new JettyWebSocketSession(Map.of());
+        webSocketSession.initializeNativeSession(session);
+
+        ExchangeContext<REQ, RES> ctx = new ExchangeContext<>(webSocketSession, chargeBoxId);
+        ctx.setIncomingMessage(call);
+        ctx.setOutgoingMessage(preparedResponse);
+        ctx.setRequestClass(requestClass);
+
+        exchangeQueue.add(ctx);
+
+        return ctx;
+    }
+
+    // -------------------------------------------------------------------------
+    // Websocket and message processing stuff
+    // -------------------------------------------------------------------------
 
     @OnWebSocketOpen
     public void onConnect(Session session) {
-        this.session = session;
+        // No-op
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
+        try {
+            this.client.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.session = null;
         this.closeHappenedSignal.countDown();
     }
@@ -126,294 +349,232 @@ public class OcppJsonChargePoint {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
-        try {
-            OcppJsonMessage ocppMsg = deserializer.extract(msg);
+        ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
-            if (ocppMsg instanceof OcppJsonResult) {
-                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
-                ctx.responseHandler.accept(((OcppJsonResult) ocppMsg).getPayload());
-            } else if (ocppMsg instanceof OcppJsonError) {
-                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
-                ctx.errorHandler.accept((OcppJsonError) ocppMsg);
-            } else if (ocppMsg instanceof OcppJsonCallForTesting) {
-                handleCall((OcppJsonCallForTesting) ocppMsg);
+        try (JsonParser parser = mapper.createParser(msg)) {
+            parser.nextToken(); // set cursor to '['
+
+            parser.nextToken();
+            int messageTypeNr = parser.getIntValue();
+
+            parser.nextToken();
+            String messageId = parser.getString();
+
+            MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
+            switch (messageType) {
+                case CALL_RESULT -> handleResult(messageId, parser);
+                case CALL_ERROR -> handleError(messageId, parser);
+                case CALL -> handleCall(messageId, parser);
             }
+        } catch (Throwable e) {
+            testerThreadInterruptReason = new RuntimeException(e);
+            testerThread.interrupt();
+        }
+    }
+
+    private void handleResult(String messageId, JsonParser parser) throws Exception {
+        parser.nextToken();
+        JsonNode responsePayload = parser.readValueAsTree();
+
+        ExchangeContext exchangeContext = exchangeQueue.poll();
+        if (exchangeContext == null) {
+            throw new RuntimeException("Unexpected message");
+        }
+
+        if (!Objects.equals(exchangeContext.getOutgoingMessage().getMessageId(), messageId)) {
+            throw new RuntimeException("Unexpected order of exchanges");
+        }
+
+        Class<ResponseType> responseClass = exchangeContext.getResponseClass();
+        if (responseClass == null) {
+            throw new RuntimeException("Was not expecting a result: responseClass was not set");
+        }
+        ResponseType res = JsonObjectMapper.INSTANCE.getMapper().treeToValue(responsePayload, responseClass);
+
+        OcppJsonResult result = new OcppJsonResult();
+        result.setMessageId(messageId);
+        result.setPayload(res);
+
+        exchangeContext.setIncomingMessage(result);
+        exchangeContext.getDoneSignal().countDown();
+    }
+
+    private void handleError(String messageId, JsonParser parser) throws Exception {
+        parser.nextToken();
+        ErrorCode code = ErrorCode.fromValue(parser.getString());
+
+        parser.nextToken();
+        String desc = parser.getString();
+        if ("".equals(desc)) {
+            desc = null;
+        }
+
+        String details = null;
+        parser.nextToken();
+        TreeNode detailsNode = parser.readValueAsTree();
+        if (detailsNode != null && detailsNode.size() != 0) {
+            details = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(detailsNode);
+        }
+
+        OcppJsonError error = new OcppJsonError();
+        error.setMessageId(messageId);
+        error.setErrorCode(code);
+        error.setErrorDescription(desc);
+        error.setErrorDetails(details);
+
+        ExchangeContext exchangeContext = exchangeQueue.poll();
+        if (exchangeContext == null) {
+            throw new RuntimeException("Was not expecting any message");
+        }
+
+        if (!Objects.equals(exchangeContext.getOutgoingMessage().getMessageId(), messageId)) {
+            throw new RuntimeException("Unexpected order of exchanges");
+        }
+
+        exchangeContext.setIncomingMessage(error);
+        exchangeContext.getDoneSignal().countDown();
+    }
+
+    private void handleCall(String messageId, JsonParser parser) {
+        // parse action
+        //
+        parser.nextToken();
+        String action = parser.getString();
+
+        // parse request payload
+        //
+        parser.nextToken();
+        JsonNode requestPayload = parser.readValueAsTree();
+        // https://github.com/steve-community/steve/issues/1109
+        if (requestPayload instanceof NullNode) {
+            requestPayload = new ObjectNode(JsonNodeFactory.instance);
+        }
+        String req = requestPayload.toString();
+
+        ExchangeContext exchangeContext = exchangeQueue.poll();
+        if (exchangeContext == null) {
+            throw new RuntimeException("Was not expecting any message, but received: " + req);
+        }
+
+        var incoming = exchangeContext.getIncomingMessage();
+        if (incoming == null) {
+            throw new RuntimeException("Was not expecting this incoming message: " + req);
+        }
+
+        if (!(incoming instanceof OcppJsonCall preparedCall)) {
+            throw new RuntimeException("Incoming is not a Call message");
+        }
+
+        if (!Objects.equals(preparedCall.getAction(), action)) {
+            throw new RuntimeException("Unexpected action: " + action + ". Was expecting: " + preparedCall.getAction());
+        }
+
+        Class<RequestType> requestClass = exchangeContext.getRequestClass();
+        var actualReqData = JsonObjectMapper.INSTANCE.getMapper().readValue(req, requestClass);
+
+        // in some newer test cases, we cannot expect a predefined/fixed request payload, since it is dynamically
+        // generated which we cannot anticipate before. so we can do strict full-payload equality, only if it is set.
+        // in other cases, set the incoming request for the caller to validate after-the-fact.
+        //
+        RequestType payload = preparedCall.getPayload();
+        if (payload == null) {
+            preparedCall.setPayload(actualReqData);
+        } else {
+            if (!Objects.equals(actualReqData.toString(), payload.toString())) {
+                throw new RuntimeException("Unexpected message: " + actualReqData + ". Was expecting: " + payload);
+            }
+        }
+
+        preparedCall.setMessageId(messageId);
+        var outgoing = exchangeContext.getOutgoingMessage();
+        outgoing.setMessageId(messageId);
+
+        Serializer.INSTANCE.accept(exchangeContext);
+
+        try {
+            session.sendText(exchangeContext.getOutgoingString(), NOOP);
         } catch (Exception e) {
             log.error("Exception", e);
-        } finally {
-            if (receivedMessagesSignal != null) {
-                receivedMessagesSignal.countDown();
-            }
-        }
-    }
-
-    public void start() {
-        try {
-            ClientUpgradeRequest request = new ClientUpgradeRequest();
-            if (version != null) {
-                request.setSubProtocols(version);
-            }
-
-            client.start();
-
-            Future<Session> connect = client.connect(this, new URI(connectionPath), request);
-            connect.get(); // block until session is created
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
-        prepare(request, getOperationName(request), responseClass, responseHandler, errorHandler);
-    }
-
-    public <T extends ResponseType> void prepare(RequestType payload, String action, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
-        String messageId = UUID.randomUUID().toString();
-
-        OcppJsonCall call = new OcppJsonCall();
-        call.setMessageId(messageId);
-        call.setPayload(payload);
-        call.setAction(action);
-
-        // session is null, because we do not need org.springframework.web.socket.WebSocketSession
-        CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
-        ctx.setOutgoingMessage(call);
-
-        Serializer.INSTANCE.accept(ctx);
-
-        ResponseContext resCtx = new ResponseContext(ctx.getOutgoingString(), responseClass, responseHandler, errorHandler);
-        responseContextMap.put(messageId, resCtx);
-    }
-
-    public void expectRequest(RequestType expectedRequest, ResponseType plannedResponse) {
-        String requestPayload;
-        JsonNode responsePayload;
-        try {
-            ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
-            requestPayload = mapper.writeValueAsString(expectedRequest);
-            responsePayload = mapper.valueToTree(plannedResponse);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
 
-        String action = getOperationName(expectedRequest);
-        requestContextMap.put(action, new RequestContext(requestPayload, responsePayload));
-    }
-
-    public void process() {
-        int requestCount = requestContextMap.values().size();
-        int responseCount = responseContextMap.values().size();
-        receivedMessagesSignal = new CountDownLatch(requestCount + responseCount);
-
-        // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
-        // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
-        ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
-
-        // send all messages
-        for (ResponseContext ctx : values) {
-            try {
-                session.sendText(ctx.outgoingMessage, NOOP);
-            } catch (Exception e) {
-                log.error("Exception", e);
-            }
-        }
-
-        // wait for all responses to arrive and be processed
-        try {
-            receivedMessagesSignal.await();
-        } catch (InterruptedException e) {
-            if (testerThreadInterruptReason != null) {
-                throw testerThreadInterruptReason;
-            }
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void close() {
-        try {
-            // "enqueue" a graceful close
-            session.close(StatusCode.NORMAL, "Finished", NOOP);
-
-            // wait for close to happen
-            closeHappenedSignal.await();
-
-            // well, stop the client
-            client.stop();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void processAndClose() {
-        process();
-        close();
+        exchangeContext.getDoneSignal().countDown();
     }
 
     // -------------------------------------------------------------------------
-    // Private helpers
+    // Private static helpers
     // -------------------------------------------------------------------------
 
-    private static String getOperationName(RequestType requestType) {
-        String s = requestType.getClass().getSimpleName();
+    private static String getOperationName(Class<?> requestClass) {
+        String s = requestClass.getSimpleName();
         if (s.endsWith("Request")) {
             s = s.substring(0, s.length() - 7);
         }
         return s;
     }
 
-    private void handleCall(OcppJsonCallForTesting call) {
-        try {
-            ArrayNode node = JsonObjectMapper.INSTANCE.getMapper()
-                .createArrayNode()
-                .add(MessageType.CALL_RESULT.getTypeNr())
-                .add(call.getMessageId())
-                .add(call.getContext().getResponsePayload());
-
-            String str = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(node);
-            session.sendText(str, NOOP);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private static String getOperationName(RequestType requestType) {
+        return getOperationName(requestType.getClass());
     }
 
-    @Value
-    private static class RequestContext {
-        String requestPayload;
-        JsonNode responsePayload;
+    /**
+     * Keep SSL scoped to this test client instance. Do not mutate global JVM SSL properties.
+     */
+    private static WebSocketClient createWebSocketClient(Ssl serverSslConfig, OcppSecurityProfile profile) {
+        if (serverSslConfig == null || !serverSslConfig.isEnabled() || !profile.isServerTLS()) {
+            return new WebSocketClient();
+        }
+
+        var sslContextFactory = new SslContextFactory.Client();
+
+        // server-side certs for profiles 2 and 3
+        if (profile.isServerTLS()) {
+            // server's keystore is client's truststore
+            sslContextFactory.setTrustStorePath(serverSslConfig.getKeyStore());
+            sslContextFactory.setTrustStorePassword(serverSslConfig.getKeyStorePassword());
+            sslContextFactory.setTrustStoreType(serverSslConfig.getKeyStoreType());
+        }
+
+        // Optionally present client certificate for mTLS (security profile 3).
+        if (profile.isClientTLS()) {
+            // server's truststore is client's keystore
+            sslContextFactory.setKeyStorePath(serverSslConfig.getTrustStore());
+            sslContextFactory.setKeyStorePassword(serverSslConfig.getTrustStorePassword());
+            sslContextFactory.setKeyStoreType(serverSslConfig.getTrustStoreType());
+        }
+
+        var httpClient = new HttpClient();
+        httpClient.setSslContextFactory(sslContextFactory);
+        return new WebSocketClient(httpClient);
     }
 
-    private static class ResponseContext {
-        private final String outgoingMessage;
-        private final Class<ResponseType> responseClass;
-        private final Consumer<ResponseType> responseHandler;
-        private final Consumer<OcppJsonError> errorHandler;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
+    public final class ExchangeContext<REQ extends RequestType, RES extends ResponseType> extends CommunicationContext {
 
-        @SuppressWarnings("unchecked")
-        private <T extends ResponseType> ResponseContext(String outgoingMessage,
-                                                         Class<T> responseClass,
-                                                         Consumer<T> responseHandler,
-                                                         Consumer<OcppJsonError> errorHandler) {
-            this.outgoingMessage = outgoingMessage;
-            this.responseClass = (Class<ResponseType>) responseClass;
-            this.responseHandler = (Consumer<ResponseType>) responseHandler;
-            this.errorHandler = errorHandler;
-        }
-    }
+        private Class<REQ> requestClass;
+        private Class<RES> responseClass;
+        private final CountDownLatch doneSignal = new CountDownLatch(1);
 
-    private class MessageDeserializer {
-
-        private OcppJsonMessage extract(String msg) throws Exception {
-            ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
-
-            try (JsonParser parser = mapper.getFactory().createParser(msg)) {
-                parser.nextToken(); // set cursor to '['
-
-                parser.nextToken();
-                int messageTypeNr = parser.getIntValue();
-
-                parser.nextToken();
-                String messageId = parser.getText();
-
-                MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
-                switch (messageType) {
-                    case CALL_RESULT:
-                        return handleResult(messageId, parser);
-                    case CALL_ERROR:
-                        return handleError(messageId, parser);
-                    case CALL:
-                        return handleCall(messageId, parser);
-                    default:
-                        throw new SteveException("Unknown enum type");
-                }
-            }
+        public ExchangeContext(@NotNull WebSocketSession session, @NotNull String chargeBoxId) {
+            super(session, chargeBoxId);
         }
 
-        private OcppJsonResponse handleResult(String messageId, JsonParser parser) throws Exception {
-            parser.nextToken();
-            JsonNode responsePayload = parser.readValueAsTree();
-            Class<ResponseType> clazz = responseContextMap.get(messageId).responseClass;
-            ResponseType res = JsonObjectMapper.INSTANCE.getMapper().treeToValue(responsePayload, clazz);
-
-            OcppJsonResult result = new OcppJsonResult();
-            result.setMessageId(messageId);
-            result.setPayload(res);
-            return result;
-        }
-
-        private OcppJsonResponse handleError(String messageId, JsonParser parser) throws Exception {
-            parser.nextToken();
-            ErrorCode code = ErrorCode.fromValue(parser.getText());
-
-            parser.nextToken();
-            String desc = parser.getText();
-            if ("".equals(desc)) {
-                desc = null;
-            }
-
-            String details = null;
-            parser.nextToken();
-            TreeNode detailsNode = parser.readValueAsTree();
-            if (detailsNode != null && detailsNode.size() != 0) {
-                details = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(detailsNode);
-            }
-
-            OcppJsonError error = new OcppJsonError();
-            error.setMessageId(messageId);
-            error.setErrorCode(code);
-            error.setErrorDescription(desc);
-            error.setErrorDetails(details);
-            return error;
-        }
-
-        private OcppJsonCall handleCall(String messageId, JsonParser parser) {
-            // parse action
-            String action;
+        public REQ await() {
+            // wait for the call to arrive and be responded with
             try {
-                parser.nextToken();
-                action = parser.getText();
-            } catch (IOException e) {
-                throw new RuntimeException();
-            }
+                OcppJsonCall call = (OcppJsonCall) getIncomingMessage();
 
-            // parse request payload
-            String req;
-            try {
-                parser.nextToken();
-                JsonNode requestPayload = parser.readValueAsTree();
-
-                // https://github.com/steve-community/steve/issues/1109
-                if (requestPayload instanceof NullNode) {
-                    requestPayload = new ObjectNode(JsonNodeFactory.instance);
+                boolean completedInTime = doneSignal.await(30, TimeUnit.SECONDS);
+                if (!completedInTime) {
+                    throw new AssertionFailedError("Timed out waiting for expected request. action=" + call.getAction());
                 }
-
-                req = requestPayload.toString();
-            } catch (IOException e) {
-                log.error("Exception occurred", e);
-                throw new RuntimeException();
+                return (REQ) call.getPayload();
+            } catch (InterruptedException e) {
+                if (testerThreadInterruptReason != null) {
+                    throw testerThreadInterruptReason;
+                }
+                throw new RuntimeException(e);
             }
-
-            RequestContext context = requestContextMap.get(action);
-            if (context == null) {
-                testerThreadInterruptReason = new RuntimeException("Unexpected message arrived: " + req);
-                testerThread.interrupt();
-            } else if (Objects.equals(context.requestPayload, req)) {
-                requestContextMap.remove(action);
-            }
-
-            OcppJsonCallForTesting call = new OcppJsonCallForTesting();
-            call.setAction(action);
-            call.setMessageId(messageId);
-            call.setContext(context);
-            return call;
         }
     }
-
-    @Setter
-    @Getter
-    private static class OcppJsonCallForTesting extends OcppJsonCall {
-        private RequestContext context;
-    }
-
 }

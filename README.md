@@ -1,9 +1,6 @@
-![SteVe](src/main/resources/webapp/static/images/logo.png) 
+![SteVe](src/main/webapp/static/images/logo.png) 
 
 [![build and run tests](https://github.com/steve-community/steve/actions/workflows/main.yml/badge.svg)](https://github.com/steve-community/steve/actions/workflows/main.yml)
-
-
-# Introduction
 
 SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827). 
 The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration). 
@@ -14,9 +11,19 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 The project is distributed under [GPL](LICENSE.txt) and is free to use. 
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
-## Relation to Powerfill
+### Relation to Powerfill
 
-[Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
+[Powerfill](https://powerfill.io/) is a SaaS company to expand beyond the basics of SteVe. 
+While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. 
+Read more in [the company announcement](https://github.com/steve-community/steve/issues/1643) and [the public launch post](https://powerfill.io/blog/from-university-project-to-enterprise-platform).
+
+> [!IMPORTANT]
+> ⚡ **OCPP 1.6 certification for Powerfill** 🎉
+>
+> Powerfill's OCPP backend has received [Open Charge Alliance (OCA) certification](https://openchargealliance.org/participants/powerfill-technologies-ltd/) for _OCPP 1.6 Core + C (Smart Charging) + S (Advanced Security)_.
+> Powerfill incorporates SteVe's OCPP protocol implementation without modifying its logic or behavior.
+> SteVe's OCPP implementation has therefore been independently validated through its integration into the certified Powerfill backend.
+> The certificate formally applies only to the certified Powerfill backend and version, not to SteVe as a standalone, open-source distribution or to other SteVe builds and deployments.
 
 ### Charge Point Support
 
@@ -27,20 +34,30 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.5S
 * OCPP1.5J
 * OCPP1.6S
-* OCPP1.6J
-
-⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
-Please, don't expose a Steve instance without knowing that risk.
+* OCPP1.6J (incl. _Security Extensions_)
 
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
+### OCPP 1.6J Security Extensions
+
+SteVe has a complete implementation of [OCPP 1.6 Security Whitepaper Edition 3](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip), providing:
+
+* **Security Profiles 0-3**: Unsecured, Basic Auth, Basic Auth with server TLS, and Mutual TLS (mTLS)
+* **Certificate Management**: Certificate signing, installation, and deletion
+* **Security Events**: Real-time security event logging and monitoring
+* **Signed Firmware Updates**: Cryptographically signed firmware updates with certificate validation
+* **Diagnostic Logs**: Secure log retrieval with configurable time ranges
+
+See [dedicated Wiki page](https://github.com/steve-community/steve/wiki/OCPP-1.6J-Security-Configuration) for detailed configuration guide.
+
+
 ### System Requirements
 
 SteVe requires 
-* JDK 17 or newer
+* JDK 21 or newer
 * Maven 
-* MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11) supported versions.
+* MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11-L35) supported versions.
 
 to build and run. 
 
@@ -72,20 +89,26 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 3. Configure SteVe **before** building:
 
-    The basic configuration is defined in [main.properties](src/main/resources/config/prod/main.properties):
-      - You _must_ change [database configuration](src/main/resources/config/prod/main.properties#L9-L13)
-      - You _must_ change [the host](src/main/resources/config/prod/main.properties#L22) to the correct IP address of your server
-      - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L17-L18)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L32-L35)
-     
+    The basic configuration is defined in [application-prod.properties](src/main/resources/application-prod.properties):
+      - You _must_ change [database configuration](src/main/resources/application-prod.properties#L7-L13)
+      - You _must_ change [the host](src/main/resources/application-prod.properties#L28) to the correct IP address of your server
+      - You _must_ change [web interface credentials](src/main/resources/application-prod.properties#L15-L18)
+      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/application-prod.properties#L36-L41)
+
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
 
-    To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
+    To compile SteVe simply use Maven. A runnable `war` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```
-    # ./mvnw package
+    # ./mvnw package -Pprod,mysql
+    ```
+
+    To build against MariaDB instead, use:
+
+    ```
+    # ./mvnw package -Pprod,mariadb
     ```
 
 5. Run SteVe:
@@ -93,7 +116,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To start the application run (please do not run SteVe as root):
 
     ```
-    # java -jar target/steve.jar
+    # java -jar target/steve.war
     ```
 
 # Docker
@@ -101,7 +124,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
 
 Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
-Instead of changing the [main.properties in the prod directory](src/main/resources/config/prod/main.properties), you have to change the [main.properties in the docker directory](src/main/resources/config/docker/main.properties). There you have to change all configurations which are described in step 3.
+Instead of changing the [application-prod.properties](src/main/resources/application-prod.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
 The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
 
 With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`
@@ -145,23 +168,34 @@ After SteVe has successfully started, you can access the web interface using the
     - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
     - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService`
 
-
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
- 
+
 *Have fun!*
 
 Screenshots
 -----
 1. [Home](website/screenshots/home.png)
-2. [Connector Status](website/screenshots/connector-status.png)
-3. [Data Management - Charge Points](website/screenshots/chargepoints.png)
-4. [Data Management - Users](website/screenshots/users.png)
-5. [Data Management - OCPP Tags](website/screenshots/ocpp-tags.png)
-6. [Data Management - Reservations](website/screenshots/reservations.png)
-7. [Data Management - Transactions](website/screenshots/transactions.png)
-8. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
-9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
-10. [Settings](website/screenshots/settings.png)
+1. [Connector Status](website/screenshots/connector-status.png)
+1. [Data Management - Charge Points](website/screenshots/chargepoints.png)
+1. [Data Management - OCPP Tags](website/screenshots/ocpp-tags.png)
+1. [Data Management - Users](website/screenshots/users.png)
+1. [Data Management - Charging Profiles](website/screenshots/charging-profiles.png)
+1. [Data Management - Reservations](website/screenshots/reservations.png)
+1. [Data Management - Transactions](website/screenshots/transactions.png)
+1. [Events and Certificates - Security Events](website/screenshots/events-security.png)
+1. [Events and Certificates - Status Events](website/screenshots/events-status.png)
+1. [Events and Certificates - Installed Certificates](website/screenshots/certiticates-installed.png)
+1. [Events and Certificates - Signed Certificates](website/screenshots/certiticates-signed.png)
+1. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
+1. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
+1. [Operations - OCPP v1.6](website/screenshots/ocpp16.png)
+1. [Settings](website/screenshots/settings.png)
+1. [APIs](website/screenshots/apis.png)
+
+OpenAPI spec
+-----
+An export of the actual OpenAPI spec for APIs is available [here](api-docs.json).
+To explore it interactively, open it in the [Live Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/steve-community/steve/refs/heads/master/api-docs.json).
 
 GDPR
 -----

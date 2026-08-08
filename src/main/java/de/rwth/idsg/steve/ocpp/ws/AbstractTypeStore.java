@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,17 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.ClassPath;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.RegexPatternTypeFilter;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -43,8 +45,17 @@ public abstract class AbstractTypeStore implements TypeStore {
 
     public AbstractTypeStore(String packageForRequestClassMap,
                              String packageForActionResponseMap) {
-        populateRequestClassMap(packageForRequestClassMap);
-        populateActionResponseMap(packageForActionResponseMap);
+        this(List.of(packageForRequestClassMap), List.of(packageForActionResponseMap));
+    }
+
+    public AbstractTypeStore(List<String> packagesForRequestClassMap,
+                             List<String> packagesForActionResponseMap) {
+        for (var pkg : packagesForRequestClassMap) {
+            populateRequestClassMap(pkg.trim());
+        }
+        for (var pkg : packagesForActionResponseMap) {
+            populateActionResponseMap(pkg.trim());
+        }
     }
 
     @Override
@@ -87,25 +98,36 @@ public abstract class AbstractTypeStore implements TypeStore {
     }
 
     /**
+     * https://stackoverflow.com/a/21430849
      * @return <simple name of class, class>
      */
     @SuppressWarnings("unchecked")
     private static <INTERFACE, IMPL extends INTERFACE> Map<String, Class<IMPL>> getClassesWithInterface(
             String packageName, Class<INTERFACE> interfaceClass) {
         try {
-            ImmutableSet<ClassPath.ClassInfo> classInfos =
-                    ClassPath.from(Thread.currentThread().getContextClassLoader())
-                             .getTopLevelClasses(packageName);
+            // create scanner and disable default filters (that is the 'false' argument)
+            var provider = new ClassPathScanningCandidateComponentProvider(false);
+            // add include filters which matches all the classes (or use your own)
+            provider.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile(".*")));
+            // get matching classes defined in the package
+            var classes = provider.findCandidateComponents(packageName);
 
             Map<String, Class<IMPL>> map = new HashMap<>();
-            for (ClassPath.ClassInfo classInfo : classInfos) {
-                Class<?> clazz = classInfo.load();
+
+            // this is how you can load the class type from BeanDefinition instance
+            for (BeanDefinition bean: classes) {
+                Class<?> clazz = Class.forName(bean.getBeanClassName());
                 if (interfaceClass.isAssignableFrom(clazz)) {
                     map.put(clazz.getSimpleName(), (Class<IMPL>) clazz);
                 }
             }
+
+            if (map.isEmpty()) {
+                throw new IllegalStateException("No classes with interface " + interfaceClass.getSimpleName() + " found in package " + packageName);
+            }
+
             return map;
-        } catch (IOException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

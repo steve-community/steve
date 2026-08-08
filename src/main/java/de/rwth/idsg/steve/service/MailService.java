@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,11 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.repository.dto.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 
 import jakarta.mail.MessagingException;
+
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,4 +37,6 @@ public interface MailService {
     void sendAsync(String subject, String body);
 
     void send(String subject, String body) throws MessagingException;
+
+    void send(String subject, String body, List<String> eMailAddresses);
 }

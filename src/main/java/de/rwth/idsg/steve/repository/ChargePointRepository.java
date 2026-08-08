@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,17 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,13 +39,12 @@ import java.util.Optional;
  * @since 19.08.2014
  */
 public interface ChargePointRepository {
-    Optional<String> getRegistrationStatus(String chargeBoxId);
+    Optional<ChargePointRegistration> getRegistration(String chargeBoxId);
+    void updateBasicAuthPassword(String chargeBoxId, String encodedPwd);
+    void updateSecurityProfile(String chargeBoxId, OcppSecurityProfile ocppSecurityProfile);
+    void updateOcppConfiguration(String chargeBoxId, String jsonNode);
 
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
-
-    default List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
-        return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
-    }
 
     List<String> getChargeBoxIds();
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
@@ -51,16 +52,12 @@ public interface ChargePointRepository {
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
     ChargePoint.Details getDetails(int chargeBoxPk);
 
-    default List<ConnectorStatus> getChargePointConnectorStatus() {
-        return getChargePointConnectorStatus(null);
-    }
-
     List<ConnectorStatus> getChargePointConnectorStatus(@Nullable ConnectorStatusForm form);
 
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
     void addChargePointList(List<String> chargeBoxIdList);
-    int addChargePoint(ChargePointForm form);
-    void updateChargePoint(ChargePointForm form);
+    int addChargePoint(ChargePointFormForCreate form);
+    void updateChargePoint(ChargePointFormForUpdate form);
     void deleteChargePoint(int chargeBoxPk);
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
-import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
@@ -39,6 +38,7 @@ import jooq.steve.db.tables.SchemaVersion;
 import jooq.steve.db.tables.Settings;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Schema;
@@ -52,6 +52,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static jooq.steve.db.Tables.CHARGE_BOX_CERTIFICATE_SIGNED_VIEW;
+import static jooq.steve.db.Tables.CHARGE_BOX_STATUS_EVENT;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
@@ -64,6 +66,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2018
  */
+@RequiredArgsConstructor
 public class __DatabasePreparer__ {
 
     private static final String SCHEMA_TO_TRUNCATE = "stevedb_test_2aa6a783d47d";
@@ -71,10 +74,9 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_CHARGE_BOX_ID_2 = "charge_box_2aa6a783d47d_2";
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
-    private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
-    private static final DSLContext dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource());
+    private final DSLContext dslContext;
 
-    public static void prepare() {
+    public void prepare() {
         runOperation(ctx -> {
             truncateTables(ctx);
             insertChargeBox(ctx);
@@ -82,7 +84,7 @@ public class __DatabasePreparer__ {
         });
     }
 
-    public static int makeReservation(int connectorId) {
+    public int makeReservation(int connectorId) {
         ReservationRepositoryImpl r = new ReservationRepositoryImpl(dslContext);
         InsertReservationParams params = InsertReservationParams.builder()
                                                                 .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
@@ -95,8 +97,8 @@ public class __DatabasePreparer__ {
         return reservationId;
     }
 
-    public static void cleanUp() {
-        runOperation(__DatabasePreparer__::truncateTables);
+    public void cleanUp() {
+        runOperation(this::truncateTables);
     }
 
     public static String getRegisteredChargeBoxId() {
@@ -111,51 +113,53 @@ public class __DatabasePreparer__ {
         return REGISTERED_OCPP_TAG;
     }
 
-    public static List<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
         return impl.getTransactions(new TransactionQueryForm());
     }
-    public static List<TransactionRecord> getTransactionRecords() {
+    public List<TransactionRecord> getTransactionRecords() {
         return dslContext.selectFrom(TRANSACTION).fetch();
     }
 
-    public static List<Reservation> getReservations() {
+    public List<Reservation> getReservations() {
         ReservationRepositoryImpl impl = new ReservationRepositoryImpl(dslContext);
         return impl.getReservations(new ReservationQueryForm());
     }
 
-    public static List<ConnectorStatus> getChargePointConnectorStatus() {
+    public List<ConnectorStatus> getChargePointConnectorStatus() {
         ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
-        return impl.getChargePointConnectorStatus();
+        return impl.getChargePointConnectorStatus(null);
     }
 
-    public static TransactionDetails getDetails(int transactionPk) {
+    public TransactionDetails getDetails(int transactionPk) {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
-        return impl.getDetails(transactionPk);
+        return impl.getDetails(transactionPk, true);
     }
 
-    public static OcppTagActivityRecord getOcppTagRecord(String idTag) {
+    public OcppTagActivityRecord getOcppTagRecord(String idTag) {
         OcppTagRepositoryImpl impl = new OcppTagRepositoryImpl(dslContext);
         return impl.getRecord(idTag);
     }
 
-    public static ChargePoint.Details getCBDetails(String chargeboxID) {
+    public ChargePoint.Details getCBDetails(String chargeboxID) {
         ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         Map<String, Integer> pkMap = impl.getChargeBoxIdPkPair(Arrays.asList(chargeboxID));
         int pk = pkMap.get(chargeboxID);
         return impl.getDetails(pk);
     }
 
-    private static void runOperation(Consumer<DSLContext> consumer) {
+    private void runOperation(Consumer<DSLContext> consumer) {
         consumer.accept(dslContext);
     }
 
-    private static void truncateTables(DSLContext ctx) {
+    private void truncateTables(DSLContext ctx) {
         Set<Table<?>> skipList = Sets.newHashSet(
                 SchemaVersion.SCHEMA_VERSION,
                 Settings.SETTINGS,
                 OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
-                TRANSACTION // only a view
+                TRANSACTION, // only a view
+                CHARGE_BOX_STATUS_EVENT, // only a view
+                CHARGE_BOX_CERTIFICATE_SIGNED_VIEW // only a view
         );
 
         ctx.transaction(configuration -> {

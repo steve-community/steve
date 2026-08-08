@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,12 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 
 public interface AuthTagService {
 
-    IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
-                           @Nullable String chargeBoxId, @Nullable Integer connectorId);
+    IdTagInfo decideStatus(String idTag, AuthTagContext authTagContext,
+                           String chargeBoxId, @Nullable Integer connectorId);
 }

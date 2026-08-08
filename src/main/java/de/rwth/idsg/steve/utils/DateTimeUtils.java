@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,13 +22,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,30 +37,6 @@ public final class DateTimeUtils {
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
-
-    private static final PeriodFormatter PERIOD_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroNever()
-            .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
-            .appendHours().appendSuffix(" hour", " hours").appendSeparator(" ")
-            .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
-            .appendSeconds().appendSuffix(" second", " seconds")
-            .toFormatter();
-
-    public static DateTime toDateTime(LocalDateTime ldt) {
-        if (ldt == null) {
-            return null;
-        } else {
-            return ldt.toDateTime();
-        }
-    }
-
-    public static LocalDateTime toLocalDateTime(DateTime dt) {
-        if (dt == null) {
-            return null;
-        } else {
-            return dt.toLocalDateTime();
-        }
-    }
 
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
@@ -95,7 +69,24 @@ public final class DateTimeUtils {
     }
 
     public static String timeElapsed(DateTime from, DateTime to) {
-        return PERIOD_FORMATTER.print(new Period(from, to));
+        if (from == null || to == null) {
+            return "";
+        }
+
+        long totalSeconds = Math.max(0, TimeUnit.MILLISECONDS.toSeconds(to.getMillis() - from.getMillis()));
+        long days = TimeUnit.SECONDS.toDays(totalSeconds);
+        long hours = TimeUnit.SECONDS.toHours(totalSeconds) % 24;
+        long minutes = TimeUnit.SECONDS.toMinutes(totalSeconds) % 60;
+        long seconds = totalSeconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+
+        appendTimePart(sb, days, "day");
+        appendTimePart(sb, hours, "hour");
+        appendTimePart(sb, minutes, "minute");
+        appendTimePart(sb, seconds, "second");
+
+        return sb.isEmpty() ? "0 seconds" : sb.toString();
     }
 
     public static long getOffsetFromUtcInSeconds() {
@@ -103,5 +94,36 @@ public final class DateTimeUtils {
         DateTime now = DateTime.now();
         long offsetInMilliseconds = timeZone.getOffset(now.getMillis());
         return TimeUnit.MILLISECONDS.toSeconds(offsetInMilliseconds);
+    }
+
+    public static DateTime toDateTime(OffsetDateTime odt) {
+        if (odt == null) {
+            return null;
+        }
+        long instant = odt.toInstant().toEpochMilli();
+        int offsetMillis = (int) TimeUnit.SECONDS.toMillis(odt.getOffset().getTotalSeconds());
+        return new DateTime(instant, DateTimeZone.forOffsetMillis(offsetMillis));
+    }
+
+    public static OffsetDateTime toOffsetDateTime(DateTime dt, ZoneId zoneId) {
+        return OffsetDateTime.ofInstant(dt.toDate().toInstant(), zoneId);
+    }
+
+    private static void appendTimePart(StringBuilder sb, long value, String unit) {
+        if (value == 0) {
+            return;
+        }
+
+        if (!sb.isEmpty()) {
+            sb.append(' ');
+        }
+
+        sb.append(value)
+            .append(' ')
+            .append(unit);
+
+        if (value != 1) {
+            sb.append('s');
+        }
     }
 }

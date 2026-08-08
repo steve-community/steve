@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,17 +19,20 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.01.2015
  */
 @Getter
+@Setter
 public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
@@ -37,17 +40,20 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @NotBlank(message = "User ID Tag is required")
     @IdTag
-    @Setter private String idTag;
+    private String idTag;
+
+    @Schema(description = """
+    PK of the charging profile to be used for the transaction.
+    <code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.
+    """)
+    @Positive
+    private Integer chargingProfilePk;
 
     /**
      * Not for a specific connector, when frontend sends the value 0.
      * This corresponds to not to include the connector id parameter in OCPP request.
      */
-    public void setConnectorId(Integer connectorId) {
-        if (connectorId == 0) {
-            this.connectorId = null;
-        } else {
-            this.connectorId = connectorId;
-        }
+    public Integer getConnectorId() {
+        return (connectorId == null || connectorId == 0) ? null : connectorId;
     }
 }

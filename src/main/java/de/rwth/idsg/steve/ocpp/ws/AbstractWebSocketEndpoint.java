@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,18 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -40,42 +40,47 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
-
-    @Autowired private DelegatingTaskScheduler asyncTaskScheduler;
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
+public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable, OcppCallHandler {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final SessionContextStore sessionContextStore = new SessionContextStoreImpl();
+    private final OcppServerRepository ocppServerRepository;
+    private final IncomingPipeline pipeline;
+    private final SessionContextStore sessionContextStore;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
-    private final Object sessionContextLock = new Object();
 
-    private IncomingPipeline pipeline;
+    public AbstractWebSocketEndpoint(OcppServerRepository ocppServerRepository,
+                                     FutureResponseContextStore futureResponseContextStore,
+                                     ApplicationEventPublisher applicationEventPublisher,
+                                     SessionContextStoreHolder sessionContextStoreHolder,
+                                     AbstractTypeStore typeStore) {
+        this.ocppServerRepository = ocppServerRepository;
+        this.sessionContextStore = sessionContextStoreHolder.getOrCreate(getVersion());
+        this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, sessionContextStore, typeStore), this);
+
+        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, getVersion())));
+        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, getVersion())));
+
+        log.info("Initialized");
+    }
 
     public abstract OcppVersion getVersion();
 
-    public void init(IncomingPipeline pipeline) {
-        this.pipeline = pipeline;
-
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+    @Override
+    public Logger getLogger() {
+        return log;
     }
 
     @Override
@@ -85,8 +90,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        if (message instanceof TextMessage) {
-            handleTextMessage(session, (TextMessage) message);
+        if (message instanceof TextMessage textMessage) {
+            handleTextMessage(session, textMessage);
 
         } else if (message instanceof PongMessage) {
             handlePongMessage(session);
@@ -125,30 +130,15 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Override
     public void onOpen(WebSocketSession session) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
-
         WebSocketLogger.connected(chargeBoxId, session);
+
+        boolean stationConnected = sessionContextStore.add(chargeBoxId, session);
+
         ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
-
-        // Just to keep the connection alive, such that the servers do not close
-        // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
-                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
-                WebSocketConfiguration.PING_INTERVAL
-        );
-
-        futureResponseContextStore.addSession(session);
-
-        int sizeBeforeAdd;
-
-        synchronized (sessionContextLock) {
-            sizeBeforeAdd = sessionContextStore.getSize(chargeBoxId);
-            sessionContextStore.add(chargeBoxId, session, pingSchedule);
-        }
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
-        if (sizeBeforeAdd == 0) {
+        if (stationConnected) {
             connectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
         }
     }
@@ -156,21 +146,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Override
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
-
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
-        futureResponseContextStore.removeSession(session);
-
-        int sizeAfterRemove;
-
-        synchronized (sessionContextLock) {
-            sessionContextStore.remove(chargeBoxId, session);
-            sizeAfterRemove = sessionContextStore.getSize(chargeBoxId);
-        }
+        boolean stationDisconnected = sessionContextStore.remove(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 1 -> 0.
-        if (sizeAfterRemove == 0) {
+        if (stationDisconnected) {
             disconnectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
         }
     }
@@ -191,30 +173,6 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     protected String getChargeBoxId(WebSocketSession session) {
         return (String) session.getAttributes().get(CHARGEBOX_ID_KEY);
-    }
-
-    protected void registerConnectedCallback(Consumer<String> consumer) {
-        connectedCallbackList.add(consumer);
-    }
-
-    protected void registerDisconnectedCallback(Consumer<String> consumer) {
-        disconnectedCallbackList.add(consumer);
-    }
-
-    public List<String> getChargeBoxIdList() {
-        return sessionContextStore.getChargeBoxIdList();
-    }
-
-    public int getNumberOfChargeBoxes() {
-        return sessionContextStore.getNumberOfChargeBoxes();
-    }
-
-    public Map<String, Deque<SessionContext>> getACopy() {
-        return sessionContextStore.getACopy();
-    }
-
-    public WebSocketSession getSession(String chargeBoxId) {
-        return sessionContextStore.getSession(chargeBoxId);
     }
 
 }

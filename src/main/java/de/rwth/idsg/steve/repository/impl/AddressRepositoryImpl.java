@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -99,6 +99,9 @@ public class AddressRepositoryImpl implements AddressRepository {
                       .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                       .set(ADDRESS.CITY, ad.getCity())
                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                      .set(ADDRESS.LATITUDE, ad.getLatitude())
+                      .set(ADDRESS.LONGITUDE, ad.getLongitude())
+                      .set(ADDRESS.TIME_ZONE, ad.getTimeZone())
                       .returning(ADDRESS.ADDRESS_PK)
                       .fetchOne()
                       .getAddressPk();
@@ -114,6 +117,9 @@ public class AddressRepositoryImpl implements AddressRepository {
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
                        .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                       .set(ADDRESS.LATITUDE, ad.getLatitude())
+                       .set(ADDRESS.LONGITUDE, ad.getLongitude())
+                       .set(ADDRESS.TIME_ZONE, ad.getTimeZone())
                        .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
                        .execute();
 

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,14 @@
 package de.rwth.idsg.steve.web.dto;
 
 import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.validation.TimeZoneId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.Range;
+
+import java.math.BigDecimal;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,13 +46,29 @@ public class Address {
     private String city;
     private CountryCode country;
 
+    @Range(min = -90, max = 90, message = "Latitude must be between {min} and {max}")
+    private BigDecimal latitude;
+
+    @Range(min = -180, max = 180, message = "Longitude must be between {min} and {max}")
+    private BigDecimal longitude;
+
+    @TimeZoneId
+    private String timeZone;
+
     public boolean isEmpty() {
         return addressPk == null
-                && street == null
-                && houseNumber == null
-                && zipCode == null
-                && city == null
-                && country == null;
+                && StringUtils.isEmpty(street)
+                && StringUtils.isEmpty(houseNumber)
+                && StringUtils.isEmpty(zipCode)
+                && StringUtils.isEmpty(city)
+                && country == null
+                && latitude == null
+                && longitude == null
+                && StringUtils.isEmpty(timeZone);
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = StringUtils.isEmpty(timeZone) ? null : timeZone;
     }
 
     /**

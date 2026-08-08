@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,8 +44,19 @@ public class TransactionDetails {
      * that is at the same chargebox and connector
      */
     @Nullable
+    @JsonIgnore
     private final TransactionStartRecord nextTransactionStart;
 
+    @JsonPropertyOrder(value = {
+        "valueTimestamp",
+        "value",
+        "readingContext",
+        "format",
+        "measurand",
+        "location",
+        "unit",
+        "phase"
+    })
     @Getter
     @Builder
     public static class MeterValues {

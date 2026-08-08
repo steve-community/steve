@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
+
 import java.util.Objects;
 
 /**
@@ -52,9 +53,9 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
-    @Schema(description = "A date/time without timezone. Example: 2022-10-10T09:00")
+    @Schema(description = "ISO 8601 date/time with timezone. Example: `2024-08-25T14:30:00.000Z`")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiryDate;
+    private DateTime expiryDate;
 
     private Integer maxActiveTransactionCount;
 

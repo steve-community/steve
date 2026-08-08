@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -37,8 +40,11 @@ import java.util.Objects;
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
-    @Schema(description = "Database primary key of the transaction")
-    private Integer transactionPk;
+    @Schema(description = "Database primary keys of the transactions")
+    private List<@NotNull(message = "transactionPk must not be null") Integer> transactionPk;
+    
+    @Schema(description = "ID of the connector")
+    private Integer connectorId;
 
     @Schema(description = "Disabled for the Web APIs. Do not use and set", hidden = true)
     private boolean returnCSV = false;
@@ -57,8 +63,14 @@ public class TransactionQueryForm extends QueryForm {
 
     @Schema(hidden = true)
     public boolean isTransactionPkSet() {
-        return transactionPk != null;
+        return !CollectionUtils.isEmpty(transactionPk);
     }
+    
+    @Schema(hidden = true)
+    public boolean isConnectorIdSet() {
+        return connectorId != null;
+    }
+
 
     public QueryType getType() {
         return Objects.requireNonNullElse(type, QueryType.ALL);
@@ -82,35 +94,6 @@ public class TransactionQueryForm extends QueryForm {
 
         public static QueryType fromValue(String v) {
             for (QueryType c: QueryType.values()) {
-                if (c.value.equals(v)) {
-                    return c;
-                }
-            }
-            throw new IllegalArgumentException(v);
-        }
-    }
-
-    @RequiredArgsConstructor
-    public enum QueryPeriodType {
-        ALL("All", -1),
-        TODAY("Today", -1),
-        LAST_10("Last 10 days", 10),
-        LAST_30("Last 30 days", 30),
-        LAST_90("Last 90 days", 90),
-        FROM_TO("From/To", -1);
-
-        @Getter private final String value;
-        private final int interval;
-
-        public int getInterval() {
-            if (this.interval == -1) {
-                throw new UnsupportedOperationException("This enum does not have any meaningful interval set.");
-            }
-            return this.interval;
-        }
-
-        public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

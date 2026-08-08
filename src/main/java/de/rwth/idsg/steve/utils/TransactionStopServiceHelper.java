@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,21 +19,42 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
 
+@Slf4j
 public class TransactionStopServiceHelper {
+
+    public static Double calculateEnergyConsumptionInKWh(Transaction t) {
+        if (t.getStopValue() == null) {
+            return null; // this transaction did not finish yet
+        }
+
+        try {
+            Integer meterValueStop = Integer.valueOf(t.getStopValue());
+            Integer meterValueStart = Integer.valueOf(t.getStartValue());
+            return (meterValueStop - meterValueStart) / 1000.0; // --> kWh
+        } catch (Exception e) {
+            log.error("Failed to calculate charged energy", e);
+            return null;
+        }
+    }
 
     public static String floatingStringToIntString(String s) {
         // meter values can be floating, whereas start/end values are int
         return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
     }
 
+    public static double kWhStringToWhDouble(String s) {
+        return Double.parseDouble(s) * 1000;
+    }
+
     public static String kWhStringToWhString(String s) {
-        double kWhValue = Double.parseDouble(s);
-        return Double.toString(kWhValue * 1000);
+        return Double.toString(kWhStringToWhDouble(s));
     }
 
     public static boolean isEnergyValue(TransactionDetails.MeterValues v) {

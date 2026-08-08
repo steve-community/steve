@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -89,18 +89,21 @@ public final class ConnectorStatusFilter {
 
         // decide what to return
         //
-        if (maxZero.isPresent()) {
-            Predicate<ConnectorStatus> pr = o -> o.getStatusTimestamp().isAfter(maxZero.get().getStatusTimestamp());
+        if (maxZero.isPresent() && maxNonZero.isEmpty()) {
+            return zero;
 
-            if (maxNonZero.filter(pr).isPresent()) {
-                return nonZero;
-            } else {
-                // this is the special case we need to handle
-                return strategy.process(zero, nonZero);
-            }
-        } else if (maxNonZero.isPresent()) {
+        } else if (maxZero.isEmpty() && maxNonZero.isPresent()) {
             return nonZero;
 
+        } else if (maxZero.isPresent()) { // if both present
+            Predicate<ConnectorStatus> pr = o -> maxZero.get().getStatusTimestamp().isAfter(o.getStatusTimestamp());
+
+            if (maxNonZero.filter(pr).isPresent()) {
+                // this is the special case we need to handle
+                return strategy.process(zero, nonZero);
+            } else {
+                return nonZero;
+            }
         } else {
             return Collections.emptyList();
         }

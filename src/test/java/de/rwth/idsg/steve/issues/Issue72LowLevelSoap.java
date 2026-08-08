@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,18 +35,19 @@ import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
@@ -56,8 +57,6 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @since 27.06.2018
  */
 public class Issue72LowLevelSoap extends StressTest {
-
-    private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
         new Issue72LowLevelSoap().attack();
@@ -75,14 +74,14 @@ public class Issue72LowLevelSoap extends StressTest {
         int meterStart = 444;
         int meterStop = 99999;
 
-        BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+        BootNotificationResponse boot = getForOcpp16(soapPath).bootNotification(
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 chargeBoxId);
         Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
-        StartTransactionResponse start = getForOcpp16(path).startTransaction(
+        StartTransactionResponse start = getForOcpp16(soapPath).startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(connectorId)
                         .withIdTag(idTag)
@@ -97,7 +96,7 @@ public class Issue72LowLevelSoap extends StressTest {
         String body = buildRequest(chargeBoxId, transactionId, idTag, stopDateTime, meterStop);
         ContentType contentType = ContentType.create(MediaType.SOAP_XML_UTF_8.type(), MediaType.SOAP_XML_UTF_8.charset().orNull());
 
-        HttpUriRequest req = RequestBuilder.post(path)
+        ClassicHttpRequest req = ClassicRequestBuilder.post(soapPath)
                                            .addHeader("SOAPAction", "urn://Ocpp/Cs/2015/10/StopTransaction")
                                            .setEntity(new StringEntity(body, contentType))
                                            .build();
@@ -110,7 +109,7 @@ public class Issue72LowLevelSoap extends StressTest {
 
             @Override
             public void beforeRepeat() {
-                threadLocalClient.set(getForOcpp16(path));
+                threadLocalClient.set(getForOcpp16(soapPath));
             }
 
             @Override
@@ -134,7 +133,7 @@ public class Issue72LowLevelSoap extends StressTest {
 
                 try {
                     httpClient.execute(req, httpResponse -> {
-                        if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                        if (httpResponse.getCode() != HttpStatus.SC_OK) {
                             throw new RuntimeException("Not OK");
                         }
                         return null;
@@ -158,12 +157,12 @@ public class Issue72LowLevelSoap extends StressTest {
         }
     }
 
-    private static String buildRequest(String chargeBoxId, int transactionId, String idTag,
-                                       DateTime stop, int meterStop) {
+    private String buildRequest(String chargeBoxId, int transactionId, String idTag,
+                                DateTime stop, int meterStop) {
         return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" +
                 "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>" +
                 "<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:47c9e1d9-a278-4e9c-8f08-565c29d86167</MessageID>" +
-                "<To xmlns=\"http://www.w3.org/2005/08/addressing\">" + path + "</To>" +
+                "<To xmlns=\"http://www.w3.org/2005/08/addressing\">" + soapPath + "</To>" +
                 "<ReplyTo xmlns=\"http://www.w3.org/2005/08/addressing\"><Address>http://www.w3.org/2005/08/addressing/anonymous</Address>" +
                 "</ReplyTo><chargeBoxIdentity xmlns=\"urn://Ocpp/Cs/2015/10/\">" + chargeBoxId + "</chargeBoxIdentity>" +
                 "</soap:Header>" +

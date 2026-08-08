@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.BooleanType;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -78,7 +78,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(new OcppTagsRestController(ocppTagService))
             .setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+            .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType(CONTENT_TYPE))
             .build();
     }
@@ -242,7 +242,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         // given
         OcppTagForm form = new OcppTagForm();
         form.setIdTag("id-123");
-        form.setExpiryDate(LocalDateTime.parse("1990-10-01T00:00"));
+        form.setExpiryDate(DateTime.parse("1990-10-01T00:00Z"));
 
         // when and then
         mockMvc.perform(
@@ -465,9 +465,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.FALSE);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getExpired(), BooleanType.FALSE);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), BooleanType.ALL);
     }
 
     @Test
@@ -487,9 +487,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.TRUE);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getExpired(), BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.TRUE);
+        assertEquals(capturedForm.getBlocked(), BooleanType.ALL);
     }
 
     @Test
@@ -509,9 +509,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
-        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.FALSE);
+        assertEquals(capturedForm.getExpired(), BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), BooleanType.FALSE);
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

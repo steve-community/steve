@@ -40,7 +40,12 @@
        <table class="userInput">
             <thead><tr><th>New Webuser</th><th></th></thead>
             <tbody>
-            <tr><td>Webusername:</td><td><form:input path="webUsername" title="Web-Users Name"/></td></tr>
+            <tr>
+                <td>Webusername:</td><td><form:input path="webUsername" title="Web-Users Name"/>
+                    <form:hidden path="apiPassword" value="doesNotCreateApiPasword"/>
+                    <form:hidden path="apiPasswordComparison" value="doesNotCreateApiPasword"/>
+                </td>
+            </tr>
             <tr><td>Password:</td><td><form:password path="password" title="Set the password"/></td></tr>
             <tr><td>Password confirmation:</td><td><form:password  path="passwordComparison" title="Confirm the password"/></td></tr>
             <tr><td>Roles:</td>

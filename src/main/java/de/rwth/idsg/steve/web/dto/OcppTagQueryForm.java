@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,6 +45,9 @@ public class OcppTagQueryForm {
     @Schema(description = "The parent OCPP tag of this OCPP tag")
     private String parentIdTag;
 
+    @Schema(description = "The User ID")
+    private Integer userId;
+
     @Schema(description = "Return expired, not expired, or all Ocpp tags? Defaults to ALL")
     private BooleanType expired = BooleanType.FALSE;
 
@@ -56,6 +59,9 @@ public class OcppTagQueryForm {
 
     @Schema(description = "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.")
     private String note;
+
+    @Schema(description = "Filter by whether the OCPP tag is associated with a user or not. Defaults to All")
+    private UserFilter userFilter = UserFilter.All;
 
     @Schema(hidden = true)
     public boolean isOcppTagPkSet() {
@@ -77,6 +83,11 @@ public class OcppTagQueryForm {
         return !Strings.isNullOrEmpty(note);
     }
 
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
+    }
+
     public BooleanType getExpired() {
         return Objects.requireNonNullElse(expired, BooleanType.ALL);
     }
@@ -89,30 +100,10 @@ public class OcppTagQueryForm {
         return Objects.requireNonNullElse(blocked, BooleanType.ALL);
     }
 
-    @RequiredArgsConstructor
-    public enum BooleanType {
-        ALL("All", null),
-        TRUE("True", true),
-        FALSE("False", false);
-
-        @Getter private final String value;
-        private final Boolean boolValue;
-
-        public boolean getBoolValue() {
-            if (this.boolValue == null) {
-                throw new UnsupportedOperationException("This enum does not have any meaningful bool value set.");
-            }
-            return this.boolValue;
-        }
-
-        public static BooleanType fromValue(String v) {
-            for (BooleanType c: BooleanType.values()) {
-                if (c.value.equals(v)) {
-                    return c;
-                }
-            }
-            throw new IllegalArgumentException(v);
-        }
+    public enum UserFilter {
+        All,
+        OnlyTagsWithUser,
+        OnlyTagsWithoutUser
     }
 
     @ToString(callSuper = true)

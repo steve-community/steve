@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,18 @@
  */
 package de.rwth.idsg.steve.web;
 
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +41,10 @@ import java.util.List;
  */
 @ControllerAdvice(basePackages = "de.rwth.idsg.steve.web.controller")
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalControllerAdvice {
+
+    private final SteveProperties steveProperties;
 
     @InitBinder
     public void binder(WebDataBinder binder) {
@@ -46,11 +52,11 @@ public class GlobalControllerAdvice {
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forMvc());
+        binder.registerCustomEditor(DateTime.class, DateTimeEditor.forMvc());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);
-        binder.registerCustomEditor(List.class, "recipients", batchInsertConverter);
+        binder.registerCustomEditor(List.class, "mailSettings.recipients", batchInsertConverter);
     }
 
     @ExceptionHandler(Exception.class)
@@ -61,5 +67,20 @@ public class GlobalControllerAdvice {
         mav.addObject("exception", exception);
         mav.setViewName("00-error");
         return mav;
+    }
+
+    @ModelAttribute("ocpp12Enabled")
+    public boolean isOcpp12JsonEnabled() {
+        return steveProperties.getOcpp().getEnabledProtocols().getV12().isEnabled();
+    }
+
+    @ModelAttribute("ocpp15Enabled")
+    public boolean isOcpp15JsonEnabled() {
+        return steveProperties.getOcpp().getEnabledProtocols().getV15().isEnabled();
+    }
+
+    @ModelAttribute("ocpp16Enabled")
+    public boolean isOcpp16JsonEnabled() {
+        return steveProperties.getOcpp().getEnabledProtocols().getV16().isEnabled();
     }
 }

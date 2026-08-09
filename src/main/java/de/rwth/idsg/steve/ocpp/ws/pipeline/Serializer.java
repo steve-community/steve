@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
@@ -32,8 +28,12 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -54,29 +54,17 @@ public enum Serializer implements Consumer<CommunicationContext> {
     public void accept(CommunicationContext context) {
         OcppJsonMessage message = context.getOutgoingMessage();
 
-        ArrayNode str;
-        MessageType messageType = message.getMessageType();
-        switch (messageType) {
-            case CALL:
-                str = handleCall((OcppJsonCall) message);
-                break;
-
-            case CALL_RESULT:
-                str = handleResult((OcppJsonResult) message);
-                break;
-
-            case CALL_ERROR:
-                str = handleError((OcppJsonError) message);
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
-        }
+        ArrayNode str = switch (message) {
+            case OcppJsonCall call -> handleCall(call);
+            case OcppJsonResult result -> handleResult(result);
+            case OcppJsonError error -> handleError(error);
+            default -> throw new SteveException("Unknown message type: " + message.getClass().getName());
+        };
 
         try {
             String result = mapper.writeValueAsString(str);
             context.setOutgoingString(result);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new SteveException("The outgoing message could not be serialized", e);
         }
     }
@@ -140,7 +128,7 @@ public enum Serializer implements Consumer<CommunicationContext> {
         // If there are no error details you should fill in an empty object {}, missing or null is not allowed
         ObjectNode detailsNode = mapper.createObjectNode();
         if (error.isSetDetails()) {
-            detailsNode.set("errorMsg", mapper.getNodeFactory().textNode(error.toStringErrorDetails()));
+            detailsNode.set("errorMsg", mapper.getNodeFactory().stringNode(error.toStringErrorDetails()));
         }
 
         return mapper.createArrayNode()

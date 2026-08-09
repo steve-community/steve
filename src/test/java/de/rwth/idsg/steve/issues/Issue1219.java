@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,6 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -111,7 +110,7 @@ public class Issue1219 {
             }
 
             TransactionQueryForm form = new TransactionQueryForm();
-            form.setTransactionPk(transactionId);
+            form.setTransactionPk(List.of(transactionId));
             Transaction transaction = transactionRepository.getTransactions(form).get(0);
 
             DateTime stopTimestamp = transaction.getStartTimestamp().plusHours(1);
@@ -200,9 +199,9 @@ public class Issue1219 {
         return null;
     }
 
-    private static LocalDateTime getRandomExpiry() {
+    private static DateTime getRandomExpiry() {
         if (ThreadLocalRandom.current().nextBoolean()) {
-            return LocalDateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
+            return DateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
         }
         return null;
     }

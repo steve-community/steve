@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,21 +18,22 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 
@@ -41,11 +42,12 @@ import jakarta.validation.Valid;
  * @since 12.11.2018
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargingProfileRepository repository;
+    private final ChargePointService chargePointService;
+    private final ChargingProfileRepository repository;
 
     private static final String PARAMS = "params";
 
@@ -66,7 +68,7 @@ public class ChargingProfilesController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         ChargingProfileQueryForm queryForm = new ChargingProfileQueryForm();
         model.addAttribute(PARAMS, queryForm);
@@ -74,19 +76,19 @@ public class ChargingProfilesController {
         return "data-man/chargingProfiles";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) ChargingProfileQueryForm queryForm, Model model) {
         initList(queryForm, model);
         return "data-man/chargingProfiles";
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
         model.addAttribute("form", new ChargingProfileForm());
         return "data-man/chargingProfileAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_PATH)
     public String addPost(@Valid @ModelAttribute("form") ChargingProfileForm form,
                           BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -97,7 +99,7 @@ public class ChargingProfilesController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("form") ChargingProfileForm form,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -108,23 +110,23 @@ public class ChargingProfilesController {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("chargingProfilePk") int chargingProfilePk) {
         repository.delete(chargingProfilePk);
         return toOverview();
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("chargingProfilePk") int chargingProfilePk, Model model) {
         ChargingProfile.Details details = repository.getDetails(chargingProfilePk);
         ChargingProfileForm form = ChargingProfileDetailsMapper.mapToForm(details);
@@ -133,11 +135,11 @@ public class ChargingProfilesController {
         return "data-man/chargingProfileDetails";
     }
 
-    @RequestMapping(value = ASSIGNMENTS_PATH, method = RequestMethod.GET)
+    @GetMapping(ASSIGNMENTS_PATH)
     public String getAssignments(@ModelAttribute(PARAMS) ChargingProfileAssignmentQueryForm form, Model model) {
         model.addAttribute(PARAMS, form);
         model.addAttribute("profileList", repository.getBasicInfo());
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("assignments", repository.getAssignments(form));
         return "data-man/chargingProfileAssignments";
     }

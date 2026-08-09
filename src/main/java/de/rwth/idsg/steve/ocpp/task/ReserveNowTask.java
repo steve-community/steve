@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,13 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
+import ocpp.cp._2015._10.ReservationStatus;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -30,38 +32,42 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams, String> {
+public class ReserveNowTask extends Ocpp15AndAboveTask<ReserveNowParams, ReservationStatus> {
 
+    private final int reservationId;
+    private final String parentIdTag;
     private final ReservationRepository reservationRepository;
 
-    public ReserveNowTask(EnhancedReserveNowParams params,
+    public ReserveNowTask(ReserveNowParams params, int reservationId, String parentIdTag,
                           ReservationRepository reservationRepository) {
         super(params);
+        this.reservationId = reservationId;
+        this.parentIdTag = parentIdTag;
         this.reservationRepository = reservationRepository;
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback() {
+    public OcppCallback<ReservationStatus> defaultCallback() {
+        return new OcppCallback<>() {
             @Override
-            public void success(String chargeBoxId, String responseStatus) {
-                addNewResponse(chargeBoxId, responseStatus);
+            public void success(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, ReservationStatus response) {
+                addNewResponse(chargeBoxId, response.value());
 
-                if ("Accepted".equalsIgnoreCase(responseStatus)) {
-                    reservationRepository.accepted(params.getReservationId());
+                if (ReservationStatus.ACCEPTED == response) {
+                    reservationRepository.accepted(reservationId);
                 } else {
                     delete();
                 }
             }
 
             @Override
-            public void success(String chargeBoxId, OcppJsonError error) {
+            public void success(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, OcppJsonError error) {
                 addNewError(chargeBoxId, error.toString());
                 delete();
             }
 
             @Override
-            public void failed(String chargeBoxId, Exception e) {
+            public void failed(CommunicationTask<?, ReservationStatus> task, String chargeBoxId, Exception e) {
                 addNewError(chargeBoxId, e.getMessage());
                 delete();
             }
@@ -71,28 +77,28 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     @Override
     public ocpp.cp._2012._06.ReserveNowRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.ReserveNowRequest()
-                .withConnectorId(params.getReserveNowParams().getConnectorId())
-                .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
-                .withIdTag(params.getReserveNowParams().getIdTag())
-                .withReservationId(params.getReservationId())
-                .withParentIdTag(params.getParentIdTag());
+                .withConnectorId(params.getConnectorId())
+                .withExpiryDate(params.getExpiry())
+                .withIdTag(params.getIdTag())
+                .withReservationId(reservationId)
+                .withParentIdTag(parentIdTag);
     }
 
     @Override
     public ocpp.cp._2015._10.ReserveNowRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ReserveNowRequest()
-                .withConnectorId(params.getReserveNowParams().getConnectorId())
-                .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
-                .withIdTag(params.getReserveNowParams().getIdTag())
-                .withReservationId(params.getReservationId())
-                .withParentIdTag(params.getParentIdTag());
+                .withConnectorId(params.getConnectorId())
+                .withExpiryDate(params.getExpiry())
+                .withIdTag(params.getIdTag())
+                .withReservationId(reservationId)
+                .withParentIdTag(parentIdTag);
     }
 
     @Override
     public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, ReservationStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -103,7 +109,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -111,7 +117,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     }
 
     private void delete() {
-        reservationRepository.delete(params.getReservationId());
+        reservationRepository.delete(reservationId);
     }
 
 }

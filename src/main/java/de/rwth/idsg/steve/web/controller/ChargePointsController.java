@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,30 +18,27 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
+import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -49,21 +46,13 @@ import java.util.stream.Collectors;
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired protected ChargePointRepository chargePointRepository;
-    @Autowired protected ChargePointHelperService chargePointHelperService;
+    protected final ChargePointService chargePointService;
 
     protected static final String PARAMS = "params";
-
-    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
-                                                                               .map(ocpp.cs._2012._06.RegistrationStatus::value)
-                                                                               .collect(Collectors.toList());
-
-    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
-                                                                           .map(ocpp.cs._2015._10.RegistrationStatus::value)
-                                                                           .collect(Collectors.toList());
 
     // -------------------------------------------------------------------------
     // Paths
@@ -89,13 +78,13 @@ public class ChargePointsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         initList(model, new ChargePointQueryForm());
         return "data-man/chargepoints";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) ChargePointQueryForm params, Model model) {
         initList(model, params);
         return "data-man/chargepoints";
@@ -103,52 +92,35 @@ public class ChargePointsController {
 
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("cpList", chargePointService.getOverview(params));
+        model.addAttribute("unknownList", chargePointService.getUnknownChargePoints());
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
-        ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxPk);
-        ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
+        ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
+        ChargePointFormForUpdate form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
-        model.addAttribute("registrationStatusList", getRegistrationStatusList(cp.getChargeBox()));
-        addCountryCodes(model);
+        addAddressAttributes(model);
 
         return "data-man/chargepointDetails";
     }
 
-    private List<String> getRegistrationStatusList(ChargeBoxRecord chargeBoxRecord) {
-        if (chargeBoxRecord.getOcppProtocol() == null) {
-            return upToOcpp15RegistrationStatusList;
-        }
-
-        OcppProtocol protocol = OcppProtocol.fromCompositeValue(chargeBoxRecord.getOcppProtocol());
-        switch (protocol.getVersion()) {
-            case V_12:
-            case V_15:
-                return upToOcpp15RegistrationStatusList;
-            case V_16:
-                return ocpp16RegistrationStatusList;
-            default:
-                throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
-        }
-    }
-
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
-        model.addAttribute("chargePointForm", new ChargePointForm());
+        model.addAttribute("chargePointForm", new ChargePointFormForCreate());
         setCommonAttributesForSingleAdd(model);
         return "data-man/chargepointAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
-    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+    @PostMapping(params = "add", value = ADD_SINGLE_PATH)
+    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointFormForCreate chargePointForm,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
+            model.addAttribute("chargePointForm", chargePointForm);
             return "data-man/chargepointAdd";
         }
 
@@ -156,12 +128,12 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
+    @PostMapping(ADD_BATCH_PATH)
     public String addBatchPost(@Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
-            addCountryCodes(model);
-            model.addAttribute("chargePointForm", new ChargePointForm());
+            addAddressAttributes(model);
+            model.addAttribute("chargePointForm", new ChargePointFormForCreate());
             return "data-man/chargepointAdd";
         }
 
@@ -169,50 +141,53 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+    @PostMapping(params = "update", value = UPDATE_PATH)
+    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointFormForUpdate chargePointForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            addCountryCodes(model);
+            setCommonAttributesForSingleAdd(model);
+            model.addAttribute("chargePointForm", chargePointForm);
+            model.addAttribute("cp", chargePointService.getDetails(chargePointForm.getChargeBoxPk()));
             return "data-man/chargepointDetails";
         }
 
-        chargePointRepository.updateChargePoint(chargePointForm);
+        chargePointService.updateChargePoint(chargePointForm);
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
-        chargePointRepository.deleteChargePoint(chargeBoxPk);
+        chargePointService.deleteChargePoint(chargeBoxPk);
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_ADD_PATH)
     public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
         add(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
-    @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
+    @PostMapping(UNKNOWN_REMOVE_PATH)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        chargePointService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
-    protected void addCountryCodes(Model model) {
+    protected void addAddressAttributes(Model model) {
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
+        model.addAttribute("timeZones", ControllerHelper.TIME_ZONE_DROPDOWN);
     }
 
     // -------------------------------------------------------------------------
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_SINGLE_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }
@@ -226,19 +201,17 @@ public class ChargePointsController {
     // -------------------------------------------------------------------------
 
     private void setCommonAttributesForSingleAdd(Model model) {
-        addCountryCodes(model);
+        addAddressAttributes(model);
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
-        // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
-        model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
     }
 
-    private void add(ChargePointForm form) {
-        chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
+    private void add(ChargePointFormForCreate form) {
+        chargePointService.addChargePoint(form);
+        chargePointService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
-        chargePointRepository.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
+        chargePointService.addChargePointList(idList);
+        chargePointService.removeUnknown(idList);
     }
 }

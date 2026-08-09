@@ -1,0 +1,89 @@
+spring:
+  main:
+    banner-mode: off
+  profiles.active: @envName@
+  application:
+    name: steve
+  datasource:
+    url: jdbc:@databaseName@://${db.ip}:${db.port}/${db.schema}
+    username: ${db.user}
+    password: ${db.password}
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+      file-size-threshold: 10GB  # we should not hit this, since 1GB will be the limiting factor earlier
+
+server:
+  address: ${server.host}
+  port: ${http.port}
+  servlet.context-path: /${context.path}
+  compression:
+    enabled: ${server.gzip.enabled}
+  ssl:
+    enabled: ${https.enabled}
+    key-store-type:
+    key-store: ${keystore.path}
+    key-store-password: ${keystore.password}
+    trust-store-type:
+    trust-store:
+    trust-store-password:
+    enabled-protocols:
+      - TLSv1.2
+      - TLSv1.3
+    ciphers:
+    # or 'need' for strict security profile 3 (mTLS)
+    client-auth: want
+
+steve:
+  version: @project.version@
+  jooq:
+    executive-logging: ${db.sql.logging}
+  auth:
+    username: ${auth.user}
+    password: ${auth.password}
+    web-api-key: ${webapi.key}
+    web-api-secret: ${webapi.value}
+  ocpp:
+    ws-session-select-strategy: ${ws.session.select.strategy}
+    auto-register-unknown-stations: ${auto.register.unknown.stations}
+    charge-box-id-validation-regex: ${charge-box-id.validation.regex}
+
+    # Enables compatibility workarounds for OCTT-based OCA certification testing.
+    # These workarounds alter otherwise OCPP-compliant behavior to accommodate OCTT-specific expectations.
+    octt-quirks-enabled: false
+
+    # Which transport (SOAP and JSON-over-WebSocket) of which OCPP version (1.2, 1.5 and 1.6) should we enable?
+    # This configuration affects the endpoints we expose for station communication, but also the corresponding web page
+    # for OCPP operations (e.g. if soap and json both are disabled for v12, OCPP 1.2 Operations page will be disabled).
+    enabled-protocols:
+      v12: { soap: true, json: true }
+      v15: { soap: true, json: true }
+      v16: { soap: true, json: true }
+
+    # OCPP 1.6 security config.
+    # Note: security profile (0..3) is a per-charge-point state in DB, not a global application property.
+    security:
+      # the custom header with original protocol info forwarded by proxy
+      protocol-header-from-proxy:
+      # Relevant for stations with profile 3
+      # See de.rwth.idsg.steve.service.CertificateValidator for documentation
+      client-cert-header-from-proxy:
+      # Relevant for stations with profile 3
+      csr-signing:
+        provider:
+        # CSR signing configuration for provider=local. This is intentionally separate from server.ssl.
+        provider-local:
+          certificate-validity-years: 1
+          # Selection currently defaults to CSR key family; station-capability based policy belongs in
+          # CertificateSigningServiceLocal#selectIssuer.
+          rsa:
+            ca-certificate-pem:
+            ca-key-pem:
+            ca-key-password:
+            ca-chain-pem:
+          ecdsa:
+            ca-certificate-pem:
+            ca-key-pem:
+            ca-key-password:
+            ca-chain-pem:

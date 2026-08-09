@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,11 +26,8 @@ import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
@@ -49,10 +46,7 @@ import java.util.UUID;
 public class ChargePointServiceJsonInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
-
-    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final SessionContextStoreHolder sessionContextStoreHolder;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
@@ -71,13 +65,13 @@ public class ChargePointServiceJsonInvoker {
      * Actual processing
      */
     private void run(ChargePointSelect cps, CommunicationTask task) {
+        if (!cps.isJson()) {
+            throw new SteveException("Not a JSON charge point");
+        }
+
         var chargeBoxId = cps.getChargeBoxId();
 
-        var endpoint = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> ocpp12WebSocketEndpoint;
-            case V_15 -> ocpp15WebSocketEndpoint;
-            case V_16 -> ocpp16WebSocketEndpoint;
-        };
+        var sessionStore = sessionContextStoreHolder.getOrCreate(cps.getOcppProtocol().getVersion());
 
         var typeStore = switch (cps.getOcppProtocol().getVersion()) {
             case V_12 -> Ocpp12TypeStore.INSTANCE;
@@ -103,7 +97,7 @@ public class ChargePointServiceJsonInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context = new CommunicationContext(sessionStore.getSession(chargeBoxId), chargeBoxId);
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,8 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.github.zafarkhaja.semver.Version;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
 import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +29,13 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.joda.JodaModule;
 
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -55,19 +53,17 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
 
     private static final String API_URL = "https://api.github.com/repos/steve-community/steve/releases/latest";
-
     private static final String TAG_NAME_PREFIX = "steve-";
-
     private static final String FILE_SEPARATOR = File.separator;
 
-    private RestTemplate restTemplate;
+    private final SteveProperties steveProperties;
+    private final RestTemplate restTemplate;
 
-    @PostConstruct
-    private void init() {
+    public GithubReleaseCheckService(SteveProperties steveProperties) {
+        this.steveProperties = steveProperties;
+
         var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
 
-        var connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout).build();
-        var socketConfig = SocketConfig.custom().setSoTimeout(timeout).build();
         var requestConfig = RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
 
         var httpClient = HttpClientBuilder.create()
@@ -76,12 +72,12 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JodaModule());
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
+        var mapper = JsonMapper.builder()
+            .addModule(new JodaModule())
+            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .build();
 
-        restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
+        restTemplate = new RestTemplate(Collections.singletonList(new JacksonJsonHttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);
     }
 
@@ -102,10 +98,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static ReleaseReport getReport(ReleaseResponse response) {
+    private ReleaseReport getReport(ReleaseResponse response) {
         String githubVersion = extractVersion(response);
 
-        Version build = Version.valueOf(SteveConfiguration.CONFIG.getSteveVersion());
+        Version build = Version.valueOf(steveProperties.getVersion());
         Version github = Version.valueOf(githubVersion);
 
         boolean isGithubMoreRecent = github.greaterThan(build);

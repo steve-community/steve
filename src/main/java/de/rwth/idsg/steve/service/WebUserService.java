@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,10 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserAuthority;
@@ -50,6 +48,7 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -77,6 +76,8 @@ public class WebUserService implements UserDetailsManager {
 
     private final ObjectMapper jacksonObjectMapper;
     private final WebUserRepository webUserRepository;
+    private final SteveProperties steveProperties;
+    private final PasswordEncoder passwordEncoder;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
     private final PasswordEncoder encoder;
 
@@ -91,15 +92,15 @@ public class WebUserService implements UserDetailsManager {
             return;
         }
 
-        var headerVal = SteveConfiguration.CONFIG.getWebApi().getHeaderValue();
+        var headerVal = steveProperties.getAuth().getWebApiSecret();
 
-        var encodedApiPassword = StringUtils.isEmpty(headerVal)
+        var encodedApiPassword = StringUtils.isBlank(headerVal)
             ? null
-            : SteveConfiguration.CONFIG.getAuth().getPasswordEncoder().encode(headerVal);
+            : passwordEncoder.encode(headerVal);
 
         var user = new WebUserRecord()
-            .setUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
-            .setPassword(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
+            .setUsername(steveProperties.getAuth().getUsername())
+            .setPassword(passwordEncoder.encode(steveProperties.getAuth().getPassword()))
             .setApiPassword(encodedApiPassword)
             .setEnabled(true)
             .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));
@@ -196,7 +197,6 @@ public class WebUserService implements UserDetailsManager {
         Integer count = webUserRepository.getUserCountWithAuthority(authority);
         return count != null && count > 0;
     }
-
 
     // Methods for the website
     public void add(WebUserForm form) {
@@ -321,11 +321,7 @@ public class WebUserService implements UserDetailsManager {
     }
 
     private String[] fromJson(JSON jsonArray) {
-        try {
-            return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
     }
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
@@ -334,12 +330,8 @@ public class WebUserService implements UserDetailsManager {
             .sorted() // keep a stable order of entries
             .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
-        try {
-            String str = jacksonObjectMapper.writeValueAsString(auths);
-            return JSON.jsonOrNull(str);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        String str = jacksonObjectMapper.writeValueAsString(auths);
+        return JSON.jsonOrNull(str);
     }
 
     /**

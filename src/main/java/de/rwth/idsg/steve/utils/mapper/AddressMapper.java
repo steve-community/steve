@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,6 +40,9 @@ public final class AddressMapper {
             address.setZipCode(record.getZipCode());
             address.setCity(record.getCity());
             address.setCountry(CountryCode.getByCode(record.getCountry()));
+            address.setLatitude(record.getLatitude());
+            address.setLongitude(record.getLongitude());
+            address.setTimeZone(record.getTimeZone());
         }
         return address;
     }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,6 +41,9 @@ public final class OcppTag {
 
         @Schema(description = "The OCPP tag")
         private final String idTag;
+
+        @Schema(description = "PK of the user this OCPP tag belongs to (if any)")
+        private final Integer userPk;
 
         @Schema(description = "PK of the parent OCPP tag of this OCPP tag")
         private final Integer parentOcppTagPk;

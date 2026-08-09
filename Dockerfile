@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -21,6 +21,5 @@ COPY . /code
 # Wait for the db to startup(via dockerize), then 
 # Build and run steve, requires a db to be available on port 3306
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -XX:MaxRAMPercentage=85 -jar target/steve.jar
-
+	./mvnw clean package -Pdocker,mariadb -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
+	java -XX:MaxRAMPercentage=85 -jar target/steve.war

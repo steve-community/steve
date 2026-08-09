@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,8 @@
  */
 package de.rwth.idsg.steve.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -36,32 +31,27 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
+import org.jooq.tools.jdbc.JDBCUtils;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.format.support.FormattingConversionService;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-
-import jakarta.validation.Validator;
+import tools.jackson.datatype.joda.JodaModule;
 
 import javax.sql.DataSource;
-import java.util.List;
+import java.sql.SQLException;
+import java.time.Clock;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static tools.jackson.databind.cfg.DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -71,38 +61,63 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 @Slf4j
 @Configuration
-@EnableWebMvc
 @EnableScheduling
+@EnableAsync
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     @Bean
-    public DataSource dataSource() {
-        SteveConfiguration.DB dbConfig = CONFIG.getDb();
-
+    public HikariDataSource dataSource(DataSourceProperties properties) {
         HikariConfig hc = new HikariConfig();
 
         // set standard params
-        hc.setJdbcUrl("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
-        hc.setUsername(dbConfig.getUserName());
-        hc.setPassword(dbConfig.getPassword());
+        hc.setJdbcUrl(properties.getUrl());
+        hc.setUsername(properties.getUsername());
+        hc.setPassword(properties.getPassword());
 
         // set non-standard params
-        hc.addDataSourceProperty(PropertyKey.cachePrepStmts.getKeyName(), true);
-        hc.addDataSourceProperty(PropertyKey.useServerPrepStmts.getKeyName(), true);
-        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
-        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
-        hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
-        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
-        hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
+        // https://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html
+        // https://mariadb.com/docs/connectors/mariadb-connector-j/about-mariadb-connector-j
+        hc.addDataSourceProperty("cachePrepStmts", true);
+        hc.addDataSourceProperty("useServerPrepStmts", true);
+        hc.addDataSourceProperty("prepStmtCacheSize", 250);
+        hc.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+        hc.addDataSourceProperty("characterEncoding", "utf8");
+        hc.addDataSourceProperty("connectionTimeZone", SteveProperties.TIME_ZONE_ID);
+        hc.addDataSourceProperty("useSSL", true);
 
         // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
         return new HikariDataSource(hc);
+    }
+
+    /**
+     * We are using the same strategy as Spring Boot's auto-detection.
+     *
+     * https://github.com/spring-projects/spring-boot/blob/main/module/spring-boot-jooq/src/main/java/org/springframework/boot/jooq/autoconfigure/SqlDialectLookup.java
+     */
+    @Bean
+    public SQLDialect jooqSqlDialect(DataSource dataSource) {
+        SQLDialect fallback = SQLDialect.MYSQL;
+
+        try (var connection = dataSource.getConnection()) {
+            var dialect = JDBCUtils.dialect(connection);
+            var dialectToReturn = (dialect == SQLDialect.DEFAULT) ? fallback : dialect;
+            log.info("Using jOOQ dialect {}", dialectToReturn);
+            return dialectToReturn;
+        } catch (SQLException e) {
+            log.warn("Could not detect database dialect. Falling back to jOOQ dialect {}.", fallback, e);
+            return fallback;
+        }
     }
 
     /**
@@ -118,7 +133,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
-    public DSLContext dslContext(DataSource dataSource) {
+    public DSLContext dslContext(DataSource dataSource,
+                                 SteveProperties steveProperties,
+                                 SQLDialect jooqSqlDialect) {
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
@@ -126,44 +143,32 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 // operations. We do not use or need that.
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+                .withExecuteLogging(steveProperties.getJooq().isExecutiveLogging());
 
         // Configuration for JOOQ
         org.jooq.Configuration conf = new DefaultConfiguration()
-                .set(SQLDialect.MYSQL)
+                .set(jooqSqlDialect)
                 .set(new DataSourceConnectionProvider(dataSource))
                 .set(settings);
 
         return DSL.using(conf);
     }
 
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskScheduler asyncTaskScheduler() {
+    /**
+     * ThreadPoolTaskScheduler is both a TaskScheduler and a TaskExecutor
+     * https://github.com/spring-projects/spring-boot/issues/20308
+     */
+    @Bean
+    @Primary
+    public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(5);
+        scheduler.setPoolSize(10);
         scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
 
-        return new DelegatingTaskScheduler(scheduler);
-    }
-
-    @Bean(destroyMethod = "close")
-    public DelegatingTaskExecutor asyncTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setThreadNamePrefix("SteVe-TaskExecutor-");
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(30);
-        executor.initialize();
-
-        return new DelegatingTaskExecutor(executor);
-    }
-
-    @Bean
-    public Validator validator() {
-        return new LocalValidatorFactoryBean();
+        return scheduler;
     }
 
     /**
@@ -173,9 +178,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * steps and return a "no new version" report immediately.
      */
     @Bean
-    public ReleaseCheckService releaseCheckService() {
+    public ReleaseCheckService releaseCheckService(SteveProperties steveProperties) {
         if (InternetChecker.isInternetAvailable()) {
-            return new GithubReleaseCheckService();
+            return new GithubReleaseCheckService(steveProperties);
         } else {
             return new DummyReleaseCheckService();
         }
@@ -205,44 +210,19 @@ public class BeanConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**").addResourceLocations("static/");
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/manager/signin").setViewName("signin");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    }
-
     // -------------------------------------------------------------------------
     // API config
     // -------------------------------------------------------------------------
 
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
-                ObjectMapper objectMapper = conv.getObjectMapper();
-                objectMapper.findAndRegisterModules();
-                // if the client sends unknown props, just ignore them instead of failing
-                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                // default is true
-                objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
-     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
-     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
-     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
-     */
     @Bean
-    public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
-        return requestMappingHandlerAdapter.getMessageConverters().stream()
-            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-            .findAny()
-            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
-            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    public JsonMapperBuilderCustomizer jacksonCustomizer() {
+        return builder -> {
+            // default is true
+            builder.disable(WRITE_DATES_AS_TIMESTAMPS);
+            // if the client sends unknown props, just ignore them instead of failing
+            builder.disable(FAIL_ON_UNKNOWN_PROPERTIES);
+            // we still use joda DateTime...
+            builder.addModule(new JodaModule());
+        };
     }
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,22 +18,23 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
-import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.service.OcppTagService;
-import de.rwth.idsg.steve.service.TransactionStopService;
+import de.rwth.idsg.steve.service.TransactionService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -46,14 +47,14 @@ import java.io.IOException;
  * @since 15.08.2014
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class TransactionsReservationsController {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private TransactionStopService transactionStopService;
+    private final TransactionService transactionService;
+    private final ReservationRepository reservationRepository;
+    private final ChargePointService chargePointService;
+    private final OcppTagService ocppTagService;
 
     private static final String PARAMS = "params";
 
@@ -64,6 +65,7 @@ public class TransactionsReservationsController {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
+    private static final String TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH = TRANSACTIONS_DETAILS_PATH + "/meterValues.csv";
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -77,21 +79,36 @@ public class TransactionsReservationsController {
         TransactionQueryForm params = new TransactionQueryForm();
         initList(model);
 
-        model.addAttribute("transList", transactionRepository.getTransactions(params));
+        model.addAttribute("transList", transactionService.getTransactions(params));
         model.addAttribute(PARAMS, params);
         return "data-man/transactions";
     }
 
-    @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
+    @PostMapping(TRANSACTION_STOP_PATH)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
-        transactionStopService.stop(transactionPk);
+        transactionService.stop(transactionPk);
         return "redirect:/manager/transactions";
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
-    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionRepository.getDetails(transactionPk));
+    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk,
+                                        @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
+                                        Model model) {
+        model.addAttribute("details", transactionService.getDetails(transactionPk, energyValuesOnly));
+        model.addAttribute("energyValuesOnly", energyValuesOnly);
         return "data-man/transactionDetails";
+    }
+
+    @RequestMapping(value = TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH)
+    public void getTransactionDetailsMeterValuesCsv(@PathVariable("transactionPk") int transactionPk,
+                                                    @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
+                                                    HttpServletResponse response) throws IOException {
+        String fileName = "transaction_%s_meter_values.csv".formatted(transactionPk);
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
+        response.setContentType("text/csv");
+        response.setHeader(headerKey, headerValue);
+        transactionService.writeTransactionMeterValuesCSV(transactionPk, energyValuesOnly, response.getWriter());
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)
@@ -107,14 +124,14 @@ public class TransactionsReservationsController {
         if (params.isReturnCSV()) {
             String fileName = "transactions.csv";
             String headerKey = "Content-Disposition";
-            String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+            String headerValue = "attachment; filename=\"%s\"".formatted(fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
-            transactionRepository.writeTransactionsCSV(params, response.getWriter());
+            transactionService.writeTransactionsCSV(params, response.getWriter());
             return null;
 
         } else {
-            model.addAttribute("transList", transactionRepository.getTransactions(params));
+            model.addAttribute("transList", transactionService.getTransactions(params));
             initList(model);
             model.addAttribute(PARAMS, params);
             return "data-man/transactions";
@@ -144,7 +161,7 @@ public class TransactionsReservationsController {
     }
 
     private void initList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 

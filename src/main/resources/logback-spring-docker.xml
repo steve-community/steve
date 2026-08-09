@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATTERN" value="[%-5level] %d %c \(%thread\) - %msg%n" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Disable the Jooq logo in logs -->
+    <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
+    <logger name="org.jooq.Constants" level="WARN" />
+
+    <logger name="org.apache.jasper" level="WARN"/>
+    <logger name="org.apache.tomcat.util" level="WARN"/>
+    <logger name="jndi" level="WARN"/>
+
+</configuration>

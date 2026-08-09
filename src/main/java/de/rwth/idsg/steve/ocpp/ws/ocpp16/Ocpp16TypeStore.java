@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
 
+import java.util.List;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
@@ -30,8 +32,14 @@ public final class Ocpp16TypeStore extends AbstractTypeStore {
 
     private Ocpp16TypeStore() {
         super(
+            List.of(
                 ocpp.cs._2015._10.ObjectFactory.class.getPackage().getName(),
-                ocpp.cp._2015._10.ObjectFactory.class.getPackage().getName()
+                ocpp._2022._02.security.GetLog.class.getPackage().getName()
+            ),
+            List.of(
+                ocpp.cp._2015._10.ObjectFactory.class.getPackage().getName(),
+                ocpp._2022._02.security.GetLog.class.getPackage().getName()
+            )
         );
     }
 }

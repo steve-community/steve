@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,20 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
+import de.rwth.idsg.steve.service.CertificateValidator;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.RegistrationStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketHttpHeaders;
@@ -49,11 +54,14 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
-    private static final ChargeBoxIdValidator CHARGE_BOX_ID_VALIDATOR = new ChargeBoxIdValidator();
-
+    private final ChargeBoxIdValidator chargeBoxIdValidator;
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final ChargePointHelperService chargePointHelperService;
+    private final ChargePointService chargePointService;
+    private final CertificateValidator certificateValidator;
+    private final String protocolHeaderFromProxy;
+
+    private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
 
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
@@ -73,17 +81,20 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId);
+        log.debug("Extracted chargeBoxId='{}'", chargeBoxId);
+
+        boolean isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
+        log.debug("ChargeBoxId '{}' has a valid pattern", chargeBoxId);
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+        Optional<ChargePointRegistration> registration = chargePointService.getRegistration(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
-        boolean allowConnection = status.isPresent();
+        boolean allowConnection = registration.isPresent();
 
         // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
@@ -92,16 +103,72 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
+        // original value in the connection URL provided by the station might have a different uppercase/lowercase
+        // configuration than the one from database. functionally this is not an issue, since the entries in the
+        // database are case-insensitive. but still, let's use the value from DB from here on (and also reference it in
+        // sessions) to prevent confusion.
+        chargeBoxId = registration.get().chargeBoxId();
 
         // -------------------------------------------------------------------------
-        // 2. Route according to the selected protocol
+        // 2. Check Ocpp security profiles (if needed)
+        // -------------------------------------------------------------------------
+
+        boolean isSecure = isSecure(request);
+        OcppSecurityProfile profile = registration.get().securityProfile();
+        log.debug("ChargeBoxId '{}' is found in DB with security profile {}", chargeBoxId, profile.getValue());
+
+        // Basic auth for profiles 1 and 2
+        if (profile.isBasicAuth()) {
+            log.debug("ChargeBoxId '{}' is attempting Basic-Auth...", chargeBoxId);
+            ServletServerHttpRequest casted = (ServletServerHttpRequest) request;
+
+            // prevent profile 1 type behavior when profile 2 is configured
+            if (profile == OcppSecurityProfile.Profile_2 && !isSecure) {
+                log.warn("ChargeBoxId '{}' is trying to connect via plain WS, even though it is configured for profile 2. Rejecting.", chargeBoxId);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+
+            UsernamePasswordAuthenticationToken authentication;
+            try {
+                authentication = converter.convert(casted.getServletRequest());
+            } catch (Exception e) {
+                log.error("ChargeBoxId '{}': Failed to extract Authentication from request ({})", chargeBoxId, e.getMessage());
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                return false;
+            }
+
+            boolean valid = chargePointService.validateBasicAuth(registration.get(), authentication);
+            if (!valid) {
+                log.debug("ChargeBoxId '{}': Rejecting handshake because Basic-Auth validation failed", chargeBoxId);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+
+            log.debug("ChargeBoxId '{}': Successful Basic-Auth", chargeBoxId);
+        }
+
+        // Client cert checks for profile 3
+        if (profile.isClientTLS()) {
+            log.debug("ChargeBoxId '{}' is attempting mTLS...", chargeBoxId);
+            var cert = certificateValidator.getCertificate(request, chargeBoxId);
+            boolean valid = certificateValidator.validate(registration.get(), cert);
+            if (!valid) {
+                log.debug("ChargeBoxId '{}': Rejecting handshake because mTLS certificate validation failed", chargeBoxId);
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                return false;
+            }
+            log.debug("ChargeBoxId '{}': Successful mTLS", chargeBoxId);
+        }
+
+        // -------------------------------------------------------------------------
+        // 3. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
         List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
 
         if (CollectionUtils.isEmpty(requestedProtocols)) {
-            log.error("No protocol (OCPP version) is specified.");
+            log.error("ChargeBoxId '{}': No protocol (OCPP version) is specified.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
@@ -109,23 +176,37 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         AbstractWebSocketEndpoint endpoint = selectEndpoint(requestedProtocols);
 
         if (endpoint == null) {
-            log.error("None of the requested protocols '{}' is supported", requestedProtocols);
+            log.error("ChargeBoxId '{}': None of the requested protocols '{}' is supported", chargeBoxId, requestedProtocols);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 
+        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
     private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
-        for (String requestedProcotol : requestedProtocols) {
+        for (String requestedProtocol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
-                if (item.getVersion().getValue().equals(requestedProcotol)) {
+                if (item.getVersion().getValue().equals(requestedProtocol)) {
                     return item;
                 }
             }
         }
         return null;
+    }
+
+    private boolean isSecure(ServerHttpRequest request) {
+        // if behind a TLS-terminating proxy, consider forwarded headers first
+        if (!StringUtils.isEmpty(protocolHeaderFromProxy)) {
+            String forwardedProto = request.getHeaders().getFirst(protocolHeaderFromProxy);
+            if ("https".equalsIgnoreCase(forwardedProto) || "wss".equalsIgnoreCase(forwardedProto)) {
+                return true;
+            }
+        }
+
+        var scheme = request.getURI().getScheme();
+        return "https".equalsIgnoreCase(scheme) || "wss".equalsIgnoreCase(scheme);
     }
 }

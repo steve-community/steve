@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,16 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -43,7 +52,6 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.jws.WebService;
@@ -52,6 +60,7 @@ import jakarta.xml.ws.BindingType;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.Addressing;
 import jakarta.xml.ws.soap.SOAPBinding;
+
 import java.util.concurrent.Future;
 
 /**
@@ -59,6 +68,7 @@ import java.util.concurrent.Future;
  * @since 13.03.2018
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Addressing(enabled = true, required = false)
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
@@ -69,7 +79,7 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2015._10.CentralSystemService")
 public class CentralSystemService16_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService16_Service service;
+    private final CentralSystemService16_Service service;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {
@@ -130,6 +140,25 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         return service.dataTransfer(parameters, chargeBoxIdentity);
+    }
+
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
+        return service.signCertificate(parameters, chargeBoxIdentity);
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
+                                                                       String chargeBoxIdentity) {
+        return service.securityEventNotification(parameters, chargeBoxIdentity);
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
+        return service.signedFirmwareStatusNotification(parameters, chargeBoxIdentity);
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
+        return service.logStatusNotification(parameters, chargeBoxIdentity);
     }
 
     // -------------------------------------------------------------------------

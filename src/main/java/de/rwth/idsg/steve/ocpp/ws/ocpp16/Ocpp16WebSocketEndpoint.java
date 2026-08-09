@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,15 +20,18 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import lombok.RequiredArgsConstructor;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.DataTransferRequest;
@@ -39,26 +42,27 @@ import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 @Component
+@Conditional(OcppEnabledCondition.V16.Json.class)
 public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    @Autowired private CentralSystemService16_SoapServer server;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
+    private final CentralSystemService16_SoapServer server;
 
-    @PostConstruct
-    public void init() {
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp16TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp16CallHandler(server));
-        super.init(pipeline);
+    public Ocpp16WebSocketEndpoint(OcppServerRepository ocppServerRepository,
+                                   FutureResponseContextStore futureResponseContextStore,
+                                   ApplicationEventPublisher applicationEventPublisher,
+                                   CentralSystemService16_SoapServer server,
+                                   SessionContextStoreHolder sessionContextStoreHolder) {
+        super(ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp16TypeStore.INSTANCE);
+        this.server = server;
     }
 
     @Override
@@ -66,49 +70,28 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
         return OcppVersion.V_16;
     }
 
-    @RequiredArgsConstructor
-    private static class Ocpp16CallHandler extends AbstractCallHandler {
+    @Override
+    public ResponseType dispatch(RequestType params, String chargeBoxId) {
+        return switch (params) {
+            case BootNotificationRequest request -> server.bootNotificationWithTransport(request, chargeBoxId, OcppProtocol.V_16_JSON);
+            case FirmwareStatusNotificationRequest request -> server.firmwareStatusNotification(request, chargeBoxId);
+            case StatusNotificationRequest request -> server.statusNotification(request, chargeBoxId);
+            case MeterValuesRequest request -> server.meterValues(request, chargeBoxId);
+            case DiagnosticsStatusNotificationRequest request -> server.diagnosticsStatusNotification(request, chargeBoxId);
+            case StartTransactionRequest request -> server.startTransaction(request, chargeBoxId);
+            case StopTransactionRequest request -> server.stopTransaction(request, chargeBoxId);
+            case HeartbeatRequest request -> server.heartbeat(request, chargeBoxId);
+            case AuthorizeRequest request -> server.authorize(request, chargeBoxId);
+            case DataTransferRequest request -> server.dataTransfer(request, chargeBoxId);
 
-        private final CentralSystemService16_SoapServer server;
+            // "Improved security for OCPP 1.6-J" additions
+            case SignCertificate request -> server.signCertificate(request, chargeBoxId);
+            case SecurityEventNotification request -> server.securityEventNotification(request, chargeBoxId);
+            case SignedFirmwareStatusNotification request -> server.signedFirmwareStatusNotification(request, chargeBoxId);
+            case LogStatusNotification request -> server.logStatusNotification(request, chargeBoxId);
 
-        @Override
-        protected ResponseType dispatch(RequestType params, String chargeBoxId) {
-            ResponseType r;
-
-            if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
-
-            } else if (params instanceof FirmwareStatusNotificationRequest) {
-                r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StatusNotificationRequest) {
-                r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof MeterValuesRequest) {
-                r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
-
-            } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-                r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StartTransactionRequest) {
-                r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof StopTransactionRequest) {
-                r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof HeartbeatRequest) {
-                r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
-
-            } else if (params instanceof AuthorizeRequest) {
-                r = server.authorize((AuthorizeRequest) params, chargeBoxId);
-
-            } else if (params instanceof DataTransferRequest) {
-                r = server.dataTransfer((DataTransferRequest) params, chargeBoxId);
-            } else {
+            case null, default ->
                 throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
-            }
-
-            return r;
-        }
+        };
     }
 }

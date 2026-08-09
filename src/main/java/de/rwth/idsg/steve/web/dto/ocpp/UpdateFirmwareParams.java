@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -36,17 +37,22 @@ import jakarta.validation.constraints.Pattern;
 @Getter
 public class UpdateFirmwareParams extends MultipleChargePointSelect {
 
+    @Schema(description = "URL where charge point can download the firmware",
+            example = "https://firmware.example.com/v2.3.bin")
     @NotBlank(message = "Location is required")
     @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")
     private String location;
 
+    @Schema(description = "Number of download retry attempts", minimum = "1")
     @Min(value = 1, message = "Retries must be at least {value}")
     private Integer retries;
 
+    @Schema(description = "Interval in seconds between retry attempts", minimum = "1")
     @Min(value = 1, message = "Retry Interval must be at least {value}")
     private Integer retryInterval;
 
+    @Schema(description = "When charge point should start downloading firmware")
     @Future(message = "Retrieve Date/Time must be in future")
     @NotNull(message = "Retrieve Date/Time is required")
-    private LocalDateTime retrieve;
+    private DateTime retrieveDateTime;
 }

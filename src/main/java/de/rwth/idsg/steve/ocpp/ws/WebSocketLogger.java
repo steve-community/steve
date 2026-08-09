@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,18 +18,21 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
+
+import java.nio.channels.ClosedChannelException;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.05.2018
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WebSocketLogger {
-
-    private WebSocketLogger() { }
 
     public static void connected(String chargeBoxId, WebSocketSession session) {
         log.info("[chargeBoxId={}, sessionId={}] Connection is established", chargeBoxId, session.getId());
@@ -41,6 +44,10 @@ public final class WebSocketLogger {
 
     public static void sending(String chargeBoxId, WebSocketSession session, String msg) {
         log.info("[chargeBoxId={}, sessionId={}] Sending: {}", chargeBoxId, session.getId(), msg);
+    }
+
+    public static void willNotSend(String chargeBoxId, WebSocketSession session, String msg) {
+        log.warn("[chargeBoxId={}, sessionId={}] Attempted to send to closed session: {}", chargeBoxId, session.getId(), msg);
     }
 
     public static void sendingPing(String chargeBoxId, WebSocketSession session) {
@@ -60,14 +67,27 @@ public final class WebSocketLogger {
     }
 
     public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Ping error", t);
-        }
+        log.error("[chargeBoxId={}, sessionId={}] Ping error", chargeBoxId, session.getId(), t);
     }
 
     public static void transportError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Transport error", t);
+        // https://github.com/steve-community/steve/issues/1913
+        //
+        // Clients can disconnect abruptly at any moment without warning, especially in mobile environments or unstable
+        // networks. ClosedChannelException is Jetty's way of notifying that the connection ended unexpectedly. This can
+        // be seen as normal behavior in WebSocket applications. No need to print stacktrace (which is useless anyway).
+        if (t instanceof ClosedChannelException) {
+            log.warn("[chargeBoxId={}, sessionId={}] Connection ended unexpectedly", chargeBoxId, session.getId());
+        } else {
+            log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
         }
+    }
+
+    public static void closingDangling(String chargeBoxId, WebSocketSession session) {
+        log.warn("[chargeBoxId={}, sessionId={}] Closing a dangling WebSocketSession", chargeBoxId, session.getId());
+    }
+
+    public static void closingDanglingError(String chargeBoxId, WebSocketSession session, Throwable t) {
+        log.error("[chargeBoxId={}, sessionId={}] Error while trying to close the WebSocketSession", chargeBoxId, session.getId(), t);
     }
 }

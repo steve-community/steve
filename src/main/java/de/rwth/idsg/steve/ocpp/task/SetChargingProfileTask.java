@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import ocpp.cp._2015._10.ChargingProfileStatus;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 import ocpp.cp._2015._10.SetChargingProfileResponse;
 
@@ -31,7 +32,7 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 06.02.2025
  */
-public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<MultipleChargePointSelect, String> {
+public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<MultipleChargePointSelect, ChargingProfileStatus> {
 
     public SetChargingProfileTask(MultipleChargePointSelect params) {
         super(params);
@@ -43,7 +44,7 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<Multiple
     public AsyncHandler<SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -64,6 +65,16 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<Multiple
         if (ChargingProfilePurposeType.TX_PROFILE == purpose
             && request.getConnectorId() < 1) {
             throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+            && request.getCsChargingProfiles().getTransactionId() == null) {
+            throw new SteveException("transaction id is required for TxProfile");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE != purpose
+            && request.getCsChargingProfiles().getTransactionId() != null) {
+            throw new SteveException("transaction id should only be set for TxProfile");
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,25 +18,38 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.EventRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import de.rwth.idsg.steve.service.notification.OccpStationBooted;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.dto.AuthTagContext;
+import de.rwth.idsg.steve.service.notification.OcppStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusUpdate;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp._2022._02.security.LogStatusNotification;
+import ocpp._2022._02.security.LogStatusNotificationResponse;
+import ocpp._2022._02.security.SecurityEventNotification;
+import ocpp._2022._02.security.SecurityEventNotificationResponse;
+import ocpp._2022._02.security.SignCertificate;
+import ocpp._2022._02.security.SignCertificateResponse;
+import ocpp._2022._02.security.SignCertificateResponse.GenericStatusEnumType;
+import ocpp._2022._02.security.SignedFirmwareStatusNotification;
+import ocpp._2022._02.security.SignedFirmwareStatusNotificationResponse;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
-import ocpp.cs._2015._10.ChargePointStatus;
 import ocpp.cs._2015._10.DataTransferRequest;
 import ocpp.cs._2015._10.DataTransferResponse;
 import ocpp.cs._2015._10.DataTransferStatus;
@@ -56,12 +69,17 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
+
+import static ocpp.cs._2015._10.ChargePointStatus.FAULTED;
+import static ocpp.cs._2015._10.ChargePointStatus.UNAVAILABLE;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -69,20 +87,25 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
-
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final OcppServerRepository ocppServerRepository;
+    private final SettingsRepository settingsRepository;
+    private final OcppTagService ocppTagService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChargePointService chargePointService;
+    private final EventRepository eventRepository;
+    private final CertificateSigningService certificateSigningService;
+    private final TaskScheduler taskScheduler;
+    private final CentralSystemService16_ServiceValidator serviceValidator;
+    private final ReservationRepository reservationRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
+        Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxIdentity);
+        applicationEventPublisher.publishEvent(new OcppStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -125,6 +148,12 @@ public class CentralSystemService16_Service {
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
+
+        var results = serviceValidator.validateStatusNotification(parameters);
+        if (results.hasHardErrors()) {
+            return new StatusNotificationResponse();
+        }
+
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 
@@ -142,16 +171,36 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertConnectorStatus(params);
 
-        if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
+        // https://github.com/steve-community/steve/issues/1398
+        // OCPP 1.6: "A reservation SHALL be terminated on the Charge Point when [...]
+        // the Charge Point or connector are set to Faulted or Unavailable."
+        if (parameters.getStatus() == UNAVAILABLE || parameters.getStatus() == FAULTED) {
+            reservationRepository.cancelActiveReservations(chargeBoxIdentity, parameters.getConnectorId());
         }
+
+        applicationEventPublisher.publishEvent(new OcppStationStatusUpdate(
+            chargeBoxIdentity,
+            parameters.getConnectorId(),
+            parameters.getStatus(),
+            parameters.getErrorCode(),
+            timestamp
+        ));
 
         return new StatusNotificationResponse();
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
+
+        var results = (transactionId == null)
+            ? serviceValidator.validateMeterValues(parameters)
+            : serviceValidator.validateMeterValues(
+                parameters,
+                ocppServerRepository.getTransaction(chargeBoxIdentity, parameters.getConnectorId(), transactionId)
+            );
+        if (results.hasHardErrors()) {
+            return new MeterValuesResponse();
+        }
 
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
@@ -174,7 +223,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
         IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                true,
+                AuthTagContext.StationStartTx,
                 chargeBoxIdentity,
                 parameters.getConnectorId(),
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
@@ -191,6 +240,8 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
+        serviceValidator.validateStart(parameters);
+
         int transactionId = ocppServerRepository.insertTransaction(params);
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
@@ -205,9 +256,11 @@ public class CentralSystemService16_Service {
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+        IdTagInfo idTagInfo = Strings.isNullOrEmpty(parameters.getIdTag())
+            ? null
+            : ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                AuthTagContext.StationStopTx,
                 chargeBoxIdentity,
                 null,
                 () -> null
@@ -224,11 +277,18 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        ocppServerRepository.updateTransaction(params);
+        var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, null, transactionId);
+        var results = serviceValidator.validateStop(transaction, parameters);
 
-        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
-
-        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
+        if (results.hasHardErrors()) {
+            ocppServerRepository.updateTransactionAsFailed(params, results.getHardErrors());
+            // TODO: we need to handle meter values of invalid stops differently. will come later.
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
+        } else {
+            ocppServerRepository.updateTransaction(params);
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transaction);
+            applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
+        }
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
@@ -244,7 +304,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                AuthTagContext.StationAuth,
                 chargeBoxIdentity,
                 null,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
@@ -257,17 +317,100 @@ public class CentralSystemService16_Service {
      * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
      */
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
-        log.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, parameters.getVendorId());
-        if (parameters.isSetMessageId()) {
-            log.info("[Data Transfer] Message Id: {}", parameters.getMessageId());
-        }
-        if (parameters.isSetData()) {
-            log.info("[Data Transfer] Data: {}", parameters.getData());
-        }
+        log.warn("Cannot process DataTransfer from '{}'. Operation is not implemented. Rejecting DataTransfer={}", chargeBoxIdentity, parameters);
 
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
         // https://github.com/steve-community/steve/pull/36
-        return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+        //
+        // 2026 Update: Better reject it to signal that this operation is not implemented/supported.
+        return new DataTransferResponse().withStatus(DataTransferStatus.REJECTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // "Improved security for OCPP 1.6-J" additions
+    // -------------------------------------------------------------------------
+
+    public SignCertificateResponse signCertificate(SignCertificate parameters, String chargeBoxIdentity) {
+        try {
+            PKCS10CertificationRequest csr;
+            try {
+                var csrPem = parameters.getCsr();
+                csr = certificateSigningService.validateCSR(csrPem, chargeBoxIdentity);
+            } catch (Exception e) {
+                log.error("Could not validate CSR from '{}'", chargeBoxIdentity, e);
+                return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+            }
+
+            /*
+             * Creating an artificial delay of a couple of seconds, such that the SignCertificateResponse is sent,
+             * and we start CSR processing only after that. Otherwise, for example in case of signing the certificates
+             * locally, there is a chance of SignCertificateResponse and CertificateSignedRequest arriving in wrong
+             * order: Ocpp specifies first SignCertificateResponse and later CertificateSignedRequest (in a decoupled
+             * subsequent process)
+             */
+            taskScheduler.schedule(
+                () -> certificateSigningService.processAndSendToStation(csr, chargeBoxIdentity),
+                Instant.now().plusSeconds(5)
+            );
+
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.ACCEPTED);
+        } catch (Exception e) {
+            log.error("Error processing SignCertificate for '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+            return new SignCertificateResponse().withStatus(GenericStatusEnumType.REJECTED);
+        }
+    }
+
+    public SecurityEventNotificationResponse securityEventNotification(SecurityEventNotification parameters,
+                                                                       String chargeBoxIdentity) {
+        var results = serviceValidator.validateSecurityEvent(parameters);
+        if (results.hasHardErrors()) {
+            return new SecurityEventNotificationResponse();
+        }
+
+        try {
+            eventRepository.insertSecurityEvent(
+                chargeBoxIdentity,
+                parameters.getType(),
+                parameters.getTimestamp(),
+                parameters.getTechInfo()
+            );
+        } catch (Exception e) {
+            log.error("Error storing security event from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SecurityEventNotificationResponse();
+    }
+
+    public SignedFirmwareStatusNotificationResponse signedFirmwareStatusNotification(SignedFirmwareStatusNotification parameters,
+                                                                                     String chargeBoxIdentity) {
+        try {
+            eventRepository.insertFirmwareUpdateStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
+        } catch (Exception e) {
+            log.error("Error processing firmware status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new SignedFirmwareStatusNotificationResponse();
+    }
+
+    public LogStatusNotificationResponse logStatusNotification(LogStatusNotification parameters,
+                                                               String chargeBoxIdentity) {
+        try {
+            eventRepository.insertLogUploadStatus(
+                chargeBoxIdentity,
+                parameters.getRequestId(),
+                parameters.getStatus().value(),
+                DateTime.now()
+            );
+        } catch (Exception e) {
+            log.error("Error processing log status notification from '{}': {}", chargeBoxIdentity, e.getMessage(), e);
+        }
+
+        return new LogStatusNotificationResponse();
     }
 
     // -------------------------------------------------------------------------

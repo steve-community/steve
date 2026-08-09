@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,23 +20,39 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
+import ocpp.cp._2015._10.ConfigurationStatus;
 
 import jakarta.xml.ws.AsyncHandler;
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
+
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.AuthorizationKey;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum.SecurityProfile;
+import static ocpp.cp._2015._10.ConfigurationStatus.ACCEPTED;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, String> {
+public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, ConfigurationStatus> {
 
-    public ChangeConfigurationTask(ChangeConfigurationParams params) {
+    private final ChargePointService chargePointService;
+
+    public ChangeConfigurationTask(ChangeConfigurationParams params, ChargePointService chargePointService) {
         super(params);
+        this.chargePointService = chargePointService;
     }
 
     @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
+    public OcppCallback<ConfigurationStatus> defaultCallback() {
+        return new DefaultOcppCallback<ConfigurationStatus>() {
+            @Override
+            public void success(String chargeBoxId, ConfigurationStatus response) {
+                addNewResponse(chargeBoxId, response.value());
+            }
+        };
     }
 
     @Override
@@ -55,16 +71,23 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
 
     @Override
     public ocpp.cp._2015._10.ChangeConfigurationRequest getOcpp16Request() {
+        String value = params.getValue();
+
+        // https://github.com/steve-community/steve/issues/1895
+        if (AuthorizationKey.name().equals(params.getKey())) {
+            value = HexFormat.of().formatHex(value.getBytes(StandardCharsets.UTF_8));
+        }
+
         return new ocpp.cp._2015._10.ChangeConfigurationRequest()
                 .withKey(params.getKey())
-                .withValue(params.getValue());
+                .withValue(value);
     }
 
     @Override
     public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, ConfigurationStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -75,7 +98,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, ConfigurationStatus.fromValue(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -86,10 +109,23 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                var status = res.get().getStatus();
+                if (status == ACCEPTED) {
+                    updateDatabaseAfterAccepted(chargeBoxId);
+                }
+                success(chargeBoxId, status);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
+    }
+
+    private void updateDatabaseAfterAccepted(String chargeBoxId) {
+        if (AuthorizationKey.name().equals(params.getKey())) {
+            chargePointService.updateBasicAuthPassword(chargeBoxId, params.getValue());
+
+        } else if (SecurityProfile.name().equals(params.getKey())) {
+            chargePointService.updateSecurityProfile(chargeBoxId, params.getValue());
+        }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,21 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
+import de.rwth.idsg.ocpp.jaxb.validation.BeanValidationModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
+import tools.jackson.databind.AnnotationIntrospector;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.joda.JodaModule;
+import tools.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 
-import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static tools.jackson.core.StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN;
+import static tools.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
+import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
@@ -44,33 +47,32 @@ public enum JsonObjectMapper {
     private final ObjectMapper mapper;
 
     JsonObjectMapper() {
-        mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-        // OCPP messages contain some mandatory primitive fields (like transactionId), that are not allowed
-        // to be null. any misinterpretation/mapping of these fields like "null -> 0" is a mistake.
-        //
-        // true story: while testing with abusive-charge-point, it sends stopTransactions where transactionId=null
-        // in communication flows, where a startTransaction before causes an Exception and we cannot send a regular
-        // response with a transactionId, but an error message. if we do not fail early, it will fail at the database
-        // level which we want to prevent.
-        mapper.configure(FAIL_ON_NULL_FOR_PRIMITIVES, true);
-
-        mapper.configure(WRITE_BIGDECIMAL_AS_PLAIN, true);
-
-        mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        mapper.registerModule(new CustomStringModule());
-        mapper.registerModule(new Ocpp12JacksonModule());
-        mapper.registerModule(new Ocpp15JacksonModule());
-        mapper.registerModule(new Ocpp16JacksonModule());
-
-        mapper.setAnnotationIntrospector(
+        mapper = JsonMapper.builder()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            // OCPP messages contain some mandatory primitive fields (like transactionId), that are not allowed
+            // to be null. any misinterpretation/mapping of these fields like "null -> 0" is a mistake.
+            //
+            // true story: while testing with abusive-charge-point, it sends stopTransactions where transactionId=null
+            // in communication flows, where a startTransaction before causes an Exception and we cannot send a regular
+            // response with a transactionId, but an error message. if we do not fail early, it will fail at the database
+            // level which we want to prevent.
+            .enable(FAIL_ON_NULL_FOR_PRIMITIVES)
+            .enable(WRITE_BIGDECIMAL_AS_PLAIN)
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .addModule(new CustomStringModule())
+            .addModule(new Ocpp12JacksonModule())
+            .addModule(new Ocpp15JacksonModule())
+            .addModule(new Ocpp16JacksonModule())
+            .addModule(new JodaModule())
+            // https://github.com/steve-community/ocpp-jaxb/pull/25
+            .addModule(BeanValidationModule.forReading(null))
+            .annotationIntrospector(
                 AnnotationIntrospector.pair(
-                        new JacksonAnnotationIntrospector(),
-                        new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())
+                    new JacksonAnnotationIntrospector(),
+                    new JakartaXmlBindAnnotationIntrospector()
                 )
-        );
+            )
+            .build();
     }
 
     public ObjectMapper getMapper() {

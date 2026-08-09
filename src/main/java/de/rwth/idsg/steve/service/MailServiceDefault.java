@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,15 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.stereotype.Service;
+
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -27,16 +36,9 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+import java.util.List;
 import java.util.Properties;
-
-import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
-import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.function.Function;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -44,10 +46,11 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailServiceDefault implements MailService {
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    private final SettingsRepository settingsRepository;
+    private final TaskExecutor taskExecutor;
 
     @Override
     public MailSettings getSettings() {
@@ -65,7 +68,7 @@ public class MailServiceDefault implements MailService {
 
     @Override
     public void sendAsync(String subject, String body) {
-        asyncTaskExecutor.execute(() -> {
+        taskExecutor.execute(() -> {
             try {
                 send(subject, body);
             } catch (MessagingException e) {
@@ -76,6 +79,19 @@ public class MailServiceDefault implements MailService {
 
     @Override
     public void send(String subject, String body) throws MessagingException {
+        sendInternal(subject, body, MailSettings::getRecipients);
+    }
+
+    @Override
+    public void send(String subject, String body, List<String> eMailAddresses) {
+        try {
+            sendInternal(subject, body, mailSettings -> eMailAddresses);
+        } catch (MessagingException e) {
+            log.error("Failed to send mail", e);
+        }
+    }
+
+    public void sendInternal(String subject, String body, Function<MailSettings, List<String>> emailAddressProvider) throws MessagingException {
         MailSettings settings = getSettings();
         Session session = createSession(settings);
 
@@ -84,7 +100,7 @@ public class MailServiceDefault implements MailService {
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        for (String rep : settings.getRecipients()) {
+        for (String rep : emailAddressProvider.apply(settings)) {
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
 

@@ -1,0 +1,88 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2026 SteVe Community Team
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package de.rwth.idsg.steve.web.dto;
+
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.web.validation.ChargeBoxId;
+import de.rwth.idsg.steve.web.validation.SecurityProfileValid;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import ocpp.cs._2015._10.RegistrationStatus;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import static de.rwth.idsg.steve.ocpp.OcppSecurityProfile.Profile_0;
+
+/**
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @since 18.12.2014
+ */
+@Getter
+@Setter
+@ToString
+@SecurityProfileValid
+public class ChargePointFormForCreate {
+
+    // Internal database id
+    private Integer chargeBoxPk;
+
+    @NotBlank(message = "ChargeBox ID is required")
+    @ChargeBoxId
+    private String chargeBoxId;
+
+    /**
+     * https://github.com/steve-community/steve/pull/2030 switched from String to enum
+     */
+    @NotNull(message = "Registration status is required")
+    private RegistrationStatus registrationStatus;
+
+    @NotNull
+    private Boolean insertConnectorStatusAfterTransactionMsg;
+
+    @Valid
+    private Address address;
+
+    private String description;
+    private String note;
+
+    @URL(message = "Admin address must be a valid URL")
+    private String adminAddress;
+
+    @NotNull
+    private OcppSecurityProfile securityProfile = Profile_0;
+
+    /**
+     * Reads (from DB to browser): This field is NEVER set. Do not expose to browser.
+     *
+     * Writes (from browser to backend): The field comes as plain password in form. Service layer REPLACES it with
+     * encoded password value, and sends it to repository layer.
+     */
+    @Schema(accessMode = Schema.AccessMode.WRITE_ONLY)
+    @Length(min = 16, max = 20, message = "The field must be between {min} and {max} characters")
+    private String authPassword;
+
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private boolean hasAuthPassword;
+}

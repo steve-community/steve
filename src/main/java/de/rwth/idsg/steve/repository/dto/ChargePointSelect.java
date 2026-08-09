@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  * @since 29.12.2014
  */
 @RequiredArgsConstructor
+@EqualsAndHashCode(of = "chargeBoxId")
 @Getter
 public final class ChargePointSelect {
     private final OcppProtocol ocppProtocol;
@@ -46,5 +48,9 @@ public final class ChargePointSelect {
 
     public boolean isSoap() {
         return OcppTransport.SOAP == ocppProtocol.getTransport();
+    }
+
+    public boolean isJson() {
+        return OcppTransport.JSON == ocppProtocol.getTransport();
     }
 }

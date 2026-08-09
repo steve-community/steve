@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -93,11 +92,11 @@ public enum LogFileRetriever {
         Iterator<Appender<ILoggingEvent>> appenderIterator = logger.iteratorForAppenders();
 
         List<Path> fileNameList = new ArrayList<>();
-        if (appenderIterator.hasNext()) {
+        while (appenderIterator.hasNext()) {
             var appender = appenderIterator.next();
             String fileName = extractFileName(appender);
             if (fileName != null) {
-                fileNameList.add(Paths.get(fileName));
+                fileNameList.add(Path.of(fileName));
             }
         }
         return fileNameList;

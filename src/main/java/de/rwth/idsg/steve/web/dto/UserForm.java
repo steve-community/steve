@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,20 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.NotificationFeature;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.joda.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,20 +45,39 @@ public class UserForm {
     // Internal database id
     private Integer userPk;
 
-    private String ocppIdTag;
+    private List<String> idTagList = Collections.emptyList();
 
     private String firstName;
     private String lastName;
     private LocalDate birthDay;
     private String phone;
     private String note;
-
-    @NotNull(message = "Sex is required")
-    private UserSex sex;
+    private UserSex sex = UserSex.OTHER;
 
     @Email(message = "Not a valid e-mail address")
-    private String eMail;
+    private String email;
 
+    private List<NotificationFeature> notificationFeatures;
+
+    @Valid
     private Address address;
 
+    @AssertTrue(message = "Some of the selected notification features cannot be enabled for a user")
+    public boolean isNotificationFeaturesForUser() {
+        if (CollectionUtils.isEmpty(notificationFeatures)) {
+            return true;
+        }
+
+        for (var selectedFeature : notificationFeatures) {
+            if (!selectedFeature.isForUser()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void setSex(UserSex sex) {
+        this.sex = (sex == null) ? UserSex.OTHER : sex;
+    }
 }

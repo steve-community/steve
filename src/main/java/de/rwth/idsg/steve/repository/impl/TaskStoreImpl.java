@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -77,6 +77,22 @@ public class TaskStoreImpl implements TaskStore {
         int taskId = atomicInteger.incrementAndGet();
         lookupTable.put(taskId, task);
         return taskId;
+    }
+
+    @Override
+    public List<CommunicationTask> getFinished() {
+        return lookupTable.values()
+            .stream()
+            .filter(CommunicationTask::isFinished)
+            .toList();
+    }
+
+    @Override
+    public List<CommunicationTask> getUnfinished() {
+        return lookupTable.values()
+            .stream()
+            .filter(task -> !task.isFinished())
+            .toList();
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.TransactionReportService;
+import de.rwth.idsg.steve.service.TransactionService;
+import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -55,15 +57,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TransactionRestControllerTest extends AbstractControllerTest {
 
     @Mock
-    private TransactionRepository transactionRepository;
+    private TransactionService transactionService;
+    @Mock
+    private TransactionReportService transactionReportService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
+        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionService, transactionReportService))
             .setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+            .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType("application/json"))
             .build();
     }
@@ -75,7 +79,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         List<Transaction> results = Collections.emptyList();
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(results);
+        when(transactionService.getTransactions(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -90,7 +94,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         List<Transaction> results = List.of(Transaction.builder().id(234).build());
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(results);
+        when(transactionService.getTransactions(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -104,7 +108,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("Downstream bean throws exception, expected 500")
     public void test3() throws Exception {
         // when
-        when(transactionRepository.getTransactions(any())).thenThrow(new RuntimeException("failed"));
+        when(transactionService.getTransactions(any())).thenThrow(new RuntimeException("failed"));
 
         // then
         mockMvc.perform(get("/api/v1/transactions"))
@@ -173,7 +177,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(List.of(transaction));
+        when(transactionService.getTransactions(any())).thenReturn(List.of(transaction));
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
@@ -216,18 +220,18 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
+        when(transactionService.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
                 .param("type", "ACTIVE"))
             .andExpect(status().isOk());
 
-        verify(transactionRepository).getTransactions(formToCapture.capture());
+        verify(transactionService).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ACTIVE);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.ALL);
+        assertEquals(capturedForm.getPeriodType(), QueryPeriodType.ALL);
     }
 
     @Test
@@ -237,18 +241,18 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
-        when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
+        when(transactionService.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/transactions")
                 .param("periodType", "LAST_30"))
             .andExpect(status().isOk());
 
-        verify(transactionRepository).getTransactions(formToCapture.capture());
+        verify(transactionService).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ALL);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.LAST_30);
+        assertEquals(capturedForm.getPeriodType(), QueryPeriodType.LAST_30);
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

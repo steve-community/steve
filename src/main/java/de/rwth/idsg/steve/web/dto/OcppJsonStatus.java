@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,9 +32,12 @@ import org.joda.time.DateTime;
 @Builder
 @ToString
 public final class OcppJsonStatus {
-    private final int chargeBoxPk;
-    private final String chargeBoxId, connectedSince;
-    private final String connectionDuration;
+    private final String sessionId;
+    private final Integer chargeBoxPk;
+    private final String chargeBoxId;
     private final OcppVersion version;
+
     private final DateTime connectedSinceDT;
+    private final String connectedSince;
+    private final String connectionDuration;
 }

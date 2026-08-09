@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,17 +18,35 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.01.2016
  */
+@Component
 public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
 
-    private static final ChargeBoxIdValidator VALIDATOR = new ChargeBoxIdValidator();
+    private final ChargeBoxIdValidator validator;
+
+    /**
+     * For tests
+     */
+    public ChargeBoxIdListValidator() {
+        this.validator = new ChargeBoxIdValidator((String) null);
+    }
+
+    @Autowired
+    public ChargeBoxIdListValidator(ChargeBoxIdValidator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public void initialize(ChargeBoxId constraintAnnotation) {
@@ -37,8 +55,11 @@ public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+        if (CollectionUtils.isEmpty(value)) {
+            return true; // null or empty is valid, because it is another constraint's responsibility
+        }
         for (String s : value) {
-            if (!VALIDATOR.isValid(s, context)) {
+            if (!validator.isValid(s, context)) {
                 return false;
             }
         }

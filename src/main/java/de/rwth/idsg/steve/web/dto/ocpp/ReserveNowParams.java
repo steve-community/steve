@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -37,12 +37,12 @@ import jakarta.validation.constraints.NotNull;
 public class ReserveNowParams extends SingleChargePointSelect {
 
     @NotNull(message = "Connector ID is required")
-    @Min(value = 1, message = "Connector ID must be at least {value}")
+    @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
     @NotNull(message = "Expiry Date/Time is required")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiry;
+    private DateTime expiry;
 
     @NotBlank(message = "User ID Tag is required.")
     @IdTag

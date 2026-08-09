@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,6 +59,10 @@ public final class Transaction {
 
     @Schema(description = "The Ocpp Tag used in the transaction")
     private final String ocppIdTag;
+
+    @Nullable
+    @Schema(description = "The ID of the user who owns the Ocpp Tag associated with this transaction")
+    private final Integer userId;
 
     /**
      * Only relevant for the web pages. Disabled for API

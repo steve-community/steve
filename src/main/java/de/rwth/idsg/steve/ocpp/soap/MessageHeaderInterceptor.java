@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,10 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.cxf.binding.soap.Soap12;
@@ -37,7 +36,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
@@ -51,7 +50,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * 2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A header) in DB.
  * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
- * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List)}.
+ * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List, java.util.List)}.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
@@ -60,15 +59,20 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    private final OcppServerRepository ocppServerRepository;
+    private final ChargePointService chargePointService;
+    private final TaskExecutor taskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public MessageHeaderInterceptor() {
+    public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository,
+                                    ChargePointService chargePointService,
+                                    TaskExecutor taskExecutor) {
         super(Phase.PRE_INVOKE);
+        this.ocppServerRepository = ocppServerRepository;
+        this.chargePointService = chargePointService;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -82,8 +86,8 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
-            boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
+            Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxId);
+            boolean allow = status.isPresent() && status.get() == RegistrationStatus.ACCEPTED;
             if (!allow) {
                 throw createAuthFault(opName);
             }
@@ -93,7 +97,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        asyncTaskExecutor.execute(() -> {
+        taskExecutor.execute(() -> {
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {

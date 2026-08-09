@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,12 +22,13 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
+import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
 import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jetbrains.annotations.NotNull;
@@ -38,18 +39,18 @@ import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
-import static jooq.steve.db.Tables.CONNECTOR;
 import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
+import static jooq.steve.db.Tables.EVSE;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
 /**
@@ -58,9 +59,10 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ChargingProfileRepositoryImpl implements ChargingProfileRepository {
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
 
     // -------------------------------------------------------------------------
     // OCPP operations
@@ -68,27 +70,25 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
-        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
+        int evsePk = Ocpp1ConnectorEvseBridge.insertIgnoreConnector(ctx, chargeBoxId, connectorId, false);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                     .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+        int count = ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
+                       .set(CONNECTOR_CHARGING_PROFILE.EVSE_PK, evsePk)
+                       .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
+                       .onDuplicateKeyIgnore()
+                       .execute();
 
-        ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
-           .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
-           .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
-           .execute();
+        if (count == 0) {
+            log.warn("Could not insert charging profile assignment (maybe duplicate?). chargeBoxId={}, connectorId={}, chargingProfilePk={}", chargeBoxId, connectorId, chargingProfilePk);
+        }
     }
 
     @Override
     public void clearProfile(int chargingProfilePk, String chargeBoxId) {
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId));
+        var evsePkSelect = Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId);
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+           .where(CONNECTOR_CHARGING_PROFILE.EVSE_PK.in(evsePkSelect))
            .and(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
            .execute();
     }
@@ -103,12 +103,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // Connector select
         // -------------------------------------------------------------------------
 
-        Condition connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
-
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                     .and(connectorIdCondition);
+        var evsePkSelect = Ocpp1ConnectorEvseBridge.evsePkSelect(ctx, chargeBoxId, connectorId);
 
         // -------------------------------------------------------------------------
         // Profile select
@@ -136,7 +131,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // -------------------------------------------------------------------------
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+           .where(CONNECTOR_CHARGING_PROFILE.EVSE_PK.in(evsePkSelect))
            .and(profilePkCondition)
            .execute();
     }
@@ -147,7 +142,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public List<ChargingProfileAssignment> getAssignments(ChargingProfileAssignmentQueryForm query) {
-        Condition conditions = DSL.trueCondition();
+        Condition conditions = EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1);
 
         if (query.getChargeBoxId() != null) {
             conditions = conditions.and(CHARGE_BOX.CHARGE_BOX_ID.eq(query.getChargeBoxId()));
@@ -164,20 +159,20 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         return ctx.select(
                         CHARGE_BOX.CHARGE_BOX_PK,
                         CHARGE_BOX.CHARGE_BOX_ID,
-                        CONNECTOR.CONNECTOR_ID,
+                        EVSE.EVSE_ID,
                         CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK,
                         CHARGING_PROFILE.DESCRIPTION)
                   .from(CONNECTOR_CHARGING_PROFILE)
-                  .join(CONNECTOR)
-                    .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                  .join(EVSE)
+                    .on(EVSE.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
                   .join(CHARGING_PROFILE)
                     .on(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK))
                   .join(CHARGE_BOX)
-                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
                   .where(conditions)
                   .orderBy(
                           CHARGE_BOX.CHARGE_BOX_ID,
-                          CONNECTOR.CONNECTOR_ID,
+                          EVSE.EVSE_ID,
                           CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK)
                   .fetch()
                   .map(k -> ChargingProfileAssignment.builder()
@@ -227,11 +222,11 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         }
 
         if (form.getValidFrom() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom()));
         }
 
         if (form.getValidTo() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo()));
         }
 
         return ctx.selectFrom(CHARGING_PROFILE)
@@ -257,12 +252,25 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                    .fetchOne();
 
+        if (profile == null) {
+            throw new SteveException.NotFound("Charging Profile not found");
+        }
+
         List<ChargingSchedulePeriodRecord> periods =
                 ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
                    .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                    .fetch();
 
         return new ChargingProfile.Details(profile, periods);
+    }
+
+    @Override
+    public boolean exists(int chargingProfilePk) {
+        return ctx.selectOne()
+            .from(CHARGING_PROFILE)
+            .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+            .fetchOptional()
+            .isPresent();
     }
 
     @Override
@@ -277,13 +285,13 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                                   .set(CHARGING_PROFILE.VALID_FROM, form.getValidFrom())
+                                   .set(CHARGING_PROFILE.VALID_TO, form.getValidTo())
                                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                                   .set(CHARGING_PROFILE.START_SCHEDULE, form.getStartSchedule())
                                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                                   .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
+                                   .returning(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                                    .fetchOne()
                                    .getChargingProfilePk();
 
@@ -304,21 +312,27 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                ctx.update(CHARGING_PROFILE)
+                int updateCount = ctx.update(CHARGING_PROFILE)
                    .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
                    .set(CHARGING_PROFILE.NOTE, form.getNote())
                    .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                   .set(CHARGING_PROFILE.VALID_FROM, form.getValidFrom())
+                   .set(CHARGING_PROFILE.VALID_TO, form.getValidTo())
                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                   .set(CHARGING_PROFILE.START_SCHEDULE, form.getStartSchedule())
                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
                    .execute();
+
+                // if there was no update, then the profile does not exist.
+                // operations related to periods should not be executed.
+                if (updateCount != 1) {
+                    return;
+                }
 
                 // -------------------------------------------------------------------------
                 // the form contains all period information for this schedule. instead of
@@ -349,25 +363,26 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private void checkProfileUsage(int chargingProfilePk) {
-        List<String> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
+        List<String> r = ctx.select(EVSE.CHARGE_BOX_ID)
                             .from(CONNECTOR_CHARGING_PROFILE)
-                            .join(CONNECTOR)
-                            .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                            .join(EVSE)
+                            .on(EVSE.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
                             .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                            .fetch(CONNECTOR.CHARGE_BOX_ID);
+                            .fetch(EVSE.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
             throw new SteveException("Cannot modify this charging profile, since the following stations are still using it: %s", r);
         }
     }
 
     private static void insertPeriods(DSLContext ctx, ChargingProfileForm form) {
-        if (CollectionUtils.isEmpty(form.getSchedulePeriodMap())) {
+        if (CollectionUtils.isEmpty(form.getSchedulePeriods())) {
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap()
-                                                   .values()
+        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriods()
                                                    .stream()
+                                                   .filter(ChargingProfileForm.SchedulePeriod::isNonEmpty)
+                                                   .sorted(Comparator.comparingInt(ChargingProfileForm.SchedulePeriod::getStartPeriodInSeconds))
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                                                                 .setChargingProfilePk(form.getChargingProfilePk())
                                                                 .setStartPeriodInSeconds(k.getStartPeriodInSeconds())

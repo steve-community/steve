@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final String operationName;
     private final TaskOrigin origin;
     private final String caller;
+    private final Map<String, String> customDetails; // task-specific details
     protected final S params;
 
     private final Map<String, OcppVersion> versionMap;
@@ -70,19 +72,24 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
     public CommunicationTask(S params) {
-        this(params, TaskOrigin.INTERNAL, "SteVe");
+        this(params, Collections.emptyMap());
+    }
+
+    public CommunicationTask(S params, Map<String, String> customDetails) {
+        this(params, TaskOrigin.INTERNAL, "SteVe", customDetails);
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(S params, TaskOrigin origin, String caller) {
+    CommunicationTask(S params, TaskOrigin origin, String caller, Map<String, String> customDetails) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
         this.params = params;
+        this.customDetails = customDetails;
 
         resultMap = new HashMap<>(resultSize);
         versionMap = new HashMap<>(resultSize);
@@ -128,7 +135,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public void success(String chargeBoxId, RESPONSE response) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.success(chargeBoxId, response);
+                c.success(this, chargeBoxId, response);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -138,7 +145,21 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public void failed(String chargeBoxId, Exception exception) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.failed(chargeBoxId, exception);
+                c.failed(this, chargeBoxId, exception);
+            } catch (Exception e) {
+                log.error("Exception occurred in OcppCallback", e);
+            }
+        }
+    }
+
+    /**
+     * Relevant to WebSocket/JSON transport: Handle OCPP error responses (e.g., NotImplemented, NotSupported)
+     * from charging stations. This iterates through all registered callbacks, not just the default one.
+     */
+    public void success(String chargeBoxId, OcppJsonError error) {
+        for (OcppCallback<RESPONSE> c : callbackList) {
+            try {
+                c.success(this, chargeBoxId, error);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -172,21 +193,18 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         public abstract void success(String chargeBoxId, RES response);
 
         @Override
-        public void success(String chargeBoxId, OcppJsonError error) {
+        public void success(CommunicationTask<?, RES> task, String chargeBoxId, RES response) {
+            success(chargeBoxId, response);
+        }
+
+        @Override
+        public void success(CommunicationTask<?, RES> task, String chargeBoxId, OcppJsonError error) {
             addNewResponse(chargeBoxId, error.toString());
         }
 
         @Override
-        public void failed(String chargeBoxId, Exception e) {
+        public void failed(CommunicationTask<?, RES> task, String chargeBoxId, Exception e) {
             addNewError(chargeBoxId, e.getMessage());
-        }
-    }
-
-    public class StringOcppCallback extends DefaultOcppCallback<String> {
-
-        @Override
-        public void success(String chargeBoxId, String response) {
-            addNewResponse(chargeBoxId, response);
         }
     }
 }

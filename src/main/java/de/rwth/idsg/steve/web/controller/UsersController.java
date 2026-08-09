@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2026 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,34 +18,39 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.UserService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/users")
 public class UsersController {
 
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private UserRepository userRepository;
+    private final OcppTagService ocppTagService;
+    private final UserService userService;
 
     private static final String PARAMS = "params";
 
@@ -64,13 +69,13 @@ public class UsersController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         initList(model, new UserQueryForm());
         return "data-man/users";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) UserQueryForm params, Model model) {
         initList(model, params);
         return "data-man/users";
@@ -78,71 +83,81 @@ public class UsersController {
 
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("userList", userRepository.getOverview(params));
+        model.addAttribute("userList", userService.getOverview(params));
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(DETAILS_PATH)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
-        User.Details details = userRepository.getDetails(userPk);
+        User.Details details = userService.getDetails(userPk);
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
-        setTags(model);
+        setTags(model, form.getIdTagList());
         return "data-man/userDetails";
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(ADD_PATH)
     public String addGet(Model model) {
-        setTags(model);
+        setTags(model, List.of());
         model.addAttribute("userForm", new UserForm());
         return "data-man/userAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_PATH)
     public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm,
                           BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setTags(model);
+            setTags(model, userForm.getIdTagList());
             return "data-man/userAdd";
         }
 
-        userRepository.add(userForm);
+        userService.add(userForm);
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("userForm") UserForm userForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setTags(model);
+            setTags(model, userForm.getIdTagList());
             return "data-man/userDetails";
         }
 
-        userRepository.update(userForm);
+        userService.update(userForm);
         return toOverview();
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(DELETE_PATH)
     public String delete(@PathVariable("userPk") int userPk) {
-        userRepository.delete(userPk);
+        userService.delete(userPk);
         return toOverview();
     }
 
-    private void setTags(Model model) {
+    private void setTags(Model model, List<String> idTagsFromUser) {
+        List<String> fromDB = ocppTagService.getIdTagsWithoutUser();
+
+        // new temp list because we want to have a specific order
+        List<String> idTagList = new ArrayList<>(fromDB.size() + idTagsFromUser.size());
+        idTagList.addAll(idTagsFromUser);
+        idTagList.addAll(fromDB);
+
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
+        model.addAttribute("timeZones", ControllerHelper.TIME_ZONE_DROPDOWN);
+        model.addAttribute("idTagList", idTagList);
+        model.addAttribute("features", NotificationFeature.getUserValues());
     }
 
     // -------------------------------------------------------------------------
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }

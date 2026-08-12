@@ -348,7 +348,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
         assertHardErrors(
             result,
-            "stop.idTag does not match the transaction's idTag or share its parentIdTag"
+            "stop.idTag is neither the transaction's idTag nor related to it through parentIdTag"
         );
     }
 

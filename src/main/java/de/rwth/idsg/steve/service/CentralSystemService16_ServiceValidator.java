@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.RequiredArgsConstructor;
@@ -110,7 +111,7 @@ public class CentralSystemService16_ServiceValidator {
 
     public ValidationResults validateStop(TransactionRecord thisTx,
                                           @NotNull StopTransactionRequest stopParams,
-                                          @NotNull BiFunction<String, String, Boolean> parentMatcher) {
+                                          @NotNull BiFunction<String, String, Boolean> parentRelationMatcher) {
         var results = new ValidationResults(stopParams);
 
         if (thisTx == null) {
@@ -138,10 +139,10 @@ public class CentralSystemService16_ServiceValidator {
             results.addHard("meterStart is greater than meterStop");
         }
 
-        if (stopParams.isSetIdTag()
+        if (!Strings.isNullOrEmpty(stopParams.getIdTag())
             && !Objects.equals(thisTx.getIdTag(), stopParams.getIdTag())
-            && !parentMatcher.apply(stopParams.getIdTag(), thisTx.getIdTag())) {
-            results.addHard("stop.idTag does not match the transaction's idTag or share its parentIdTag");
+            && !parentRelationMatcher.apply(stopParams.getIdTag(), thisTx.getIdTag())) {
+            results.addHard("stop.idTag is neither the transaction's idTag nor related to it through parentIdTag");
         }
 
         this.validateMeterValuesInternal(stopParams.getTransactionData(), thisTx.getStartTimestamp(), stopParams.getTimestamp(), results);

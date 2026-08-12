@@ -138,41 +138,52 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
-    public void haveTheSameParentIdTag_sharedParent_returnsTrue() {
+    public void areIdTagsRelatedByParent_sharedParent_returnsTrue() {
         String parentIdTag = insertTag("parent", null);
         String firstIdTag = insertTag("child", parentIdTag);
         String secondIdTag = insertTag("child", parentIdTag);
 
-        Assertions.assertTrue(ocppTagService.haveTheSameParentIdTag(firstIdTag, secondIdTag));
+        Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
     }
 
     @Test
-    public void haveTheSameParentIdTag_differentParents_returnsFalse() {
+    public void areIdTagsRelatedByParent_parentAndChild_returnsTrueInBothDirections() {
+        String parentIdTag = insertTag("parent", null);
+        String childIdTag = insertTag("child", parentIdTag);
+
+        Assertions.assertAll(
+            () -> Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(parentIdTag, childIdTag)),
+            () -> Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(childIdTag, parentIdTag))
+        );
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_differentParents_returnsFalse() {
         String firstParentIdTag = insertTag("parent", null);
         String secondParentIdTag = insertTag("parent", null);
         String firstIdTag = insertTag("child", firstParentIdTag);
         String secondIdTag = insertTag("child", secondParentIdTag);
 
-        Assertions.assertFalse(ocppTagService.haveTheSameParentIdTag(firstIdTag, secondIdTag));
+        Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
     }
 
     @Test
-    public void haveTheSameParentIdTag_withoutParents_returnsFalse() {
+    public void areIdTagsRelatedByParent_withoutParents_returnsFalse() {
         String firstIdTag = insertTag("parentless", null);
         String secondIdTag = insertTag("parentless", null);
 
-        Assertions.assertFalse(ocppTagService.haveTheSameParentIdTag(firstIdTag, secondIdTag));
+        Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
     }
 
     @Test
-    public void haveTheSameParentIdTag_unknownTag_returnsFalse() {
+    public void areIdTagsRelatedByParent_unknownTag_returnsFalse() {
         String parentIdTag = insertTag("parent", null);
         String knownIdTag = insertTag("child", parentIdTag);
         String unknownIdTag = uniqueId("unknown");
 
         Assertions.assertAll(
-            () -> Assertions.assertFalse(ocppTagService.haveTheSameParentIdTag(knownIdTag, unknownIdTag)),
-            () -> Assertions.assertFalse(ocppTagService.haveTheSameParentIdTag(unknownIdTag, knownIdTag))
+            () -> Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(knownIdTag, unknownIdTag)),
+            () -> Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(unknownIdTag, knownIdTag))
         );
     }
 

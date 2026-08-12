@@ -47,6 +47,8 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -221,12 +223,13 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public String getParentIdtag(String idTag) {
-        return ctx.select(OCPP_TAG.PARENT_ID_TAG)
-                  .from(OCPP_TAG)
-                  .where(OCPP_TAG.ID_TAG.eq(idTag))
-                  .fetchOne()
-                  .value1();
+    public Map<String, String> getParentIdTags(Set<String> idTags) {
+        return ctx.select(
+                OCPP_TAG.ID_TAG,
+                OCPP_TAG.PARENT_ID_TAG)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.ID_TAG.in(idTags))
+            .fetchMap(OCPP_TAG.ID_TAG, OCPP_TAG.PARENT_ID_TAG);
     }
 
     @Override

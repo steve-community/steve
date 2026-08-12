@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
@@ -84,7 +85,16 @@ public class OcppTagService {
     }
 
     public String getParentIdtag(String idTag) {
-        return ocppTagRepository.getParentIdtag(idTag);
+        var map = ocppTagRepository.getParentIdTags(Set.of(idTag));
+        return map.get(idTag);
+    }
+
+    public boolean haveTheSameParentIdTag(String idTag1, String idTag2) {
+        var parents = ocppTagRepository.getParentIdTags(Set.of(idTag1, idTag2));
+        var parent1 = parents.get(idTag1);
+        var parent2 = parents.get(idTag2);
+
+        return parent1 != null && parent1.equals(parent2);
     }
 
     public List<AuthorizationData> getAuthDataOfAllTags() {

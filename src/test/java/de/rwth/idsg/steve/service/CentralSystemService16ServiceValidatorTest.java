@@ -41,6 +41,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,6 +51,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
     private static final Instant NOW = Instant.parse("2026-02-17T12:00:00Z");
     private static final Clock FIXED_CLOCK = Clock.fixed(NOW, ZoneOffset.UTC);
+    private static final BiFunction<String, String, Boolean> DIFFERENT_PARENTS = (first, second) -> false;
 
     private final CentralSystemService16_ServiceValidator validator = new CentralSystemService16_ServiceValidator(FIXED_CLOCK);
 
@@ -256,7 +258,7 @@ public class CentralSystemService16ServiceValidatorTest {
     @Test
     public void validateStop_transactionMissing_returnsHardError() {
         var params = stopParams(new DateTime(NOW.toEpochMilli()), "200");
-        var result = validator.validateStop(null, params);
+        var result = validator.validateStop(null, params, DIFFERENT_PARENTS);
 
         assertHardErrors(result, "The transaction is not found in database");
     }
@@ -271,7 +273,7 @@ public class CentralSystemService16ServiceValidatorTest {
             TransactionStopEventActor.station
         );
         var params = stopParams(DateTime.parse("2026-02-17T10:30:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertHardErrors(result, "The transaction was already stopped by the station");
     }
@@ -286,7 +288,7 @@ public class CentralSystemService16ServiceValidatorTest {
             TransactionStopEventActor.manual
         );
         var params = stopParams(DateTime.parse("2026-02-17T10:30:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -295,7 +297,7 @@ public class CentralSystemService16ServiceValidatorTest {
     public void validateStop_startAfterStop_returnsHardError() {
         var tx = tx("100", DateTime.parse("2026-02-17T12:01:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T12:00:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertHardErrors(result, "start.timestamp is after stop.timestamp");
     }
@@ -304,7 +306,7 @@ public class CentralSystemService16ServiceValidatorTest {
     public void validateStop_futureStopTimestamp_returnsHardError() {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T12:05:01Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertHardErrors(result, "stop.timestamp is in the future");
     }
@@ -313,7 +315,7 @@ public class CentralSystemService16ServiceValidatorTest {
     public void validateStop_futureStopTimestampAtBoundary_isAllowed() {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T12:05:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -322,7 +324,7 @@ public class CentralSystemService16ServiceValidatorTest {
     public void validateStop_stopMeterLowerThanStart_returnsHardError() {
         var tx = tx("300", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertHardErrors(result, "meterStart is greater than meterStop");
     }
@@ -331,7 +333,43 @@ public class CentralSystemService16ServiceValidatorTest {
     public void validateStop_validStationStop_returnsValidResult() {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200");
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
+
+        assertValid(result);
+    }
+
+    @Test
+    public void validateStop_differentIdTagsWithoutMatchingParents_returnsHardError() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withIdTag("tag-2");
+
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
+
+        assertHardErrors(
+            result,
+            "stop.idTag is neither the transaction's idTag nor related to it through parentIdTag"
+        );
+    }
+
+    @Test
+    public void validateStop_differentIdTagsWithMatchingParents_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withIdTag("tag-2");
+
+        var result = validator.validateStop(tx, params, (first, second) -> true);
+
+        assertValid(result);
+    }
+
+    @Test
+    public void validateStop_withoutIdTag_isAllowed() {
+        var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
+        var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
+            .withIdTag(null);
+
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -341,7 +379,7 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T12:05:01Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertSoftErrors(
             result,
@@ -356,7 +394,7 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T10:10:00Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertSoftErrors(result, "at least one MeterValue.timestamp is after stop.timestamp");
     }
@@ -367,7 +405,7 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T08:54:59Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertSoftErrors(result, "at least one MeterValue.timestamp is before start.timestamp");
     }
@@ -378,7 +416,7 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T08:55:01Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -388,7 +426,7 @@ public class CentralSystemService16ServiceValidatorTest {
         var tx = tx("100", DateTime.parse("2026-02-17T09:00:00Z"), null, null, null);
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T09:00:00Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -404,7 +442,7 @@ public class CentralSystemService16ServiceValidatorTest {
 
         var params = stopParams(DateTime.parse("2026-02-17T10:00:00Z"), "200")
             .withTransactionData(List.of(meterValue("2026-02-17T10:00:01Z")));
-        var result = validator.validateStop(tx, params);
+        var result = validator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -418,7 +456,8 @@ public class CentralSystemService16ServiceValidatorTest {
         var messageClock = Clock.fixed(Instant.parse("2026-03-25T08:10:00Z"), ZoneOffset.UTC);
         var localValidator = new CentralSystemService16_ServiceValidator(messageClock);
 
-        var tx = tx("100", DateTime.parse("2026-03-25T06:22:44.000Z"), null, null, null);
+        var tx = tx("100", DateTime.parse("2026-03-25T06:22:44.000Z"), null, null, null)
+            .setIdTag("XYZ");
 
         StopTransactionRequest params = new StopTransactionRequest()
             .withIdTag("XYZ")
@@ -441,7 +480,7 @@ public class CentralSystemService16ServiceValidatorTest {
                     .withSampledValue(sampledValue("203", ReadingContext.TRANSACTION_END, ValueFormat.SIGNED_DATA))
             ));
 
-        var result = localValidator.validateStop(tx, params);
+        var result = localValidator.validateStop(tx, params, DIFFERENT_PARENTS);
 
         assertValid(result);
     }
@@ -583,6 +622,7 @@ public class CentralSystemService16ServiceValidatorTest {
                                         String stopValue, DateTime stopTimestamp,
                                         TransactionStopEventActor stopActor) {
         return new TransactionRecord()
+            .setIdTag("tag-1")
             .setStartValue(startValue)
             .setStartTimestamp(startTimestamp)
             .setStopValue(stopValue)

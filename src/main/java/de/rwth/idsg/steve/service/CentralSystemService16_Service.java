@@ -278,7 +278,7 @@ public class CentralSystemService16_Service {
                                        .build();
 
         var transaction = ocppServerRepository.getTransaction(chargeBoxIdentity, null, transactionId);
-        var results = serviceValidator.validateStop(transaction, parameters);
+        var results = serviceValidator.validateStop(transaction, parameters, ocppTagService::areIdTagsRelatedByParent);
 
         if (results.hasHardErrors()) {
             ocppServerRepository.updateTransactionAsFailed(params, results.getHardErrors());

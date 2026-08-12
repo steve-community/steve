@@ -24,7 +24,9 @@ import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import org.jooq.Result;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -45,7 +47,7 @@ public interface OcppTagRepository {
     List<String> getActiveIdTags();
 
     List<String> getParentIdTags();
-    String getParentIdtag(String idTag);
+    Map<String, String> getParentIdTags(Collection<String> idTags);
 
     void addOcppTagList(List<String> idTagList);
     int addOcppTag(OcppTagForm form);

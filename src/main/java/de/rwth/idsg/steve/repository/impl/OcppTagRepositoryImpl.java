@@ -45,8 +45,11 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -221,12 +224,19 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public String getParentIdtag(String idTag) {
-        return ctx.select(OCPP_TAG.PARENT_ID_TAG)
-                  .from(OCPP_TAG)
-                  .where(OCPP_TAG.ID_TAG.eq(idTag))
-                  .fetchOne()
-                  .value1();
+    public Map<String, String> getParentIdTags(Collection<String> idTags) {
+        if (CollectionUtils.isEmpty(idTags)) {
+            return Collections.emptyMap();
+        }
+
+        var notNullIdTags = idTags.stream().filter(Objects::nonNull).collect(Collectors.toSet());
+
+        return ctx.select(
+                OCPP_TAG.ID_TAG,
+                OCPP_TAG.PARENT_ID_TAG)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.ID_TAG.in(notNullIdTags))
+            .fetchMap(OCPP_TAG.ID_TAG, OCPP_TAG.PARENT_ID_TAG);
     }
 
     @Override

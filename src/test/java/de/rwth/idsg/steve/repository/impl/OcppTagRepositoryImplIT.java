@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagRecord;
@@ -27,6 +28,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Set;
 
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 
@@ -39,6 +42,8 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
     private DSLContext dslContext;
     @Autowired
     private OcppTagRepository repository;
+    @Autowired
+    private OcppTagService ocppTagService;
 
     @BeforeEach
     public void setup() {
@@ -109,13 +114,77 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getParentIdTags() {
-        var tags = assertNoDatabaseException(repository::getParentIdTags);
+        var tags = assertNoDatabaseException(() -> repository.getParentIdTags());
         Assertions.assertNotNull(tags);
     }
 
     @Test
-    public void getParentIdtag() {
-        assertNoDatabaseException(() -> repository.getParentIdtag(KNOWN_OCPP_TAG));
+    public void getParentIdTagsByIdTags() {
+        String parentIdTag = insertTag("parent", null);
+        String childIdTag = insertTag("child", parentIdTag);
+        String parentlessIdTag = insertTag("parentless", null);
+        String unknownIdTag = uniqueId("unknown");
+
+        var result = assertNoDatabaseException(
+            () -> repository.getParentIdTags(Set.of(childIdTag, parentlessIdTag, unknownIdTag))
+        );
+
+        Assertions.assertAll(
+            () -> Assertions.assertEquals(parentIdTag, result.get(childIdTag)),
+            () -> Assertions.assertTrue(result.containsKey(parentlessIdTag)),
+            () -> Assertions.assertNull(result.get(parentlessIdTag)),
+            () -> Assertions.assertFalse(result.containsKey(unknownIdTag))
+        );
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_sharedParent_returnsTrue() {
+        String parentIdTag = insertTag("parent", null);
+        String firstIdTag = insertTag("child", parentIdTag);
+        String secondIdTag = insertTag("child", parentIdTag);
+
+        Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_parentAndChild_returnsTrueInBothDirections() {
+        String parentIdTag = insertTag("parent", null);
+        String childIdTag = insertTag("child", parentIdTag);
+
+        Assertions.assertAll(
+            () -> Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(parentIdTag, childIdTag)),
+            () -> Assertions.assertTrue(ocppTagService.areIdTagsRelatedByParent(childIdTag, parentIdTag))
+        );
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_differentParents_returnsFalse() {
+        String firstParentIdTag = insertTag("parent", null);
+        String secondParentIdTag = insertTag("parent", null);
+        String firstIdTag = insertTag("child", firstParentIdTag);
+        String secondIdTag = insertTag("child", secondParentIdTag);
+
+        Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_withoutParents_returnsFalse() {
+        String firstIdTag = insertTag("parentless", null);
+        String secondIdTag = insertTag("parentless", null);
+
+        Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(firstIdTag, secondIdTag));
+    }
+
+    @Test
+    public void areIdTagsRelatedByParent_unknownTag_returnsFalse() {
+        String parentIdTag = insertTag("parent", null);
+        String knownIdTag = insertTag("child", parentIdTag);
+        String unknownIdTag = uniqueId("unknown");
+
+        Assertions.assertAll(
+            () -> Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(knownIdTag, unknownIdTag)),
+            () -> Assertions.assertFalse(ocppTagService.areIdTagsRelatedByParent(unknownIdTag, knownIdTag))
+        );
     }
 
     @Test
@@ -203,5 +272,14 @@ public class OcppTagRepositoryImplIT extends AbstractRepositoryITBase {
             .where(OCPP_TAG.OCPP_TAG_PK.eq(pk))
             .fetchOne();
         assertAuditTimestampsAfterUpdate(before.value1(), before.value2(), after.value1(), after.value2());
+    }
+
+    private String insertTag(String prefix, String parentIdTag) {
+        String idTag = uniqueId(prefix);
+        dslContext.insertInto(OCPP_TAG)
+            .set(OCPP_TAG.ID_TAG, idTag)
+            .set(OCPP_TAG.PARENT_ID_TAG, parentIdTag)
+            .execute();
+        return idTag;
     }
 }

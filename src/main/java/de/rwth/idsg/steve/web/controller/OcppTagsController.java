@@ -90,6 +90,10 @@ public class OcppTagsController {
         OcppTagActivityRecord record = ocppTagService.getRecord(ocppTagPk);
         OcppTagForm form = OcppTagFormMapper.toForm(record);
 
+        if (form.getParentIdTag() == null) {
+            form.setParentIdTag(ControllerHelper.EMPTY_OPTION);
+        }
+
         model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
         model.addAttribute("ocppTagForm", form);
         setTags(model);

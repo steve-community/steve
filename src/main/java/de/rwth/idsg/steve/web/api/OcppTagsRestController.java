@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.api;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm.OcppTagQueryFormForApi;
@@ -32,11 +33,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -151,6 +154,30 @@ public class OcppTagsRestController {
         var response = getOneInternal(ocppTagPk);
         log.debug("Update response: {}", response);
         return response;
+    }
+
+    @Operation(description = """
+        Expires an existing Ocpp Tag by setting its expiry date to the current time.
+        """)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+    )
+    @PatchMapping("/{ocppTagPk}/expire")
+    public OcppTagOverview expireTag(@PathVariable("ocppTagPk") Integer ocppTagPk) {
+        log.debug("Expire request for ocppTagPk: {}", ocppTagPk);
+
+        var record = ocppTagService.getRecord(ocppTagPk);
+        if (record == null) {
+            throw new SteveException.NotFound("Could not find this ocppTag");
+        }
+
+        var form = OcppTagFormMapper.toForm(record);
+        form.setExpiryDate(DateTime.now()); // the reason we have this endpoint
+        return update(ocppTagPk, form);
     }
 
     @Operation(description = """

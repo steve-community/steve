@@ -1,13 +1,12 @@
 {
 	"openapi": "3.1.0",
 	"info": {
-		"description": "SteVe REST API Documentation",
 		"license": {
 			"name": "GPL-3.0",
 			"url": "https://github.com/steve-community/steve/blob/master/LICENSE.txt"
 		},
 		"title": "SteVe REST API Documentation",
-		"version": "3.12.0-SNAPSHOT"
+		"version": "3.15.0-SNAPSHOT"
 	},
 	"servers": [
 		{
@@ -487,6 +486,88 @@
 					},
 					"required": true
 				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OcppTagOverview"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"ocpp-tag-controller"
+				]
+			}
+		},
+		"/api/v1/ocppTags/{ocppTagPk}/expire": {
+			"patch": {
+				"description": "Expires an existing Ocpp Tag by setting its expiry date to the current time.\n",
+				"operationId": "expireTag",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "ocppTagPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
 				"responses": {
 					"200": {
 						"content": {
@@ -1400,6 +1481,7 @@
 		},
 		"/api/v1/operations/GetLocalListVersion": {
 			"post": {
+				"description": "A <code>successResponses[].response: -1</code> indicates that the charge point does not support Local Authorization Lists.\nA <code>successResponses[].response: 0</code> indicates that the local authorization list is empty.\nPositive values indicate the configured local authorization list version.\n",
 				"operationId": "getLocalListVersion",
 				"requestBody": {
 					"content": {
@@ -2615,6 +2697,15 @@
 							"type": "integer",
 							"format": "int32"
 						}
+					},
+					{
+						"in": "query",
+						"name": "energyValuesOnly",
+						"required": false,
+						"schema": {
+							"type": "boolean",
+							"default": true
+						}
 					}
 				],
 				"responses": {
@@ -2969,7 +3060,8 @@
 					},
 					"chargingProfilePk": {
 						"type": "integer",
-						"format": "int32"
+						"format": "int32",
+						"minimum": 0
 					},
 					"chargingProfilePurpose": {
 						"type": "string",
@@ -3280,7 +3372,8 @@
 					},
 					"durationInSeconds": {
 						"type": "integer",
-						"format": "int32"
+						"format": "int32",
+						"minimum": 0
 					}
 				},
 				"required": [
@@ -4539,7 +4632,8 @@
 					"chargingProfilePk": {
 						"type": "integer",
 						"format": "int32",
-						"description": "PK of the charging profile to be used for the transaction.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n"
+						"description": "PK of the charging profile to be used for the transaction.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n",
+						"minimum": 0
 					},
 					"connectorId": {
 						"type": "integer",
@@ -4595,7 +4689,7 @@
 					"connectorId": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 1
+						"minimum": 0
 					},
 					"expiry": {
 						"type": "string",
@@ -4701,7 +4795,8 @@
 					},
 					"chargingProfilePk": {
 						"type": "integer",
-						"format": "int32"
+						"format": "int32",
+						"minimum": 0
 					},
 					"connectorId": {
 						"type": "integer",
@@ -4711,7 +4806,8 @@
 					"transactionId": {
 						"type": "integer",
 						"format": "int32",
-						"description": "Apply the profile to the transaction with this ID.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n"
+						"description": "Apply the profile to the transaction with this ID.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n",
+						"minimum": 0
 					}
 				},
 				"required": [

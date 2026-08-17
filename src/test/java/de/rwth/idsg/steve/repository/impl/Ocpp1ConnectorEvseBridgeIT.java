@@ -130,7 +130,9 @@ public class Ocpp1ConnectorEvseBridgeIT extends AbstractRepositoryITBase {
             for (Supplier<T> operation : operations) {
                 futures.add(executor.submit(() -> {
                     ready.countDown();
-                    start.await();
+                    if (!start.await(10, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("Start signal was not received in time");
+                    }
                     return operation.get();
                 }));
             }
@@ -146,6 +148,10 @@ public class Ocpp1ConnectorEvseBridgeIT extends AbstractRepositoryITBase {
         } finally {
             start.countDown();
             executor.shutdownNow();
+            Assertions.assertTrue(
+                executor.awaitTermination(10, TimeUnit.SECONDS),
+                "Workers did not terminate in time"
+            );
         }
     }
 }

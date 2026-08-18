@@ -36,6 +36,5 @@ import java.util.List;
 public class ChargePointBatchInsertForm {
 
     @NotEmpty
-    @ChargeBoxId
-    private List<String> idList;
+    private List<@ChargeBoxId String> idList;
 }

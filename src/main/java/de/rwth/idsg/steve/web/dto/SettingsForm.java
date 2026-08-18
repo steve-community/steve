@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.web.validation.EmailCollection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -84,8 +83,7 @@ public class SettingsForm {
 
         private String password;
 
-        @EmailCollection
-        private List<String> recipients;
+        private List<@Email String> recipients;
 
         private List<NotificationFeature> enabledFeatures;
     }

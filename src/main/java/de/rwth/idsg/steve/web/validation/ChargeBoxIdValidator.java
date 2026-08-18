@@ -39,6 +39,10 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
 
     private final Pattern pattern;
 
+    public ChargeBoxIdValidator() {
+        this((String) null);
+    }
+
     @Autowired
     public ChargeBoxIdValidator(SteveProperties steveProperties) {
         this(steveProperties.getOcpp().getChargeBoxIdValidationRegex());

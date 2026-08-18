@@ -41,8 +41,7 @@ import java.util.List;
 @Setter
 public class ChargePointDeviceModelForm {
 
-    @Valid
-    private List<EvseForm> evses = new ArrayList<>();
+    private List<@Valid EvseForm> evses = new ArrayList<>();
 
     @Getter
     @Setter
@@ -61,8 +60,7 @@ public class ChargePointDeviceModelForm {
         // the only editable field
         private String evseIdExternal;
 
-        @Valid
-        private List<EvseConnectorForm> connectors = new ArrayList<>();
+        private List<@Valid EvseConnectorForm> connectors = new ArrayList<>();
     }
 
     @Getter

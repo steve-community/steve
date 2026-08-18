@@ -42,12 +42,10 @@ import java.util.List;
 public abstract class QueryForm extends QueryPeriodFromToFilter {
 
     @Schema(description = "The identifiers of the chargebox (i.e. charging station)")
-    @ChargeBoxId
-    private List<String> chargeBoxId;
+    private List<@ChargeBoxId String> chargeBoxId;
 
     @Schema(description = "The OCPP tags")
-    @IdTag
-    private List<String> ocppIdTag;
+    private List<@IdTag String> ocppIdTag;
 
     @Schema(description = "The User IDs")
     private List<@NotNull(message = "userId must not be null")

@@ -61,8 +61,7 @@ public class MultipleChargePointSelect implements ChargePointSelection {
         ),
         minItems = 1
     )
-    @ChargeBoxId
-    private List<String> chargeBoxIdList = Collections.emptyList();
+    private List<@ChargeBoxId String> chargeBoxIdList = Collections.emptyList();
 
     @JsonIgnore
     @AssertTrue(message = "Please select at least 1 charge point")

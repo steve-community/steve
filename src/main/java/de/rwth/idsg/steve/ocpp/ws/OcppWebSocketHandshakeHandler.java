@@ -186,6 +186,14 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
+    /**
+     * Selects the endpoint for the first supported protocol in the station's preference order. Since requested
+     * protocols are evaluated before endpoints (because we iterate over requestedProtocols in the outer loop),
+     * the station's preference order dominates the endpoint collection's order (i.e. the order of endpoints
+     * does not matter).
+     *
+     * @return the selected endpoint, or {@code null} if none of the requested protocols is supported
+     */
     private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
         for (String requestedProtocol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {

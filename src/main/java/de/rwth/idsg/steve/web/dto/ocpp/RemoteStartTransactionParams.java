@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
 /**
@@ -38,8 +37,7 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
-    @NotBlank(message = "User ID Tag is required")
-    @IdTag
+    @IdTag(maxLength = 40)
     private String idTag;
 
     @Schema(description = """

@@ -27,7 +27,6 @@ import lombok.ToString;
 import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
 
 import java.util.Objects;
 
@@ -46,7 +45,6 @@ public class OcppTagForm {
     private Integer ocppTagPk;
 
     @Schema(description = "Will be used in create/insert flows. Will be ignored in update flows.")
-    @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;
 

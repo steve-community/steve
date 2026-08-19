@@ -19,12 +19,20 @@
 package de.rwth.idsg.steve.web.validation;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Payload;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -32,12 +40,26 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
-@Target({FIELD, METHOD, TYPE_USE})
+@Documented
+@Target({FIELD, METHOD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = IdTagValidator.class)
+@Constraint(validatedBy = {})
+@NotEmpty(message = "ID Tag must not be null or empty")
+@Pattern(regexp = IdTag.PATTERN, message = "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore or hash symbols")
+@Size(min = 1, max = IdTag.DEFAULT_MAX_LENGTH, message = "ID Tag must contain between {min} and {max} characters")
 public @interface IdTag {
 
-    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore or hash symbols";
+    int DEFAULT_MAX_LENGTH = 20;
+    String PATTERN = "^[a-zA-Z0-9.:_#-]+$";
+
+    // Required by validation runtime, but composing constraint messages are reported instead
+    String message() default "Invalid ID Tag";
+
+    /**
+     * Maximum number of characters allowed in the ID Tag.
+     */
+    @OverridesAttribute(constraint = Size.class, name = "max")
+    int maxLength() default DEFAULT_MAX_LENGTH;
 
     // Required by validation runtime
     Class<?>[] groups() default {};

@@ -28,6 +28,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,13 @@ public class ContainerElementValidationTest {
         form.setIdList(List.of("valid", "invalid tag"));
 
         assertEquals(Set.of("idList[1].<list element>"), violationPaths(form));
+
+        form.setIdList(Arrays.asList("valid", null, "", " "));
+        assertEquals(Set.of(
+            "idList[1].<list element>",
+            "idList[2].<list element>",
+            "idList[3].<list element>"
+        ), violationPaths(form));
 
         form.setIdList(Collections.emptyList());
         assertEquals(Set.of("idList"), violationPaths(form));

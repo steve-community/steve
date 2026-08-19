@@ -45,7 +45,7 @@ public abstract class QueryForm extends QueryPeriodFromToFilter {
     private List<@ChargeBoxId String> chargeBoxId;
 
     @Schema(description = "The OCPP tags")
-    private List<@IdTag String> ocppIdTag;
+    private List<@IdTag(maxLength = 40) String> ocppIdTag;
 
     @Schema(description = "The User IDs")
     private List<@NotNull(message = "userId must not be null")

@@ -37,7 +37,7 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
-    @IdTag
+    @IdTag(maxLength = 40)
     private String idTag;
 
     @Schema(description = """

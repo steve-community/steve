@@ -43,7 +43,7 @@ public class ReserveNowParams extends SingleChargePointSelect {
     @Future(message = "Expiry Date/Time must be in future")
     private DateTime expiry;
 
-    @IdTag
+    @IdTag(maxLength = 40)
     private String idTag;
 
 }

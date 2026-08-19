@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -81,17 +82,29 @@ public class Ocpp1ConnectorEvseBridge {
     }
 
     private static int insertIgnoreConnectorInternal(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        // Deliberately do not lock this lookup. The unique keys and idempotent upserts below take care of races.
-        var topology = ctx.select(EVSE.EVSE_PK, EVSE_CONNECTOR.EVSE_CONNECTOR_PK)
-            .from(CHARGE_BOX)
-            .leftJoin(EVSE)
-                .on(EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+        Field<Integer> evsePkField = ctx.select(EVSE.EVSE_PK)
+            .from(EVSE)
+            .where(EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+            .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
+            .and(EVSE.EVSE_ID.eq(connectorId))
+            .asField();
+
+        Field<Integer> evseConnectorPkField = ctx.select(EVSE_CONNECTOR.EVSE_CONNECTOR_PK)
+            .from(EVSE_CONNECTOR)
+            .join(EVSE)
+                .on(EVSE.EVSE_PK.eq(EVSE_CONNECTOR.EVSE_PK))
+                .and(EVSE.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
                 .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
                 .and(EVSE.EVSE_ID.eq(connectorId))
-            .leftJoin(EVSE_CONNECTOR)
-                .on(EVSE_CONNECTOR.EVSE_PK.eq(EVSE.EVSE_PK))
-                .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(1))
+            .where(EVSE_CONNECTOR.CONNECTOR_ID.eq(1))
+            .asField();
+
+        // Serialize topology creation per charge box without locking EVSE index gaps.
+        // FOR UPDATE applies only to the outer query block, not to the scalar subqueries above.
+        var topology = ctx.select(evsePkField, evseConnectorPkField)
+            .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxIdentity))
+            .forUpdate()
             .fetchOne();
 
         if (topology == null) {

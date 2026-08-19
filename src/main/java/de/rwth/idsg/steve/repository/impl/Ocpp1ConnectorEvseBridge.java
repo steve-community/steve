@@ -81,6 +81,7 @@ public class Ocpp1ConnectorEvseBridge {
     }
 
     private static int insertIgnoreConnectorInternal(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+        // Deliberately do not lock this lookup. The unique keys and idempotent upserts below take care of races.
         var topology = ctx.select(EVSE.EVSE_PK, EVSE_CONNECTOR.EVSE_CONNECTOR_PK)
             .from(CHARGE_BOX)
             .leftJoin(EVSE)
@@ -91,7 +92,6 @@ public class Ocpp1ConnectorEvseBridge {
                 .on(EVSE_CONNECTOR.EVSE_PK.eq(EVSE.EVSE_PK))
                 .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(1))
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxIdentity))
-            .forUpdate()
             .fetchOne();
 
         if (topology == null) {
@@ -106,6 +106,13 @@ public class Ocpp1ConnectorEvseBridge {
                 .set(EVSE.CHARGE_BOX_ID, chargeBoxIdentity)
                 .set(EVSE.TOPOLOGY_SOURCE, EvseTopologySource.ocpp1)
                 .set(EVSE.EVSE_ID, connectorId)
+                .onDuplicateKeyUpdate()
+                // Return the existing identity when another transaction won the insert race.
+                .set(EVSE.EVSE_PK, DSL.field(
+                    "last_insert_id({0})",
+                    EVSE.EVSE_PK.getDataType(),
+                    EVSE.EVSE_PK
+                ))
                 .returning(EVSE.EVSE_PK)
                 .fetchOne(EVSE.EVSE_PK);
 
@@ -118,6 +125,7 @@ public class Ocpp1ConnectorEvseBridge {
             ctx.insertInto(EVSE_CONNECTOR)
                 .set(EVSE_CONNECTOR.EVSE_PK, evsePk)
                 .set(EVSE_CONNECTOR.CONNECTOR_ID, defaultEvseConnectorId)
+                .onDuplicateKeyIgnore()
                 .execute();
 
             log.debug("The evse_connector {}/{}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId, defaultEvseConnectorId);

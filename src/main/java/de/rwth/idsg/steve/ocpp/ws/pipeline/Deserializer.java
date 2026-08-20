@@ -145,8 +145,13 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return;
         }
 
-        // find action class
         var typeStore = typeStoreHolder.get(context.getProtocol().getVersion());
+        if (typeStore == null) {
+            // should not happen, means impl or config error
+            throw new SteveException("Unknown protocol version: " + context.getProtocol().getVersion());
+        }
+
+        // find action class
         Class<? extends RequestType> clazz = typeStore.findRequestClass(action);
         if (clazz == null) {
             context.setOutgoingMessage(ErrorFactory.actionNotFound(messageId, action));

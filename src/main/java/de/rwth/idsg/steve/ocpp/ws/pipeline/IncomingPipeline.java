@@ -91,6 +91,10 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
 
     private void processCall(CommunicationContext context, OcppJsonCall call) {
         var handler = handlerMap.get(context.getProtocol().getVersion());
+        if (handler == null) {
+            // should not happen, means impl or config error
+            throw new SteveException("Unknown protocol version: " + context.getProtocol().getVersion());
+        }
 
         handler.accept(context);
         serializer.accept(context);

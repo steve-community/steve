@@ -24,10 +24,9 @@ import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.ocpp.ws.TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
+import lombok.extern.slf4j.Slf4j;
 import ocpp._2022._02.security.LogStatusNotification;
 import ocpp._2022._02.security.SecurityEventNotification;
 import ocpp._2022._02.security.SignCertificate;
@@ -42,7 +41,7 @@ import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
-import org.springframework.context.ApplicationEventPublisher;
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -50,24 +49,31 @@ import org.springframework.stereotype.Component;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
+@Slf4j
 @Component
 @Conditional(OcppEnabledCondition.V16.Json.class)
-public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
+public class Ocpp16Handler implements OcppCallHandler {
 
     private final CentralSystemService16_SoapServer server;
 
-    public Ocpp16WebSocketEndpoint(OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService16_SoapServer server,
-                                   SessionContextStoreHolder sessionContextStoreHolder) {
-        super(ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp16TypeStore.INSTANCE);
+    public Ocpp16Handler(CentralSystemService16_SoapServer server) {
         this.server = server;
+        log.info("Initialized");
     }
 
     @Override
     public OcppVersion getVersion() {
         return OcppVersion.V_16;
+    }
+
+    @Override
+    public TypeStore getTypeStore() {
+        return Ocpp16TypeStore.INSTANCE;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return log;
     }
 
     @Override

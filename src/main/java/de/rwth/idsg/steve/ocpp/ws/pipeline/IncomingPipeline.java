@@ -20,14 +20,18 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import jakarta.xml.ws.Response;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -39,14 +43,23 @@ import java.util.function.Consumer;
  * @since 23.03.2015
  */
 @Slf4j
-@RequiredArgsConstructor
+@Component
 public class IncomingPipeline implements Consumer<CommunicationContext> {
 
     private final Serializer serializer = Serializer.INSTANCE;
     private final Sender sender = Sender.INSTANCE;
 
     private final Deserializer deserializer;
-    private final OcppCallHandler handler;
+    private final Map<OcppVersion, OcppCallHandler> handlerMap = new EnumMap<>(OcppVersion.class);
+
+    @Autowired
+    public IncomingPipeline(Deserializer deserializer,
+                            List<OcppCallHandler> handlers) {
+        this.deserializer = deserializer;
+        for (OcppCallHandler handler : handlers) {
+            handlerMap.put(handler.getVersion(), handler);
+        }
+    }
 
     @Override
     public void accept(CommunicationContext context) {
@@ -77,6 +90,8 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
     }
 
     private void processCall(CommunicationContext context, OcppJsonCall call) {
+        var handler = handlerMap.get(context.getProtocol().getVersion());
+
         handler.accept(context);
         serializer.accept(context);
         sender.accept(context);

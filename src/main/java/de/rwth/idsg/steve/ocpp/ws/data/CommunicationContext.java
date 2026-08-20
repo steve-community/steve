@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.data;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,7 @@ public class CommunicationContext {
 
     @NotNull private final WebSocketSession session;
     @NotNull private final String chargeBoxId;
+    @NotNull private final OcppProtocol protocol;
 
     @Setter private String incomingString;
     @Setter private String outgoingString;

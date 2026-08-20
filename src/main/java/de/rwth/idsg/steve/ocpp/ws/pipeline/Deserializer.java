@@ -21,10 +21,11 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -33,9 +34,9 @@ import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
@@ -49,6 +50,9 @@ import tools.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -58,14 +62,24 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 @Slf4j
-@RequiredArgsConstructor
+@Component
 public class Deserializer implements Consumer<CommunicationContext> {
 
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+    private final Map<OcppVersion, TypeStore> typeStoreHolder = new EnumMap<>(OcppVersion.class);
 
     private final FutureResponseContextStore futureResponseContextStore;
-    private final SessionContextStore sessionContextStore;
-    private final TypeStore typeStore;
+    private final SessionContextStoreHolder sessionContextStoreHolder;
+
+    public Deserializer(FutureResponseContextStore futureResponseContextStore,
+                        SessionContextStoreHolder sessionContextStoreHolder,
+                        List<OcppCallHandler> handlers) {
+        this.futureResponseContextStore = futureResponseContextStore;
+        this.sessionContextStoreHolder = sessionContextStoreHolder;
+        for (OcppCallHandler handler : handlers) {
+            typeStoreHolder.put(handler.getVersion(), handler.getTypeStore());
+        }
+    }
 
     /**
      * Parsing with streaming API is cumbersome, but only it allows to parse the String step for step
@@ -109,6 +123,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return;
         }
 
+        var sessionContextStore = sessionContextStoreHolder.getOrCreate(context.getProtocol().getVersion());
         Boolean success = sessionContextStore.registerIncomingCallId(context.getChargeBoxId(), context.getSession(), messageId);
         if (success == null) {
             log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, context.getSession().getId());
@@ -131,6 +146,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         }
 
         // find action class
+        var typeStore = typeStoreHolder.get(context.getProtocol().getVersion());
         Class<? extends RequestType> clazz = typeStore.findRequestClass(action);
         if (clazz == null) {
             context.setOutgoingMessage(ErrorFactory.actionNotFound(messageId, action));

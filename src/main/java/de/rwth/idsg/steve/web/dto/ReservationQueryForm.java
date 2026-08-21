@@ -83,6 +83,7 @@ public class ReservationQueryForm extends QueryForm {
 
     @RequiredArgsConstructor
     public enum QueryPeriodType {
+        ALL("All"),
         ACTIVE("Active"),
         FROM_TO("From/To");
 
@@ -95,6 +96,15 @@ public class ReservationQueryForm extends QueryForm {
                 }
             }
             throw new IllegalArgumentException(v);
+        }
+    }
+
+    @ToString(callSuper = true)
+    public static class ReservationQueryFormForApi extends ReservationQueryForm {
+
+        public ReservationQueryFormForApi() {
+            super();
+            setPeriodType(QueryPeriodType.ALL);
         }
     }
 }

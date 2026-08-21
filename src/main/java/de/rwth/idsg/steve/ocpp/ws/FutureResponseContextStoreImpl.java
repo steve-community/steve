@@ -27,9 +27,15 @@ import org.springframework.web.socket.WebSocketSession;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Presumption: The responses must be sent using the same connection as the requests!
+ * Stores pending request/response correlations per WebSocket session. Responses must be handled
+ * using the same connection as their corresponding requests.
+ * <p>
+ * Updates to the outer map use {@link ConcurrentHashMap} atomic operations so additions and
+ * removals for the same session cannot interfere with each other. Empty per-session stores are
+ * removed after their final correlation entry is polled.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2015
@@ -54,33 +60,54 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
     }
 
     /**
-     * Adds/updates a correlation entry and performs opportunistic stale-entry cleanup on the write path.
+     * Adds or updates a correlation entry and performs opportunistic stale-entry cleanup on the
+     * write path. The outer-map computation makes the complete update atomic for this session ID.
      */
     @Override
     public void add(String webSocketSessionId, String messageId, FutureResponseContext context) {
-        var map = addIfAbsent(webSocketSessionId);
-        evictTimedOutEntries(map);
-        map.put(messageId, context);
-        log.debug("Store size for sessionId '{}': {}", webSocketSessionId, map.size());
+        lookupTable.compute(webSocketSessionId, (sessionId, map) -> {
+            if (map == null) {
+                map = createStore(sessionId);
+            }
+
+            evictTimedOutEntries(map);
+            map.put(messageId, context);
+            log.debug("Store size for sessionId '{}': {}", sessionId, map.size());
+            return map;
+        });
     }
 
+    /**
+     * Atomically removes and returns a correlation entry. Returning {@code null} from the
+     * outer-map computation removes the per-session store when it becomes empty, preventing
+     * failed-send rollbacks from leaving empty session maps behind.
+     */
     @Nullable
     @Override
     public FutureResponseContext poll(String webSocketSessionId, String messageId) {
-        var map = lookupTable.get(webSocketSessionId);
-        if (map == null) {
-            return null;
-        }
-        FutureResponseContext removedContext = map.remove(messageId);
-        log.debug("Store size for sessionId '{}': {}", webSocketSessionId, map.size());
-        return removedContext;
+        var removedContext = new AtomicReference<FutureResponseContext>();
+        lookupTable.computeIfPresent(webSocketSessionId, (sessionId, map) -> {
+            removedContext.set(map.remove(messageId));
+            log.debug("Store size for sessionId '{}': {}", sessionId, map.size());
+            return map.isEmpty() ? null : map;
+        });
+        return removedContext.get();
+    }
+
+    /**
+     * For tests only
+     */
+    boolean containsKey(String webSocketSessionId) {
+        return lookupTable.containsKey(webSocketSessionId);
     }
 
     private Map<String, FutureResponseContext> addIfAbsent(String webSocketSessionId) {
-        return lookupTable.computeIfAbsent(webSocketSessionId, innerSessionId -> {
-            log.debug("Creating new store for sessionId '{}'", innerSessionId);
-            return new ConcurrentHashMap<>();
-        });
+        return lookupTable.computeIfAbsent(webSocketSessionId, this::createStore);
+    }
+
+    private Map<String, FutureResponseContext> createStore(String webSocketSessionId) {
+        log.debug("Creating new store for sessionId '{}'", webSocketSessionId);
+        return new ConcurrentHashMap<>();
     }
 
     /**

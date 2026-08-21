@@ -39,46 +39,46 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FutureResponseContextStoreImpl implements FutureResponseContextStore {
 
     // We store for each chargeBox connection, multiple pairs of (messageId, context)
-    // (session, (messageId, context))
-    private final Map<WebSocketSession, Map<String, FutureResponseContext>> lookupTable = new ConcurrentHashMap<>();
+    // (webSocketSessionId, (messageId, context))
+    private final Map<String, Map<String, FutureResponseContext>> lookupTable = new ConcurrentHashMap<>();
 
     @Override
     public void addSession(WebSocketSession session) {
-        addIfAbsent(session);
+        addIfAbsent(session.getId());
     }
 
     @Override
     public void removeSession(WebSocketSession session) {
         log.debug("Deleting the store for sessionId '{}'", session.getId());
-        lookupTable.remove(session);
+        lookupTable.remove(session.getId());
     }
 
     /**
      * Adds/updates a correlation entry and performs opportunistic stale-entry cleanup on the write path.
      */
     @Override
-    public void add(WebSocketSession session, String messageId, FutureResponseContext context) {
-        var map = addIfAbsent(session);
+    public void add(String webSocketSessionId, String messageId, FutureResponseContext context) {
+        var map = addIfAbsent(webSocketSessionId);
         evictTimedOutEntries(map);
         map.put(messageId, context);
-        log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
+        log.debug("Store size for sessionId '{}': {}", webSocketSessionId, map.size());
     }
 
     @Nullable
     @Override
-    public FutureResponseContext poll(WebSocketSession session, String messageId) {
-        var map = lookupTable.get(session);
+    public FutureResponseContext poll(String webSocketSessionId, String messageId) {
+        var map = lookupTable.get(webSocketSessionId);
         if (map == null) {
             return null;
         }
         FutureResponseContext removedContext = map.remove(messageId);
-        log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
+        log.debug("Store size for sessionId '{}': {}", webSocketSessionId, map.size());
         return removedContext;
     }
 
-    private Map<String, FutureResponseContext> addIfAbsent(WebSocketSession session) {
-        return lookupTable.computeIfAbsent(session, innerSession -> {
-            log.debug("Creating new store for sessionId '{}'", innerSession.getId());
+    private Map<String, FutureResponseContext> addIfAbsent(String webSocketSessionId) {
+        return lookupTable.computeIfAbsent(webSocketSessionId, innerSessionId -> {
+            log.debug("Creating new store for sessionId '{}'", innerSessionId);
             return new ConcurrentHashMap<>();
         });
     }

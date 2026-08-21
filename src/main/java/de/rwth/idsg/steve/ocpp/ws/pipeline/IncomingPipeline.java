@@ -20,11 +20,8 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +31,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * For all incoming message types.
@@ -44,75 +40,79 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Component
-public class IncomingPipeline implements Consumer<CommunicationContext> {
+public class IncomingPipeline {
 
     private final Serializer serializer = Serializer.INSTANCE;
-    private final Sender sender = Sender.INSTANCE;
 
+    private final Sender sender;
     private final Deserializer deserializer;
     private final Map<OcppVersion, OcppCallHandler> handlerMap = new EnumMap<>(OcppVersion.class);
 
     @Autowired
-    public IncomingPipeline(Deserializer deserializer,
+    public IncomingPipeline(Sender sender,
+                            Deserializer deserializer,
                             List<OcppCallHandler> handlers) {
+        this.sender = sender;
         this.deserializer = deserializer;
         for (OcppCallHandler handler : handlers) {
             handlerMap.put(handler.getVersion(), handler);
         }
     }
 
-    @Override
-    public void accept(CommunicationContext context) {
+    public void accept(CommunicationContext.In inMsg) {
+        CommunicationContext.DeserializationResult inMsgData;
         try {
-            deserializer.accept(context);
-        } catch (SteveException e) {
-            // do not let OcppCallbacks hang. try to inform them when the response from the station cannot be parsed.
-            var frc = context.getFutureResponseContext();
-            if (frc != null) {
-                frc.getTask().failed(context.getChargeBoxId(), e);
-            }
-            throw e;
-        }
+            inMsgData = deserializer.accept(inMsg);
 
-        // When the incoming could not be deserialized
-        if (context.isSetOutgoingError()) {
-            serializer.accept(context);
-            sender.accept(context);
+        } catch (CommunicationContext.JsonCallParseException e) {
+            var parseError = e.getParseError();
+            var parseErrorStr = serializer.accept(parseError);
+            sender.accept(new CommunicationContext.Out(inMsg.route(), parseErrorStr, parseError.getMessageType()));
             return;
+
+        } catch (CommunicationContext.JsonResponseInvalidException e) {
+            var frc = e.getFrc();
+            if (frc != null) {
+                frc.getTask().failed(inMsg.route().chargeBoxId(), e);
+            }
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new SteveException("Deserialization of incoming string failed: %s", inMsg.payload(), e);
         }
 
-        switch (context.getIncomingMessage()) {
-            case OcppJsonCall call -> processCall(context, call);
-            case OcppJsonResult result -> processResult(context, result);
-            case OcppJsonError error -> processError(context, error);
-            default -> log.warn("Unexpected value: {}", context.getIncomingMessage());
+        switch (inMsgData) {
+            case CommunicationContext.InCall call -> processCall(call);
+            case CommunicationContext.InResult result -> processResult(result);
+            case CommunicationContext.InError error -> processError(error);
         }
     }
 
-    private void processCall(CommunicationContext context, OcppJsonCall call) {
-        var handler = handlerMap.get(context.getProtocol().getVersion());
+    private void processCall(CommunicationContext.InCall data) {
+        var version = data.in().route().protocol().getVersion();
+
+        var handler = handlerMap.get(version);
         if (handler == null) {
             // should not happen, means impl or config error
-            throw new SteveException("Unknown protocol version: " + context.getProtocol().getVersion());
+            throw new SteveException("Unknown protocol version: " + version);
         }
 
-        handler.accept(context);
-        serializer.accept(context);
-        sender.accept(context);
+        var response = handler.accept(data);
+        var responseStr = serializer.accept(response);
+        sender.accept(new CommunicationContext.Out(data.in().route(), responseStr, response.getMessageType()));
     }
 
     @SuppressWarnings("unchecked")
-    private void processResult(CommunicationContext context, OcppJsonResult result) {
-        context.getFutureResponseContext()
+    private void processResult(CommunicationContext.InResult data) {
+        data.frc()
             .getTask()
-            .getHandler(context.getChargeBoxId())
-            .handleResponse(new DummyResponse(result.getPayload()));
+            .getHandler(data.in().route().chargeBoxId())
+            .handleResponse(new DummyResponse(data.result().getPayload()));
     }
 
-    private void processError(CommunicationContext context, OcppJsonError error) {
-        context.getFutureResponseContext()
+    private void processError(CommunicationContext.InError data) {
+        data.frc()
             .getTask()
-            .success(context.getChargeBoxId(), error);
+            .success(data.in().route().chargeBoxId(), data.error());
     }
 
     private record DummyResponse(ResponseType payload) implements Response<ResponseType> {

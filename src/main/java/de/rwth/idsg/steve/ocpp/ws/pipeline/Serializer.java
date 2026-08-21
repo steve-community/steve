@@ -21,8 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
@@ -34,8 +32,6 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-import java.util.function.Consumer;
-
 /**
  * Outgoing OcppJsonMessage --> String.
  *
@@ -45,15 +41,12 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 @Slf4j
-public enum Serializer implements Consumer<CommunicationContext> {
+public enum Serializer {
     INSTANCE;
 
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
-    @Override
-    public void accept(CommunicationContext context) {
-        OcppJsonMessage message = context.getOutgoingMessage();
-
+    public String accept(OcppJsonMessage message) {
         ArrayNode str = switch (message) {
             case OcppJsonCall call -> handleCall(call);
             case OcppJsonResult result -> handleResult(result);
@@ -62,8 +55,7 @@ public enum Serializer implements Consumer<CommunicationContext> {
         };
 
         try {
-            String result = mapper.writeValueAsString(str);
-            context.setOutgoingString(result);
+            return mapper.writeValueAsString(str);
         } catch (JacksonException e) {
             throw new SteveException("The outgoing message could not be serialized", e);
         }

@@ -25,12 +25,10 @@ import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,18 +50,10 @@ public class DeserializerTest {
     public void testValidation_Ocpp16TypoInEnum() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2, "abc1","StatusNotification",{"connectorId":1,"status":"Faultd","errorCode":"NoError","info":"","timestamp":"2026-01-01T07:00:00.000Z","vendorId":"","vendorErrorCode":""}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
         Assertions.assertEquals("Invalid payload value (cannot understand one field)", error.getErrorDetails());
     }
@@ -72,18 +62,10 @@ public class DeserializerTest {
     public void testValidation_Ocpp16MeterValueCascade() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"abc2","MeterValues",{"connectorId":1,"meterValue":[{"timestamp":"2026-02-13T15:17:02.501+01:00"}]}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
         Assertions.assertEquals("Violation of field constraints", error.getErrorDetails());
     }
@@ -92,18 +74,10 @@ public class DeserializerTest {
     public void testValidation_Ocpp16IdTagMissing() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"abc3","Authorize",{"idTag":null}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
         Assertions.assertEquals("Violation of field constraints", error.getErrorDetails());
     }
@@ -112,18 +86,10 @@ public class DeserializerTest {
     public void testValidation_BrokenPayload() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"abc4","Authorize",{"idTag":"A1B.....]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(FormationViolation, error.getErrorCode());
         Assertions.assertNull(error.getErrorDetails());
     }
@@ -132,18 +98,10 @@ public class DeserializerTest {
     public void testValidation_DuplicateMessageId() {
         Deserializer des = createDeserializer(false);
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"dup1","Heartbeat",{}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(ProtocolError, error.getErrorCode());
         Assertions.assertEquals("dup1", error.getMessageId());
     }
@@ -152,18 +110,10 @@ public class DeserializerTest {
     public void testValidation_UnknownSessionContextForMessageIdStore() {
         Deserializer des = createDeserializer(null);
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"unknown1","Heartbeat",{}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(InternalError, error.getErrorCode());
         Assertions.assertEquals("unknown1", error.getMessageId());
     }
@@ -172,34 +122,22 @@ public class DeserializerTest {
     public void testValidation_FirstSeenMessageIdAccepted() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        CommunicationContext.DeserializationResult result = Assertions.assertDoesNotThrow(() -> des.accept(inbound("""
             [2,"ok1","Heartbeat",{}]
-            """);
+            """)));
 
-        des.accept(context);
-
-        Assertions.assertNull(context.getOutgoingMessage());
-        Assertions.assertNotNull(context.getIncomingMessage());
-        Assertions.assertInstanceOf(OcppJsonCall.class, context.getIncomingMessage());
+        CommunicationContext.InCall call = Assertions.assertInstanceOf(CommunicationContext.InCall.class, result);
+        Assertions.assertInstanceOf(OcppJsonCall.class, call.call());
     }
 
     @Test
     public void testValidation_EmptyMessageIdRejected() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,"","Heartbeat",{}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(FormationViolation, error.getErrorCode());
         Assertions.assertEquals("", error.getMessageId());
     }
@@ -208,20 +146,29 @@ public class DeserializerTest {
     public void testValidation_NullMessageIdRejected() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
-        context.setIncomingString("""
+        OcppJsonError error = deserializeError(des, """
             [2,null,"Heartbeat",{}]
             """);
 
-        des.accept(context);
-
-        OcppJsonMessage outgoingMessage = context.getOutgoingMessage();
-        Assertions.assertNotNull(outgoingMessage);
-        Assertions.assertInstanceOf(OcppJsonError.class, outgoingMessage);
-
-        OcppJsonError error = (OcppJsonError) outgoingMessage;
         Assertions.assertEquals(FormationViolation, error.getErrorCode());
         Assertions.assertNull(error.getMessageId());
+    }
+
+    private static OcppJsonError deserializeError(Deserializer deserializer, String payload) {
+        var exception = Assertions.assertThrows(
+            CommunicationContext.JsonCallParseException.class,
+            () -> deserializer.accept(inbound(payload))
+        );
+        return exception.getParseError();
+    }
+
+    private static CommunicationContext.In inbound(String payload) {
+        var route = new CommunicationContext.StationRoute(
+            UUID.randomUUID().toString(),
+            "foo",
+            OcppProtocol.V_16_JSON
+        );
+        return new CommunicationContext.In(route, payload);
     }
 
     private static Deserializer createDeserializer() {
@@ -242,13 +189,6 @@ public class DeserializerTest {
         when(handler.getTypeStore()).thenReturn(Ocpp16TypeStore.INSTANCE);
 
         return new Deserializer(futureResponseContextStore, holder, List.of(handler));
-    }
-
-    private static JettyWebSocketSession getMockSession() {
-        JettyWebSocketSession session = Mockito.mock(JettyWebSocketSession.class);
-        when(session.isOpen()).thenReturn(true);
-        when(session.getId()).thenReturn(UUID.randomUUID().toString());
-        return session;
     }
 
 }

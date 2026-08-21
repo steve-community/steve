@@ -18,12 +18,10 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.function.Consumer;
 
 /**
  * For outgoing CALLs, triggered by the user.
@@ -33,34 +31,44 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor
 @Component
-public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
+public class OutgoingCallPipeline {
 
+    private final Sender sender;
     private final FutureResponseContextStore store;
 
     /**
      * Uses a store-before-send strategy to close response-correlation races.
      * If transport sending fails, the stored context is rolled back immediately.
      */
-    @Override
-    public void accept(CommunicationContext ctx) {
+    public void accept(CommunicationContext.OutCall outWithCall) {
         // 1. Create the payload to send
-        Serializer.INSTANCE.accept(ctx);
+        String outMsg = Serializer.INSTANCE.accept(outWithCall.call());
 
         // 2. Store the response context for later lookup.
         store.add(
-            ctx.getSession(),
-            ctx.getOutgoingMessage().getMessageId(),
-            ctx.getFutureResponseContext()
+            outWithCall.route().webSocketSessionId(),
+            outWithCall.call().getMessageId(),
+            outWithCall.frc()
         );
 
         // 3. Send the payload via WebSocket
         try {
-            if (!Sender.INSTANCE.accept(ctx)) {
-                store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
+            var out = new CommunicationContext.Out(
+                outWithCall.route(),
+                outMsg,
+                outWithCall.call().getMessageType()
+            );
+
+            if (!sender.accept(out)) {
+                poll(outWithCall);
             }
         } catch (Exception e) {
-            store.poll(ctx.getSession(), ctx.getOutgoingMessage().getMessageId());
+            poll(outWithCall);
             throw e;
         }
+    }
+
+    private void poll(CommunicationContext.OutCall outWithCall) {
+        store.poll(outWithCall.route().webSocketSessionId(), outWithCall.call().getMessageId());
     }
 }

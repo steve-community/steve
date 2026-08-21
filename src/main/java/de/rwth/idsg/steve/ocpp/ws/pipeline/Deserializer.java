@@ -21,13 +21,13 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
@@ -53,7 +53,6 @@ import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Incoming String --> OcppJsonMessage
@@ -63,7 +62,7 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Component
-public class Deserializer implements Consumer<CommunicationContext> {
+public class Deserializer {
 
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
     private final Map<OcppVersion, TypeStore> typeStoreHolder = new EnumMap<>(OcppVersion.class);
@@ -85,9 +84,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * Parsing with streaming API is cumbersome, but only it allows to parse the String step for step
      * and build, if any, a corresponding error message.
      */
-    @Override
-    public void accept(CommunicationContext context) {
-        try (JsonParser parser = mapper.createParser(context.getIncomingString())) {
+    public CommunicationContext.DeserializationResult accept(CommunicationContext.In inMsg) throws CommunicationContext.JsonCallParseException, CommunicationContext.JsonResponseInvalidException {
+        try (JsonParser parser = mapper.createParser(inMsg.payload())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
@@ -96,13 +94,11 @@ public class Deserializer implements Consumer<CommunicationContext> {
             parser.nextToken();
             String messageId = parser.getString();
 
-            switch (MessageType.fromTypeNr(messageTypeNr)) {
-                case CALL -> handleCall(context, messageId, parser);
-                case CALL_RESULT -> handleResult(context, messageId, parser);
-                case CALL_ERROR -> handleError(context, messageId, parser);
-            }
-        } catch (Exception e) {
-            throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
+            return switch (MessageType.fromTypeNr(messageTypeNr)) {
+                case CALL -> handleCall(inMsg, messageId, parser);
+                case CALL_RESULT -> handleResult(inMsg, messageId, parser);
+                case CALL_ERROR -> handleError(inMsg, messageId, parser);
+            };
         }
     }
 
@@ -113,25 +109,28 @@ public class Deserializer implements Consumer<CommunicationContext> {
     /**
      * Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs.
      */
-    private void handleCall(CommunicationContext context, String messageId, JsonParser parser) {
+    private CommunicationContext.InCall handleCall(CommunicationContext.In inMsg, String messageId,
+                                                   JsonParser parser) throws CommunicationContext.JsonCallParseException {
+        OcppVersion version = inMsg.route().protocol().getVersion();
+
         // Enforce OCPP CALL messageId as a non-empty JSON string.
         // messageId must be a usable request identifier, so null or empty should be treated as invalid.
         // Token-type check avoids accepting VALUE_NULL cases that can be exposed as text like "null" by streaming accessors.
         JsonToken messageIdToken = parser.currentToken();
         if (messageIdToken != JsonToken.VALUE_STRING || StringUtils.isEmpty(messageId)) {
-            context.setOutgoingMessage(ErrorFactory.invalidMessageId(messageIdToken == JsonToken.VALUE_STRING ? messageId : null));
-            return;
+            var error = ErrorFactory.invalidMessageId(messageIdToken == JsonToken.VALUE_STRING ? messageId : null);
+            throw new CommunicationContext.JsonCallParseException(error);
         }
 
-        var sessionContextStore = sessionContextStoreHolder.getOrCreate(context.getProtocol().getVersion());
-        Boolean success = sessionContextStore.registerIncomingCallId(context.getChargeBoxId(), context.getSession(), messageId);
+        var sessionContextStore = sessionContextStoreHolder.getOrCreate(version);
+        Boolean success = sessionContextStore.registerIncomingCallId(inMsg.route().chargeBoxId(), inMsg.route().webSocketSessionId(), messageId);
         if (success == null) {
-            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, context.getSession().getId());
-            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
-            return;
+            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, inMsg.route().webSocketSessionId());
+            var error = ErrorFactory.payloadProcessingError(messageId, null);
+            throw new CommunicationContext.JsonCallParseException(error);
         } else if (!success) {
-            context.setOutgoingMessage(ErrorFactory.duplicateCallMessageId(messageId));
-            return;
+            var error = ErrorFactory.duplicateCallMessageId(messageId);
+            throw new CommunicationContext.JsonCallParseException(error);
         }
 
         // parse action
@@ -141,21 +140,21 @@ public class Deserializer implements Consumer<CommunicationContext> {
             action = parser.getString();
         } catch (JacksonException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.genericDeserializeError(messageId, e.getMessage()));
-            return;
+            var error = ErrorFactory.genericDeserializeError(messageId, e.getMessage());
+            throw new CommunicationContext.JsonCallParseException(error);
         }
 
-        var typeStore = typeStoreHolder.get(context.getProtocol().getVersion());
+        var typeStore = typeStoreHolder.get(version);
         if (typeStore == null) {
             // should not happen, means impl or config error
-            throw new SteveException("Unknown protocol version: " + context.getProtocol().getVersion());
+            throw new SteveException("Unknown protocol version: " + version);
         }
 
         // find action class
         Class<? extends RequestType> clazz = typeStore.findRequestClass(action);
         if (clazz == null) {
-            context.setOutgoingMessage(ErrorFactory.actionNotFound(messageId, action));
-            return;
+            var error = ErrorFactory.actionNotFound(messageId, action);
+            throw new CommunicationContext.JsonCallParseException(error);
         }
 
         // parse request payload
@@ -172,12 +171,12 @@ public class Deserializer implements Consumer<CommunicationContext> {
             req = mapper.treeToValue(requestPayload, clazz);
         } catch (ConstraintViolationException | DatabindException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.propertyConstraintViolation(messageId, getDetails(e)));
-            return;
+            var error = ErrorFactory.propertyConstraintViolation(messageId, getDetails(e));
+            throw new CommunicationContext.JsonCallParseException(error);
         } catch (JacksonException e) {
             log.error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, null));
-            return;
+            var error = ErrorFactory.payloadDeserializeError(messageId, null);
+            throw new CommunicationContext.JsonCallParseException(error);
         }
 
         OcppJsonCall call = new OcppJsonCall();
@@ -185,16 +184,17 @@ public class Deserializer implements Consumer<CommunicationContext> {
         call.setAction(action);
         call.setPayload(req);
 
-        context.setIncomingMessage(call);
+        return new CommunicationContext.InCall(inMsg, call);
     }
 
     /**
      * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail.
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
-    private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
-        validate(context, responseContext);
+    private CommunicationContext.InResult handleResult(CommunicationContext.In inMsg, String messageId,
+                                                       JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
+        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.route().webSocketSessionId(), messageId);
+        validate(responseContext);
 
         ResponseType res;
         try {
@@ -202,23 +202,24 @@ public class Deserializer implements Consumer<CommunicationContext> {
             JsonNode responsePayload = parser.readValueAsTree();
             res = mapper.treeToValue(responsePayload, responseContext.getResponseClass());
         } catch (JacksonException e) {
-            throw new SteveException("Deserialization of incoming response payload failed", e);
+            throw new CommunicationContext.JsonResponseInvalidException("Deserialization of incoming response payload failed", e, responseContext);
         }
 
         OcppJsonResult result = new OcppJsonResult();
         result.setMessageId(messageId);
         result.setPayload(res);
 
-        context.setIncomingMessage(result);
+        return new CommunicationContext.InResult(inMsg, result, responseContext);
     }
 
     /**
      * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail.
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
-    private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.poll(context.getSession(), messageId);
-        validate(context, responseContext);
+    private CommunicationContext.InError handleError(CommunicationContext.In inMsg, String messageId,
+                                                     JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
+        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.route().webSocketSessionId(), messageId);
+        validate(responseContext);
 
         ErrorCode code;
         String desc;
@@ -245,8 +246,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 details = mapper.writeValueAsString(detailsNode);
             }
 
-        } catch (JacksonException e) {
-            throw new SteveException("Deserialization of incoming error message failed", e);
+        } catch (Exception e) {
+            throw new CommunicationContext.JsonResponseInvalidException("Deserialization of incoming error message failed", e, responseContext);
         }
 
         OcppJsonError error = new OcppJsonError();
@@ -255,7 +256,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         error.setErrorDescription(desc);
         error.setErrorDetails(details);
 
-        context.setIncomingMessage(error);
+        return new CommunicationContext.InError(inMsg, error, responseContext);
     }
 
     private static String getDetails(Exception e) {
@@ -272,16 +273,14 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * Ensures incoming responses map only to active, non-stale calls.
      * Unknown or expired correlations are rejected to prevent accidental matching.
      */
-    private static void validate(CommunicationContext cc, FutureResponseContext frc) {
+    private static void validate(FutureResponseContext frc) throws CommunicationContext.JsonResponseInvalidException {
         if (frc == null) {
-            throw new SteveException("A response message was received to a not-sent call");
+            throw new CommunicationContext.JsonResponseInvalidException("A response message was received to a not-sent call", null);
         }
 
-        // set this before throwing the next exception, because IncomingPipeline will need it to handle and propagate.
-        cc.setFutureResponseContext(frc);
-
         if (frc.hasTimedOut(Instant.now())) {
-            throw new SteveException("A response message was received to an expired call");
+            // carry frc with this exception, because IncomingPipeline will need it to handle and propagate.
+            throw new CommunicationContext.JsonResponseInvalidException("A response message was received to an expired call", frc);
         }
     }
 }

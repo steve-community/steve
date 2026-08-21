@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
@@ -152,11 +153,32 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
-    public Boolean registerIncomingCallId(String chargeBoxId, WebSocketSession session, @NotNull String messageId) {
+    @Nullable
+    public WebSocketSession getSession(String chargeBoxId, String webSocketSessionId) {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
-            return messageIdStore.registerIncomingCallId(session, messageId);
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                return null;
+            }
+            for (SessionContext context : endpointDeque) {
+                if (context.getSession().getId().equals(webSocketSessionId)) {
+                    return context.getSession();
+                }
+            }
+            return null;
+        } finally {
+            l.unlock();
+        }
+    }
+
+    @Override
+    public Boolean registerIncomingCallId(String chargeBoxId, String webSocketSessionId, @NotNull String messageId) {
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            return messageIdStore.registerIncomingCallId(webSocketSessionId, messageId);
         } finally {
             l.unlock();
         }

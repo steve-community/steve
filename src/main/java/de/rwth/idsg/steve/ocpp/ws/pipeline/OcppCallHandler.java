@@ -20,40 +20,37 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import org.slf4j.Logger;
-
-import java.util.function.Consumer;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public interface OcppCallHandler extends Consumer<CommunicationContext> {
+public interface OcppCallHandler {
 
-    @Override
-    default void accept(CommunicationContext context) {
-        OcppJsonCall call = (OcppJsonCall) context.getIncomingMessage();
+    default OcppJsonResponse accept(CommunicationContext.InCall data) {
+        OcppJsonCall call = data.call();
         String messageId = call.getMessageId();
 
         ResponseType response;
         try {
-            response = dispatch(call.getPayload(), context.getChargeBoxId());
+            response = dispatch(call.getPayload(), data.in().route().chargeBoxId());
         } catch (Exception e) {
             getLogger().error("Exception occurred", e);
-            context.setOutgoingMessage(ErrorFactory.payloadProcessingError(messageId, null));
-            return;
+            return ErrorFactory.payloadProcessingError(messageId, null);
         }
 
         OcppJsonResult result = new OcppJsonResult();
         result.setPayload(response);
         result.setMessageId(messageId);
-        context.setOutgoingMessage(result);
+        return result;
     }
 
     OcppVersion getVersion();

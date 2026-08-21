@@ -72,6 +72,7 @@ public class ChargePointServiceJsonInvoker {
         var chargeBoxId = cps.getChargeBoxId();
 
         var sessionStore = sessionContextStoreHolder.getOrCreate(cps.getOcppProtocol().getVersion());
+        var session = sessionStore.getSession(chargeBoxId);
 
         var typeStore = switch (cps.getOcppProtocol().getVersion()) {
             case V_12 -> Ocpp12TypeStore.INSTANCE;
@@ -95,15 +96,15 @@ public class ChargePointServiceJsonInvoker {
         call.setPayload(request);
         call.setAction(pair.getAction());
 
-        FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
-
-        CommunicationContext context = new CommunicationContext(
-            sessionStore.getSession(chargeBoxId),
-            chargeBoxId,
-            cps.getOcppProtocol()
+        var context = new CommunicationContext.OutCall(
+            new CommunicationContext.StationRoute(
+                session.getId(),
+                chargeBoxId,
+                cps.getOcppProtocol()
+            ),
+            call,
+            new FutureResponseContext(task, pair.getResponseClass())
         );
-        context.setOutgoingMessage(call);
-        context.setFutureResponseContext(frc);
 
         outgoingCallPipeline.accept(context);
     }

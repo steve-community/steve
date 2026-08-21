@@ -32,7 +32,7 @@ public interface FutureResponseContextStore {
 
     void removeSession(WebSocketSession session);
 
-    void add(WebSocketSession session, String messageId, FutureResponseContext context);
+    void add(String webSocketSessionId, String messageId, FutureResponseContext context);
 
-    @Nullable FutureResponseContext poll(WebSocketSession session, String messageId);
+    @Nullable FutureResponseContext poll(String webSocketSessionId, String messageId);
 }

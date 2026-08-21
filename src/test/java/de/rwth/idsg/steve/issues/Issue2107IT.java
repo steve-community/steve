@@ -55,6 +55,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -176,6 +177,7 @@ public class Issue2107IT {
         CountDownLatch start = new CountDownLatch(1);
         ExecutorService executor = Executors.newFixedThreadPool(chargeBoxIds.size());
         List<Future<StatusNotificationResponse>> futures = new ArrayList<>(chargeBoxIds.size());
+        boolean terminated;
 
         try {
             for (String chargeBoxId : chargeBoxIds) {
@@ -196,6 +198,13 @@ public class Issue2107IT {
                     // response of the wrong message type. The cause of the CALLERROR itself is
                     // in the server log of this run.
                     failures.add(chargeBoxId + " -> " + e.getCause());
+                } catch (TimeoutException e) {
+                    // Collected rather than thrown: the summary below is this test's entire
+                    // output, and a station that was never answered at all is a different
+                    // failure from one answered with a CALLERROR.
+                    futures.get(i).cancel(true);
+                    failures.add(chargeBoxId + " -> no answer within "
+                        + RESULT_TIMEOUT_SECONDS + "s");
                 }
             }
 
@@ -205,9 +214,13 @@ public class Issue2107IT {
         } finally {
             start.countDown();
             executor.shutdownNow();
-            Assertions.assertTrue(executor.awaitTermination(30, TimeUnit.SECONDS),
-                "stations did not terminate in time");
+            // Recorded here, asserted below: an exception thrown from a finally block
+            // REPLACES the one already in flight, and the one in flight is the summary this
+            // test exists to produce.
+            terminated = executor.awaitTermination(30, TimeUnit.SECONDS);
         }
+
+        Assertions.assertTrue(terminated, "stations did not terminate in time");
     }
 
     /**

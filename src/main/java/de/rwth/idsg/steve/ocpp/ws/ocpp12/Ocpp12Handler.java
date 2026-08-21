@@ -24,10 +24,9 @@ import de.rwth.idsg.steve.ocpp.OcppEnabledCondition;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.ocpp.ws.TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest;
@@ -37,32 +36,40 @@ import ocpp.cs._2010._08.MeterValuesRequest;
 import ocpp.cs._2010._08.StartTransactionRequest;
 import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StopTransactionRequest;
-import org.springframework.context.ApplicationEventPublisher;
+import org.slf4j.Logger;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.03.2015
  */
+@Slf4j
 @Component
 @Conditional(OcppEnabledCondition.V12.Json.class)
-public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
+public class Ocpp12Handler implements OcppCallHandler {
 
     private final CentralSystemService12_SoapServer server;
 
-    public Ocpp12WebSocketEndpoint(OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService12_SoapServer server,
-                                   SessionContextStoreHolder sessionContextStoreHolder) {
-        super(ocppServerRepository, futureResponseContextStore, applicationEventPublisher, sessionContextStoreHolder, Ocpp12TypeStore.INSTANCE);
+    public Ocpp12Handler(CentralSystemService12_SoapServer server) {
         this.server = server;
+        log.info("Initialized");
     }
 
     @Override
     public OcppVersion getVersion() {
         return OcppVersion.V_12;
+    }
+
+    @Override
+    public TypeStore getTypeStore() {
+        return Ocpp12TypeStore.INSTANCE;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return log;
     }
 
     @Override
@@ -81,5 +88,4 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
                 throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
         };
     }
-
 }

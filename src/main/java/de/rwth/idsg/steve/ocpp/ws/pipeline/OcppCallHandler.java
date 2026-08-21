@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
+import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
@@ -53,6 +55,10 @@ public interface OcppCallHandler extends Consumer<CommunicationContext> {
         result.setMessageId(messageId);
         context.setOutgoingMessage(result);
     }
+
+    OcppVersion getVersion();
+
+    TypeStore getTypeStore();
 
     Logger getLogger();
 

@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStoreImpl;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
+import java.util.List;
 import java.util.UUID;
 
 import static de.rwth.idsg.steve.ocpp.ws.data.ErrorCode.FormationViolation;
@@ -49,7 +52,7 @@ public class DeserializerTest {
     public void testValidation_Ocpp16TypoInEnum() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2, "abc1","StatusNotification",{"connectorId":1,"status":"Faultd","errorCode":"NoError","info":"","timestamp":"2026-01-01T07:00:00.000Z","vendorId":"","vendorErrorCode":""}]
             """);
@@ -69,7 +72,7 @@ public class DeserializerTest {
     public void testValidation_Ocpp16MeterValueCascade() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"abc2","MeterValues",{"connectorId":1,"meterValue":[{"timestamp":"2026-02-13T15:17:02.501+01:00"}]}]
             """);
@@ -89,7 +92,7 @@ public class DeserializerTest {
     public void testValidation_Ocpp16IdTagMissing() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"abc3","Authorize",{"idTag":null}]
             """);
@@ -109,7 +112,7 @@ public class DeserializerTest {
     public void testValidation_BrokenPayload() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"abc4","Authorize",{"idTag":"A1B.....]
             """);
@@ -129,7 +132,7 @@ public class DeserializerTest {
     public void testValidation_DuplicateMessageId() {
         Deserializer des = createDeserializer(false);
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"dup1","Heartbeat",{}]
             """);
@@ -149,7 +152,7 @@ public class DeserializerTest {
     public void testValidation_UnknownSessionContextForMessageIdStore() {
         Deserializer des = createDeserializer(null);
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"unknown1","Heartbeat",{}]
             """);
@@ -169,7 +172,7 @@ public class DeserializerTest {
     public void testValidation_FirstSeenMessageIdAccepted() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"ok1","Heartbeat",{}]
             """);
@@ -185,7 +188,7 @@ public class DeserializerTest {
     public void testValidation_EmptyMessageIdRejected() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,"","Heartbeat",{}]
             """);
@@ -205,7 +208,7 @@ public class DeserializerTest {
     public void testValidation_NullMessageIdRejected() {
         Deserializer des = createDeserializer();
 
-        CommunicationContext context = new CommunicationContext(getMockSession(), "foo");
+        CommunicationContext context = new CommunicationContext(getMockSession(), "foo", OcppProtocol.V_16_JSON);
         context.setIncomingString("""
             [2,null,"Heartbeat",{}]
             """);
@@ -231,7 +234,14 @@ public class DeserializerTest {
         SessionContextStore store = Mockito.mock(SessionContextStore.class);
         when(store.registerIncomingCallId(any(), any(), any())).thenReturn(registerIncomingCallIdResponse);
 
-        return new Deserializer(futureResponseContextStore, store, Ocpp16TypeStore.INSTANCE);
+        SessionContextStoreHolder holder = Mockito.mock(SessionContextStoreHolder.class);
+        when(holder.getOrCreate(OcppProtocol.V_16_JSON.getVersion())).thenReturn(store);
+
+        OcppCallHandler handler = Mockito.mock(OcppCallHandler.class);
+        when(handler.getVersion()).thenReturn(OcppProtocol.V_16_JSON.getVersion());
+        when(handler.getTypeStore()).thenReturn(Ocpp16TypeStore.INSTANCE);
+
+        return new Deserializer(futureResponseContextStore, holder, List.of(handler));
     }
 
     private static JettyWebSocketSession getMockSession() {

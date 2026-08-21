@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketEndpoint;
 import de.rwth.idsg.steve.service.CertificateValidator;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
@@ -35,7 +35,6 @@ import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,8 +49,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     private final SteveProperties steveProperties;
     private final ChargePointService chargePointService;
     private final ChargeBoxIdValidator chargeBoxIdValidator;
-    private final List<AbstractWebSocketEndpoint> endpoints;
     private final CertificateValidator certificateValidator;
+    private final WebSocketEndpoint webSocketEndpoint;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
@@ -63,13 +62,13 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
             chargeBoxIdValidator,
             handshakeHandler(),
-            endpoints,
+            webSocketEndpoint,
             chargePointService,
             certificateValidator,
             steveProperties.getOcpp().getSecurity().getProtocolHeaderFromProxy()
         );
 
-        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
+        registry.addHandler(webSocketEndpoint, PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
     }

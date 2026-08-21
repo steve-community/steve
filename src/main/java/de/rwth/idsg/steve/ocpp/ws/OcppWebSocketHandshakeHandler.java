@@ -33,9 +33,9 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.socket.SubProtocolCapable;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
@@ -56,21 +56,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
     private final ChargeBoxIdValidator chargeBoxIdValidator;
     private final DefaultHandshakeHandler delegate;
-    private final List<AbstractWebSocketEndpoint> endpoints;
+    private final SubProtocolCapable subProtocolCapable;
     private final ChargePointService chargePointService;
     private final CertificateValidator certificateValidator;
     private final String protocolHeaderFromProxy;
 
     private final BasicAuthenticationConverter converter = new BasicAuthenticationConverter();
-
-    /**
-     * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
-     * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
-     * based on the selectedProtocol and replace the dummy one with the proper one in the subsequent call chain.
-     */
-    public WebSocketHandler getDummyWebSocketHandler() {
-        return new TextWebSocketHandler();
-    }
 
     @Override
     public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -173,31 +164,33 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        AbstractWebSocketEndpoint endpoint = selectEndpoint(requestedProtocols);
+        String version = selectVersion(requestedProtocols);
 
-        if (endpoint == null) {
+        if (version == null) {
             log.error("ChargeBoxId '{}': None of the requested protocols '{}' is supported", chargeBoxId, requestedProtocols);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 
-        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
-        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
-        return delegate.doHandshake(request, response, endpoint, attributes);
+        attributes.put(WebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
+
+        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, version);
+        return delegate.doHandshake(request, response, wsHandler, attributes);
     }
 
     /**
-     * Selects the endpoint for the first supported protocol in the station's preference order. Since requested
-     * protocols are evaluated before endpoints (because we iterate over requestedProtocols in the outer loop),
-     * the station's preference order dominates the endpoint collection's order (i.e. the order of endpoints
+     * Selects the OCPP version for the first supported protocol in the station's preference order. Since requested
+     * protocols are evaluated before versions (because we iterate over requestedProtocols in the outer loop),
+     * the station's preference order dominates the version collection's order (i.e. the order of versions
      * does not matter).
      *
-     * @return the selected endpoint, or {@code null} if none of the requested protocols is supported
+     * @return the selected OCPP version, or {@code null} if none of the requested protocols is supported
      */
-    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
+    private String selectVersion(List<String> requestedProtocols) {
+        List<String> supportedProtocols = subProtocolCapable.getSubProtocols();
         for (String requestedProtocol : requestedProtocols) {
-            for (AbstractWebSocketEndpoint item : endpoints) {
-                if (item.getVersion().getValue().equals(requestedProtocol)) {
+            for (String item : supportedProtocols) {
+                if (item.equals(requestedProtocol)) {
                     return item;
                 }
             }

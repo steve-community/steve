@@ -22,6 +22,7 @@ import com.google.common.net.HttpHeaders;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -556,7 +557,11 @@ public class OcppJsonChargePoint {
         private final CountDownLatch doneSignal = new CountDownLatch(1);
 
         public ExchangeContext(@NotNull WebSocketSession session, @NotNull String chargeBoxId) {
-            super(session, chargeBoxId);
+            super(
+                session,
+                chargeBoxId,
+                OcppVersion.fromValue(session.getAcceptedProtocol()).toProtocol(OcppTransport.JSON)
+            );
         }
 
         public REQ await() {

@@ -22,16 +22,15 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -40,52 +39,29 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable, OcppCallHandler {
+@Component
+@RequiredArgsConstructor
+public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
+    private final List<OcppCallHandler> versionHandlers;
     private final OcppServerRepository ocppServerRepository;
-    private final IncomingPipeline pipeline;
-    private final SessionContextStore sessionContextStore;
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
-    private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
-
-    public AbstractWebSocketEndpoint(OcppServerRepository ocppServerRepository,
-                                     FutureResponseContextStore futureResponseContextStore,
-                                     ApplicationEventPublisher applicationEventPublisher,
-                                     SessionContextStoreHolder sessionContextStoreHolder,
-                                     AbstractTypeStore typeStore) {
-        this.ocppServerRepository = ocppServerRepository;
-        this.sessionContextStore = sessionContextStoreHolder.getOrCreate(getVersion());
-        this.pipeline = new IncomingPipeline(new Deserializer(futureResponseContextStore, sessionContextStore, typeStore), this);
-
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, getVersion())));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, getVersion())));
-
-        log.info("Initialized");
-    }
-
-    public abstract OcppVersion getVersion();
-
-    @Override
-    public Logger getLogger() {
-        return log;
-    }
+    private final SessionContextStoreHolder sessionContextStoreHolder;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final IncomingPipeline incomingPipeline;
 
     @Override
     public List<String> getSubProtocols() {
-        return Collections.singletonList(getVersion().getValue());
+        return versionHandlers.stream()
+            .map(it -> it.getVersion().getValue())
+            .toList();
     }
 
     @Override
@@ -105,8 +81,10 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     }
 
     private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
+        var chargeBoxId = getChargeBoxId(session);
+        var version = getVersion(session);
+
         String incomingString = webSocketMessage.getPayload();
-        String chargeBoxId = getChargeBoxId(session);
 
         // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
@@ -116,10 +94,14 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
-        CommunicationContext context = new CommunicationContext(session, chargeBoxId);
+        CommunicationContext context = new CommunicationContext(
+            session,
+            chargeBoxId,
+            version.toProtocol(OcppTransport.JSON)
+        );
         context.setIncomingString(incomingString);
 
-        pipeline.accept(context);
+        incomingPipeline.accept(context);
     }
 
     private void handlePongMessage(WebSocketSession session) {
@@ -129,31 +111,37 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onOpen(WebSocketSession session) throws Exception {
-        String chargeBoxId = getChargeBoxId(session);
+        var chargeBoxId = getChargeBoxId(session);
+        var version = getVersion(session);
+
         WebSocketLogger.connected(chargeBoxId, session);
 
+        var sessionContextStore = sessionContextStoreHolder.getOrCreate(version);
         boolean stationConnected = sessionContextStore.add(chargeBoxId, session);
 
-        ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
+        ocppServerRepository.updateOcppProtocol(chargeBoxId, version.toProtocol(OcppTransport.JSON));
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
         if (stationConnected) {
-            connectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
+            applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId, version));
         }
     }
 
     @Override
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        String chargeBoxId = getChargeBoxId(session);
+        var chargeBoxId = getChargeBoxId(session);
+        var version = getVersion(session);
+
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
+        var sessionContextStore = sessionContextStoreHolder.getOrCreate(version);
         boolean stationDisconnected = sessionContextStore.remove(chargeBoxId, session);
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 1 -> 0.
         if (stationDisconnected) {
-            disconnectedCallbackList.forEach(consumer -> consumer.accept(chargeBoxId));
+            applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId, version));
         }
     }
 
@@ -175,4 +163,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         return (String) session.getAttributes().get(CHARGEBOX_ID_KEY);
     }
 
+    private OcppVersion getVersion(WebSocketSession session) {
+        return OcppVersion.fromValue(session.getAcceptedProtocol());
+    }
 }

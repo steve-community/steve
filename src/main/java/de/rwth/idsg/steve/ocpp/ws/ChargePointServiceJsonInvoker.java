@@ -97,7 +97,11 @@ public class ChargePointServiceJsonInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext(sessionStore.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context = new CommunicationContext(
+            sessionStore.getSession(chargeBoxId),
+            chargeBoxId,
+            cps.getOcppProtocol()
+        );
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

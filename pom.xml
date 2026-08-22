@@ -615,11 +615,11 @@
         </dependency>
 
         <!-- Codes according to ISO standards
-             https://github.com/TakahikoKawasaki/nv-i18n -->
+             https://github.com/foundationsedge/nv-i18n -->
         <dependency>
-            <groupId>com.neovisionaries</groupId>
+            <groupId>uk.co.foundationsedge</groupId>
             <artifactId>nv-i18n</artifactId>
-            <version>1.29</version>
+            <version>1.33</version>
         </dependency>
 
         <dependency>

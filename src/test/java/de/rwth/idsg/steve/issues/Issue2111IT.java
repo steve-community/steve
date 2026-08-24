@@ -41,8 +41,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -62,50 +62,42 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Evse.EVSE;
 
 /**
- * Issue 2107: several charge points sending their FIRST {@code StatusNotification(connectorId=0)}
- * at the same time deadlocked on {@code insert into evse} (MariaDB 1213), and the deadlock was
- * returned to the charge point as an OCPP {@code CALLERROR} instead of a
- * {@code StatusNotification.conf}. The connector status was silently not recorded either.
+ * Issue 2111: the other half of the race #2107 was about. There, several DISTINCT charge
+ * boxes reported their first connector status at once and deadlocked while each inserted a
+ * row of its own. Here the burst comes from ONE charge box reporting ONE connector, so the
+ * second transaction to arrive finds the unique key already taken and takes the
+ * {@code ON DUPLICATE KEY UPDATE} branch of
+ * {@code Ocpp1ConnectorEvseBridge.insertIgnoreConnectorInternal}.
  *
- * <p>This test is deliberately at the PROTOCOL level, over real WebSocket connections, where
- * {@code Ocpp1ConnectorEvseBridgeIT} covers the repository call directly. What made 2107 a bug
- * worth fixing is not that a repository method threw, it is that OCPP 1.6 obliges the Central
- * System to answer {@code StatusNotification.req} with {@code StatusNotification.conf} — and
- * that obligation is only observable from the wire.
+ * <p>On MariaDB that branch raises {@code Record has changed since last read in table 'evse'}
+ * (error 1020, snapshot isolation — MDEV-37208), and it escapes to the charge point as a
+ * {@code CALLERROR}, exactly as the 1213 deadlock did before #2108. The obligation is the
+ * same one OCPP 1.6 states: {@code StatusNotification.req} is answered with
+ * {@code StatusNotification.conf}.
  *
- * <p>Two properties of the setup carry the whole reproduction, and neither is incidental:
- * <ul>
- *   <li><b>Fresh charge boxes.</b> Once a charge box's {@code evse} rows exist, later
- *       StatusNotifications do not insert and there is nothing left to race on. Every round
- *       therefore registers charge boxes that have never sent anything.</li>
- *   <li><b>One barrier, one message.</b> The stations connect and boot first, then wait on a
- *       shared latch, so the only thing that happens simultaneously is the StatusNotification
- *       itself.</li>
- * </ul>
+ * <p>Two sessions of one charge box is not a contrivance: SteVe accepts several
+ * ({@code ws.session.select.strategy} exists for exactly that), and a station that reconnects
+ * before the old socket is reaped is the ordinary way to get there.
  *
- * <p>It is a sampler: the failure it targets was probabilistic (roughly half of the bursts of
- * three, before the fix). Hence several rounds, and an assertion that can only go red when the
- * regression is back — a station answered with a CALLERROR, or a connector status that was
- * never written.
+ * <p>THIS TEST IS EXPECTED TO FAIL until #2111 is fixed. It is the wire-level statement of
+ * what {@code Ocpp1ConnectorEvseBridgeIT.insertIgnoreConnectorCreatesSameTopologyIdempotently}
+ * says at the repository level.
  *
- * @see <a href="https://github.com/steve-community/steve/issues/2107">Issue 2107</a>
+ * @see <a href="https://github.com/steve-community/steve/issues/2111">Issue 2111</a>
+ * @see <a href="https://jira.mariadb.org/browse/MDEV-37208">MDEV-37208</a>
  */
 @Slf4j
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class Issue2107IT {
+public class Issue2111IT {
 
-    /**
-     * Stations per burst. Six matches {@code Ocpp1ConnectorEvseBridgeIT}, and a wider burst
-     * reproduced more often than a narrow one when this was measured against the broken build.
-     */
-    private static final int STATION_COUNT = 6;
+    /** Sessions of the one charge box, all reporting the one connector. */
+    private static final int SESSION_COUNT = 3;
 
-    /** Bursts. Each one is an independent draw, on charge boxes the CSMS has never seen. */
+    /** Non-zero, so the physical connector row is exercised alongside the EVSE row. */
+    private static final int CONNECTOR_ID = 1;
+
     private static final int ROUNDS = 3;
-
-    /** The connector id a charge point reports itself with, and the one 2107 was raised on. */
-    private static final int CONNECTOR_ID = 0;
 
     private static final long BARRIER_TIMEOUT_SECONDS = 60;
     private static final long RESULT_TIMEOUT_SECONDS = 60;
@@ -117,16 +109,13 @@ public class Issue2107IT {
     private ServerProperties serverProperties;
 
     /**
-     * The port the server actually bound, which is what {@code RANDOM_PORT} is for here.
+     * The port the server actually bound.
      *
-     * <p>A fixed port would be the shorter annotation, and it would break the build: Spring
-     * caches one context per configuration and does not close them between classes, so a
-     * second {@code DEFINED_PORT} context whose key differs from
-     * {@code Ocpp16JsonCsmsCertificationIT}'s — and this one's does, it sets no
-     * {@code octt-quirks} property — starts while the first is still listening on 8080.
-     * Measured: whichever of the two runs second dies with
-     * {@code BindException: Address already in use}. The TLS certification IT gets away with
-     * a fixed port only because {@code application-test-tls.yml} moves it to 8443.
+     * <p>Not {@code DEFINED_PORT}: Spring caches one context per configuration and closes
+     * none of them between classes, so a second fixed-port context on 8080 — and this one's
+     * cache key differs from {@code Ocpp16JsonCsmsCertificationIT}'s, which sets an
+     * {@code octt-quirks} property — means whichever class runs second dies with
+     * {@code BindException: Address already in use}. Measured.
      */
     @LocalServerPort
     private int port;
@@ -145,72 +134,68 @@ public class Issue2107IT {
     }
 
     @Test
-    public void concurrentFirstStatusNotificationIsAnsweredAndRecorded() throws Exception {
+    public void concurrentFirstStatusNotificationOfOneStationIsAnsweredAndRecorded() throws Exception {
         for (int round = 1; round <= ROUNDS; round++) {
             log.info("----- burst {}/{} -----", round, ROUNDS);
-            List<String> chargeBoxIds = registerStations();
+            String chargeBoxId = registerStation();
 
-            burstStatusNotification(chargeBoxIds);
+            burstOneStation(chargeBoxId);
 
             int recorded = dslContext.fetchCount(
                 EVSE,
-                EVSE.CHARGE_BOX_ID.in(chargeBoxIds)
+                EVSE.CHARGE_BOX_ID.eq(chargeBoxId)
                     .and(EVSE.TOPOLOGY_SOURCE.eq(EvseTopologySource.ocpp1))
                     .and(EVSE.EVSE_ID.eq(CONNECTOR_ID))
             );
 
-            // The half a charge point cannot see: before the fix, a station whose insert lost
-            // the race got its CALLERROR *and* no row at all.
-            Assertions.assertEquals(STATION_COUNT, recorded,
-                "burst " + round + ": every station's connector status must be recorded");
+            // Exactly one: the point of insertIgnoreConnector is that concurrent reports of
+            // the same connector converge on one row rather than failing or duplicating it.
+            Assertions.assertEquals(1, recorded,
+                "burst " + round + ": the connector must be recorded exactly once");
         }
     }
 
-    /**
-     * Every station sends its StatusNotification in the same instant. Each one is answered with
-     * a {@code StatusNotification.conf} or the test fails naming the stations that were not.
-     */
-    private void burstStatusNotification(List<String> chargeBoxIds) throws Exception {
+    private void burstOneStation(String chargeBoxId) throws Exception {
         String path = jsonPath();
 
-        CountDownLatch ready = new CountDownLatch(chargeBoxIds.size());
+        CountDownLatch ready = new CountDownLatch(SESSION_COUNT);
         CountDownLatch start = new CountDownLatch(1);
-        ExecutorService executor = Executors.newFixedThreadPool(chargeBoxIds.size());
-        List<Future<StatusNotificationResponse>> futures = new ArrayList<>(chargeBoxIds.size());
+        ExecutorService executor = Executors.newFixedThreadPool(SESSION_COUNT);
+        List<Future<StatusNotificationResponse>> futures = new ArrayList<>(SESSION_COUNT);
         boolean terminated;
 
         try {
-            for (String chargeBoxId : chargeBoxIds) {
-                futures.add(executor.submit(station(chargeBoxId, path, ready, start)));
+            for (int session = 0; session < SESSION_COUNT; session++) {
+                futures.add(executor.submit(session(chargeBoxId, path, ready, start)));
             }
 
             Assertions.assertTrue(ready.await(BARRIER_TIMEOUT_SECONDS, TimeUnit.SECONDS),
-                "stations did not finish booting in time");
+                "sessions did not finish booting in time");
             start.countDown();
 
             List<String> failures = new ArrayList<>();
             for (int i = 0; i < futures.size(); i++) {
-                String chargeBoxId = chargeBoxIds.get(i);
+                int session = i;
                 try {
                     Assertions.assertNotNull(futures.get(i).get(RESULT_TIMEOUT_SECONDS, TimeUnit.SECONDS));
                 } catch (ExecutionException e) {
                     // A CALLERROR surfaces here: OcppJsonChargePoint refuses to hand back a
-                    // response of the wrong message type. The cause of the CALLERROR itself is
-                    // in the server log of this run.
-                    failures.add(chargeBoxId + " -> " + e.getCause());
+                    // response of the wrong message type.
+                    failures.add("session " + session + " -> " + e.getCause());
                 } catch (TimeoutException e) {
                     // Collected rather than thrown: the summary below is this test's entire
-                    // output, and a station that was never answered at all is a different
-                    // failure from one answered with a CALLERROR.
+                    // output, and a session that was never answered at all is a different
+                    // failure from one answered with a CALLERROR. Throwing here would report
+                    // the first slow session and say nothing about the other two.
                     futures.get(i).cancel(true);
-                    failures.add(chargeBoxId + " -> no answer within "
+                    failures.add("session " + session + " -> no answer within "
                         + RESULT_TIMEOUT_SECONDS + "s");
                 }
             }
 
             Assertions.assertTrue(failures.isEmpty(),
-                () -> failures.size() + "/" + chargeBoxIds.size()
-                    + " stations were not answered with a StatusNotification.conf: " + failures);
+                () -> failures.size() + "/" + SESSION_COUNT
+                    + " sessions were not answered with a StatusNotification.conf: " + failures);
         } finally {
             start.countDown();
             executor.shutdownNow();
@@ -220,17 +205,17 @@ public class Issue2107IT {
             terminated = executor.awaitTermination(30, TimeUnit.SECONDS);
         }
 
-        Assertions.assertTrue(terminated, "stations did not terminate in time");
+        Assertions.assertTrue(terminated, "sessions did not terminate in time");
     }
 
     /**
-     * One station: connect, boot, wait for the others, then the one message under test.
+     * One session of the charge box.
      *
      * <p>The charge point is built inside the worker on purpose — {@link OcppJsonChargePoint}
      * remembers the thread that created it and interrupts that thread on a protocol error, so
-     * an instance built on the main thread would report another station's failure.
+     * an instance built on the main thread would report another session's failure.
      */
-    private static Callable<StatusNotificationResponse> station(String chargeBoxId,
+    private static Callable<StatusNotificationResponse> session(String chargeBoxId,
                                                                 String path,
                                                                 CountDownLatch ready,
                                                                 CountDownLatch start) {
@@ -248,10 +233,6 @@ public class Issue2107IT {
                     );
                     Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
                 } finally {
-                    // Whether the setup worked or not. A station that never booted would
-                    // otherwise cost the coordinator the whole barrier timeout and report
-                    // "did not finish booting in time" instead of the failure already sitting
-                    // in this station's future.
                     ready.countDown();
                 }
 
@@ -290,21 +271,13 @@ public class Issue2107IT {
             + WebSocketConfiguration.PATH_INFIX;
     }
 
-    /**
-     * Charge boxes with a row and nothing else: registered enough to be allowed to connect,
-     * with no {@code evse} row yet. That is the state the race needs.
-     */
-    private List<String> registerStations() {
-        String prefix = "issue2107_" + UUID.randomUUID().toString().replace("-", "");
-        List<String> chargeBoxIds = new ArrayList<>(STATION_COUNT);
-
-        for (int i = 0; i < STATION_COUNT; i++) {
-            String chargeBoxId = prefix + "_" + i;
-            chargeBoxIds.add(chargeBoxId);
-            dslContext.insertInto(CHARGE_BOX)
-                .set(CHARGE_BOX.CHARGE_BOX_ID, chargeBoxId)
-                .execute();
-        }
-        return chargeBoxIds;
+    /** A charge box with a row and nothing else: no {@code evse} row yet, which is what makes
+     *  the burst below a race between three FIRST reports of the same connector. */
+    private String registerStation() {
+        String chargeBoxId = "issue2111_" + UUID.randomUUID().toString().replace("-", "");
+        dslContext.insertInto(CHARGE_BOX)
+            .set(CHARGE_BOX.CHARGE_BOX_ID, chargeBoxId)
+            .execute();
+        return chargeBoxId;
     }
 }

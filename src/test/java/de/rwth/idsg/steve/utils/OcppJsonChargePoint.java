@@ -156,7 +156,25 @@ public class OcppJsonChargePoint {
             this.session = connect.get(); // block until session is created
             return this;
         } catch (Throwable t) {
+            // The client is started before the connection is attempted, and a caller cannot
+            // clean it up afterwards: close() begins with session.close(), and there is no
+            // session when we got here. Tests that expect start() to fail -- an unknown
+            // charge box, a wrong subprotocol -- would otherwise leave a Jetty client and
+            // its threads running for the rest of the fork.
+            stopClientQuietly();
             throw new RuntimeException(t);
+        }
+    }
+
+    /** Best effort: the exception from the failed start is the one worth reporting. */
+    private void stopClientQuietly() {
+        if (client == null) {
+            return;
+        }
+        try {
+            client.stop();
+        } catch (Exception e) {
+            log.warn("Failed to stop websocket client after a failed start", e);
         }
     }
 

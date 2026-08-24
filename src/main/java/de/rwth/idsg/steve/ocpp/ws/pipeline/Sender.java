@@ -19,24 +19,27 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
+import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 
 /**
- * This class should remain stateless.
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.03.2015
  */
 @Slf4j
-public enum Sender {
-    INSTANCE;
+@Component
+@RequiredArgsConstructor
+public class Sender {
+
+    private final SessionContextStoreHolder sessionContextStoreHolder;
 
     /**
      * Return value is used by callers to decide whether they must rollback any pre-send bookkeeping.
@@ -44,14 +47,17 @@ public enum Sender {
      *
      * @return whether the message was actually sent or not
      */
-    public boolean accept(CommunicationContext context) {
-        String outgoingString = context.getOutgoingString();
-        String chargeBoxId = context.getChargeBoxId();
-        WebSocketSession session = context.getSession();
+    public boolean accept(CommunicationContext.Out outMsg) {
+        String outgoingString = outMsg.payload();
+        String chargeBoxId = outMsg.route().chargeBoxId();
+        String webSocketSessionId = outMsg.route().webSocketSessionId();
+
+        var sessionStore = sessionContextStoreHolder.getOrCreate(outMsg.route().protocol().getVersion());
+        var session = sessionStore.getSession(chargeBoxId, webSocketSessionId);
 
         // https://github.com/steve-community/steve/issues/1914
-        if (!session.isOpen()) {
-            WebSocketLogger.willNotSend(chargeBoxId, session, outgoingString);
+        if (session == null || !session.isOpen()) {
+            WebSocketLogger.willNotSend(chargeBoxId, webSocketSessionId, outgoingString);
             return false;
         }
 
@@ -62,7 +68,7 @@ public enum Sender {
             return true;
         } catch (IOException e) {
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
-            if (context.getOutgoingMessage() instanceof OcppJsonCall) {
+            if (outMsg.messageType() == MessageType.CALL) {
                 throw new SteveException("OCPP CALL failed", e);
             } else {
                 log.error("Could not send the outgoing message", e);

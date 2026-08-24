@@ -20,10 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.web.socket.WebSocketSession;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Default holder/context of incoming and outgoing messages.
@@ -31,28 +28,94 @@ import org.springframework.web.socket.WebSocketSession;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2015
  */
-@RequiredArgsConstructor
-@Getter
 public class CommunicationContext {
 
-    @NotNull private final WebSocketSession session;
-    @NotNull private final String chargeBoxId;
-    @NotNull private final OcppProtocol protocol;
+    // -------------------------------------------------------------------------
+    // Raw messages. These are queue-friendly and can be serialized
+    // -------------------------------------------------------------------------
 
-    @Setter private String incomingString;
-    @Setter private String outgoingString;
+    public record StationRoute(
+        String webSocketSessionId,
+        String chargeBoxId,
+        OcppProtocol protocol
+    ) {
+    }
 
-    @Setter private OcppJsonMessage incomingMessage;
-    @Setter private OcppJsonMessage outgoingMessage;
+    public record In(
+        StationRoute route,
+        String payload
+    ) {
+    }
 
-    /**
-     * This is only relevant for requests CSMS sends.
-     * During the outgoing pipeline, we create an instance of this and store it.
-     * During the incoming pipeline (response from station to request), we restore and reference it.
-     */
-    @Setter private FutureResponseContext futureResponseContext;
+    public record Out(
+        StationRoute route,
+        String payload,
+        MessageType messageType
+    ) {
+    }
 
-    public boolean isSetOutgoingError() {
-        return (outgoingMessage != null) && (outgoingMessage instanceof OcppJsonError);
+    // -------------------------------------------------------------------------
+    // In-process data holders
+    // -------------------------------------------------------------------------
+
+    public sealed interface DeserializationResult {
+
+    }
+
+    public record InCall(
+        In in,
+        OcppJsonCall call
+    ) implements DeserializationResult {
+    }
+
+    public record InResult(
+        In in,
+        OcppJsonResult result,
+        FutureResponseContext frc
+    ) implements DeserializationResult {
+    }
+
+    public record InError(
+        In in,
+        OcppJsonError error,
+        FutureResponseContext frc
+    ) implements DeserializationResult {
+    }
+
+    public record OutCall(
+        StationRoute route,
+        OcppJsonCall call,
+        FutureResponseContext frc
+    ) {
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom exceptions
+    // -------------------------------------------------------------------------
+
+    public static class JsonCallParseException extends Exception {
+
+        @Getter
+        private final OcppJsonError parseError;
+
+        public JsonCallParseException(OcppJsonError parseError) {
+            this.parseError = parseError;
+        }
+    }
+
+    public static class JsonResponseInvalidException extends Exception {
+
+        @Getter
+        private final FutureResponseContext frc;
+
+        public JsonResponseInvalidException(String msg, @Nullable FutureResponseContext frc) {
+            super(msg);
+            this.frc = frc;
+        }
+
+        public JsonResponseInvalidException(String msg, Throwable cause, @Nullable FutureResponseContext frc) {
+            super(msg, cause);
+            this.frc = frc;
+        }
     }
 }

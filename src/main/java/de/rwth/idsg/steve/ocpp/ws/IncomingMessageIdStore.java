@@ -90,8 +90,8 @@ public class IncomingMessageIdStore {
         lookupBySessionId.remove(session.getId());
     }
 
-    Boolean registerIncomingCallId(WebSocketSession session, @NotNull String messageId) {
-        LongOpenHashSet set = lookupBySessionId.get(session.getId());
+    Boolean registerIncomingCallId(String webSocketSessionId, @NotNull String messageId) {
+        LongOpenHashSet set = lookupBySessionId.get(webSocketSessionId);
         if (set == null) {
             // return null in order to stop processing this message. if the set is null, we clearly don't know this
             // session. it might imply some add/remove race or some other unexpected edge case.
@@ -107,7 +107,7 @@ public class IncomingMessageIdStore {
         if (maxTrackedMessageIdsPerSession != null && set.size() > maxTrackedMessageIdsPerSession) {
             throw new SteveException(
                 "Incoming CALL messageId limit of %s exceeded for session '%s'",
-                maxTrackedMessageIdsPerSession, session.getId()
+                maxTrackedMessageIdsPerSession, webSocketSessionId
             );
         }
         return true;

@@ -46,8 +46,8 @@ public final class WebSocketLogger {
         log.info("[chargeBoxId={}, sessionId={}] Sending: {}", chargeBoxId, session.getId(), msg);
     }
 
-    public static void willNotSend(String chargeBoxId, WebSocketSession session, String msg) {
-        log.warn("[chargeBoxId={}, sessionId={}] Attempted to send to closed session: {}", chargeBoxId, session.getId(), msg);
+    public static void willNotSend(String chargeBoxId, String webSocketSessionId, String msg) {
+        log.warn("[chargeBoxId={}, sessionId={}] Attempted to send to closed session: {}", chargeBoxId, webSocketSessionId, msg);
     }
 
     public static void sendingPing(String chargeBoxId, WebSocketSession session) {

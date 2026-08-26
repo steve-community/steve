@@ -81,6 +81,11 @@ public class TaskStoreImpl implements TaskStore {
     }
 
     @Override
+    public boolean remove(CommunicationTask task) {
+        return lookupTable.remove(task.getTaskId(), task);
+    }
+
+    @Override
     public List<CommunicationTask> getFinished() {
         return lookupTable.values()
             .stream()

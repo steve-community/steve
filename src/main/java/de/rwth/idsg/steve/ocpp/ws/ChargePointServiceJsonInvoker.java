@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChargePointServiceJsonInvoker {
 
-    private final OutgoingCallPipeline outgoingCallPipeline;
+    private final OutgoingPipeline outgoingPipeline;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
@@ -89,6 +89,6 @@ public class ChargePointServiceJsonInvoker {
             task.getTaskId()
         );
 
-        outgoingCallPipeline.accept(context);
+        outgoingPipeline.accept(context);
     }
 }

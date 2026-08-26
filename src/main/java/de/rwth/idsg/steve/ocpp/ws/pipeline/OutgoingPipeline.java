@@ -19,11 +19,17 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
+import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
+import de.rwth.idsg.steve.repository.TaskStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -32,22 +38,82 @@ import java.io.IOException;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 12.03.2015
+ * @since 27.03.2015
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class Sender {
+public class OutgoingPipeline {
 
+    private final TaskStore taskStore;
     private final SessionContextStoreHolder sessionContextStoreHolder;
+    private final FutureResponseContextStore futureResponseContextStore;
 
     public void accept(CommunicationContext.Out outMsg) {
+        var version = outMsg.route().protocol().getVersion();
+        var chargeBoxId = outMsg.route().chargeBoxId();
+        var webSocketSessionId = outMsg.route().webSocketSessionId();
+
+        // Retrieve session by id
+        var sessionStore = sessionContextStoreHolder.getOrCreate(version);
+        var session = sessionStore.getSession(chargeBoxId, webSocketSessionId);
+
+        sendOut(outMsg, session);
+    }
+
+    /**
+     * For outgoing CALLs, triggered by the user.
+     * Uses a store-before-send strategy to close response-correlation races.
+     * If transport sending fails, the stored context is rolled back immediately.
+     */
+    public void accept(CommunicationContext.OutCall outWithCall) {
+        var version = outWithCall.protocol().getVersion();
+
+        // Pick a session to send
+        var sessionStore = sessionContextStoreHolder.getOrCreate(version);
+        var session = sessionStore.getSession(outWithCall.chargeBoxId());
+
+        // Reconstruct CommunicationTask from its id
+        var typeStore = TypeStore.getTypeStore(version);
+        var task = taskStore.get(outWithCall.taskId());
+
+        // Construct a response context before send
+        var responseClass = typeStore.findResponseClass(outWithCall.action());
+        var frc = new FutureResponseContext(task, responseClass);
+
+        // 1. Store the response context for later lookup.
+        futureResponseContextStore.add(
+            session.getId(),
+            outWithCall.ocppMessageId(),
+            frc
+        );
+
+        // 2. Send the payload via WebSocket
+        try {
+            if (!sendOutCall(outWithCall, session)) {
+                poll(outWithCall, session);
+            }
+        } catch (Exception e) {
+            poll(outWithCall, session);
+            throw e;
+        }
+    }
+
+    /**
+     * 3. In case of failure, rollback aka remove the FutureResponseContext
+     */
+    private void poll(CommunicationContext.OutCall outWithCall, WebSocketSession session) {
+        futureResponseContextStore.poll(session.getId(), outWithCall.ocppMessageId());
+    }
+
+    // -------------------------------------------------------------------------
+    // Actual sending over WebSocket
+    // -------------------------------------------------------------------------
+
+    private static void sendOut(CommunicationContext.Out outMsg,  @Nullable WebSocketSession session) {
         String outgoingString = outMsg.payload();
         String chargeBoxId = outMsg.route().chargeBoxId();
         String webSocketSessionId = outMsg.route().webSocketSessionId();
-
-        var sessionStore = sessionContextStoreHolder.getOrCreate(outMsg.route().protocol().getVersion());
-        var session = sessionStore.getSession(chargeBoxId, webSocketSessionId);
 
         // https://github.com/steve-community/steve/issues/1914
         if (session == null || !session.isOpen()) {
@@ -71,7 +137,7 @@ public class Sender {
      *
      * @return whether the message was actually sent or not
      */
-    public boolean accept(CommunicationContext.OutCall outMsg, WebSocketSession session) {
+    private static boolean sendOutCall(CommunicationContext.OutCall outMsg, WebSocketSession session) {
         String outgoingString = outMsg.payload();
         String chargeBoxId = outMsg.chargeBoxId();
         String webSocketSessionId = session.getId();

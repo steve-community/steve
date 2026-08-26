@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
@@ -86,15 +85,15 @@ public class ChargePointServiceJsonInvoker {
             case V_16 -> task.getOcpp16Request();
         };
 
-        ActionResponsePair pair = typeStore.findActionResponse(request);
-        if (pair == null) {
+        String action = typeStore.findAction(request);
+        if (action == null) {
             throw new SteveException("Action name is not found");
         }
 
         OcppJsonCall call = new OcppJsonCall();
         call.setMessageId(UUID.randomUUID().toString());
         call.setPayload(request);
-        call.setAction(pair.getAction());
+        call.setAction(action);
 
         var context = new CommunicationContext.OutCall(
             new CommunicationContext.StationRoute(
@@ -103,7 +102,7 @@ public class ChargePointServiceJsonInvoker {
                 cps.getOcppProtocol()
             ),
             call,
-            new FutureResponseContext(task, pair.getResponseClass())
+            new FutureResponseContext(task, typeStore.findResponseClass(action))
         );
 
         outgoingCallPipeline.accept(context);

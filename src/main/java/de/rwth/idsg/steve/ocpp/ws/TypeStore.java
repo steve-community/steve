@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,7 +37,14 @@ public interface TypeStore {
     /**
      * For outgoing requests
      *
-     * Request JAXB class --> Action field, Response JAXB class
+     * Action field --> Response JAXB class
      */
-    <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload);
+    Class<? extends ResponseType> findResponseClass(String action);
+
+    /**
+     * For outgoing requests
+     *
+     * Request JAXB class --> Action field
+     */
+    <T extends RequestType> String findAction(T requestPayload);
 }

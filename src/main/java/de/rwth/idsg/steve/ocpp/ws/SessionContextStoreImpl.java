@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -62,7 +58,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     private final Striped<Lock> locks = Striped.lock(128);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
-    private final TaskScheduler taskScheduler;
+    private final WebSocketPingService pingService;
     private final FutureResponseContextStore futureResponseContextStore;
 
     @Override
@@ -77,13 +73,9 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
             // Just to keep the connection alive, such that the servers do not close
             // the connection because of a idle timeout, we ping-pong at fixed intervals.
-            ScheduledFuture<?> pingSchedule = taskScheduler.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
-                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
-                WebSocketConfiguration.PING_INTERVAL
-            );
+            pingService.register(chargeBoxId, session);
 
-            SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
+            SessionContext context = new SessionContext(session, DateTime.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
@@ -113,7 +105,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
             for (var it = endpointDeque.iterator(); it.hasNext();) {
                 SessionContext context = it.next();
                 if (context.getSession().getId().equals(session.getId())) {
-                    context.getPingSchedule().cancel(true);
+                    pingService.deregister(session);
                     it.remove();
                     log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}", chargeBoxId, endpointDeque.size());
                     break;

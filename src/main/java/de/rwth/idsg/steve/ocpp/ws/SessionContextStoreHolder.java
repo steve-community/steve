@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,18 +35,21 @@ public class SessionContextStoreHolder {
     private final ConcurrentHashMap<OcppVersion, SessionContextStore> storesPerVersion = new ConcurrentHashMap<>();
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
-    private final TaskScheduler taskScheduler;
+    private final WebSocketPingService pingService;
     private final FutureResponseContextStore futureResponseContextStore;
 
     public SessionContextStoreHolder(SteveProperties steveProperties,
-                                     TaskScheduler taskScheduler,
+                                     WebSocketPingService pingService,
                                      FutureResponseContextStore futureResponseContextStore) {
         wsSessionSelectStrategy = steveProperties.getOcpp().getWsSessionSelectStrategy();
-        this.taskScheduler = taskScheduler;
+        this.pingService = pingService;
         this.futureResponseContextStore = futureResponseContextStore;
     }
 
     public SessionContextStore getOrCreate(OcppVersion version) {
-        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy, taskScheduler, futureResponseContextStore));
+        return storesPerVersion.computeIfAbsent(
+            version,
+            k -> new SessionContextStoreImpl(wsSessionSelectStrategy, pingService, futureResponseContextStore)
+        );
     }
 }

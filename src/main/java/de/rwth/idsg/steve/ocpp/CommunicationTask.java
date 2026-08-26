@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.StringUtils;
@@ -46,6 +47,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Getter
 public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE> {
+
+    private static final AtomicInteger TASK_ID_SEQUENCE = new AtomicInteger(0);
+
+    /**
+     * Process-local identifier allocated as part of task construction. It is unique for the
+     * lifetime of this application process, but is not stable across application restarts.
+     */
+    private final int taskId = nextTaskId();
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -100,6 +109,15 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
         callbackList.add(defaultCallback());
         operationName = StringUtils.getOperationName(this);
+    }
+
+    private static int nextTaskId() {
+        return TASK_ID_SEQUENCE.updateAndGet(current -> {
+            if (current == Integer.MAX_VALUE) {
+                throw new SteveException("Task ID space exhausted");
+            }
+            return current + 1;
+        });
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {
@@ -171,6 +189,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
             case V_12 -> getOcpp12Handler(chargeBoxId);
             case V_15 -> getOcpp15Handler(chargeBoxId);
             case V_16 -> getOcpp16Handler(chargeBoxId);
+        };
+    }
+
+    public <T extends RequestType> T getOcppRequest(String chargeBoxId) {
+        return switch (versionMap.get(chargeBoxId)) {
+            case V_12 -> getOcpp12Request();
+            case V_15 -> getOcpp15Request();
+            case V_16 -> getOcpp16Request();
         };
     }
 

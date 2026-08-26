@@ -16,24 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.repository.dto.TaskOverview;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 29.12.2014
- */
-public interface TaskStore {
-    List<TaskOverview> getOverview();
-    CommunicationTask get(Integer taskId);
-    Integer add(CommunicationTask task);
-    boolean remove(CommunicationTask task);
-    List<CommunicationTask> getFinished();
-    List<CommunicationTask> getUnfinished();
-    void clearFinished();
-    void clearUnfinished();
+public class TaskStoreImplTest {
+
+    @Test
+    public void storesTaskUsingItsConstructionTimeId() {
+        var store = new TaskStoreImpl();
+        var task = new ClearCacheTask(new MultipleChargePointSelect());
+
+        var storedId = store.add(task);
+
+        assertEquals(task.getTaskId(), storedId);
+        assertSame(task, store.get(task.getTaskId()));
+    }
 }

@@ -20,8 +20,8 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,15 +44,15 @@ public class IncomingPipeline {
 
     private final Serializer serializer = Serializer.INSTANCE;
 
-    private final Sender sender;
+    private final OutgoingPipeline outgoingPipeline;
     private final Deserializer deserializer;
     private final Map<OcppVersion, OcppCallHandler> handlerMap = new EnumMap<>(OcppVersion.class);
 
     @Autowired
-    public IncomingPipeline(Sender sender,
+    public IncomingPipeline(OutgoingPipeline outgoingPipeline,
                             Deserializer deserializer,
                             List<OcppCallHandler> handlers) {
-        this.sender = sender;
+        this.outgoingPipeline = outgoingPipeline;
         this.deserializer = deserializer;
         for (OcppCallHandler handler : handlers) {
             handlerMap.put(handler.getVersion(), handler);
@@ -67,17 +67,17 @@ public class IncomingPipeline {
         } catch (CommunicationContext.JsonCallParseException e) {
             var parseError = e.getParseError();
             var parseErrorStr = serializer.accept(parseError);
-            sender.accept(new CommunicationContext.Out(inMsg.route(), parseErrorStr, parseError.getMessageType()));
+            outgoingPipeline.accept(CommunicationContext.outFrom(inMsg, parseErrorStr));
             return;
 
         } catch (CommunicationContext.JsonResponseInvalidException e) {
             var frc = e.getFrc();
             if (frc != null) {
-                frc.getTask().failed(inMsg.route().chargeBoxId(), e);
+                frc.getTask().failed(inMsg.chargeBoxId(), e);
             }
             throw new RuntimeException(e);
         } catch (Exception e) {
-            throw new SteveException("Deserialization of incoming string failed: %s", inMsg.payload(), e);
+            throw new SteveException("Deserialization of incoming string failed: %s", inMsg.ocppPayload(), e);
         }
 
         switch (inMsgData) {
@@ -88,7 +88,7 @@ public class IncomingPipeline {
     }
 
     private void processCall(CommunicationContext.InCall data) {
-        var version = data.in().route().protocol().getVersion();
+        var version = data.in().protocol().getVersion();
 
         var handler = handlerMap.get(version);
         if (handler == null) {
@@ -98,21 +98,21 @@ public class IncomingPipeline {
 
         var response = handler.accept(data);
         var responseStr = serializer.accept(response);
-        sender.accept(new CommunicationContext.Out(data.in().route(), responseStr, response.getMessageType()));
+        outgoingPipeline.accept(CommunicationContext.outFrom(data.in(), responseStr));
     }
 
     @SuppressWarnings("unchecked")
     private void processResult(CommunicationContext.InResult data) {
         data.frc()
             .getTask()
-            .getHandler(data.in().route().chargeBoxId())
+            .getHandler(data.in().chargeBoxId())
             .handleResponse(new DummyResponse(data.result().getPayload()));
     }
 
     private void processError(CommunicationContext.InError data) {
         data.frc()
             .getTask()
-            .success(data.in().route().chargeBoxId(), data.error());
+            .success(data.in().chargeBoxId(), data.error());
     }
 
     private record DummyResponse(ResponseType payload) implements Response<ResponseType> {

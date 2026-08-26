@@ -18,20 +18,19 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
-import de.rwth.idsg.steve.ocpp.TaskOrigin;
-import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.repository.TaskStore;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.List;
 
 /**
  * Created with assistance from GPT-5.3-Codex
@@ -46,11 +45,13 @@ public class TaskStoreImplIT extends AbstractRepositoryITBase {
     @BeforeEach
     public void setup() {
         resetDatabase(dslContext);
+        repository.clearFinished();
+        repository.clearUnfinished();
     }
 
     @Test
     public void getOverview() {
-        Integer taskId = repository.add(mockTask(false));
+        Integer taskId = repository.add(task(false));
         var overview = assertNoDatabaseException(repository::getOverview);
         Assertions.assertFalse(overview.isEmpty());
         Assertions.assertEquals(taskId, overview.get(0).getTaskId());
@@ -58,21 +59,22 @@ public class TaskStoreImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void get() {
-        Integer taskId = repository.add(mockTask(false));
+        Integer taskId = repository.add(task(false));
         var task = assertNoDatabaseException(() -> repository.get(taskId));
         Assertions.assertNotNull(task);
     }
 
     @Test
     public void add() {
-        Integer taskId = assertNoDatabaseException(() -> repository.add(mockTask(false)));
-        Assertions.assertNotNull(taskId);
+        var task = task(false);
+        Integer taskId = assertNoDatabaseException(() -> repository.add(task));
+        Assertions.assertEquals(task.getTaskId(), taskId);
     }
 
     @Test
     public void clearFinished() {
-        Integer finishedId = repository.add(mockTask(true));
-        Integer unfinishedId = repository.add(mockTask(false));
+        Integer finishedId = repository.add(task(true));
+        Integer unfinishedId = repository.add(task(false));
 
         assertNoDatabaseException(repository::clearFinished);
 
@@ -82,8 +84,8 @@ public class TaskStoreImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void clearUnfinished() {
-        Integer finishedId = repository.add(mockTask(true));
-        Integer unfinishedId = repository.add(mockTask(false));
+        Integer finishedId = repository.add(task(true));
+        Integer unfinishedId = repository.add(task(false));
 
         assertNoDatabaseException(repository::clearUnfinished);
 
@@ -91,12 +93,13 @@ public class TaskStoreImplIT extends AbstractRepositoryITBase {
         Assertions.assertThrows(SteveException.class, () -> repository.get(unfinishedId));
     }
 
-    private static de.rwth.idsg.steve.ocpp.CommunicationTask mockTask(boolean finished) {
-        var task = mock(de.rwth.idsg.steve.ocpp.CommunicationTask.class);
-        when(task.isFinished()).thenReturn(finished);
-        when(task.getOrigin()).thenReturn(TaskOrigin.INTERNAL);
-        when(task.getResponseCount()).thenReturn(new AtomicInteger(0));
-        when(task.getResultMap()).thenReturn(new HashMap<>());
+    private static de.rwth.idsg.steve.ocpp.CommunicationTask task(boolean finished) {
+        var params = new MultipleChargePointSelect();
+        params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, "station")));
+        var task = new ClearCacheTask(params);
+        if (finished) {
+            task.addNewResponse("station", "response");
+        }
         return task;
     }
 }

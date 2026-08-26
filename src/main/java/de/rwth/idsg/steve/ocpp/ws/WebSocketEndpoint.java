@@ -95,11 +95,9 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
         var inMsg = new CommunicationContext.In(
-            new CommunicationContext.StationRoute(
-                session.getId(),
-                chargeBoxId,
-                version.toProtocol(OcppTransport.JSON)
-            ),
+            chargeBoxId,
+            version.toProtocol(OcppTransport.JSON),
+            session.getId(),
             incomingString
         );
 

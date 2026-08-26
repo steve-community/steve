@@ -28,7 +28,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 @Repository
 public class TaskStoreImpl implements TaskStore {
 
-    private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
 
     @Override
@@ -74,9 +72,17 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public Integer add(CommunicationTask task) {
-        int taskId = atomicInteger.incrementAndGet();
-        lookupTable.put(taskId, task);
+        int taskId = task.getTaskId();
+        var existing = lookupTable.putIfAbsent(taskId, task);
+        if (existing != null && existing != task) {
+            throw new SteveException("There is already a task with taskId '%s'", taskId);
+        }
         return taskId;
+    }
+
+    @Override
+    public boolean remove(CommunicationTask task) {
+        return lookupTable.remove(task.getTaskId(), task);
     }
 
     @Override

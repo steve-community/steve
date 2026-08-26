@@ -34,24 +34,48 @@ public class CommunicationContext {
     // Raw messages. These are queue-friendly and can be serialized
     // -------------------------------------------------------------------------
 
-    public record StationRoute(
-        String webSocketSessionId,
-        String chargeBoxId,
-        OcppProtocol protocol
-    ) {
-    }
-
     public record In(
-        StationRoute route,
-        String payload
+        String chargeBoxId,
+        OcppProtocol protocol,
+        String webSocketSessionId,
+
+        String ocppPayload // full and raw JSON array payload
     ) {
     }
 
+    /**
+     * For responses (result or error) to incoming requests
+     */
     public record Out(
-        StationRoute route,
-        String payload,
-        MessageType messageType
+        String chargeBoxId,
+        OcppProtocol protocol,
+        String webSocketSessionId,
+
+        String ocppPayload // full and raw JSON array payload
     ) {
+    }
+
+    /**
+     * Outgoing requests (calls)
+     */
+    public record OutCall(
+        String chargeBoxId,
+        OcppProtocol protocol,
+        int taskId,
+
+        String ocppPayload, // full and raw JSON array payload
+        String ocppAction,
+        String ocppMessageId
+    ) {
+    }
+
+    public static Out outFrom(CommunicationContext.In in, String ocppPayload) {
+        return new Out(
+            in.chargeBoxId,
+            in.protocol,
+            in.webSocketSessionId,
+            ocppPayload
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -80,13 +104,6 @@ public class CommunicationContext {
         OcppJsonError error,
         FutureResponseContext frc
     ) implements DeserializationResult {
-    }
-
-    public record OutCall(
-        StationRoute route,
-        OcppJsonCall call,
-        FutureResponseContext frc
-    ) {
     }
 
     // -------------------------------------------------------------------------

@@ -16,19 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.data;
+package de.rwth.idsg.steve.ocpp;
 
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 23.03.2015
- */
-@Getter
-@RequiredArgsConstructor
-public final class ActionResponsePair {
-    private final String action;
-    private final Class<? extends ResponseType> responseClass;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class CommunicationTaskTest {
+
+    @Test
+    public void assignsUniquePositiveIdsDuringConstruction() {
+        var first = new ClearCacheTask(new MultipleChargePointSelect());
+        var second = new ClearCacheTask(new MultipleChargePointSelect());
+
+        assertTrue(first.getTaskId() > 0);
+        assertTrue(second.getTaskId() > 0);
+        assertNotEquals(first.getTaskId(), second.getTaskId());
+    }
 }

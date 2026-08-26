@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 import com.google.common.base.Preconditions;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.RegexPatternTypeFilter;
@@ -40,8 +39,9 @@ public abstract class AbstractTypeStore implements TypeStore {
     private static final String REQUEST_CLASS_SUFFIX = "Request";
     private static final String RESPONSE_CLASS_SUFFIX = "Response";
 
-    private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
-    private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
+    private final Map<String, Class<? extends RequestType>> inRequestClassMap = new HashMap<>();
+    private final Map<String, Class<? extends ResponseType>> outResponseClassMap = new HashMap<>();
+    private final Map<Class<? extends RequestType>, String> outActionMap = new HashMap<>();
 
     public AbstractTypeStore(String packageForRequestClassMap,
                              String packageForActionResponseMap) {
@@ -60,12 +60,17 @@ public abstract class AbstractTypeStore implements TypeStore {
 
     @Override
     public Class<? extends RequestType> findRequestClass(String action) {
-        return requestClassMap.get(action);
+        return inRequestClassMap.get(action);
     }
 
     @Override
-    public <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload) {
-        return actionResponseMap.get(requestPayload.getClass());
+    public Class<? extends ResponseType> findResponseClass(String action) {
+        return outResponseClassMap.get(action);
+    }
+
+    @Override
+    public <T extends RequestType> String findAction(T requestPayload) {
+        return outActionMap.get(requestPayload.getClass());
     }
 
     // -------------------------------------------------------------------------
@@ -77,7 +82,7 @@ public abstract class AbstractTypeStore implements TypeStore {
         for (Class<RequestType> clazz : classes.values()) {
             String action = getAction(clazz);
             Preconditions.checkNotNull(action);
-            requestClassMap.put(action, clazz);
+            inRequestClassMap.put(action, clazz);
         }
     }
 
@@ -93,7 +98,8 @@ public abstract class AbstractTypeStore implements TypeStore {
             Class<? extends ResponseType> responseClass = responseClasses.get(responseClassSimpleName);
             Preconditions.checkNotNull(responseClass);
 
-            actionResponseMap.put(requestClass, new ActionResponsePair(action, responseClass));
+            outResponseClassMap.put(action, responseClass);
+            outActionMap.put(requestClass, action);
         }
     }
 

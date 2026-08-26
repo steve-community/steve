@@ -43,6 +43,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ChargePointServiceClientTest {
@@ -75,6 +76,7 @@ public class ChargePointServiceClientTest {
     public void clearCache_storesTaskBeforeSchedulingIt() {
         var params = new MultipleChargePointSelect();
         params.setChargePointSelectList(List.of(new ChargePointSelect(OcppProtocol.V_16_JSON, "station")));
+        when(taskStore.add(any(CommunicationTask.class))).thenReturn(42);
 
         int taskId = client.clearCache(params);
 
@@ -82,6 +84,6 @@ public class ChargePointServiceClientTest {
         InOrder order = inOrder(taskStore, taskExecutor);
         order.verify(taskStore).add(taskCaptor.capture());
         order.verify(taskExecutor).execute(any(Runnable.class));
-        assertEquals(taskCaptor.getValue().getTaskId(), taskId);
+        assertEquals(42, taskId);
     }
 }

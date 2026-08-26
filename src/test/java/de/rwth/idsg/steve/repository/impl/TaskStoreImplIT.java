@@ -59,38 +59,49 @@ public class TaskStoreImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void get() {
-        Integer taskId = repository.add(task(false));
-        var task = assertNoDatabaseException(() -> repository.get(taskId));
-        Assertions.assertNotNull(task);
+        var expectedTask = task(false);
+        Integer taskId = repository.add(expectedTask);
+        var taskById = assertNoDatabaseException(() -> repository.get(taskId));
+        var taskByUuid = assertNoDatabaseException(() -> repository.get(expectedTask.getTaskUuid()));
+        Assertions.assertSame(expectedTask, taskById);
+        Assertions.assertSame(expectedTask, taskByUuid);
     }
 
     @Test
     public void add() {
         var task = task(false);
         Integer taskId = assertNoDatabaseException(() -> repository.add(task));
-        Assertions.assertEquals(task.getTaskId(), taskId);
+        Assertions.assertTrue(taskId > 0);
     }
 
     @Test
     public void clearFinished() {
-        Integer finishedId = repository.add(task(true));
-        Integer unfinishedId = repository.add(task(false));
+        var finishedTask = task(true);
+        var unfinishedTask = task(false);
+        Integer finishedId = repository.add(finishedTask);
+        Integer unfinishedId = repository.add(unfinishedTask);
 
         assertNoDatabaseException(repository::clearFinished);
 
         Assertions.assertThrows(SteveException.class, () -> repository.get(finishedId));
+        Assertions.assertThrows(SteveException.class, () -> repository.get(finishedTask.getTaskUuid()));
         Assertions.assertNotNull(repository.get(unfinishedId));
+        Assertions.assertNotNull(repository.get(unfinishedTask.getTaskUuid()));
     }
 
     @Test
     public void clearUnfinished() {
-        Integer finishedId = repository.add(task(true));
-        Integer unfinishedId = repository.add(task(false));
+        var finishedTask = task(true);
+        var unfinishedTask = task(false);
+        Integer finishedId = repository.add(finishedTask);
+        Integer unfinishedId = repository.add(unfinishedTask);
 
         assertNoDatabaseException(repository::clearUnfinished);
 
         Assertions.assertNotNull(repository.get(finishedId));
+        Assertions.assertNotNull(repository.get(finishedTask.getTaskUuid()));
         Assertions.assertThrows(SteveException.class, () -> repository.get(unfinishedId));
+        Assertions.assertThrows(SteveException.class, () -> repository.get(unfinishedTask.getTaskUuid()));
     }
 
     private static de.rwth.idsg.steve.ocpp.CommunicationTask task(boolean finished) {

@@ -22,6 +22,8 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 /**
  * Default holder/context of incoming and outgoing messages.
  *
@@ -61,7 +63,7 @@ public class CommunicationContext {
     public record OutCall(
         String chargeBoxId,
         OcppProtocol protocol,
-        int taskId,
+        UUID taskUuid,
 
         String ocppPayload, // full and raw JSON array payload
         String ocppAction,

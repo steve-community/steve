@@ -18,23 +18,38 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TaskStoreImplTest {
 
     @Test
-    public void storesTaskUsingItsConstructionTimeId() {
+    public void storesTaskByNumericIdAndUuid() {
         var store = new TaskStoreImpl();
         var task = new ClearCacheTask(new MultipleChargePointSelect());
 
         var storedId = store.add(task);
 
-        assertEquals(task.getTaskId(), storedId);
-        assertSame(task, store.get(task.getTaskId()));
+        assertTrue(storedId > 0);
+        assertSame(task, store.get(storedId));
+        assertSame(task, store.get(task.getTaskUuid()));
+    }
+
+    @Test
+    public void removeDeletesNumericIdAndUuidIndexEntries() {
+        var store = new TaskStoreImpl();
+        var task = new ClearCacheTask(new MultipleChargePointSelect());
+        var storedId = store.add(task);
+
+        assertTrue(store.remove(storedId, task));
+
+        assertThrows(SteveException.class, () -> store.get(storedId));
+        assertThrows(SteveException.class, () -> store.get(task.getTaskUuid()));
     }
 }

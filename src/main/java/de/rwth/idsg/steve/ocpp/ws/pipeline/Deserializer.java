@@ -85,7 +85,7 @@ public class Deserializer {
      * and build, if any, a corresponding error message.
      */
     public CommunicationContext.DeserializationResult accept(CommunicationContext.In inMsg) throws CommunicationContext.JsonCallParseException, CommunicationContext.JsonResponseInvalidException {
-        try (JsonParser parser = mapper.createParser(inMsg.payload())) {
+        try (JsonParser parser = mapper.createParser(inMsg.ocppPayload())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
@@ -111,7 +111,7 @@ public class Deserializer {
      */
     private CommunicationContext.InCall handleCall(CommunicationContext.In inMsg, String messageId,
                                                    JsonParser parser) throws CommunicationContext.JsonCallParseException {
-        OcppVersion version = inMsg.route().protocol().getVersion();
+        OcppVersion version = inMsg.protocol().getVersion();
 
         // Enforce OCPP CALL messageId as a non-empty JSON string.
         // messageId must be a usable request identifier, so null or empty should be treated as invalid.
@@ -123,9 +123,9 @@ public class Deserializer {
         }
 
         var sessionContextStore = sessionContextStoreHolder.getOrCreate(version);
-        Boolean success = sessionContextStore.registerIncomingCallId(inMsg.route().chargeBoxId(), inMsg.route().webSocketSessionId(), messageId);
+        Boolean success = sessionContextStore.registerIncomingCallId(inMsg.chargeBoxId(), inMsg.webSocketSessionId(), messageId);
         if (success == null) {
-            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, inMsg.route().webSocketSessionId());
+            log.warn("No session context found while registering incoming CALL messageId '{}' for sessionId '{}'", messageId, inMsg.webSocketSessionId());
             var error = ErrorFactory.payloadProcessingError(messageId, null);
             throw new CommunicationContext.JsonCallParseException(error);
         } else if (!success) {
@@ -193,7 +193,7 @@ public class Deserializer {
      */
     private CommunicationContext.InResult handleResult(CommunicationContext.In inMsg, String messageId,
                                                        JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
-        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.route().webSocketSessionId(), messageId);
+        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.webSocketSessionId(), messageId);
         validate(responseContext);
 
         ResponseType res;
@@ -218,7 +218,7 @@ public class Deserializer {
      */
     private CommunicationContext.InError handleError(CommunicationContext.In inMsg, String messageId,
                                                      JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
-        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.route().webSocketSessionId(), messageId);
+        FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.webSocketSessionId(), messageId);
         validate(responseContext);
 
         ErrorCode code;

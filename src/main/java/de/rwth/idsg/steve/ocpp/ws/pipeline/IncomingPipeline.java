@@ -67,17 +67,17 @@ public class IncomingPipeline {
         } catch (CommunicationContext.JsonCallParseException e) {
             var parseError = e.getParseError();
             var parseErrorStr = serializer.accept(parseError);
-            outgoingPipeline.accept(new CommunicationContext.Out(inMsg.route(), parseErrorStr));
+            outgoingPipeline.accept(CommunicationContext.outFrom(inMsg, parseErrorStr));
             return;
 
         } catch (CommunicationContext.JsonResponseInvalidException e) {
             var frc = e.getFrc();
             if (frc != null) {
-                frc.getTask().failed(inMsg.route().chargeBoxId(), e);
+                frc.getTask().failed(inMsg.chargeBoxId(), e);
             }
             throw new RuntimeException(e);
         } catch (Exception e) {
-            throw new SteveException("Deserialization of incoming string failed: %s", inMsg.payload(), e);
+            throw new SteveException("Deserialization of incoming string failed: %s", inMsg.ocppPayload(), e);
         }
 
         switch (inMsgData) {
@@ -88,7 +88,7 @@ public class IncomingPipeline {
     }
 
     private void processCall(CommunicationContext.InCall data) {
-        var version = data.in().route().protocol().getVersion();
+        var version = data.in().protocol().getVersion();
 
         var handler = handlerMap.get(version);
         if (handler == null) {
@@ -98,21 +98,21 @@ public class IncomingPipeline {
 
         var response = handler.accept(data);
         var responseStr = serializer.accept(response);
-        outgoingPipeline.accept(new CommunicationContext.Out(data.in().route(), responseStr));
+        outgoingPipeline.accept(CommunicationContext.outFrom(data.in(), responseStr));
     }
 
     @SuppressWarnings("unchecked")
     private void processResult(CommunicationContext.InResult data) {
         data.frc()
             .getTask()
-            .getHandler(data.in().route().chargeBoxId())
+            .getHandler(data.in().chargeBoxId())
             .handleResponse(new DummyResponse(data.result().getPayload()));
     }
 
     private void processError(CommunicationContext.InError data) {
         data.frc()
             .getTask()
-            .success(data.in().route().chargeBoxId(), data.error());
+            .success(data.in().chargeBoxId(), data.error());
     }
 
     private record DummyResponse(ResponseType payload) implements Response<ResponseType> {

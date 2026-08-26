@@ -41,7 +41,7 @@ public interface OcppCallHandler {
 
         ResponseType response;
         try {
-            response = dispatch(call.getPayload(), data.in().route().chargeBoxId());
+            response = dispatch(call.getPayload(), data.in().chargeBoxId());
         } catch (Exception e) {
             getLogger().error("Exception occurred", e);
             return ErrorFactory.payloadProcessingError(messageId, null);

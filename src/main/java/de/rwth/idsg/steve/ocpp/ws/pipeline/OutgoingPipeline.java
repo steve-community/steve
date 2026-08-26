@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
@@ -50,9 +49,9 @@ public class OutgoingPipeline {
     private final FutureResponseContextStore futureResponseContextStore;
 
     public void accept(CommunicationContext.Out outMsg) {
-        var version = outMsg.route().protocol().getVersion();
-        var chargeBoxId = outMsg.route().chargeBoxId();
-        var webSocketSessionId = outMsg.route().webSocketSessionId();
+        var version = outMsg.protocol().getVersion();
+        var chargeBoxId = outMsg.chargeBoxId();
+        var webSocketSessionId = outMsg.webSocketSessionId();
 
         // Retrieve session by id
         var sessionStore = sessionContextStoreHolder.getOrCreate(version);
@@ -78,7 +77,7 @@ public class OutgoingPipeline {
         var task = taskStore.get(outWithCall.taskId());
 
         // Construct a response context before send
-        var responseClass = typeStore.findResponseClass(outWithCall.action());
+        var responseClass = typeStore.findResponseClass(outWithCall.ocppAction());
         var frc = new FutureResponseContext(task, responseClass);
 
         // 1. Store the response context for later lookup.
@@ -111,9 +110,9 @@ public class OutgoingPipeline {
     // -------------------------------------------------------------------------
 
     private static void sendOut(CommunicationContext.Out outMsg,  @Nullable WebSocketSession session) {
-        String outgoingString = outMsg.payload();
-        String chargeBoxId = outMsg.route().chargeBoxId();
-        String webSocketSessionId = outMsg.route().webSocketSessionId();
+        String outgoingString = outMsg.ocppPayload();
+        String chargeBoxId = outMsg.chargeBoxId();
+        String webSocketSessionId = outMsg.webSocketSessionId();
 
         // https://github.com/steve-community/steve/issues/1914
         if (session == null || !session.isOpen()) {
@@ -138,7 +137,7 @@ public class OutgoingPipeline {
      * @return whether the message was actually sent or not
      */
     private static boolean sendOutCall(CommunicationContext.OutCall outMsg, WebSocketSession session) {
-        String outgoingString = outMsg.payload();
+        String outgoingString = outMsg.ocppPayload();
         String chargeBoxId = outMsg.chargeBoxId();
         String webSocketSessionId = session.getId();
 

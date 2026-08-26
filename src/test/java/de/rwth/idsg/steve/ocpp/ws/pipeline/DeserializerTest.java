@@ -163,12 +163,11 @@ public class DeserializerTest {
     }
 
     private static CommunicationContext.In inbound(String payload) {
-        var route = new CommunicationContext.StationRoute(
-            UUID.randomUUID().toString(),
+        return new CommunicationContext.In(
             "foo",
-            OcppProtocol.V_16_JSON
-        );
-        return new CommunicationContext.In(route, payload);
+            OcppProtocol.V_16_JSON,
+            UUID.randomUUID().toString(),
+            payload);
     }
 
     private static Deserializer createDeserializer() {

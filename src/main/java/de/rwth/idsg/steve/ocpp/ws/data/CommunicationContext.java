@@ -47,10 +47,25 @@ public class CommunicationContext {
     ) {
     }
 
+    /**
+     * For responses (result or error) to incoming requests
+     */
     public record Out(
         StationRoute route,
+        String payload
+    ) {
+    }
+
+    /**
+     * Outgoing requests (calls)
+     */
+    public record OutCall(
+        String chargeBoxId,
+        OcppProtocol protocol,
         String payload,
-        MessageType messageType
+        String action,
+        String ocppMessageId,
+        int taskId
     ) {
     }
 
@@ -80,13 +95,6 @@ public class CommunicationContext {
         OcppJsonError error,
         FutureResponseContext frc
     ) implements DeserializationResult {
-    }
-
-    public record OutCall(
-        StationRoute route,
-        OcppJsonCall call,
-        FutureResponseContext frc
-    ) {
     }
 
     // -------------------------------------------------------------------------

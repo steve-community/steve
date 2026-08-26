@@ -18,10 +18,15 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
+import de.rwth.idsg.steve.ocpp.ws.TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
+import de.rwth.idsg.steve.repository.TaskStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 /**
  * For outgoing CALLs, triggered by the user.
@@ -34,41 +39,49 @@ import org.springframework.stereotype.Component;
 public class OutgoingCallPipeline {
 
     private final Sender sender;
-    private final FutureResponseContextStore store;
+    private final TaskStore taskStore;
+    private final SessionContextStoreHolder sessionContextStoreHolder;
+    private final FutureResponseContextStore futureResponseContextStore;
 
     /**
      * Uses a store-before-send strategy to close response-correlation races.
      * If transport sending fails, the stored context is rolled back immediately.
      */
     public void accept(CommunicationContext.OutCall outWithCall) {
-        // 1. Create the payload to send
-        String outMsg = Serializer.INSTANCE.accept(outWithCall.call());
+        // Pick a session to send
+        var sessionStore = sessionContextStoreHolder.getOrCreate(outWithCall.protocol().getVersion());
+        var session = sessionStore.getSession(outWithCall.chargeBoxId());
 
-        // 2. Store the response context for later lookup.
-        store.add(
-            outWithCall.route().webSocketSessionId(),
-            outWithCall.call().getMessageId(),
-            outWithCall.frc()
+        // Reconstruct CommunicationTask from its id
+        var typeStore = TypeStore.getTypeStore(outWithCall.protocol().getVersion());
+        var task = taskStore.get(outWithCall.taskId());
+
+        // Construct a response context before send
+        var responseClass = typeStore.findResponseClass(outWithCall.action());
+        var frc = new FutureResponseContext(task, responseClass);
+
+        // 1. Store the response context for later lookup.
+        futureResponseContextStore.add(
+            session.getId(),
+            outWithCall.ocppMessageId(),
+            frc
         );
 
-        // 3. Send the payload via WebSocket
+        // 2. Send the payload via WebSocket
         try {
-            var out = new CommunicationContext.Out(
-                outWithCall.route(),
-                outMsg,
-                outWithCall.call().getMessageType()
-            );
-
-            if (!sender.accept(out)) {
-                poll(outWithCall);
+            if (!sender.accept(outWithCall, session)) {
+                poll(outWithCall, session);
             }
         } catch (Exception e) {
-            poll(outWithCall);
+            poll(outWithCall, session);
             throw e;
         }
     }
 
-    private void poll(CommunicationContext.OutCall outWithCall) {
-        store.poll(outWithCall.route().webSocketSessionId(), outWithCall.call().getMessageId());
+    /**
+     * 3. In case of failure, rollback aka remove the FutureResponseContext
+     */
+    private void poll(CommunicationContext.OutCall outWithCall, WebSocketSession session) {
+        futureResponseContextStore.poll(session.getId(), outWithCall.ocppMessageId());
     }
 }

@@ -192,6 +192,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         };
     }
 
+    public <T extends RequestType> T getOcppRequest(String chargeBoxId) {
+        return switch (versionMap.get(chargeBoxId)) {
+            case V_12 -> getOcpp12Request();
+            case V_15 -> getOcpp15Request();
+            case V_16 -> getOcpp16Request();
+        };
+    }
+
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();

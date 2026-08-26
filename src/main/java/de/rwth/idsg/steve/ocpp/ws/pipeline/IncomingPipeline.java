@@ -67,7 +67,7 @@ public class IncomingPipeline {
         } catch (CommunicationContext.JsonCallParseException e) {
             var parseError = e.getParseError();
             var parseErrorStr = serializer.accept(parseError);
-            sender.accept(new CommunicationContext.Out(inMsg.route(), parseErrorStr, parseError.getMessageType()));
+            sender.accept(new CommunicationContext.Out(inMsg.route(), parseErrorStr));
             return;
 
         } catch (CommunicationContext.JsonResponseInvalidException e) {
@@ -98,7 +98,7 @@ public class IncomingPipeline {
 
         var response = handler.accept(data);
         var responseStr = serializer.accept(response);
-        sender.accept(new CommunicationContext.Out(data.in().route(), responseStr, response.getMessageType()));
+        sender.accept(new CommunicationContext.Out(data.in().route(), responseStr));
     }
 
     @SuppressWarnings("unchecked")

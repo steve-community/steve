@@ -203,9 +203,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.changeAvailability(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -254,9 +255,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.changeConfiguration(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -271,9 +273,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.clearCache(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -288,9 +291,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getDiagnostics(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -305,9 +309,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.reset(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -322,9 +327,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.updateFirmware(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     // -------------------------------------------------------------------------
@@ -354,9 +360,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.remoteStartTransaction(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -371,9 +378,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.remoteStopTransaction(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -388,9 +396,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.unlockConnector(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     // -------------------------------------------------------------------------
@@ -409,9 +418,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.dataTransfer(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -426,9 +436,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getConfiguration(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -443,9 +454,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getLocalListVersion(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -460,9 +472,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.sendLocalList(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     // -------------------------------------------------------------------------
@@ -494,9 +507,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.reserveNow(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -511,9 +525,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.cancelReservation(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     // -------------------------------------------------------------------------
@@ -532,9 +547,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.triggerMessage(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -548,9 +564,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.setChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -575,9 +592,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.clearChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -592,9 +610,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getCompositeSchedule(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     // -------------------------------------------------------------------------
@@ -613,9 +632,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.extendedTriggerMessage(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -632,9 +652,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getLog(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -651,9 +672,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.signedUpdateFirmware(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -668,9 +690,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.installCertificate(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -685,9 +708,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forFirst(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.deleteCertificate(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -702,9 +726,10 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.certificateSigned(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 
     @SafeVarargs
@@ -719,8 +744,9 @@ public class ChargePointServiceClient {
 
         BackgroundService.with(taskExecutor)
             .forEach(task.getParams().getChargePointSelectList())
+            .prepare(() -> taskStore.add(task))
             .execute(c -> invoker.getInstalledCertificateIds(c, task));
 
-        return taskStore.add(task);
+        return task.getTaskId();
     }
 }

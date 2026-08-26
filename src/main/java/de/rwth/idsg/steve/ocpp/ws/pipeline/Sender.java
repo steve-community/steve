@@ -22,11 +22,11 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
-import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 
@@ -41,13 +41,7 @@ public class Sender {
 
     private final SessionContextStoreHolder sessionContextStoreHolder;
 
-    /**
-     * Return value is used by callers to decide whether they must rollback any pre-send bookkeeping.
-     * Outgoing CALL failures are surfaced as exceptions to avoid silently keeping invalid correlation state.
-     *
-     * @return whether the message was actually sent or not
-     */
-    public boolean accept(CommunicationContext.Out outMsg) {
+    public void accept(CommunicationContext.Out outMsg) {
         String outgoingString = outMsg.payload();
         String chargeBoxId = outMsg.route().chargeBoxId();
         String webSocketSessionId = outMsg.route().webSocketSessionId();
@@ -58,6 +52,33 @@ public class Sender {
         // https://github.com/steve-community/steve/issues/1914
         if (session == null || !session.isOpen()) {
             WebSocketLogger.willNotSend(chargeBoxId, webSocketSessionId, outgoingString);
+            return;
+        }
+
+        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
+        TextMessage out = new TextMessage(outgoingString);
+        try {
+            session.sendMessage(out);
+        } catch (IOException e) {
+            // Just log. We cannot do anything else when we could not reply with a response.
+            log.error("Could not send the outgoing response message", e);
+        }
+    }
+
+    /**
+     * Return value is used by callers to decide whether they must rollback any pre-send bookkeeping.
+     * Outgoing CALL failures are surfaced as exceptions to avoid silently keeping invalid correlation state.
+     *
+     * @return whether the message was actually sent or not
+     */
+    public boolean accept(CommunicationContext.OutCall outMsg, WebSocketSession session) {
+        String outgoingString = outMsg.payload();
+        String chargeBoxId = outMsg.chargeBoxId();
+        String webSocketSessionId = session.getId();
+
+        // https://github.com/steve-community/steve/issues/1914
+        if (!session.isOpen()) {
+            WebSocketLogger.willNotSend(chargeBoxId, webSocketSessionId, outgoingString);
             return false;
         }
 
@@ -67,13 +88,8 @@ public class Sender {
             session.sendMessage(out);
             return true;
         } catch (IOException e) {
-            // Do NOT swallow exceptions for outgoing CALLs. For others just log.
-            if (outMsg.messageType() == MessageType.CALL) {
-                throw new SteveException("OCPP CALL failed", e);
-            } else {
-                log.error("Could not send the outgoing message", e);
-                return false;
-            }
+            // Do NOT swallow exceptions for outgoing CALLs.
+            throw new SteveException("OCPP CALL failed", e);
         }
     }
 }

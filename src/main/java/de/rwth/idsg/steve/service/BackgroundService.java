@@ -52,6 +52,12 @@ public class BackgroundService {
     }
 
     public interface Runner {
+
+        default Runner prepare(Runnable runnable) {
+            runnable.run();
+            return this;
+        }
+
         void execute(Consumer<ChargePointSelect> consumer);
     }
 

@@ -20,6 +20,10 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,4 +51,12 @@ public interface TypeStore {
      * Request JAXB class --> Action field
      */
     <T extends RequestType> String findAction(T requestPayload);
+
+    static TypeStore getTypeStore(OcppVersion version) {
+        return switch (version) {
+            case V_12 -> Ocpp12TypeStore.INSTANCE;
+            case V_15 -> Ocpp15TypeStore.INSTANCE;
+            case V_16 -> Ocpp16TypeStore.INSTANCE;
+        };
+    }
 }

@@ -18,16 +18,12 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +41,6 @@ import java.util.UUID;
 public class ChargePointServiceJsonInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
-    private final SessionContextStoreHolder sessionContextStoreHolder;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
@@ -69,23 +64,10 @@ public class ChargePointServiceJsonInvoker {
         }
 
         var chargeBoxId = cps.getChargeBoxId();
+        var request = task.getOcppRequest(chargeBoxId);
+        var typeStore = TypeStore.getTypeStore(cps.getOcppProtocol().getVersion());
 
-        var sessionStore = sessionContextStoreHolder.getOrCreate(cps.getOcppProtocol().getVersion());
-        var session = sessionStore.getSession(chargeBoxId);
-
-        var typeStore = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> Ocpp12TypeStore.INSTANCE;
-            case V_15 -> Ocpp15TypeStore.INSTANCE;
-            case V_16 -> Ocpp16TypeStore.INSTANCE;
-        };
-
-        RequestType request = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> task.getOcpp12Request();
-            case V_15 -> task.getOcpp15Request();
-            case V_16 -> task.getOcpp16Request();
-        };
-
-        String action = typeStore.findAction(request);
+        var action = typeStore.findAction(request);
         if (action == null) {
             throw new SteveException("Action name is not found");
         }
@@ -95,14 +77,16 @@ public class ChargePointServiceJsonInvoker {
         call.setPayload(request);
         call.setAction(action);
 
+        // Create the payload to send
+        String callPayload = Serializer.INSTANCE.accept(call);
+
         var context = new CommunicationContext.OutCall(
-            new CommunicationContext.StationRoute(
-                session.getId(),
-                chargeBoxId,
-                cps.getOcppProtocol()
-            ),
-            call,
-            new FutureResponseContext(task, typeStore.findResponseClass(action))
+            chargeBoxId,
+            cps.getOcppProtocol(),
+            callPayload,
+            call.getAction(),
+            call.getMessageId(),
+            task.getTaskId()
         );
 
         outgoingCallPipeline.accept(context);

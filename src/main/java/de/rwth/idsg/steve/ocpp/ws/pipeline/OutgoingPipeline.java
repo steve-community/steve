@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.MessagingConfiguration;
+import de.rwth.idsg.steve.messaging.Messaging;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
@@ -29,6 +31,9 @@ import de.rwth.idsg.steve.repository.TaskStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.integration.annotation.Poller;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -42,13 +47,23 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OutgoingPipeline {
+public class OutgoingPipeline implements Messaging.Out.Consumer, Messaging.OutCall.Consumer {
 
     private final TaskStore taskStore;
     private final SessionContextStoreHolder sessionContextStoreHolder;
     private final FutureResponseContextStore futureResponseContextStore;
 
-    public void accept(CommunicationContext.Out outMsg) {
+    @ServiceActivator(
+        inputChannel = MessagingConfiguration.OUT_CHANNEL,
+        poller = @Poller(
+            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
+            maxMessagesPerPoll = "-1",
+            receiveTimeout = "0"
+        )
+    )
+    @Override
+    public void processOut(Message<CommunicationContext.Out> message) {
+        var outMsg = message.getPayload();
         var version = outMsg.protocol().getVersion();
         var chargeBoxId = outMsg.chargeBoxId();
         var webSocketSessionId = outMsg.webSocketSessionId();
@@ -65,44 +80,54 @@ public class OutgoingPipeline {
      * Uses a store-before-send strategy to close response-correlation races.
      * If transport sending fails, the stored context is rolled back immediately.
      */
-    public void accept(CommunicationContext.OutCall outWithCall) {
-        var version = outWithCall.protocol().getVersion();
-
-        // Pick a session to send
-        var sessionStore = sessionContextStoreHolder.getOrCreate(version);
-        var session = sessionStore.getSession(outWithCall.chargeBoxId());
+    @ServiceActivator(
+        inputChannel = MessagingConfiguration.OUT_CALL_CHANNEL,
+        poller = @Poller(
+            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
+            maxMessagesPerPoll = "-1",
+            receiveTimeout = "0"
+        )
+    )
+    @Override
+    public void processOutCall(Message<CommunicationContext.OutCall> message) {
+        var outWithCall = message.getPayload();
 
         // Reconstruct CommunicationTask from its UUID
-        var typeStore = TypeStore.getTypeStore(version);
         var task = taskStore.get(outWithCall.taskUuid());
 
-        // Construct a response context before send
-        var responseClass = typeStore.findResponseClass(outWithCall.ocppAction());
-        var frc = new FutureResponseContext(task, responseClass);
+        String webSocketSessionId = null;
+        boolean responseContextStored = false;
 
-        // 1. Store the response context for later lookup.
-        futureResponseContextStore.add(
-            session.getId(),
-            outWithCall.ocppMessageId(),
-            frc
-        );
-
-        // 2. Send the payload via WebSocket
         try {
+            // Pick a session to send
+            var sessionStore = sessionContextStoreHolder.getOrCreate(outWithCall.protocol().getVersion());
+            var session = sessionStore.getSession(outWithCall.chargeBoxId());
+            webSocketSessionId = session.getId();
+
+            // Construct a response context before send
+            var typeStore = TypeStore.getTypeStore(outWithCall.protocol().getVersion());
+            var responseClass = typeStore.findResponseClass(outWithCall.ocppAction());
+            var frc = new FutureResponseContext(task, responseClass);
+
+            // 1. Store the response context for later lookup.
+            futureResponseContextStore.add(
+                webSocketSessionId,
+                outWithCall.ocppMessageId(),
+                frc
+            );
+            responseContextStored = true;
+
+            // 2. Send the payload via WebSocket
             if (!sendOutCall(outWithCall, session)) {
-                poll(outWithCall, session);
+                throw new SteveException("OCPP CALL failed");
             }
-        } catch (Exception e) {
-            poll(outWithCall, session);
+        } catch (RuntimeException e) {
+            if (responseContextStored) {
+                futureResponseContextStore.poll(webSocketSessionId, outWithCall.ocppMessageId());
+            }
+            task.failed(outWithCall.chargeBoxId(), e);
             throw e;
         }
-    }
-
-    /**
-     * 3. In case of failure, rollback aka remove the FutureResponseContext
-     */
-    private void poll(CommunicationContext.OutCall outWithCall, WebSocketSession session) {
-        futureResponseContextStore.poll(session.getId(), outWithCall.ocppMessageId());
     }
 
     // -------------------------------------------------------------------------

@@ -20,10 +20,16 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.MessagingConfiguration;
+import de.rwth.idsg.steve.messaging.Messaging;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.annotation.Poller;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import jakarta.xml.ws.Response;
@@ -40,26 +46,36 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class IncomingPipeline {
+public class IncomingPipeline implements Messaging.In.Consumer {
 
     private final Serializer serializer = Serializer.INSTANCE;
 
-    private final OutgoingPipeline outgoingPipeline;
+    private final Messaging.Out.Producer outProducer;
     private final Deserializer deserializer;
     private final Map<OcppVersion, OcppCallHandler> handlerMap = new EnumMap<>(OcppVersion.class);
 
     @Autowired
-    public IncomingPipeline(OutgoingPipeline outgoingPipeline,
+    public IncomingPipeline(Messaging.Out.Producer outProducer,
                             Deserializer deserializer,
                             List<OcppCallHandler> handlers) {
-        this.outgoingPipeline = outgoingPipeline;
+        this.outProducer = outProducer;
         this.deserializer = deserializer;
         for (OcppCallHandler handler : handlers) {
             handlerMap.put(handler.getVersion(), handler);
         }
     }
 
-    public void accept(CommunicationContext.In inMsg) {
+    @ServiceActivator(
+        inputChannel = MessagingConfiguration.IN_CHANNEL,
+        poller = @Poller(
+            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
+            maxMessagesPerPoll = "-1",
+            receiveTimeout = "0"
+        )
+    )
+    @Override
+    public void processIn(Message<CommunicationContext.In> message) {
+        var inMsg = message.getPayload();
         CommunicationContext.DeserializationResult inMsgData;
         try {
             inMsgData = deserializer.accept(inMsg);
@@ -67,7 +83,7 @@ public class IncomingPipeline {
         } catch (CommunicationContext.JsonCallParseException e) {
             var parseError = e.getParseError();
             var parseErrorStr = serializer.accept(parseError);
-            outgoingPipeline.accept(CommunicationContext.outFrom(inMsg, parseErrorStr));
+            sendOut(message, parseErrorStr);
             return;
 
         } catch (CommunicationContext.JsonResponseInvalidException e) {
@@ -81,13 +97,13 @@ public class IncomingPipeline {
         }
 
         switch (inMsgData) {
-            case CommunicationContext.InCall call -> processCall(call);
+            case CommunicationContext.InCall call -> processCall(message, call);
             case CommunicationContext.InResult result -> processResult(result);
             case CommunicationContext.InError error -> processError(error);
         }
     }
 
-    private void processCall(CommunicationContext.InCall data) {
+    private void processCall(Message<CommunicationContext.In> message, CommunicationContext.InCall data) {
         var version = data.in().protocol().getVersion();
 
         var handler = handlerMap.get(version);
@@ -98,7 +114,13 @@ public class IncomingPipeline {
 
         var response = handler.accept(data);
         var responseStr = serializer.accept(response);
-        outgoingPipeline.accept(CommunicationContext.outFrom(data.in(), responseStr));
+        sendOut(message, responseStr);
+    }
+
+    private void sendOut(Message<CommunicationContext.In> inMsg, String ocppPayload) {
+        var out = CommunicationContext.outFrom(inMsg.getPayload(), ocppPayload);
+        var outMsg = MessageBuilder.withPayload(out).copyHeaders(inMsg.getHeaders()).build();
+        outProducer.send(outMsg);
     }
 
     @SuppressWarnings("unchecked")

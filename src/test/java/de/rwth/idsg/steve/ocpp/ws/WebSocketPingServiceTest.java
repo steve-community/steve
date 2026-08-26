@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +29,10 @@ import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledFuture;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,6 +50,10 @@ public class WebSocketPingServiceTest {
     private final TaskScheduler taskScheduler = Mockito.mock(TaskScheduler.class);
     private final ScheduledFuture<?> schedule = Mockito.mock(ScheduledFuture.class);
 
+    /** What the scheduler handed over to {@code pingExecutor}, instead of running it itself. */
+    private final Deque<Runnable> offloaded = new ArrayDeque<>();
+    private final Executor pingExecutor = offloaded::addLast;
+
     @BeforeEach
     public void stubScheduler() {
         doReturn(schedule).when(taskScheduler).scheduleAtFixedRate(any(), any(Instant.class), any(Duration.class));
@@ -57,8 +65,13 @@ public class WebSocketPingServiceTest {
         var session = getMockSession();
 
         service.register("foo", session);
-        scheduledPing().run();
 
+        // the scheduler must only hand the ping over: a blocking send belongs on a virtual thread, not on
+        // one of the ten threads the rest of SteVe schedules on
+        scheduledPing().run();
+        verify(session, never()).sendMessage(any());
+
+        offloaded.removeFirst().run();
         verify(session).sendMessage(any(PingMessage.class));
     }
 
@@ -74,6 +87,7 @@ public class WebSocketPingServiceTest {
 
         service.register("foo", session);
         scheduledPing().run();
+        offloaded.removeFirst().run();
 
         verify(session).close();
         verify(session, never()).sendMessage(any());
@@ -108,6 +122,27 @@ public class WebSocketPingServiceTest {
         verify(taskScheduler, never()).scheduleAtFixedRate(any(), any(Instant.class), any(Duration.class));
     }
 
+    /**
+      * scheduleAtFixedRate gives us that guarantee for free as long as the task does the work itself; we
+      * hand it over instead, so the service has to keep the guarantee on its own.
+      */
+    @Test
+    public void testPingsOfOneSessionDoNotOverlap() {
+        var service = newService(PING_INTERVAL);
+        var session = getMockSession();
+
+        service.register("foo", session);
+        Runnable scheduledPing = scheduledPing();
+
+        scheduledPing.run();
+        scheduledPing.run();
+        Assertions.assertEquals(1, offloaded.size(), "the second firing should wait for the first send");
+
+        offloaded.removeFirst().run();
+        scheduledPing.run();
+        Assertions.assertEquals(1, offloaded.size(), "a finished send should let the next ping through");
+    }
+
     @Test
     public void testRejectsNegativeInterval() {
         assertThrows(IllegalArgumentException.class, () -> newService(Duration.ofMinutes(-1)));
@@ -123,7 +158,7 @@ public class WebSocketPingServiceTest {
     // -------------------------------------------------------------------------
 
     private WebSocketPingService newService(Duration pingInterval) {
-        return new WebSocketPingService(pingInterval, taskScheduler);
+        return new WebSocketPingService(pingInterval, taskScheduler, pingExecutor);
     }
 
     private Runnable scheduledPing() {

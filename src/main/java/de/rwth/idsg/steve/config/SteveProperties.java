@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
@@ -69,6 +71,7 @@ public class SteveProperties {
         String chargeBoxIdValidationRegex;
         Protocols enabledProtocols;
         boolean octtQuirksEnabled;
+        Duration wsPingInterval = Duration.ofMinutes(15);
         Security security = new Security();
 
         @Data

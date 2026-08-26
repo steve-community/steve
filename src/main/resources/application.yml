@@ -61,6 +61,12 @@ steve:
       v15: { soap: true, json: true }
       v16: { soap: true, json: true }
 
+    # SteVe pings every open WebSocket session at this interval, so that connections which are idle on the
+    # OCPP level are not dropped by the station, or by an intermediary such as a proxy, a load balancer or
+    # a NAT gateway. Managed proxies often close idle WebSockets after 60 to 100 seconds, which is well
+    # below our default. Keep it under the Jetty idle timeout, minimum 1s, or 0 to disable pings entirely.
+    ws-ping-interval: 15m
+
     # OCPP 1.6 security config.
     # Note: security profile (0..3) is a per-charge-point state in DB, not a global application property.
     security:

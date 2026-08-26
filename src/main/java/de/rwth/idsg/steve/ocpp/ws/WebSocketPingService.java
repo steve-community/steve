@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.config.SteveProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
@@ -43,6 +43,12 @@ import java.util.concurrent.ScheduledFuture;
 public class WebSocketPingService {
 
     /**
+     * A sub-second server-side ping is not a keep-alive, it is a flood. {@link Duration#ZERO} disables
+     * pinging altogether.
+     */
+    private static final Duration MIN_PING_INTERVAL = Duration.ofSeconds(1);
+
+    /**
      * Key   (String)          = WebSocket session id
      * Value (ScheduledFuture) = the periodic ping of that session
      */
@@ -56,18 +62,31 @@ public class WebSocketPingService {
      * to be told which one to call.
      */
     @Autowired
-    public WebSocketPingService(TaskScheduler taskScheduler) {
-        this(WebSocketConfiguration.PING_INTERVAL, taskScheduler);
+    public WebSocketPingService(SteveProperties steveProperties, TaskScheduler taskScheduler) {
+        this(steveProperties.getOcpp().getWsPingInterval(), taskScheduler);
     }
 
     WebSocketPingService(Duration pingInterval, TaskScheduler taskScheduler) {
+        if (!pingInterval.isZero() && pingInterval.compareTo(MIN_PING_INTERVAL) < 0) {
+            throw new IllegalArgumentException(
+                "Ping interval must be at least " + MIN_PING_INTERVAL + ", or 0 to disable, but was " + pingInterval);
+        }
+
         this.pingInterval = pingInterval;
         this.taskScheduler = taskScheduler;
 
-        log.info("Pinging WebSocket sessions every {}", pingInterval);
+        if (pingInterval.isZero()) {
+            log.info("Pinging of WebSocket sessions is disabled");
+        } else {
+            log.info("Pinging WebSocket sessions every {}", pingInterval);
+        }
     }
 
     public void register(String chargeBoxId, WebSocketSession session) {
+        if (pingInterval.isZero()) {
+            return;
+        }
+
         ScheduledFuture<?> schedule = taskScheduler.scheduleAtFixedRate(
             new PingTask(chargeBoxId, session),
             Instant.now().plus(pingInterval),

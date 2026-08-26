@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -96,6 +97,25 @@ public class WebSocketPingServiceTest {
         service.deregister(getMockSession());
 
         verify(schedule, never()).cancel(true);
+    }
+
+    @Test
+    public void testZeroIntervalDisablesPings() {
+        var service = newService(Duration.ZERO);
+
+        service.register("foo", getMockSession());
+
+        verify(taskScheduler, never()).scheduleAtFixedRate(any(), any(Instant.class), any(Duration.class));
+    }
+
+    @Test
+    public void testRejectsNegativeInterval() {
+        assertThrows(IllegalArgumentException.class, () -> newService(Duration.ofMinutes(-1)));
+    }
+
+    @Test
+    public void testRejectsSubSecondInterval() {
+        assertThrows(IllegalArgumentException.class, () -> newService(Duration.ofMillis(500)));
     }
 
     // -------------------------------------------------------------------------

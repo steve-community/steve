@@ -22,13 +22,18 @@ import de.rwth.idsg.steve.messaging.Messaging;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.QueueChannel;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.integration.channel.ExecutorChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
+ * Asynchronous in-memory OCPP JSON channels. Each channel has an isolated, bounded executor queue
+ * and a dedicated worker thread pool so producers never run consumers on their own threads.
+ *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.08.2026
  */
@@ -40,24 +45,40 @@ public class MessagingConfiguration {
     public static final String OUT_CHANNEL = "ocppOutChannel";
     public static final String OUT_CALL_CHANNEL = "ocppOutCallChannel";
 
-    public static final String POLL_INTERVAL_MILLIS = "100";
+    private static final String IN_EXECUTOR = "ocppInExecutor";
+    private static final String OUT_EXECUTOR = "ocppOutExecutor";
+    private static final String OUT_CALL_EXECUTOR = "ocppOutCallExecutor";
 
     private static final int QUEUE_CAPACITY = 10_000;
-    private static final long SEND_TIMEOUT_MILLIS = 2_000;
+
+    @Bean(name = IN_EXECUTOR)
+    public ThreadPoolTaskExecutor ocppInExecutor() {
+        return executor(IN_EXECUTOR, 4);
+    }
+
+    @Bean(name = OUT_EXECUTOR)
+    public ThreadPoolTaskExecutor ocppOutExecutor() {
+        return executor(OUT_EXECUTOR, 4);
+    }
+
+    @Bean(name = OUT_CALL_EXECUTOR)
+    public ThreadPoolTaskExecutor ocppOutCallExecutor() {
+        return executor(OUT_CALL_EXECUTOR, 4);
+    }
 
     @Bean(name = IN_CHANNEL)
-    public QueueChannel ocppInChannel() {
-        return new QueueChannel(QUEUE_CAPACITY);
+    public ExecutorChannel ocppInChannel(@Qualifier(IN_EXECUTOR) TaskExecutor executor) {
+        return new ExecutorChannel(executor);
     }
 
     @Bean(name = OUT_CHANNEL)
-    public QueueChannel ocppOutChannel() {
-        return new QueueChannel(QUEUE_CAPACITY);
+    public ExecutorChannel ocppOutChannel(@Qualifier(OUT_EXECUTOR) TaskExecutor executor) {
+        return new ExecutorChannel(executor);
     }
 
     @Bean(name = OUT_CALL_CHANNEL)
-    public QueueChannel ocppOutCallChannel() {
-        return new QueueChannel(QUEUE_CAPACITY);
+    public ExecutorChannel ocppOutCallChannel(@Qualifier(OUT_CALL_EXECUTOR) TaskExecutor executor) {
+        return new ExecutorChannel(executor);
     }
 
     @Bean
@@ -76,8 +97,18 @@ public class MessagingConfiguration {
     }
 
     private static void send(MessageChannel channel, Message<?> message, String errorMessage) {
-        if (!channel.send(message, SEND_TIMEOUT_MILLIS)) {
+        if (!channel.send(message)) {
             throw new MessageDeliveryException(message, errorMessage);
         }
+    }
+
+    private static ThreadPoolTaskExecutor executor(String executorName, int consumerPoolSize) {
+        var executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(consumerPoolSize);
+        executor.setMaxPoolSize(consumerPoolSize);
+        executor.setQueueCapacity(QUEUE_CAPACITY);
+        executor.setThreadNamePrefix(executorName + "-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        return executor;
     }
 }

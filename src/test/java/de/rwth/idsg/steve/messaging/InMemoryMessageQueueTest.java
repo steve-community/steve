@@ -34,18 +34,23 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
 import de.rwth.idsg.steve.repository.TaskStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.integration.channel.ExecutorChannel;
 import org.springframework.integration.channel.QueueChannel;
+import org.springframework.integration.endpoint.EventDrivenConsumer;
+import org.springframework.integration.endpoint.PollingConsumer;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -60,10 +65,10 @@ public class InMemoryMessageQueueTest {
     private final MessagingConfiguration configuration = new MessagingConfiguration();
 
     @Test
-    public void producersEnqueueTheirMessages() {
-        var inChannel = configuration.ocppInChannel();
-        var outChannel = configuration.ocppOutChannel();
-        var outCallChannel = configuration.ocppOutCallChannel();
+    public void producersSendMessagesToTheirChannels() {
+        var inChannel = new QueueChannel(1);
+        var outChannel = new QueueChannel(1);
+        var outCallChannel = new QueueChannel(1);
         var in = inMessage();
         var out = outMessage();
         var outCall = outCallMessage();
@@ -75,27 +80,6 @@ public class InMemoryMessageQueueTest {
         assertSame(in, inChannel.receive(0));
         assertSame(out, outChannel.receive(0));
         assertSame(outCall, outCallChannel.receive(0));
-    }
-
-    @Test
-    public void producersFailWhenTheirQueueRemainsFull() {
-        var inChannel = new QueueChannel(1);
-        var outChannel = new QueueChannel(1);
-        var outCallChannel = new QueueChannel(1);
-        var inProducer = configuration.inProducer(inChannel);
-        var outProducer = configuration.outProducer(outChannel);
-        var outCallProducer = configuration.outCallProducer(outCallChannel);
-        var in = inMessage();
-        var out = outMessage();
-        var outCall = outCallMessage();
-
-        inProducer.send(in);
-        outProducer.send(out);
-        outCallProducer.send(outCall);
-
-        assertThrows(MessageDeliveryException.class, () -> inProducer.send(in));
-        assertThrows(MessageDeliveryException.class, () -> outProducer.send(out));
-        assertThrows(MessageDeliveryException.class, () -> outCallProducer.send(outCall));
     }
 
     @Test
@@ -112,12 +96,16 @@ public class InMemoryMessageQueueTest {
         var in = inMessage();
         var out = outMessage();
         var outCall = outCallMessage();
+        var inboundThreadName = new AtomicReference<String>();
 
-        when(deserializer.accept(in.getPayload())).thenReturn(new CommunicationContext.InError(
-            in.getPayload(),
-            error,
-            inboundFutureResponseContext
-        ));
+        when(deserializer.accept(in.getPayload())).thenAnswer(invocation -> {
+            inboundThreadName.set(Thread.currentThread().getName());
+            return new CommunicationContext.InError(
+                in.getPayload(),
+                error,
+                inboundFutureResponseContext
+            );
+        });
         when(inboundFutureResponseContext.getTask()).thenReturn(task);
         when(sessionContextStoreHolder.getOrCreate(OcppProtocol.V_16_JSON.getVersion()))
             .thenReturn(sessionContextStore);
@@ -136,6 +124,17 @@ public class InMemoryMessageQueueTest {
             context.register(IncomingPipeline.class, OutgoingPipeline.class);
             context.refresh();
 
+            assertInstanceOf(ExecutorChannel.class, context.getBean(MessagingConfiguration.IN_CHANNEL));
+            assertInstanceOf(ExecutorChannel.class, context.getBean(MessagingConfiguration.OUT_CHANNEL));
+            assertInstanceOf(ExecutorChannel.class, context.getBean(MessagingConfiguration.OUT_CALL_CHANNEL));
+            assertInstanceOf(EventDrivenConsumer.class,
+                context.getBean("incomingPipeline.processIn.serviceActivator"));
+            assertInstanceOf(EventDrivenConsumer.class,
+                context.getBean("outgoingPipeline.processOut.serviceActivator"));
+            assertInstanceOf(EventDrivenConsumer.class,
+                context.getBean("outgoingPipeline.processOutCall.serviceActivator"));
+            assertTrue(context.getBeansOfType(PollingConsumer.class).isEmpty());
+
             context.getBean(Messaging.In.Producer.class).send(in);
             context.getBean(Messaging.Out.Producer.class).send(out);
             context.getBean(Messaging.OutCall.Producer.class).send(outCall);
@@ -143,6 +142,7 @@ public class InMemoryMessageQueueTest {
             verify(task, timeout(2_000)).success("station", error);
             verify(session, timeout(2_000).times(2)).sendMessage(any());
             verify(futureResponseContextStore, timeout(2_000)).add(eq("session"), eq("message"), any());
+            assertTrue(inboundThreadName.get().startsWith("ocppInExecutor-"));
         }
     }
 

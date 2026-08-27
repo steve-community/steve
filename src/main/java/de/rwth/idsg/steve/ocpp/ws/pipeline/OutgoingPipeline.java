@@ -31,7 +31,6 @@ import de.rwth.idsg.steve.repository.TaskStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -53,14 +52,7 @@ public class OutgoingPipeline implements Messaging.Out.Consumer, Messaging.OutCa
     private final SessionContextStoreHolder sessionContextStoreHolder;
     private final FutureResponseContextStore futureResponseContextStore;
 
-    @ServiceActivator(
-        inputChannel = MessagingConfiguration.OUT_CHANNEL,
-        poller = @Poller(
-            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
-            maxMessagesPerPoll = "-1",
-            receiveTimeout = "0"
-        )
-    )
+    @ServiceActivator(inputChannel = MessagingConfiguration.OUT_CHANNEL)
     @Override
     public void processOut(Message<CommunicationContext.Out> message) {
         var outMsg = message.getPayload();
@@ -80,14 +72,7 @@ public class OutgoingPipeline implements Messaging.Out.Consumer, Messaging.OutCa
      * Uses a store-before-send strategy to close response-correlation races.
      * If transport sending fails, the stored context is rolled back immediately.
      */
-    @ServiceActivator(
-        inputChannel = MessagingConfiguration.OUT_CALL_CHANNEL,
-        poller = @Poller(
-            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
-            maxMessagesPerPoll = "-1",
-            receiveTimeout = "0"
-        )
-    )
+    @ServiceActivator(inputChannel = MessagingConfiguration.OUT_CALL_CHANNEL)
     @Override
     public void processOutCall(Message<CommunicationContext.OutCall> message) {
         var outWithCall = message.getPayload();

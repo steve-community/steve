@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -65,14 +64,7 @@ public class IncomingPipeline implements Messaging.In.Consumer {
         }
     }
 
-    @ServiceActivator(
-        inputChannel = MessagingConfiguration.IN_CHANNEL,
-        poller = @Poller(
-            fixedDelay = MessagingConfiguration.POLL_INTERVAL_MILLIS,
-            maxMessagesPerPoll = "-1",
-            receiveTimeout = "0"
-        )
-    )
+    @ServiceActivator(inputChannel = MessagingConfiguration.IN_CHANNEL)
     @Override
     public void processIn(Message<CommunicationContext.In> message) {
         var inMsg = message.getPayload();

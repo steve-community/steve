@@ -23,17 +23,17 @@ import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CommunicationTaskTest {
 
     @Test
-    public void assignsUniquePositiveIdsDuringConstruction() {
+    public void assignsUniqueUuidsDuringConstruction() {
         var first = new ClearCacheTask(new MultipleChargePointSelect());
         var second = new ClearCacheTask(new MultipleChargePointSelect());
 
-        assertTrue(first.getTaskId() > 0);
-        assertTrue(second.getTaskId() > 0);
-        assertNotEquals(first.getTaskId(), second.getTaskId());
+        assertNotNull(first.getTaskUuid());
+        assertNotNull(second.getTaskUuid());
+        assertNotEquals(first.getTaskUuid(), second.getTaskUuid());
     }
 }

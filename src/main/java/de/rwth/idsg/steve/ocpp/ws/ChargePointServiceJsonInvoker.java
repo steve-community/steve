@@ -83,7 +83,7 @@ public class ChargePointServiceJsonInvoker {
         var context = new CommunicationContext.OutCall(
             chargeBoxId,
             cps.getOcppProtocol(),
-            task.getTaskId(),
+            task.getTaskUuid(),
             callPayload,
             call.getAction(),
             call.getMessageId()

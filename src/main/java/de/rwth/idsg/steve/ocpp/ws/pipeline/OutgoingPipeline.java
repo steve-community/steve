@@ -72,9 +72,9 @@ public class OutgoingPipeline {
         var sessionStore = sessionContextStoreHolder.getOrCreate(version);
         var session = sessionStore.getSession(outWithCall.chargeBoxId());
 
-        // Reconstruct CommunicationTask from its id
+        // Reconstruct CommunicationTask from its UUID
         var typeStore = TypeStore.getTypeStore(version);
-        var task = taskStore.get(outWithCall.taskId());
+        var task = taskStore.get(outWithCall.taskUuid());
 
         // Construct a response context before send
         var responseClass = typeStore.findResponseClass(outWithCall.ocppAction());

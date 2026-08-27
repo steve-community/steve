@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -30,8 +31,9 @@ import java.util.List;
 public interface TaskStore {
     List<TaskOverview> getOverview();
     CommunicationTask get(Integer taskId);
+    CommunicationTask get(UUID taskUuid);
     Integer add(CommunicationTask task);
-    boolean remove(CommunicationTask task);
+    boolean remove(Integer taskId, CommunicationTask task);
     List<CommunicationTask> getFinished();
     List<CommunicationTask> getUnfinished();
     void clearFinished();

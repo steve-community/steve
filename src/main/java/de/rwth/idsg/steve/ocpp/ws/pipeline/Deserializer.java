@@ -194,7 +194,7 @@ public class Deserializer {
     private CommunicationContext.InResult handleResult(CommunicationContext.In inMsg, String messageId,
                                                        JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
         FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.webSocketSessionId(), messageId);
-        validate(responseContext);
+        validate(responseContext, inMsg.arrivedAtMillis());
 
         ResponseType res;
         try {
@@ -219,7 +219,7 @@ public class Deserializer {
     private CommunicationContext.InError handleError(CommunicationContext.In inMsg, String messageId,
                                                      JsonParser parser) throws CommunicationContext.JsonResponseInvalidException {
         FutureResponseContext responseContext = futureResponseContextStore.poll(inMsg.webSocketSessionId(), messageId);
-        validate(responseContext);
+        validate(responseContext, inMsg.arrivedAtMillis());
 
         ErrorCode code;
         String desc;
@@ -273,12 +273,12 @@ public class Deserializer {
      * Ensures incoming responses map only to active, non-stale calls.
      * Unknown or expired correlations are rejected to prevent accidental matching.
      */
-    private static void validate(FutureResponseContext frc) throws CommunicationContext.JsonResponseInvalidException {
+    private static void validate(FutureResponseContext frc, long responseArrivedAtMillis) throws CommunicationContext.JsonResponseInvalidException {
         if (frc == null) {
             throw new CommunicationContext.JsonResponseInvalidException("A response message was received to a not-sent call", null);
         }
 
-        if (frc.hasTimedOut(Instant.now())) {
+        if (frc.hasTimedOut(Instant.ofEpochMilli(responseArrivedAtMillis))) {
             // carry frc with this exception, because IncomingPipeline will need it to handle and propagate.
             throw new CommunicationContext.JsonResponseInvalidException("A response message was received to an expired call", frc);
         }

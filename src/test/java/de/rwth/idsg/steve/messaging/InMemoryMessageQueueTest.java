@@ -227,6 +227,7 @@ public class InMemoryMessageQueueTest {
             "station",
             OcppProtocol.V_16_JSON,
             "session",
+            System.currentTimeMillis(),
             "in"
         ));
     }

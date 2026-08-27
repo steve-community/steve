@@ -19,17 +19,21 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStoreImpl;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
+import ocpp.cp._2015._10.UpdateFirmwareResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -154,6 +158,71 @@ public class DeserializerTest {
         Assertions.assertNull(error.getMessageId());
     }
 
+    @Test
+    public void testCallResultArrivedBeforeDeadlineIsAcceptedAfterDeadline() throws Exception {
+        String sessionId = UUID.randomUUID().toString();
+        String messageId = "result-before-deadline";
+        Instant deadline = Instant.parse("2026-01-01T00:00:30Z");
+        Instant arrivedAt = deadline.minusMillis(1);
+        FutureResponseContext responseContext = responseContextExpiringAt(deadline);
+        Deserializer deserializer = createDeserializerWith(storeReturning(sessionId, messageId, responseContext));
+
+        CommunicationContext.DeserializationResult result = deserializer.accept(inbound(
+            sessionId,
+            arrivedAt,
+            "[3,\"" + messageId + "\",{}]"
+        ));
+
+        CommunicationContext.InResult inResult = Assertions.assertInstanceOf(CommunicationContext.InResult.class, result);
+        Assertions.assertSame(responseContext, inResult.frc());
+        Assertions.assertInstanceOf(UpdateFirmwareResponse.class, inResult.result().getPayload());
+        Mockito.verify(responseContext).hasTimedOut(arrivedAt);
+    }
+
+    @Test
+    public void testCallErrorArrivedBeforeDeadlineIsAcceptedAfterDeadline() throws Exception {
+        String sessionId = UUID.randomUUID().toString();
+        String messageId = "error-before-deadline";
+        Instant deadline = Instant.parse("2026-01-01T00:00:30Z");
+        Instant arrivedAt = deadline.minusMillis(1);
+        FutureResponseContext responseContext = responseContextExpiringAt(deadline);
+        Deserializer deserializer = createDeserializerWith(storeReturning(sessionId, messageId, responseContext));
+
+        CommunicationContext.DeserializationResult result = deserializer.accept(inbound(
+            sessionId,
+            arrivedAt,
+            "[4,\"" + messageId + "\",\"InternalError\",\"\",{}]"
+        ));
+
+        CommunicationContext.InError inError = Assertions.assertInstanceOf(CommunicationContext.InError.class, result);
+        Assertions.assertSame(responseContext, inError.frc());
+        Assertions.assertEquals(InternalError, inError.error().getErrorCode());
+        Mockito.verify(responseContext).hasTimedOut(arrivedAt);
+    }
+
+    @Test
+    public void testResponseArrivedAfterDeadlineIsRejected() {
+        String sessionId = UUID.randomUUID().toString();
+        String messageId = "result-after-deadline";
+        Instant deadline = Instant.parse("2026-01-01T00:00:30Z");
+        Instant arrivedAt = deadline.plusMillis(1);
+        FutureResponseContext responseContext = responseContextExpiringAt(deadline);
+        Deserializer deserializer = createDeserializerWith(storeReturning(sessionId, messageId, responseContext));
+
+        var exception = Assertions.assertThrows(
+            CommunicationContext.JsonResponseInvalidException.class,
+            () -> deserializer.accept(inbound(
+                sessionId,
+                arrivedAt,
+                "[3,\"" + messageId + "\",{}]"
+            ))
+        );
+
+        Assertions.assertEquals("A response message was received to an expired call", exception.getMessage());
+        Assertions.assertSame(responseContext, exception.getFrc());
+        Mockito.verify(responseContext).hasTimedOut(arrivedAt);
+    }
+
     private static OcppJsonError deserializeError(Deserializer deserializer, String payload) {
         var exception = Assertions.assertThrows(
             CommunicationContext.JsonCallParseException.class,
@@ -163,10 +232,15 @@ public class DeserializerTest {
     }
 
     private static CommunicationContext.In inbound(String payload) {
+        return inbound(UUID.randomUUID().toString(), Instant.now(), payload);
+    }
+
+    private static CommunicationContext.In inbound(String sessionId, Instant arrivedAt, String payload) {
         return new CommunicationContext.In(
             "foo",
             OcppProtocol.V_16_JSON,
-            UUID.randomUUID().toString(),
+            sessionId,
+            arrivedAt.toEpochMilli(),
             payload);
     }
 
@@ -175,7 +249,15 @@ public class DeserializerTest {
     }
 
     private static Deserializer createDeserializer(Boolean registerIncomingCallIdResponse) {
-        var futureResponseContextStore = new FutureResponseContextStoreImpl();
+        return createDeserializer(new FutureResponseContextStoreImpl(), registerIncomingCallIdResponse);
+    }
+
+    private static Deserializer createDeserializerWith(FutureResponseContextStore futureResponseContextStore) {
+        return createDeserializer(futureResponseContextStore, true);
+    }
+
+    private static Deserializer createDeserializer(FutureResponseContextStore futureResponseContextStore,
+                                                   Boolean registerIncomingCallIdResponse) {
 
         SessionContextStore store = Mockito.mock(SessionContextStore.class);
         when(store.registerIncomingCallId(any(), any(), any())).thenReturn(registerIncomingCallIdResponse);
@@ -188,6 +270,23 @@ public class DeserializerTest {
         when(handler.getTypeStore()).thenReturn(Ocpp16TypeStore.INSTANCE);
 
         return new Deserializer(futureResponseContextStore, holder, List.of(handler));
+    }
+
+    private static FutureResponseContextStore storeReturning(String sessionId, String messageId,
+                                                              FutureResponseContext responseContext) {
+        FutureResponseContextStore store = Mockito.mock(FutureResponseContextStore.class);
+        when(store.poll(sessionId, messageId)).thenReturn(responseContext);
+        return store;
+    }
+
+    private static FutureResponseContext responseContextExpiringAt(Instant deadline) {
+        FutureResponseContext responseContext = Mockito.mock(FutureResponseContext.class);
+        Mockito.doReturn(UpdateFirmwareResponse.class).when(responseContext).getResponseClass();
+        when(responseContext.hasTimedOut(any())).thenAnswer(invocation -> {
+            Instant time = invocation.getArgument(0);
+            return deadline.isBefore(time);
+        });
+        return responseContext;
     }
 
 }

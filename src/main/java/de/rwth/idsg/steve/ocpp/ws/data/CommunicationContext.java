@@ -40,6 +40,7 @@ public class CommunicationContext {
         String chargeBoxId,
         OcppProtocol protocol,
         String webSocketSessionId,
+        long arrivedAtMillis,
 
         String ocppPayload // full and raw JSON array payload
     ) {

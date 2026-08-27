@@ -99,6 +99,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
             chargeBoxId,
             version.toProtocol(OcppTransport.JSON),
             session.getId(),
+            System.currentTimeMillis(),
             incomingString
         );
 

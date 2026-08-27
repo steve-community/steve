@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 /**
  * Current implementation does double bookkeeping of tasks by numeric and UUID.
  * Deprecate numeric taskId bookkeeping later and base all operations on {@link CommunicationTask#taskUuid}.
+ * Afterwards, we can delete modificationLock and synchronized blocks.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 @Repository
 public class TaskStoreImpl implements TaskStore {
 
+    private final Object modificationLock = new Object();
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Integer> taskIdByUuid = new ConcurrentHashMap<>();
@@ -88,26 +90,32 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public Integer add(CommunicationTask task) {
-        int taskId = atomicInteger.incrementAndGet();
-        var existingTask = lookupTable.putIfAbsent(taskId, task);
-        if (existingTask != null) {
-            throw new SteveException("There is already a task with taskId '%s'", taskId);
-        }
+        synchronized (modificationLock) {
+            int taskId = atomicInteger.incrementAndGet();
+            var existingTask = lookupTable.putIfAbsent(taskId, task);
+            if (existingTask != null) {
+                throw new SteveException("There is already a task with taskId '%s'", taskId);
+            }
 
-        var existingTaskId = taskIdByUuid.putIfAbsent(task.getTaskUuid(), taskId);
-        if (existingTaskId != null) {
-            lookupTable.remove(taskId, task);
-            throw new SteveException("There is already a task with taskUuid '%s'", task.getTaskUuid());
-        }
+            var existingTaskId = taskIdByUuid.putIfAbsent(task.getTaskUuid(), taskId);
+            if (existingTaskId != null) {
+                lookupTable.remove(taskId, task);
+                throw new SteveException("There is already a task with taskUuid '%s'", task.getTaskUuid());
+            }
 
-        return taskId;
+            return taskId;
+        }
     }
 
     @Override
     public boolean remove(Integer taskId, CommunicationTask task) {
-        boolean success = lookupTable.remove(taskId, task);
-        taskIdByUuid.remove(task.getTaskUuid(), taskId);
-        return success;
+        synchronized (modificationLock) {
+            if (!lookupTable.remove(taskId, task)) {
+                return false;
+            }
+            taskIdByUuid.remove(task.getTaskUuid(), taskId);
+            return true;
+        }
     }
 
     @Override
@@ -128,12 +136,16 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public void clearFinished() {
-        removeTasks(entry -> entry.getValue().isFinished());
+        synchronized (modificationLock) {
+            removeTasks(entry -> entry.getValue().isFinished());
+        }
     }
 
     @Override
     public void clearUnfinished() {
-        removeTasks(entry -> !entry.getValue().isFinished());
+        synchronized (modificationLock) {
+            removeTasks(entry -> !entry.getValue().isFinished());
+        }
     }
 
     private void removeTasks(Predicate<Map.Entry<Integer, CommunicationTask>> filterPredicate) {

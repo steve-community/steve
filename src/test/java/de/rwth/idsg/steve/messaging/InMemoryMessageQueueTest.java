@@ -78,7 +78,7 @@ public class InMemoryMessageQueueTest {
     }
 
     @Test
-    public void producersFailFastWhenTheirQueueIsFull() {
+    public void producersFailWhenTheirQueueRemainsFull() {
         var inChannel = new QueueChannel(1);
         var outChannel = new QueueChannel(1);
         var outCallChannel = new QueueChannel(1);

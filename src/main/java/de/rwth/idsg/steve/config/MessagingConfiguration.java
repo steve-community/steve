@@ -43,6 +43,7 @@ public class MessagingConfiguration {
     public static final String POLL_INTERVAL_MILLIS = "100";
 
     private static final int QUEUE_CAPACITY = 10_000;
+    private static final long SEND_TIMEOUT_MILLIS = 2_000;
 
     @Bean(name = IN_CHANNEL)
     public QueueChannel ocppInChannel() {
@@ -75,7 +76,7 @@ public class MessagingConfiguration {
     }
 
     private static void send(MessageChannel channel, Message<?> message, String errorMessage) {
-        if (!channel.send(message, 0)) {
+        if (!channel.send(message, SEND_TIMEOUT_MILLIS)) {
             throw new MessageDeliveryException(message, errorMessage);
         }
     }

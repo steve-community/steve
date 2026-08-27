@@ -240,7 +240,7 @@ public class DeserializerTest {
             "foo",
             OcppProtocol.V_16_JSON,
             sessionId,
-            arrivedAt.toEpochMilli(),
+            arrivedAt,
             payload);
     }
 

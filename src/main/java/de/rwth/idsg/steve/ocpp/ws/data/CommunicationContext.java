@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -40,7 +41,7 @@ public class CommunicationContext {
         String chargeBoxId,
         OcppProtocol protocol,
         String webSocketSessionId,
-        long arrivedAtMillis,
+        Instant receivedAt,
 
         String ocppPayload // full and raw JSON array payload
     ) {

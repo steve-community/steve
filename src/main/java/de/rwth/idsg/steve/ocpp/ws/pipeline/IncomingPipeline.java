@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.config.MessagingConfiguration;
 import de.rwth.idsg.steve.messaging.Messaging;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -74,8 +75,7 @@ public class IncomingPipeline implements Messaging.In.Consumer {
 
         } catch (CommunicationContext.JsonCallParseException e) {
             var parseError = e.getParseError();
-            var parseErrorStr = serializer.accept(parseError);
-            sendOut(message, parseErrorStr);
+            sendOut(message, parseError);
             return;
 
         } catch (CommunicationContext.JsonResponseInvalidException e) {
@@ -105,11 +105,12 @@ public class IncomingPipeline implements Messaging.In.Consumer {
         }
 
         var response = handler.accept(data);
-        var responseStr = serializer.accept(response);
-        sendOut(message, responseStr);
+        sendOut(message, response);
     }
 
-    private void sendOut(Message<CommunicationContext.In> inMsg, String ocppPayload) {
+    private void sendOut(Message<CommunicationContext.In> inMsg, OcppJsonResponse responseMsg) {
+        var ocppPayload = serializer.accept(responseMsg);
+
         var out = CommunicationContext.outFrom(inMsg.getPayload(), ocppPayload);
         var outMsg = MessageBuilder.withPayload(out).copyHeaders(inMsg.getHeaders()).build();
         outProducer.send(outMsg);

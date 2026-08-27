@@ -40,6 +40,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -99,7 +100,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
             chargeBoxId,
             version.toProtocol(OcppTransport.JSON),
             session.getId(),
-            System.currentTimeMillis(),
+            Instant.now(),
             incomingString
         );
 

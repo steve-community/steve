@@ -42,6 +42,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -227,7 +228,7 @@ public class InMemoryMessageQueueTest {
             "station",
             OcppProtocol.V_16_JSON,
             "session",
-            System.currentTimeMillis(),
+            Instant.now(),
             "in"
         ));
     }

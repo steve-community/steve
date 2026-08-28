@@ -105,9 +105,15 @@ public class ApiDocsConfiguration {
             addInfo(openApi, steveProperties);
             addAuthScheme(openApi);
             addEnumConfSchemas(openApi);
+            
+            
+            String url_path = "/";
+            if (!steveProperties.contextpath.isBlank()) {
+                url_path = steveProperties.contextpath + "/";
+            }
 
             // https://stackoverflow.com/a/68185254
-            openApi.setServers(List.of(new Server().url("/").description("Default Server URL")));
+            openApi.setServers(List.of(new Server().url(url_path).description("Default Server URL")));
         };
     }
 

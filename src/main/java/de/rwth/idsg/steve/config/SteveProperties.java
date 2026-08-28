@@ -45,6 +45,7 @@ public class SteveProperties {
     public static final String TIME_ZONE_ID = "UTC";  // or ZoneId.systemDefault().getId();
 
     String version;
+    String contextpath;
     Auth auth = new Auth();
     Jooq jooq = new Jooq();
     Ocpp ocpp = new Ocpp();

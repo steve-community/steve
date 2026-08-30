@@ -81,26 +81,12 @@ public class UserRepositoryImpl implements UserRepository {
                 .notificationFeatures(NotificationFeature.splitFeatures(r.value6()))
                 .build();
 
-            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
-            //       should be acceptable since the number of users (and tags) are usually not very high, and this
-            //       overview query will probably not be in the hot path.
-            switch (form.getOcppTagFilter()) {
-                case OnlyUsersWithTags -> {
-                    if (!tags.isEmpty()) {
-                        userOverviews.add(user);
-                    }
-                }
-                case OnlyUsersWithoutTags -> {
-                    if (tags.isEmpty()) {
-                        userOverviews.add(user);
-                    }
-                }
-                default -> userOverviews.add(user);
-            }
+            userOverviews.add(user);
         }
 
         return userOverviews;
     }
+
 
     @Override
     public User.Details getDetails(int userPk) {
@@ -197,6 +183,16 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(joinedField, form.getName()));
         }
 
+        switch (form.getOcppTagFilter()) {
+                case OnlyUsersWithTags -> {
+                    conditions.add(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull());
+                }
+                case OnlyUsersWithoutTags -> {
+                    conditions.add(USER_OCPP_TAG.OCPP_TAG_PK.isNull());
+                }
+                default -> { /* no additional Condition*/ }
+        }
+
         return ctx.select(
                 USER.USER_PK,
                 USER.FIRST_NAME,
@@ -205,7 +201,9 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.E_MAIL,
                 USER.NOTIFICATION_FEATURES)
             .from(USER)
+            .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))  // needed to check OcppFilterTag
             .where(conditions)
+            .groupBy(USER.USER_PK)  // because of multiple OCPP_Tag per User, there may be multiple Results per User
             .fetch();
     }
 

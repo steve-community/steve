@@ -185,10 +185,18 @@ public class UserRepositoryImpl implements UserRepository {
 
         switch (form.getOcppTagFilter()) {
                 case OnlyUsersWithTags -> {
-                    conditions.add(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull());
+                    conditions.add(DSL.exists(
+                        DSL.selectOne()
+                            .from(USER_OCPP_TAG)
+                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
                 }
                 case OnlyUsersWithoutTags -> {
-                    conditions.add(USER_OCPP_TAG.OCPP_TAG_PK.isNull());
+                    conditions.add(DSL.notExists(
+                        DSL.select()
+                            .from(USER_OCPP_TAG)
+                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
                 }
                 default -> { /* no additional Condition*/ }
         }
@@ -201,9 +209,7 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.E_MAIL,
                 USER.NOTIFICATION_FEATURES)
             .from(USER)
-            .leftJoin(USER_OCPP_TAG).on(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))  // needed to check OcppFilterTag
             .where(conditions)
-            .groupBy(USER.USER_PK)  // because of multiple OCPP_Tag per User, there may be multiple Results per User
             .fetch();
     }
 

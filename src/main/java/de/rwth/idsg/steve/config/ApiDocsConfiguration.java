@@ -34,6 +34,7 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,17 +87,17 @@ public class ApiDocsConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi steveApi(SteveProperties steveProperties) {
+    public GroupedOpenApi steveApi(SteveProperties steveProperties, ServerProperties serverProperties) {
         return GroupedOpenApi.builder()
             .group("admin")
             .displayName("Admin")
             .packagesToScan(API_PACKAGES)
             .pathsToMatch("/api/**")
-            .addOpenApiCustomizer(steveApiCustomizer(steveProperties))
+            .addOpenApiCustomizer(steveApiCustomizer(steveProperties, serverProperties))
             .build();
     }
 
-    private static OpenApiCustomizer steveApiCustomizer(SteveProperties steveProperties) {
+    private static OpenApiCustomizer steveApiCustomizer(SteveProperties steveProperties, ServerProperties serverProperties) {
         return openApi -> {
             if (openApi.getComponents() == null) {
                 openApi.setComponents(new Components());
@@ -108,8 +109,8 @@ public class ApiDocsConfiguration {
             
             
             String url_path = "/";
-            if (!steveProperties.contextpath.isBlank()) {
-                url_path = steveProperties.contextpath + "/";
+            if (!serverProperties.getServlet().getContextPath().isBlank()) {
+                url_path = serverProperties.getServlet().getContextPath() + "/";
             }
 
             // https://stackoverflow.com/a/68185254

@@ -37,7 +37,6 @@ server:
 
 steve:
   version: @project.version@
-  context-path: /${context.path}
   jooq:
     executive-logging: ${db.sql.logging}
   auth:

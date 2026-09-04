@@ -29,6 +29,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -106,15 +107,12 @@ public class ApiDocsConfiguration {
             addInfo(openApi, steveProperties);
             addAuthScheme(openApi);
             addEnumConfSchemas(openApi);
-            
-            
-            String url_path = "/";
-            if (!serverProperties.getServlet().getContextPath().isBlank()) {
-                url_path = serverProperties.getServlet().getContextPath() + "/";
-            }
+
+            var contextPath = serverProperties.getServlet().getContextPath();
+            var url = StringUtils.isBlank(contextPath) ? "" : contextPath;
 
             // https://stackoverflow.com/a/68185254
-            openApi.setServers(List.of(new Server().url(url_path).description("Default Server URL")));
+            openApi.setServers(List.of(new Server().url(url + "/").description("Default Server URL")));
         };
     }
 

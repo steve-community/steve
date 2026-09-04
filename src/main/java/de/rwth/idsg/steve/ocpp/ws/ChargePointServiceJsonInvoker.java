@@ -19,14 +19,15 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.messaging.Messaging;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -40,7 +41,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChargePointServiceJsonInvoker {
 
-    private final OutgoingPipeline outgoingPipeline;
+    private final Messaging.OutCall.Producer outCallProducer;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
@@ -89,6 +90,6 @@ public class ChargePointServiceJsonInvoker {
             call.getMessageId()
         );
 
-        outgoingPipeline.accept(context);
+        outCallProducer.send(MessageBuilder.withPayload(context).build());
     }
 }

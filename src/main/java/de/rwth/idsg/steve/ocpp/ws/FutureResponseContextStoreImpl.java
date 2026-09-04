@@ -112,9 +112,10 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
     /**
      * Removes stale correlation entries to keep the lookup bounded when peers stop responding.
+     * The retention period is longer than the response timeout to account for queueing delays.
      */
     private static void evictTimedOutEntries(Map<String, FutureResponseContext> map) {
         Instant now = Instant.now();
-        map.entrySet().removeIf(entry -> entry.getValue().hasTimedOut(now));
+        map.entrySet().removeIf(entry -> entry.getValue().hasExceededRetentionPeriod(now));
     }
 }

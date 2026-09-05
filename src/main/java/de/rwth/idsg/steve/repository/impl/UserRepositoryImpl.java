@@ -81,26 +81,12 @@ public class UserRepositoryImpl implements UserRepository {
                 .notificationFeatures(NotificationFeature.splitFeatures(r.value6()))
                 .build();
 
-            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
-            //       should be acceptable since the number of users (and tags) are usually not very high, and this
-            //       overview query will probably not be in the hot path.
-            switch (form.getOcppTagFilter()) {
-                case OnlyUsersWithTags -> {
-                    if (!tags.isEmpty()) {
-                        userOverviews.add(user);
-                    }
-                }
-                case OnlyUsersWithoutTags -> {
-                    if (tags.isEmpty()) {
-                        userOverviews.add(user);
-                    }
-                }
-                default -> userOverviews.add(user);
-            }
+            userOverviews.add(user);
         }
 
         return userOverviews;
     }
+
 
     @Override
     public User.Details getDetails(int userPk) {
@@ -195,6 +181,24 @@ public class UserRepositoryImpl implements UserRepository {
 
             // Find a matching sequence anywhere within the concatenated representation
             conditions.add(includes(joinedField, form.getName()));
+        }
+
+        switch (form.getOcppTagFilter()) {
+                case OnlyUsersWithTags -> {
+                    conditions.add(DSL.exists(
+                        DSL.selectOne()
+                            .from(USER_OCPP_TAG)
+                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
+                }
+                case OnlyUsersWithoutTags -> {
+                    conditions.add(DSL.notExists(
+                        DSL.select()
+                            .from(USER_OCPP_TAG)
+                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
+                }
+                default -> { /* no additional Condition*/ }
         }
 
         return ctx.select(

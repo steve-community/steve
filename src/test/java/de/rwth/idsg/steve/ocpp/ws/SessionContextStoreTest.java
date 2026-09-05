@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.scheduling.support.NoOpTaskScheduler;
 import org.springframework.web.socket.adapter.jetty.JettyWebSocketSession;
 
 import java.util.UUID;
@@ -33,11 +32,13 @@ import static org.mockito.Mockito.when;
 
 public class SessionContextStoreTest {
 
+    private final WebSocketPingService pingService = Mockito.mock(WebSocketPingService.class);
+
     @Test
     public void testAdd() {
         var store = new SessionContextStoreImpl(
             WsSessionSelectStrategyEnum.ALWAYS_LAST,
-            new NoOpTaskScheduler(),
+            pingService,
             new FutureResponseContextStoreImpl()
         );
 
@@ -46,9 +47,11 @@ public class SessionContextStoreTest {
 
         // add first
         {
-            store.add("foo", getMockSession());
+            var session = getMockSession();
+            store.add("foo", session);
             int sizeAfterAdd =  store.getSize("foo");
             Assertions.assertEquals(1, sizeAfterAdd);
+            verify(pingService).register("foo", session);
         }
 
         // add second
@@ -63,7 +66,7 @@ public class SessionContextStoreTest {
     public void testRemove() {
         var store = new SessionContextStoreImpl(
             WsSessionSelectStrategyEnum.ALWAYS_LAST,
-            new NoOpTaskScheduler(),
+            pingService,
             new FutureResponseContextStoreImpl()
         );
 
@@ -88,6 +91,7 @@ public class SessionContextStoreTest {
             store.remove("foo", session1);
             int sizeAfterRemove = store.getSize("foo");
             Assertions.assertEquals(1, sizeAfterRemove);
+            verify(pingService).deregister(session1);
         }
 
         // remove second
@@ -110,7 +114,7 @@ public class SessionContextStoreTest {
     public void testCloseSession() throws Exception {
         var store = new SessionContextStoreImpl(
             WsSessionSelectStrategyEnum.ALWAYS_LAST,
-            new NoOpTaskScheduler(),
+            pingService,
             new FutureResponseContextStoreImpl()
         );
 
@@ -131,7 +135,7 @@ public class SessionContextStoreTest {
     public void testCloseSession_doesNotScanOtherChargeBoxIds() throws Exception {
         var store = new SessionContextStoreImpl(
             WsSessionSelectStrategyEnum.ALWAYS_LAST,
-            new NoOpTaskScheduler(),
+            pingService,
             new FutureResponseContextStoreImpl()
         );
 
@@ -149,7 +153,7 @@ public class SessionContextStoreTest {
     public void testCloseSession_unknownSession() {
         var store = new SessionContextStoreImpl(
             WsSessionSelectStrategyEnum.ALWAYS_LAST,
-            new NoOpTaskScheduler(),
+            pingService,
             new FutureResponseContextStoreImpl()
         );
 

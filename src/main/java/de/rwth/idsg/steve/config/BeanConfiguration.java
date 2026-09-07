@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -167,6 +168,20 @@ public class BeanConfiguration implements WebMvcConfigurer {
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
+
+        return scheduler;
+    }
+
+    /**
+     * The WebSocket pings are scheduled here rather than on the scheduler above, which they would share
+     * with every other periodic job of SteVe. This one runs each ping on its own virtual thread, so a
+     * station whose send blocks costs a virtual thread instead of a tenth of that pool.
+     */
+    @Bean
+    public SimpleAsyncTaskScheduler webSocketPingScheduler() {
+        SimpleAsyncTaskScheduler scheduler = new SimpleAsyncTaskScheduler();
+        scheduler.setThreadNamePrefix("SteVe-WebSocketPing-");
+        scheduler.setVirtualThreads(true);
 
         return scheduler;
     }

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
+import static de.rwth.idsg.steve.web.dto.UserQueryForm.OcppTagFilter.OnlyUsersWithoutTags;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.User.USER;
@@ -65,8 +66,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
-        var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
         var userResults = getOverviewInternal(form);
+        if (userResults.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Integer, List<User.OcppTagEntry>> ocppTagsPerUser = (form.getOcppTagFilter() == OnlyUsersWithoutTags)
+            ? Map.of()
+            : getOcppTagsInternal(userResults.getValues(USER.USER_PK), form.getOcppIdTag());
 
         List<User.Overview> userOverviews = new ArrayList<>();
         for (var r : userResults) {
@@ -87,7 +94,6 @@ public class UserRepositoryImpl implements UserRepository {
         return userOverviews;
     }
 
-
     @Override
     public User.Details getDetails(int userPk) {
         UserRecord ur = ctx.selectFrom(USER)
@@ -101,7 +107,7 @@ public class UserRepositoryImpl implements UserRepository {
         return User.Details.builder()
                            .userRecord(ur)
                            .address(addressRepository.get(ctx, ur.getAddressPk()))
-                           .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
+                           .ocppTagEntries(getOcppTagsInternal(List.of(userPk), null).getOrDefault(userPk, List.of()))
                            .build();
     }
 
@@ -156,6 +162,18 @@ public class UserRepositoryImpl implements UserRepository {
     private Result<Record6<Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
         List<Condition> conditions = new ArrayList<>();
 
+        var hasTagsQuery = DSL.exists(
+            DSL.selectOne()
+                .from(USER_OCPP_TAG)
+                .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+        );
+
+        switch (form.getOcppTagFilter()) {
+            case OnlyUsersWithTags -> conditions.add(hasTagsQuery);
+            case OnlyUsersWithoutTags -> conditions.add(hasTagsQuery.not());
+            default -> { }
+        }
+
         if (form.isSetUserPk()) {
             conditions.add(USER.USER_PK.eq(form.getUserPk()));
         }
@@ -183,24 +201,6 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(joinedField, form.getName()));
         }
 
-        switch (form.getOcppTagFilter()) {
-                case OnlyUsersWithTags -> {
-                    conditions.add(DSL.exists(
-                        DSL.selectOne()
-                            .from(USER_OCPP_TAG)
-                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
-                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
-                }
-                case OnlyUsersWithoutTags -> {
-                    conditions.add(DSL.notExists(
-                        DSL.select()
-                            .from(USER_OCPP_TAG)
-                            .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
-                            .and(USER_OCPP_TAG.OCPP_TAG_PK.isNotNull())));
-                }
-                default -> { /* no additional Condition*/ }
-        }
-
         return ctx.select(
                 USER.USER_PK,
                 USER.FIRST_NAME,
@@ -213,12 +213,9 @@ public class UserRepositoryImpl implements UserRepository {
             .fetch();
     }
 
-    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, String ocppIdTag) {
+    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(List<Integer> userPks, String ocppIdTag) {
         List<Condition> conditions = new ArrayList<>();
-
-        if (userPk != null) {
-            conditions.add(USER_OCPP_TAG.USER_PK.eq(userPk));
-        }
+        conditions.add(USER_OCPP_TAG.USER_PK.in(userPks));
 
         if (!Strings.isNullOrEmpty(ocppIdTag)) {
             conditions.add(includes(OCPP_TAG.ID_TAG, ocppIdTag));

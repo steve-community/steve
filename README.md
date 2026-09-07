@@ -11,7 +11,7 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 The project is distributed under [GPL](LICENSE.txt) and is free to use. 
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
-### Relation to Powerfill
+# Relation to Powerfill
 
 [Powerfill](https://powerfill.io/) is a SaaS company to expand beyond the basics of SteVe. 
 While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. 
@@ -25,7 +25,7 @@ Read more in [the company announcement](https://github.com/steve-community/steve
 > SteVe's OCPP implementation has therefore been independently validated through its integration into the certified Powerfill backend.
 > The certificate formally applies only to the certified Powerfill backend and version, not to SteVe as a standalone, open-source distribution or to other SteVe builds and deployments.
 
-### Charge Point Support
+# Charge Point Support
 
 Electric charge points using the following OCPP versions are supported:
 
@@ -39,7 +39,7 @@ Electric charge points using the following OCPP versions are supported:
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
-### System Requirements
+# System Requirements
 
 SteVe requires 
 * JDK 25 or newer
@@ -106,61 +106,55 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     # java -jar target/steve.war
     ```
 
-# Docker
-
-If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
-
-Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
-Instead of changing the [application-prod.properties](src/main/resources/application-prod.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
-The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
-
-With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`
-
-# Kubernetes
-
-First build your image, and push it to a registry your K8S cluster can access. Make sure the build args in the docker build command are set with the same database configuration that the main deployment will use.
-
-`docker build --build-arg DB_HOST= --build-arg DB_PORT= --build-arg DB_USERNAME= --build-arg DB_PASSWORD= --build-arg DB_DATABASE=  -f k8s/docker/Dockerfile -t <IMAGE_NAME> .`
-
-`docker push <IMAGE_NAME>`
-
-
-Then go to `k8s/yaml/Deployment.yaml` and change `### YOUR BUILT IMAGE HERE ###` to your image tag, and fill in the environment variables with the same database connection that you used at build time.
-
-After this, create the namespace using `kubectl create ns steve` and apply your yaml with `kubectl apply -f k8s/yaml/Deployment.yaml` followed by `kubectl apply -f k8s/yaml/Service.yaml`
-
-
-To access this publicaly, you'll also have to setup an ingress using something like nginx or traefik. 
-
-# Ubuntu
-
-You'll find a tutorial how to prepare Ubuntu for SteVe here: https://github.com/steve-community/steve/wiki/Prepare-Ubuntu-VM-for-SteVe
-
-# AWS
-
-You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://github.com/steve-community/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail
-
-# First Steps
-
-After SteVe has successfully started, you can access the web interface using the configured credentials under:
-
-    http://<your-server-ip>:<port>/steve/manager
+6. After SteVe has successfully started, you can access the web interface using the configured credentials under:
     
+    ```
+    http://<your-server-ip>:<port>/steve/manager
+    ```
 
-### Add a charge point
+7. Add a charge point:
+   1. In order for SteVe to accept messages from a charge point, the charge point must first be registered. To add a charge point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the charge point and confirm.
 
-1. In order for SteVe to accept messages from a charge point, the charge point must first be registered. To add a charge point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the charge point and confirm.
-
-2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
-    - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
-    - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService`
+   2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
+      - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
+      - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService`
 
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
 
 *Have fun!*
 
-Screenshots
------
+# Infrastructure & Deployment
+
+- **Docker**
+
+  If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
+
+  Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
+  Instead of changing the [application-prod.properties](src/main/resources/application-prod.properties), you have to change the [application-docker.properties](src/main/resources/application-docker.properties). There you have to change all configurations which are described in step 3.
+  The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
+
+  With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`
+
+- **Kubernetes**
+
+  First build your image, and push it to a registry your K8S cluster can access. Make sure the build args in the docker build command are set with the same database configuration that the main deployment will use.
+
+  `docker build --build-arg DB_HOST= --build-arg DB_PORT= --build-arg DB_USERNAME= --build-arg DB_PASSWORD= --build-arg DB_DATABASE=  -f k8s/docker/Dockerfile -t <IMAGE_NAME> .`
+
+  `docker push <IMAGE_NAME>`
+
+  Then go to `k8s/yaml/Deployment.yaml` and change `### YOUR BUILT IMAGE HERE ###` to your image tag, and fill in the environment variables with the same database connection that you used at build time.
+
+  After this, create the namespace using `kubectl create ns steve` and apply your yaml with `kubectl apply -f k8s/yaml/Deployment.yaml` followed by `kubectl apply -f k8s/yaml/Service.yaml`
+
+  To access this publicly, you'll also have to setup an ingress using something like nginx or traefik.
+
+- **Ubuntu** — [Prepare an Ubuntu VM for SteVe](https://github.com/steve-community/steve/wiki/Prepare-Ubuntu-VM-for-SteVe)
+
+- **AWS** — [Create a SteVe instance using Lightsail](https://github.com/steve-community/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail)
+
+# Screenshots
+
 1. [Home](website/screenshots/home.png)
 1. [Connector Status](website/screenshots/connector-status.png)
 1. [Data Management - Charge Points](website/screenshots/chargepoints.png)
@@ -179,21 +173,21 @@ Screenshots
 1. [Settings](website/screenshots/settings.png)
 1. [APIs](website/screenshots/apis.png)
 
-OpenAPI spec
------
+# OpenAPI spec
+
 An export of the actual OpenAPI spec for APIs is available [here](api-docs.json).
 To explore it interactively, open it in the [Live Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/steve-community/steve/refs/heads/master/api-docs.json).
 
-GDPR
------
+# GDPR
+
 If you are in the EU and offer vehicle charging to other people using SteVe, keep in mind that you have to comply to the General Data Protection Regulation (GDPR) as SteVe processes charging transactions, which can be considered personal data.
 
-Are you having issues?
------
+# Are you having issues?
+
 See the [FAQ](https://github.com/steve-community/steve/wiki/FAQ)
 
-Acknowledgments
------
+# Acknowledgments
+
 [goekay](https://github.com/goekay) thanks to
 - [JetBrains](https://jb.gg/OpenSourceSupport) who support this project by providing a free All Products Pack license, and
 - ej-technologies GmbH who support this project by providing a free license for their [Java profiler](https://www.ej-technologies.com/products/jprofiler/overview.html).

@@ -34,23 +34,10 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.5S
 * OCPP1.5J
 * OCPP1.6S
-* OCPP1.6J (incl. _Security Extensions_)
+* OCPP1.6J (incl. [Security Extensions](https://github.com/steve-community/steve/wiki/OCPP-1.6J-Security-Configuration))
 
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
-
-### OCPP 1.6J Security Extensions
-
-SteVe has a complete implementation of [OCPP 1.6 Security Whitepaper Edition 3](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip), providing:
-
-* **Security Profiles 0-3**: Unsecured, Basic Auth, Basic Auth with server TLS, and Mutual TLS (mTLS)
-* **Certificate Management**: Certificate signing, installation, and deletion
-* **Security Events**: Real-time security event logging and monitoring
-* **Signed Firmware Updates**: Cryptographically signed firmware updates with certificate validation
-* **Diagnostic Logs**: Secure log retrieval with configurable time ranges
-
-See [dedicated Wiki page](https://github.com/steve-community/steve/wiki/OCPP-1.6J-Security-Configuration) for detailed configuration guide.
-
 
 ### System Requirements
 

@@ -19,14 +19,24 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.WebUserRepository;
+import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
 import org.springframework.stereotype.Repository;
 
 import static jooq.steve.db.Tables.WEB_USER;
+import org.jooq.Record4;
+import org.jooq.Result;
+import org.jooq.SelectQuery;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static org.jooq.impl.DSL.condition;
 import static org.jooq.impl.DSL.count;
 
@@ -54,12 +64,22 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Override
     public void updateUser(WebUserRecord user) {
+        // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-            .set(WEB_USER.PASSWORD, user.getPassword())
-            .set(WEB_USER.API_PASSWORD, user.getApiPassword())
             .set(WEB_USER.ENABLED, user.getEnabled())
             .set(WEB_USER.AUTHORITIES, user.getAuthorities())
             .where(WEB_USER.USERNAME.eq(user.getUsername()))
+            .execute();
+    }
+
+    @Override
+    public void updateUserByPk(WebUserRecord user) {
+        // To change the password use one of the changePassword methods
+        ctx.update(WEB_USER)
+            .set(WEB_USER.USERNAME, user.getUsername())
+            .set(WEB_USER.ENABLED, user.getEnabled())
+            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+            .where(WEB_USER.WEB_USER_PK.eq(user.getWebUserPk()))
             .execute();
     }
 
@@ -87,10 +107,9 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Override
     public Integer getUserCountWithAuthority(String authority) {
-        JSON authValue = JSON.json("\"" + authority + "\"");
         return ctx.selectCount()
             .from(WEB_USER)
-            .where(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue))
+            .where(conditionsForAuthorities(Collections.singletonList(authority)))
             .fetchOne(count());
     }
 
@@ -99,6 +118,22 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         ctx.update(WEB_USER)
             .set(WEB_USER.PASSWORD, newPassword)
             .where(WEB_USER.USERNAME.eq(username))
+            .execute();
+    }
+
+    @Override
+    public void changePassword(Integer userPk, String newPassword) {
+        ctx.update(WEB_USER)
+            .set(WEB_USER.PASSWORD, newPassword)
+            .where(WEB_USER.WEB_USER_PK.eq(userPk))
+            .execute();
+    }
+
+    @Override
+    public void changeApiPassword(Integer userPk, String newPassword) {
+        ctx.update(WEB_USER)
+            .set(WEB_USER.API_PASSWORD, newPassword)
+            .where(WEB_USER.WEB_USER_PK.eq(userPk))
             .execute();
     }
 
@@ -116,5 +151,47 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         return ctx.selectFrom(WEB_USER)
             .where(WEB_USER.USERNAME.eq(username))
             .fetchOne();
+    }
+
+    @Override
+    public WebUserRecord loadUserByUsePk(Integer webUserPk) {
+        return ctx.selectFrom(WEB_USER)
+            .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
+            .fetchOne();
+    }
+
+    @Override
+    public Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form) {
+        SelectQuery selectQuery = ctx.selectQuery();
+        selectQuery.addFrom(WEB_USER);
+        selectQuery.addSelect(
+                WEB_USER.WEB_USER_PK,
+                WEB_USER.USERNAME,
+                WEB_USER.ENABLED,
+                WEB_USER.AUTHORITIES
+        );
+
+        if (form.isSetWebUsername()) {
+            selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebUsername()));
+        }
+
+        if (form.isSetEnabled()) {
+            selectQuery.addConditions(WEB_USER.ENABLED.eq(form.getEnabled()));
+        }
+
+        if (form.isSetRoles()) {
+            String[] split = form.getRoles().split(","); //Semicolon seperated String to StringArray
+            List<String> roles = Arrays.stream(split).map(String::strip).toList();
+            selectQuery.addConditions(conditionsForAuthorities(roles));
+        }
+
+        return selectQuery.fetch();
+    }
+
+    private static List<Condition> conditionsForAuthorities(List<String> authorities) {
+        return authorities.stream()
+            .map(it -> JSON.json("\"" + it + "\""))
+            .map(it -> condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, it))
+            .toList();
     }
 }

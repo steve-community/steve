@@ -157,7 +157,7 @@ public class IdTagTest {
 
     @Test
     public void testOpenApiSchema() {
-        var resolved = ModelConverters.getInstance()
+        var resolved = modelConverters()
             .resolveAsResolvedSchema(new AnnotatedType(DefaultIdTag.class));
         var schema = resolved.referencedSchemas.get(DefaultIdTag.class.getSimpleName());
         var valueSchema = (Schema<?>) schema.getProperties().get("value");
@@ -170,13 +170,29 @@ public class IdTagTest {
 
     @Test
     public void testOpenApiSchemaForListElements() {
-        var resolved = ModelConverters.getInstance()
+        var resolved = modelConverters()
             .resolveAsResolvedSchema(new AnnotatedType(DefaultIdTagList.class));
         var schema = resolved.referencedSchemas.get(DefaultIdTagList.class.getSimpleName());
         var listSchema = (Schema<?>) schema.getProperties().get("values");
 
         Assertions.assertEquals(IdTag.DEFAULT_MAX_LENGTH, listSchema.getItems().getMaxLength());
         Assertions.assertEquals(IdTag.PATTERN, listSchema.getItems().getPattern());
+    }
+
+    @Test
+    public void testOpenApiSchemaWithConfiguredMaxLength() {
+        var resolved = modelConverters()
+            .resolveAsResolvedSchema(new AnnotatedType(ExtendedIdTag.class));
+        var schema = resolved.referencedSchemas.get(ExtendedIdTag.class.getSimpleName());
+        var valueSchema = (Schema<?>) schema.getProperties().get("value");
+
+        Assertions.assertEquals(25, valueSchema.getMaxLength());
+    }
+
+    private static ModelConverters modelConverters() {
+        var converters = new ModelConverters();
+        converters.addConverter(new IdTagOpenApiModelConverter());
+        return converters;
     }
 
     private static boolean isValid(String value) {

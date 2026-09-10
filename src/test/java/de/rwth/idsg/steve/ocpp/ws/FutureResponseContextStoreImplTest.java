@@ -22,9 +22,12 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FutureResponseContextStoreImplTest {
 
@@ -52,5 +55,35 @@ public class FutureResponseContextStoreImplTest {
         assertTrue(store.containsKey("session"));
         assertSame(secondContext, store.poll("session", "second"));
         assertFalse(store.containsKey("session"));
+    }
+
+    @Test
+    public void addRetainsContextUntilRetentionPeriodIsExceeded() {
+        var store = new FutureResponseContextStoreImpl();
+        var retainedContext = mock(FutureResponseContext.class);
+        var newContext = mock(FutureResponseContext.class);
+
+        when(retainedContext.hasTimedOut(any())).thenReturn(true);
+        when(retainedContext.hasExceededRetentionPeriod(any())).thenReturn(false);
+
+        store.add("session", "retained", retainedContext);
+        store.add("session", "new", newContext);
+
+        assertSame(retainedContext, store.poll("session", "retained"));
+    }
+
+    @Test
+    public void addEvictsContextAfterRetentionPeriodIsExceeded() {
+        var store = new FutureResponseContextStoreImpl();
+        var expiredContext = mock(FutureResponseContext.class);
+        var newContext = mock(FutureResponseContext.class);
+
+        when(expiredContext.hasExceededRetentionPeriod(any())).thenReturn(true);
+
+        store.add("session", "expired", expiredContext);
+        store.add("session", "new", newContext);
+
+        assertNull(store.poll("session", "expired"));
+        assertSame(newContext, store.poll("session", "new"));
     }
 }

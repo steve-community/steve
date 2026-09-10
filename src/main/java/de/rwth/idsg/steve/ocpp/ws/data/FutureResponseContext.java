@@ -41,6 +41,12 @@ public class FutureResponseContext {
      */
     public static final int TIMEOUT_IN_SECONDS = 30;
 
+    /**
+     * Physical retention window for correlation entries. This is deliberately longer than the
+     * response timeout so an on-time response can still be correlated after waiting in the queue.
+     */
+    public static final int RETENTION_IN_SECONDS = 2 * TIMEOUT_IN_SECONDS;
+
     private final CommunicationTask task;
     private final Class<? extends ResponseType> responseClass;
 
@@ -48,9 +54,13 @@ public class FutureResponseContext {
      * Timestamp used to detect stale response contexts and prevent late responses
      * from being correlated as if they were still active.
      */
-    private final Instant createdAt = Instant.now();
+    private final Instant sentAt = Instant.now();
 
     public boolean hasTimedOut(Instant now) {
-        return createdAt.plusSeconds(TIMEOUT_IN_SECONDS).isBefore(now);
+        return sentAt.plusSeconds(TIMEOUT_IN_SECONDS).isBefore(now);
+    }
+
+    public boolean hasExceededRetentionPeriod(Instant now) {
+        return sentAt.plusSeconds(RETENTION_IN_SECONDS).isBefore(now);
     }
 }

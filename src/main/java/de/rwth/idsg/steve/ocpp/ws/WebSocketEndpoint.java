@@ -19,10 +19,10 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.messaging.Messaging;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -39,6 +40,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -55,7 +57,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
     private final OcppServerRepository ocppServerRepository;
     private final SessionContextStoreHolder sessionContextStoreHolder;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final IncomingPipeline incomingPipeline;
+    private final Messaging.In.Producer inProducer;
 
     @Override
     public List<String> getSubProtocols() {
@@ -98,10 +100,11 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
             chargeBoxId,
             version.toProtocol(OcppTransport.JSON),
             session.getId(),
+            Instant.now(),
             incomingString
         );
 
-        incomingPipeline.accept(inMsg);
+        inProducer.send(MessageBuilder.withPayload(inMsg).build());
     }
 
     private void handlePongMessage(WebSocketSession session) {

@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -45,7 +46,8 @@ public abstract class QueryForm extends QueryPeriodFromToFilter {
     private List<@ChargeBoxId String> chargeBoxId;
 
     @Schema(description = "The OCPP tags")
-    private List<@IdTag(maxLength = 40) String> ocppIdTag;
+    private List<@IdTag
+                 @Size(min = 1, max = IdTag.EXTENDED_MAX_LENGTH) String> ocppIdTag;
 
     @Schema(description = "The User IDs")
     private List<@NotNull(message = "userId must not be null")

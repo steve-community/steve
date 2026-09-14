@@ -18,18 +18,15 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import io.swagger.v3.core.converter.AnnotatedType;
-import io.swagger.v3.core.converter.ModelConverters;
-import io.swagger.v3.oas.models.media.Schema;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import jakarta.validation.constraints.Size;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -62,7 +59,7 @@ public class IdTagTest {
             "",
             "must not be null or empty",
             "can only contain",
-            "must contain between 1 and 20 characters"
+            "size must be between 1 and 20"
         );
         assertInvalidWithMessage(" ", "can only contain");
         assertInvalidWithMessage("\t\n", "can only contain");
@@ -143,44 +140,11 @@ public class IdTagTest {
     @Test
     public void testDefaultMaxLength() {
         Assertions.assertTrue(isValid("12345678901234567890"));
-        assertInvalidWithMessage("123456789012345678901", "must contain between 1 and 20 characters");
-    }
-
-    @Test
-    public void testConfiguredMaxLength() {
-        Assertions.assertTrue(isValidExtended("1234567890123456789012345"));
-
-        var violations = validator.validate(new ExtendedIdTag("12345678901234567890123456"));
-        Assertions.assertEquals(1, violations.size());
-        Assertions.assertTrue(violations.iterator().next().getMessage().contains("25"));
-    }
-
-    @Test
-    public void testOpenApiSchema() {
-        var resolved = ModelConverters.getInstance()
-            .resolveAsResolvedSchema(new AnnotatedType(DefaultIdTag.class));
-        var schema = resolved.referencedSchemas.get(DefaultIdTag.class.getSimpleName());
-        var valueSchema = (Schema<?>) schema.getProperties().get("value");
-
-        Assertions.assertTrue(schema.getRequired().contains("value"));
-        Assertions.assertEquals(1, valueSchema.getMinLength());
-        Assertions.assertEquals(IdTag.DEFAULT_MAX_LENGTH, valueSchema.getMaxLength());
-        Assertions.assertEquals(IdTag.PATTERN, valueSchema.getPattern());
-    }
-
-    @Test
-    public void testOpenApiSchemaForListElements() {
-        var resolved = ModelConverters.getInstance()
-            .resolveAsResolvedSchema(new AnnotatedType(DefaultIdTagList.class));
-        var schema = resolved.referencedSchemas.get(DefaultIdTagList.class.getSimpleName());
-        var listSchema = (Schema<?>) schema.getProperties().get("values");
-
-        Assertions.assertEquals(IdTag.DEFAULT_MAX_LENGTH, listSchema.getItems().getMaxLength());
-        Assertions.assertEquals(IdTag.PATTERN, listSchema.getItems().getPattern());
+        assertInvalidWithMessage("123456789012345678901", "size must be between 1 and 20");
     }
 
     private static boolean isValid(String value) {
-        return validator.validate(new DefaultIdTag(value)).isEmpty();
+        return validator.validate(new IdTagValue(value)).isEmpty();
     }
 
     private static void assertInvalidWithMessage(String value, String expectedMessage) {
@@ -188,7 +152,7 @@ public class IdTagTest {
     }
 
     private static void assertInvalidWithMessages(String value, String... expectedMessages) {
-        var violations = validator.validate(new DefaultIdTag(value));
+        var violations = validator.validate(new IdTagValue(value));
         Assertions.assertEquals(expectedMessages.length, violations.size());
         for (String expectedMessage : expectedMessages) {
             Assertions.assertTrue(violations.stream()
@@ -196,45 +160,17 @@ public class IdTagTest {
         }
     }
 
-    private static boolean isValidExtended(String value) {
-        return validator.validate(new ExtendedIdTag(value)).isEmpty();
-    }
-
-    private static class DefaultIdTag {
+    private static class IdTagValue {
         @IdTag
+        @Size(min = 1, max = IdTag.MAX_LENGTH)
         private final String value;
 
-        private DefaultIdTag(String value) {
+        private IdTagValue(String value) {
             this.value = value;
         }
 
         public String getValue() {
             return value;
-        }
-    }
-
-    private static class ExtendedIdTag {
-        @IdTag(maxLength = 25)
-        private final String value;
-
-        private ExtendedIdTag(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    private static class DefaultIdTagList {
-        private final List<@IdTag String> values;
-
-        private DefaultIdTagList(List<String> values) {
-            this.values = values;
-        }
-
-        public List<String> getValues() {
-            return values;
         }
     }
 

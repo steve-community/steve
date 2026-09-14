@@ -25,6 +25,7 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,7 +38,8 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
-    @IdTag(maxLength = 40)
+    @IdTag
+    @Size(min = 1, max = IdTag.EXTENDED_MAX_LENGTH)
     private String idTag;
 
     @Schema(description = """

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws.data;
 
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.web.socket.WebSocketSession;
@@ -33,6 +34,8 @@ import java.util.concurrent.ScheduledFuture;
 @RequiredArgsConstructor
 public class SessionContext {
     private final WebSocketSession session;
-    private final ScheduledFuture pingSchedule;
+    /** Null when the operator disabled server-side pinging. */
+    @Nullable
+    private final ScheduledFuture<?> pingSchedule;
     private final DateTime openSince;
 }

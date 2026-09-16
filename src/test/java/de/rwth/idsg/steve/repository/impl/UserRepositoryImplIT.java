@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
@@ -26,8 +27,15 @@ import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.User.USER;
 import static org.jooq.impl.DSL.max;
 
@@ -50,6 +58,87 @@ public class UserRepositoryImplIT extends AbstractRepositoryITBase {
     public void getOverview() {
         var rows = assertNoDatabaseException(() -> repository.getOverview(new UserQueryForm()));
         Assertions.assertNotNull(rows);
+    }
+
+    @ParameterizedTest
+    @EnumSource(UserQueryForm.OcppTagFilter.class)
+    public void getOverviewFiltersUsersByTagPresence(UserQueryForm.OcppTagFilter filter) {
+        addOverviewUser("Tagged", "tagged@example.org", List.of("match-one", "other"));
+        addOverviewUser("Untagged", "untagged@example.org", List.of());
+
+        var form = new UserQueryForm();
+        form.setOcppTagFilter(filter);
+        var rows = repository.getOverview(form);
+
+        Set<String> expectedNames = switch (filter) {
+            case All -> Set.of("Tagged IT", "Untagged IT");
+            case OnlyUsersWithTags -> Set.of("Tagged IT");
+            case OnlyUsersWithoutTags -> Set.of("Untagged IT");
+        };
+        Assertions.assertEquals(expectedNames.size(), rows.size());
+        Assertions.assertEquals(expectedNames, rows.stream().map(User.Overview::getName).collect(Collectors.toSet()));
+        for (var row : rows) {
+            var expectedTags = row.getName().equals("Tagged IT") ? Set.of("match-one", "other") : Set.of();
+            Assertions.assertEquals(expectedTags, row.getOcppTagEntries().stream()
+                .map(User.OcppTagEntry::getIdTag).collect(Collectors.toSet()));
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(UserQueryForm.OcppTagFilter.class)
+    public void getOverviewCombinesTagSearchAndPresenceFilter(UserQueryForm.OcppTagFilter filter) {
+        addOverviewUser("Tagged", "tagged@example.org", List.of("match-one", "match-two", "other"));
+        addOverviewUser("Excluded", "excluded@example.org", List.of("unrelated"));
+        addOverviewUser("Untagged", "untagged@example.org", List.of());
+
+        var form = new UserQueryForm();
+        form.setOcppTagFilter(filter);
+        form.setOcppIdTag("match-");
+        var rows = repository.getOverview(form);
+
+        if (filter == UserQueryForm.OcppTagFilter.OnlyUsersWithoutTags) {
+            Assertions.assertTrue(rows.isEmpty());
+        } else {
+            Assertions.assertEquals(1, rows.size());
+            Assertions.assertEquals("Tagged IT", rows.getFirst().getName());
+            Assertions.assertEquals(Set.of("match-one", "match-two"), rows.getFirst().getOcppTagEntries().stream()
+                .map(User.OcppTagEntry::getIdTag).collect(Collectors.toSet()));
+        }
+
+        form.setOcppIdTag("missing");
+        Assertions.assertTrue(repository.getOverview(form).isEmpty());
+    }
+
+    @Test
+    public void getOverviewCombinesNameEmailAndUserFilters() {
+        addOverviewUser("Selected", "selected@example.org", List.of("selected-tag"));
+        addOverviewUser("Excluded", "excluded@example.org", List.of("excluded-tag"));
+
+        var form = new UserQueryForm();
+        form.setName("Selected");
+        form.setEmail("selected@");
+        form.setOcppTagFilter(UserQueryForm.OcppTagFilter.OnlyUsersWithTags);
+        var rows = repository.getOverview(form);
+        Assertions.assertEquals(1, rows.size());
+        Assertions.assertEquals("Selected IT", rows.getFirst().getName());
+        Assertions.assertEquals(List.of("selected-tag"), rows.getFirst().getOcppTagEntries().stream()
+            .map(User.OcppTagEntry::getIdTag).toList());
+
+        form.setUserPk(rows.getFirst().getUserPk());
+        Assertions.assertEquals(1, repository.getOverview(form).size());
+        form.setEmail("excluded@");
+        Assertions.assertTrue(repository.getOverview(form).isEmpty());
+    }
+
+    private void addOverviewUser(String name, String email, List<String> tags) {
+        for (var tag : tags) {
+            dslContext.insertInto(OCPP_TAG).set(OCPP_TAG.ID_TAG, tag).execute();
+        }
+        var form = userForm();
+        form.setFirstName(name);
+        form.setEmail(email);
+        form.setIdTagList(tags);
+        repository.add(form);
     }
 
     @Test

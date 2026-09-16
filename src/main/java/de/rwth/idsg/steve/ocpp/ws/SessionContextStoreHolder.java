@@ -21,9 +21,11 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,18 +38,24 @@ public class SessionContextStoreHolder {
     private final ConcurrentHashMap<OcppVersion, SessionContextStore> storesPerVersion = new ConcurrentHashMap<>();
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
+    private final Duration pingInterval;
     private final TaskScheduler taskScheduler;
     private final FutureResponseContextStore futureResponseContextStore;
 
     public SessionContextStoreHolder(SteveProperties steveProperties,
-                                     TaskScheduler taskScheduler,
+                                     @Qualifier("webSocketPingScheduler") TaskScheduler taskScheduler,
                                      FutureResponseContextStore futureResponseContextStore) {
         wsSessionSelectStrategy = steveProperties.getOcpp().getWsSessionSelectStrategy();
+        pingInterval = steveProperties.getOcpp().getWsPingInterval();
         this.taskScheduler = taskScheduler;
         this.futureResponseContextStore = futureResponseContextStore;
     }
 
     public SessionContextStore getOrCreate(OcppVersion version) {
-        return storesPerVersion.computeIfAbsent(version, k -> new SessionContextStoreImpl(wsSessionSelectStrategy, taskScheduler, futureResponseContextStore));
+        return storesPerVersion.computeIfAbsent(
+            version,
+            k -> new SessionContextStoreImpl(
+                wsSessionSelectStrategy, pingInterval, taskScheduler, futureResponseContextStore)
+        );
     }
 }

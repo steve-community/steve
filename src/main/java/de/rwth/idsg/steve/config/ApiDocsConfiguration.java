@@ -29,11 +29,13 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,17 +88,17 @@ public class ApiDocsConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi steveApi(SteveProperties steveProperties) {
+    public GroupedOpenApi steveApi(SteveProperties steveProperties, ServerProperties serverProperties) {
         return GroupedOpenApi.builder()
             .group("admin")
             .displayName("Admin")
             .packagesToScan(API_PACKAGES)
             .pathsToMatch("/api/**")
-            .addOpenApiCustomizer(steveApiCustomizer(steveProperties))
+            .addOpenApiCustomizer(steveApiCustomizer(steveProperties, serverProperties))
             .build();
     }
 
-    private static OpenApiCustomizer steveApiCustomizer(SteveProperties steveProperties) {
+    private static OpenApiCustomizer steveApiCustomizer(SteveProperties steveProperties, ServerProperties serverProperties) {
         return openApi -> {
             if (openApi.getComponents() == null) {
                 openApi.setComponents(new Components());
@@ -106,8 +108,11 @@ public class ApiDocsConfiguration {
             addAuthScheme(openApi);
             addEnumConfSchemas(openApi);
 
+            var contextPath = serverProperties.getServlet().getContextPath();
+            var url = StringUtils.isBlank(contextPath) ? "" : contextPath;
+
             // https://stackoverflow.com/a/68185254
-            openApi.setServers(List.of(new Server().url("/").description("Default Server URL")));
+            openApi.setServers(List.of(new Server().url(url + "/").description("Default Server URL")));
         };
     }
 

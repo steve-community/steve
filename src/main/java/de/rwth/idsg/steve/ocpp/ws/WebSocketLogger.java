@@ -87,7 +87,7 @@ public final class WebSocketLogger {
         log.warn("[chargeBoxId={}, sessionId={}] Closing a dangling WebSocketSession", chargeBoxId, session.getId());
     }
 
-    public static void closingDanglingError(String chargeBoxId, WebSocketSession session, Throwable t) {
+    public static void closingError(String chargeBoxId, WebSocketSession session, Throwable t) {
         log.error("[chargeBoxId={}, sessionId={}] Error while trying to close the WebSocketSession", chargeBoxId, session.getId(), t);
     }
 }

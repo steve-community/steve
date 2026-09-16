@@ -65,7 +65,7 @@ public class PingTask implements Runnable {
         try {
             session.close();
         } catch (Exception e) {
-            WebSocketLogger.closingDanglingError(chargeBoxId, session, e);
+            WebSocketLogger.closingError(chargeBoxId, session, e);
         }
     }
 }

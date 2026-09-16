@@ -41,6 +41,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.time.Instant;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -67,22 +68,16 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
     }
 
     @Override
-    public void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        if (message instanceof TextMessage textMessage) {
-            handleTextMessage(session, textMessage);
-
-        } else if (message instanceof PongMessage) {
-            handlePongMessage(session);
-
-        } else if (message instanceof BinaryMessage) {
-            session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
-
-        } else {
-            throw new IllegalStateException("Unexpected WebSocket message type: " + message);
+    public void onMessage(WebSocketSession session, WebSocketMessage<?> message) {
+        switch (message) {
+            case TextMessage textMessage -> handleTextMessage(session, textMessage);
+            case PongMessage _ -> handlePongMessage(session);
+            case BinaryMessage _ -> handleBinaryMessage(session);
+            default -> throw new IllegalStateException("Unexpected WebSocket message type: " + message);
         }
     }
 
-    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
+    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) {
         var chargeBoxId = getChargeBoxId(session);
         var version = getVersion(session);
 
@@ -112,8 +107,16 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
         ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
+    private void handleBinaryMessage(WebSocketSession session) {
+        try {
+            session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
+        } catch (IOException e) {
+            WebSocketLogger.closingError(getChargeBoxId(session), session, e);
+        }
+    }
+
     @Override
-    public void onOpen(WebSocketSession session) throws Exception {
+    public void onOpen(WebSocketSession session) {
         var chargeBoxId = getChargeBoxId(session);
         var version = getVersion(session);
 
@@ -132,7 +135,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
     }
 
     @Override
-    public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void onClose(WebSocketSession session, CloseStatus closeStatus) {
         var chargeBoxId = getChargeBoxId(session);
         var version = getVersion(session);
 
@@ -149,7 +152,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
     }
 
     @Override
-    public void onError(WebSocketSession session, Throwable throwable) throws Exception {
+    public void onError(WebSocketSession session, Throwable throwable) {
         WebSocketLogger.transportError(getChargeBoxId(session), session, throwable);
     }
 

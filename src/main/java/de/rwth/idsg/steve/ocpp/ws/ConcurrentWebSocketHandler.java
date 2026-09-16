@@ -68,8 +68,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     // Implement in extending classes
     // -------------------------------------------------------------------------
 
-    abstract void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception;
-    abstract void onOpen(WebSocketSession session) throws Exception;
-    abstract void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception;
-    abstract void onError(WebSocketSession session, Throwable throwable) throws Exception;
+    abstract void onMessage(WebSocketSession session, WebSocketMessage<?> message);
+    abstract void onOpen(WebSocketSession session);
+    abstract void onClose(WebSocketSession session, CloseStatus closeStatus);
+    abstract void onError(WebSocketSession session, Throwable throwable);
 }

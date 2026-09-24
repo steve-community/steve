@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ConnectorStatusForm {
+    @ChargeBoxId
     private String chargeBoxId;
 
     @Schema(allowableValues = {"Available", "Charging", "Faulted", "Finishing", "Occupied", "Preparing", "Reserved", "SuspendedEV", "SuspendedEVSE", "Unavailable"})

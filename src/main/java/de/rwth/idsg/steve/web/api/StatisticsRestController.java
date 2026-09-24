@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @Tag(name = "statistics-controller")
@@ -59,7 +60,7 @@ public class StatisticsRestController {
         The status information can be filtered by the given parameters.
         """)
     @GetMapping(value = "/status")
-    public ConnectorStatusList getConnectorStatus(@ParameterObject ConnectorStatusForm params) {
+    public ConnectorStatusList getConnectorStatus(@Valid @ParameterObject ConnectorStatusForm params) {
         List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
         return new ConnectorStatusList(filteredList);

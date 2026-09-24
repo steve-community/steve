@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,18 +34,25 @@ import org.joda.time.DateTime;
 @Getter
 @Builder
 public final class ConnectorStatus {
-    private final String chargeBoxId, timeStamp, status, errorCode;
-    private final int chargeBoxPk, connectorId;
+    private final int chargeBoxPk;
+    private final String chargeBoxId;
+    private final int connectorId;
+    private final OcppProtocol ocppProtocol;
+
+    @Schema(allowableValues = {"Available", "Charging", "Faulted", "Finishing", "Occupied", "Preparing", "Reserved", "SuspendedEV", "SuspendedEVSE", "Unavailable"})
+    private final String status;
+
+    private final String errorCode;
+
+    @JsonIgnore
+    private final String timeStamp;
 
     // For additional internal processing. Not related to the humanized
     // String version above, which is for representation on frontend
     private final DateTime statusTimestamp;
 
-    private final OcppProtocol ocppProtocol;
-
-    // This is true, if the chargeBox this connector belongs to is a WS/JSON station
-    // and it is disconnected at the moment of building this DTO.
     @Setter
     @Builder.Default
+    @Schema(description = "This is true, if the chargeBox this connector belongs to is a WS/JSON station and it is disconnected at the moment of retrieving the status.")
     private boolean jsonAndDisconnected = false;
 }

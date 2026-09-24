@@ -303,11 +303,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         // https://github.com/steve-community/steve/issues/691
         conditions.add(CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value()));
 
-        if (form != null && form.getChargeBoxId() != null) {
+        if (form != null && StringUtils.isNotBlank(form.getChargeBoxId())) {
             conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        if (form != null && form.getStatus() != null) {
+        if (form != null && StringUtils.isNotBlank(form.getStatus())) {
             conditions.add(t2.field(t2Status).eq(form.getStatus()));
         }
 

@@ -2397,6 +2397,219 @@
 				]
 			}
 		},
+		"/api/v1/statistics": {
+			"get": {
+				"description": "Returns some simple business statistics of the system.\n",
+				"operationId": "getStatistics",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Statistics"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"statistics-controller"
+				]
+			}
+		},
+		"/api/v1/statistics/connected": {
+			"get": {
+				"description": "Returns the list of all connected WS/JSON Charge Points (i.e. Charge Points that have an open WebSocket connection to our platform at the moment).\n",
+				"operationId": "getOcppJsonStatus",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/WebSocketConnectionList"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"statistics-controller"
+				]
+			}
+		},
+		"/api/v1/statistics/status": {
+			"get": {
+				"description": "Returns the latest status (and optionally the error code) information of connectors of Charge Points.\nThe status information can be filtered by the given parameters.\n",
+				"operationId": "getConnectorStatus",
+				"parameters": [
+					{
+						"in": "query",
+						"name": "chargeBoxId",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "status",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"Available",
+								"Charging",
+								"Faulted",
+								"Finishing",
+								"Occupied",
+								"Preparing",
+								"Reserved",
+								"SuspendedEV",
+								"SuspendedEVSE",
+								"Unavailable"
+							]
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConnectorStatusList"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"404": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"statistics-controller"
+				]
+			}
+		},
 		"/api/v1/transactions": {
 			"get": {
 				"description": "Returns a list of transactions based on the query parameters.\nThe query parameters can be used to filter the transactions.\n",
@@ -2485,7 +2698,10 @@
 							"description": "The OCPP tags",
 							"items": {
 								"type": "string",
-								"description": "The OCPP tags"
+								"description": "The OCPP tags",
+								"maxLength": 40,
+								"minLength": 1,
+								"pattern": "^[a-zA-Z0-9.:_#-]+$"
 							}
 						}
 					},
@@ -3061,7 +3277,7 @@
 					"chargingProfilePk": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 0
+						"exclusiveMinimum": 0
 					},
 					"chargingProfilePurpose": {
 						"type": "string",
@@ -3208,6 +3424,70 @@
 						"type": "array",
 						"items": {
 							"type": "string"
+						}
+					}
+				}
+			},
+			"ConnectorStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"chargeBoxPk": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"connectorId": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"errorCode": {
+						"type": "string"
+					},
+					"jsonAndDisconnected": {
+						"type": "boolean",
+						"description": "This is true, if the chargeBox this connector belongs to is a WS/JSON station and it is disconnected at the moment of retrieving the status."
+					},
+					"ocppProtocol": {
+						"type": "string",
+						"enum": [
+							"V_12_SOAP",
+							"V_12_JSON",
+							"V_15_SOAP",
+							"V_15_JSON",
+							"V_16_SOAP",
+							"V_16_JSON"
+						]
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Available",
+							"Charging",
+							"Faulted",
+							"Finishing",
+							"Occupied",
+							"Preparing",
+							"Reserved",
+							"SuspendedEV",
+							"SuspendedEVSE",
+							"Unavailable"
+						]
+					},
+					"statusTimestamp": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"ConnectorStatusList": {
+				"type": "object",
+				"properties": {
+					"connectors": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ConnectorStatus"
 						}
 					}
 				}
@@ -3373,7 +3653,7 @@
 					"durationInSeconds": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 0
+						"exclusiveMinimum": 0
 					}
 				},
 				"required": [
@@ -3716,6 +3996,33 @@
 				"required": [
 					"chargeBoxIdList"
 				]
+			},
+			"OcppJsonStatus": {
+				"type": "object",
+				"properties": {
+					"chargeBoxId": {
+						"type": "string"
+					},
+					"chargeBoxPk": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"connectedSince": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"sessionId": {
+						"type": "string"
+					},
+					"version": {
+						"type": "string",
+						"enum": [
+							"V_12",
+							"V_15",
+							"V_16"
+						]
+					}
+				}
 			},
 			"OcppOperationResponseAvailabilityStatus": {
 				"type": "object",
@@ -4544,7 +4851,9 @@
 					"idTag": {
 						"type": "string",
 						"description": "Will be used in create/insert flows. Will be ignored in update flows.",
-						"minLength": 1
+						"maxLength": 20,
+						"minLength": 1,
+						"pattern": "^[a-zA-Z0-9.:_#-]+$"
 					},
 					"maxActiveTransactionCount": {
 						"type": "integer",
@@ -4633,7 +4942,7 @@
 						"type": "integer",
 						"format": "int32",
 						"description": "PK of the charging profile to be used for the transaction.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n",
-						"minimum": 0
+						"exclusiveMinimum": 0
 					},
 					"connectorId": {
 						"type": "integer",
@@ -4642,7 +4951,9 @@
 					},
 					"idTag": {
 						"type": "string",
-						"minLength": 1
+						"maxLength": 40,
+						"minLength": 1,
+						"pattern": "^[a-zA-Z0-9.:_#-]+$"
 					}
 				},
 				"required": [
@@ -4697,7 +5008,9 @@
 					},
 					"idTag": {
 						"type": "string",
-						"minLength": 1
+						"maxLength": 40,
+						"minLength": 1,
+						"pattern": "^[a-zA-Z0-9.:_#-]+$"
 					}
 				},
 				"required": [
@@ -4796,7 +5109,7 @@
 					"chargingProfilePk": {
 						"type": "integer",
 						"format": "int32",
-						"minimum": 0
+						"exclusiveMinimum": 0
 					},
 					"connectorId": {
 						"type": "integer",
@@ -4807,7 +5120,7 @@
 						"type": "integer",
 						"format": "int32",
 						"description": "Apply the profile to the transaction with this ID.\n<code>ChargingProfilePurposeType</code> of the profile must be <code>TX_PROFILE</code>.\n",
-						"minimum": 0
+						"exclusiveMinimum": 0
 					}
 				},
 				"required": [
@@ -4878,6 +5191,62 @@
 					"signature",
 					"signingCertificate"
 				]
+			},
+			"Statistics": {
+				"type": "object",
+				"properties": {
+					"heartbeatEarlier": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"heartbeatToday": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"heartbeatYesterday": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numChargeBoxes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numOcpp12JChargeBoxes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numOcpp15JChargeBoxes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numOcpp16JChargeBoxes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numOcppTags": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numReservations": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numTransactions": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"numUsers": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"statusCountMap": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				}
 			},
 			"SuccessResponseAvailabilityStatus": {
 				"type": "object",
@@ -5411,6 +5780,17 @@
 					"location",
 					"retrieveDateTime"
 				]
+			},
+			"WebSocketConnectionList": {
+				"type": "object",
+				"properties": {
+					"connections": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/OcppJsonStatus"
+						}
+					}
+				}
 			}
 		},
 		"securitySchemes": {

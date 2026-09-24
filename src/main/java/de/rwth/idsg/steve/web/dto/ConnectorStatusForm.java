@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,5 +32,7 @@ import lombok.ToString;
 @ToString
 public class ConnectorStatusForm {
     private String chargeBoxId;
+
+    @Schema(allowableValues = {"Available", "Charging", "Faulted", "Finishing", "Occupied", "Preparing", "Reserved", "SuspendedEV", "SuspendedEVSE", "Unavailable"})
     private String status;
 }

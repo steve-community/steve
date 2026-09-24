@@ -18,31 +18,11 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-import org.joda.time.DateTime;
+import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 25.03.2015
- */
-@Getter
-@Builder
-@ToString
-public final class OcppJsonStatus {
-    private final String sessionId;
-    private final Integer chargeBoxPk;
-    private final String chargeBoxId;
-    private final OcppVersion version;
+import java.util.List;
 
-    @JsonProperty("connectedSince")
-    private final DateTime connectedSinceDT;
-    @JsonIgnore
-    private final String connectedSince;
-    @JsonIgnore
-    private final String connectionDuration;
+public record ConnectorStatusList(
+    List<ConnectorStatus> connectors
+) {
 }

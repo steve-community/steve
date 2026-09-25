@@ -20,8 +20,14 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.SteveProperties;
 import de.rwth.idsg.steve.repository.WebUserRepository;
+import de.rwth.idsg.steve.service.dto.WebUserOverview;
+import de.rwth.idsg.steve.web.dto.WebUserAuthority;
+import de.rwth.idsg.steve.web.dto.WebUserBaseForm;
+import de.rwth.idsg.steve.web.dto.WebUserForm;
+import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +53,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -72,6 +79,7 @@ public class WebUserService implements UserDetailsManager {
     private final SteveProperties steveProperties;
     private final PasswordEncoder passwordEncoder;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
+    private final PasswordEncoder encoder;
 
     private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
         .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
@@ -190,6 +198,77 @@ public class WebUserService implements UserDetailsManager {
         return count != null && count > 0;
     }
 
+    // Methods for the website
+    public void add(WebUserForm form) {
+        createUser(toUserDetails(form));
+    }
+
+    public void update(WebUserBaseForm form) {
+        validateUserDetails(toUserDetailsBaseForm(form));
+        WebUserRecord record = new WebUserRecord();
+        record.setWebUserPk(form.getWebUserPk());
+        record.setUsername(form.getWebUsername());
+        record.setEnabled(form.getEnabled());
+        record.setAuthorities(form.getAuthorities().getJsonValue());
+        webUserRepository.updateUserByPk(record);
+    }
+
+    public void updatePassword(WebUserForm form) {
+        webUserRepository.changePassword(form.getWebUserPk(), encoder.encode(form.getPassword()));
+    }
+    
+    public void updateApiPassword(WebUserForm form) {
+        String newPassword = null;
+        if (form.getApiPassword() != null) {
+            newPassword = encoder.encode(form.getApiPassword());
+        }
+        webUserRepository.changeApiPassword(form.getWebUserPk(), newPassword);
+    }
+
+    public List<WebUserOverview> getOverview(WebUserQueryForm form) {
+        return webUserRepository.getOverview(form)
+                .map(r -> WebUserOverview.builder()
+                        .webUserPk(r.value1())
+                        .webUsername(r.value2())
+                        .enabled(r.value3())
+                        //.authorities(fromJsonToString(r.value4()))
+                        .authorities(WebUserAuthority.fromJsonValue(r.value4()))
+                        .build()
+                );
+    }
+
+
+    public WebUserBaseForm getDetails(Integer webUserPk) {
+        WebUserRecord ur = webUserRepository.loadUserByUsePk(webUserPk);
+
+        if (ur == null) {
+            throw new SteveException("There is no user with id '%d'", webUserPk);
+        }
+
+        WebUserBaseForm form = new WebUserBaseForm();
+        form.setWebUserPk(ur.getWebUserPk());
+        form.setEnabled(ur.getEnabled());
+        form.setWebUsername(ur.getUsername());
+        form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
+        return form;
+    }
+    
+    public WebUserBaseForm getDetails(String webUserName) {
+        WebUserRecord ur = webUserRepository.loadUserByUsername(webUserName);
+
+        if (ur == null) {
+            throw new SteveException("There is no user with id '%s'", webUserName);
+        }
+
+        WebUserBaseForm form = new WebUserBaseForm();
+        form.setWebUserPk(ur.getWebUserPk());
+        form.setEnabled(ur.getEnabled());
+        form.setWebUsername(ur.getUsername());
+        form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
+        return form;
+    }
+
+    // Helpers
     private UserDetails loadUserByUsernameForApiInternal(String username) {
         WebUserRecord record = webUserRepository.loadUserByUsername(username);
         if (record == null) {
@@ -216,6 +295,29 @@ public class WebUserService implements UserDetailsManager {
             .setPassword(user.getPassword())
             .setEnabled(user.isEnabled())
             .setAuthorities(toJson(user.getAuthorities()));
+    }
+
+    private UserDetails toUserDetailsBaseForm(WebUserBaseForm form) {
+        return User
+            .withUsername(form.getWebUsername())
+            .password("")
+            .disabled(!form.getEnabled())
+            .authorities(fromJson(form.getAuthorities().getJsonValue()))
+            .build();
+    }
+
+    private UserDetails toUserDetails(WebUserForm form) {
+        String encPw = "";
+        if (form.getPassword() != null) {
+            //encPw = form.getPassword();
+            encPw = encoder.encode(form.getPassword());
+        }
+        return User
+            .withUsername(form.getWebUsername())
+            .password(encPw)
+            .disabled(!form.getEnabled())
+            .authorities(fromJson(form.getAuthorities().getJsonValue()))
+            .build();
     }
 
     private String[] fromJson(JSON jsonArray) {

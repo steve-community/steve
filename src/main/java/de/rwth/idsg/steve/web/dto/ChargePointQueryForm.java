@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -57,11 +58,11 @@ public class ChargePointQueryForm {
     }
 
     public boolean isSetChargeBoxId() {
-        return chargeBoxId != null;
+        return StringUtils.isNotBlank(chargeBoxId);
     }
 
     public boolean isSetNote() {
-        return !Strings.isNullOrEmpty(note);
+        return StringUtils.isNotBlank(note);
     }
 
     public enum ChargeBoxIdMatchType {

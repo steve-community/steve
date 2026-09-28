@@ -76,6 +76,10 @@
         <form:form action="${ctxPath}/manager/chargepoints/query" method="get" modelAttribute="params">
             <table class="userInput">
                 <tr>
+                    <td>ChargeBox PK:</td>
+                    <td><form:input path="chargeBoxPk"/></td>
+                </tr>
+                <tr>
                     <td>ChargeBox ID:</td>
                     <td><form:input path="chargeBoxId"/></td>
                 </tr>

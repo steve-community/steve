@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm.ChargeBoxIdMatchType;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.jooq.DSLContext;
@@ -120,7 +121,7 @@ public class ChargePointRepositoryImplIT extends AbstractRepositoryITBase {
 
     @Test
     public void getOverview() {
-        var rows = assertNoDatabaseException(() -> repository.getOverview(new ChargePointQueryForm()));
+        var rows = assertNoDatabaseException(() -> repository.getOverview(new ChargePointQueryForm(), ChargeBoxIdMatchType.PatternMatchLike));
         Assertions.assertNotNull(rows);
     }
 

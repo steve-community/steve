@@ -34,6 +34,7 @@ import lombok.ToString;
 @ToString
 public class ChargePointQueryForm {
 
+    private Integer chargeBoxPk;
     private String chargeBoxId;
     private String description;
     private String note;
@@ -61,6 +62,11 @@ public class ChargePointQueryForm {
 
     public boolean isSetNote() {
         return !Strings.isNullOrEmpty(note);
+    }
+
+    public enum ChargeBoxIdMatchType {
+        Exact,
+        PatternMatchLike
     }
 
     @RequiredArgsConstructor

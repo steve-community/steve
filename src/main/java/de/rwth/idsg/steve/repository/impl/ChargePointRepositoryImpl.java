@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm.ChargeBoxIdMatchType;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
@@ -170,8 +171,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
-        return getOverviewInternal(form)
+    public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form, ChargeBoxIdMatchType chargeBoxIdMatchType) {
+        return getOverviewInternal(form, chargeBoxIdMatchType)
                 .map(r -> ChargePoint.Overview.builder()
                                               .chargeBoxPk(r.value1())
                                               .chargeBoxId(r.value2())
@@ -184,7 +185,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @SuppressWarnings("unchecked")
-    private Result<Record5<Integer, String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
+    private Result<Record5<Integer, String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form,
+                                                                                           ChargeBoxIdMatchType chargeBoxIdMatchType) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(CHARGE_BOX);
         selectQuery.addSelect(
@@ -196,7 +198,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         );
 
         if (form.isSetOcppVersion()) {
-
             // http://dev.mysql.com/doc/refman/5.7/en/pattern-matching.html
             selectQuery.addConditions(CHARGE_BOX.OCPP_PROTOCOL.like(form.getOcppVersion().getValue() + "_"));
         }
@@ -205,8 +206,16 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             selectQuery.addConditions(includes(CHARGE_BOX.DESCRIPTION, form.getDescription()));
         }
 
+        if (form.getChargeBoxPk() != null) {
+            selectQuery.addConditions(CHARGE_BOX.CHARGE_BOX_PK.eq(form.getChargeBoxPk()));
+        }
+
         if (form.isSetChargeBoxId()) {
-            selectQuery.addConditions(includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId()));
+            var condition = switch (chargeBoxIdMatchType) {
+                case Exact -> CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId());
+                case PatternMatchLike -> includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId());
+            };
+            selectQuery.addConditions(condition);
         }
 
         if (form.isSetNote()) {

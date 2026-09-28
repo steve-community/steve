@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm.ChargeBoxIdMatchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -92,7 +93,7 @@ public class ChargePointsController {
 
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointService.getOverview(params));
+        model.addAttribute("cpList", chargePointService.getOverview(params, ChargeBoxIdMatchType.PatternMatchLike));
         model.addAttribute("unknownList", chargePointService.getUnknownChargePoints());
     }
 

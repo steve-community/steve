@@ -41,6 +41,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm.ChargeBoxIdMatchType;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
@@ -94,8 +95,8 @@ public class ChargePointService {
         return chargePointRepository.getChargeBoxIds();
     }
 
-    public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
-        return chargePointRepository.getOverview(form);
+    public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form, ChargeBoxIdMatchType chargeBoxIdMatchType) {
+        return chargePointRepository.getOverview(form, chargeBoxIdMatchType);
     }
 
     public ChargePoint.Details getDetails(int chargeBoxPk) {

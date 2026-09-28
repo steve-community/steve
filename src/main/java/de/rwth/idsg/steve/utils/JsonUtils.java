@@ -48,7 +48,7 @@ public class JsonUtils {
 
         var node = mapper.readTree(jsonFromDB.data());
         if (!node.isObject()) {
-            throw new SteveException("Existing OCPP configuration is not a JSON object"); // should not happen
+            throw new SteveException("Data from this DB column is not a JSON object");
         }
         return (ObjectNode) node;
     }

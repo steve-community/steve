@@ -44,7 +44,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -114,6 +116,8 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
      */
     @Override
     public void importCsv(InputStream in, Table<?> table) {
+        var fieldsByName = getTableFieldsByName(table);
+
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -125,7 +129,20 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
                 // Leave committing to client code: We touch each table in 1 transaction that does a commit at the end
                 .commitNone()
                 .loadCSV(in, StandardCharsets.UTF_8)
-                .fields(getTableFields(table))
+                // Exporting and importing builds may have different generated field orders.
+                // jOOQ invokes this mapper only when it reads the first data row. A header-only CSV
+                // therefore skips column validation and commits the deletion, leaving the table empty.
+                .fields(source -> {
+                    String name = source.field().getName();
+                    Field<?> field = fieldsByName.get(name);
+                    if (field == null) {
+                        // Abort instead of silently dropping unknown columns. This rolls back this table's
+                        // transaction (including DELETE) and stops the ZIP import; earlier tables stay committed.
+                        throw new IllegalArgumentException("Unknown CSV column '" + name + "' for table '" + table.getName() + "'");
+                    }
+                    return field;
+                })
+                .ignoreRows(1)
                 .nullString(NULL_STRING)
                 .execute();
 
@@ -200,7 +217,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
     // table fields during the import.
     // -------------------------------------------------------------------------
 
-    private List<Field<?>> getTableFields(Table<?> table) {
+    private Map<String, Field<?>> getTableFieldsByName(Table<?> table) {
         return Arrays.stream(table.fields())
             .map(it -> {
                 if (it.getDataType().isTimestamp()) {
@@ -208,7 +225,7 @@ public class DataImportExportRepositoryImpl implements DataImportExportRepositor
                 } else {
                     return it;
                 }
-            }).toList();
+            }).collect(Collectors.toMap(Field::getName, Function.identity()));
     }
 
     private static class IsoTimestampConverter extends AbstractConverter<String, Timestamp> {

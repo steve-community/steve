@@ -163,6 +163,7 @@
                         <exclude>**/*.yaml</exclude>
                         <exclude>**/*.PNG</exclude>
                         <exclude>**/Dockerfile</exclude>
+                        <exclude>**/*.pem</exclude>
                         <!-- <exclude>**/*.jsp</exclude> -->
 
                     </excludes>

@@ -55,12 +55,12 @@ public class AuthTagServiceLocal implements AuthTagService {
 
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         if (record == null) {
-            log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
+            log.warn("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
         }
 
         if (isBlocked(record)) {
-            log.error("The user with idTag '{}' is BLOCKED.", idTag);
+            log.warn("The user with idTag '{}' is BLOCKED.", idTag);
             return new IdTagInfo()
                 .withStatus(AuthorizationStatus.BLOCKED)
                 .withParentIdTag(record.getParentIdTag())
@@ -68,7 +68,7 @@ public class AuthTagServiceLocal implements AuthTagService {
         }
 
         if (isExpired(record, DateTime.now())) {
-            log.error("The user with idTag '{}' is EXPIRED.", idTag);
+            log.warn("The user with idTag '{}' is EXPIRED.", idTag);
             return new IdTagInfo()
                 .withStatus(AuthorizationStatus.EXPIRED)
                 .withParentIdTag(record.getParentIdTag())

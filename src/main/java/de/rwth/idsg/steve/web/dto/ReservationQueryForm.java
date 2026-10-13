@@ -50,11 +50,8 @@ public class ReservationQueryForm extends QueryForm {
 
     private QueryPeriodType periodType;
 
-    /**
-     * Init with sensible default values
-     */
-    public ReservationQueryForm() {
-        periodType = QueryPeriodType.ACTIVE;
+    public QueryPeriodType getPeriodType() {
+        return java.util.Objects.requireNonNullElse(periodType, QueryPeriodType.ACTIVE);
     }
 
     @Schema(hidden = true)
@@ -83,6 +80,7 @@ public class ReservationQueryForm extends QueryForm {
 
     @RequiredArgsConstructor
     public enum QueryPeriodType {
+        ALL("All"),
         ACTIVE("Active"),
         FROM_TO("From/To");
 
@@ -95,6 +93,14 @@ public class ReservationQueryForm extends QueryForm {
                 }
             }
             throw new IllegalArgumentException(v);
+        }
+    }
+
+    @ToString(callSuper = true)
+    public static class ReservationQueryFormForApi extends ReservationQueryForm {
+        @Override
+        public QueryPeriodType getPeriodType() {
+            return java.util.Objects.requireNonNullElse(super.getPeriodType(), QueryPeriodType.ALL);
         }
     }
 }

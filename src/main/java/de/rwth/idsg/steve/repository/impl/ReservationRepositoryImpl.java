@@ -283,7 +283,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
+        if (form.getPeriodType() == null) {
+            return;
+        }
         switch (form.getPeriodType()) {
+            case ALL:
+                break;
+
             case ACTIVE:
                 selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()));
                 break;

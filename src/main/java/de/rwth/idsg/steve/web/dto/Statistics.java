@@ -37,7 +37,9 @@ public final class Statistics {
     // Number of chargeboxes, ocppTags, users, reservations, transactions
     private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
     // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier;
+    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
+    //WebUser
+    numWebUsers;
 
     // Number of connected WebSocket/JSON chargeboxes
     @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;

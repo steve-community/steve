@@ -25,6 +25,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
+ * Verifies that the Jackson ObjectMapper does not HTML-encode string values.
+ * Strings must be serialized using standard JSON escaping (RFC 8259) so that
+ * OCPP wire payloads are not corrupted.
+ *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.08.2022
  */
@@ -43,14 +47,40 @@ public class CustomStringModuleTest {
     public void testLink() throws Exception {
         SimpleJsonModel input = new SimpleJsonModel("<a href=\"link\">Some link</a>");
         String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}", output);
+        // Standard JSON escaping: quotes inside strings are escaped with backslash,
+        // angle brackets are passed through unmodified (no HTML encoding).
+        Assertions.assertEquals("{\"someText\":\"<a href=\\\"link\\\">Some link</a>\"}", output);
     }
 
     @Test
     public void testScript() throws Exception {
         SimpleJsonModel input = new SimpleJsonModel("<script src=\"http://someurl.com/script.js\"/>");
         String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}", output);
+        // Standard JSON escaping: no HTML encoding of angle brackets or quotes.
+        Assertions.assertEquals("{\"someText\":\"<script src=\\\"http://someurl.com/script.js\\\"/>\"}", output);
+    }
+
+    @Test
+    public void testDataTransferWithQuotes() throws Exception {
+        // Reproduces the bug from issue #938: DataTransfer payloads with embedded quotes
+        // must not be HTML-encoded.
+        String data = "{\"txId\":\"123456\",\"description\": \"Charging:$2.81\"}";
+        SimpleJsonModel input = new SimpleJsonModel(data);
+        String output = mapper.writeValueAsString(input);
+        Assertions.assertEquals(
+            "{\"someText\":\"{\\\"txId\\\":\\\"123456\\\",\\\"description\\\": \\\"Charging:$2.81\\\"}\"}",
+            output
+        );
+    }
+
+    @Test
+    public void testRoundTrip() throws Exception {
+        // Verify that serialization followed by deserialization preserves the original string.
+        String original = "<script>alert(\"xss\")</script>";
+        SimpleJsonModel input = new SimpleJsonModel(original);
+        String json = mapper.writeValueAsString(input);
+        SimpleJsonModel deserialized = mapper.readValue(json, SimpleJsonModel.class);
+        Assertions.assertEquals(original, deserialized.getSomeText());
     }
 
     @Data

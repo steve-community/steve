@@ -148,6 +148,10 @@ public class UsersRestController {
         params.setUserPk(userPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
 
+        // Check existence before updating: UserRepository.update() would insert the
+        // submitted address even for an unknown userPk (leaving an orphan address row).
+        getOneInternal(userPk);
+
         userService.update(params);
 
         var response = getOneInternal(userPk);

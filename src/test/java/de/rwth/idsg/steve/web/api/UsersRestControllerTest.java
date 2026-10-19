@@ -213,6 +213,28 @@ public class UsersRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @DisplayName("PUT: Unknown user is rejected before any write, expected 404")
+    public void test13() throws Exception {
+        // given
+        UserForm form = new UserForm();
+        form.setFirstName("First");
+
+        // when
+        when(userService.getOverview(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(
+                put("/api/v1/users/999")
+                    .content(objectMapper.writeValueAsString(form))
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isNotFound())
+            .andExpectAll(errorJsonMatchers());
+
+        verify(userService, times(0)).update(any());
+    }
+
+    @Test
     @DisplayName("POST: Downstream bean throws exception, expected 500")
     public void test9() throws Exception {
         // given

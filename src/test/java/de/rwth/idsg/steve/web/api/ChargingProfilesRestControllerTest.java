@@ -22,6 +22,9 @@ import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
+import ocpp.cp._2015._10.ChargingProfileKindType;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import ocpp.cp._2015._10.ChargingRateUnitType;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,6 +76,27 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
             .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType(CONTENT_TYPE))
             .build();
+    }
+
+    /**
+     * A form that passes @Valid, mirroring how the existing API tests serialize
+     * the form object instead of hand-writing JSON (so the enum wire format
+     * stays correct).
+     */
+    private static ChargingProfileForm aValidForm() {
+        ChargingProfileForm form = new ChargingProfileForm();
+        form.setDescription("Night charging");
+        form.setStackLevel(1);
+        form.setChargingProfilePurpose(ChargingProfilePurposeType.TX_PROFILE);
+        form.setChargingProfileKind(ChargingProfileKindType.ABSOLUTE);
+        form.setChargingRateUnit(ChargingRateUnitType.A);
+
+        ChargingProfileForm.SchedulePeriod period = new ChargingProfileForm.SchedulePeriod();
+        period.setStartPeriodInSeconds(0);
+        period.setPowerLimit(new BigDecimal("16"));
+        period.setNumberPhases(3);
+        form.setSchedulePeriods(List.of(period));
+        return form;
     }
 
     @Test
@@ -160,9 +185,7 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
         // then
         mockMvc.perform(
                 post("/api/v1/chargingProfiles")
-                    .content("""
-                        {"description": "Night charging", "stackLevel": 1}
-                        """)
+                    .content(objectMapper.writeValueAsString(aValidForm()))
                     .contentType(CONTENT_TYPE)
             )
             .andExpect(status().isCreated())
@@ -179,9 +202,7 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
         // then
         mockMvc.perform(
                 post("/api/v1/chargingProfiles")
-                    .content("""
-                        {"description": "Night charging"}
-                        """)
+                    .content(objectMapper.writeValueAsString(aValidForm()))
                     .contentType(CONTENT_TYPE)
             )
             .andExpect(status().isInternalServerError())
@@ -205,9 +226,7 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
         // then
         mockMvc.perform(
                 put("/api/v1/chargingProfiles/" + chargingProfilePk)
-                    .content("""
-                        {"description": "Updated", "stackLevel": 1}
-                        """)
+                    .content(objectMapper.writeValueAsString(aValidForm()))
                     .contentType(CONTENT_TYPE)
             )
             .andExpect(status().isOk());

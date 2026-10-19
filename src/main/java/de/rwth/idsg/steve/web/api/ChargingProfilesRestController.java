@@ -156,10 +156,9 @@ public class ChargingProfilesRestController {
     @Operation(description = """
         Deletes an existing persisted charging profile based on the chargingProfilePk.
         Returns the deleted charging profile.
-        This mirrors the behaviour of the manager UI. Deleting a profile that is
-        currently assigned to a connector or referenced by a pending operation
-        does not send any OCPP command; existing assignments are removed together
-        with the profile.
+        This mirrors the behaviour of the manager UI: a profile that is still assigned
+        to a connector cannot be deleted (the repository rejects it), so clear the
+        assignment first via ClearChargingProfile.
         """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

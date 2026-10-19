@@ -112,13 +112,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void add(UserForm form) {
-        ctx.transaction(configuration -> {
+    public int add(UserForm form) {
+        return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 Integer userPk = addInternal(ctx, form, addressId);
                 refreshOcppTagsInternal(ctx, form, userPk);
+                return userPk;
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);

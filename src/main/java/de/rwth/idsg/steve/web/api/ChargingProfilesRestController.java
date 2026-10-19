@@ -71,6 +71,11 @@ public class ChargingProfilesRestController {
 
     @Operation(description = """
         Returns a list of persisted charging profiles based on the query parameters.
+        Besides the profile's own fields, the list can be filtered by assignment
+        (chargeBoxId, connectorId) and by validity (active=true selects profiles
+        whose validity period contains now). OCPP enums are accepted both as Java
+        constant names ("TX_PROFILE") and as the OCPP values returned by this API
+        ("TxProfile").
         """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

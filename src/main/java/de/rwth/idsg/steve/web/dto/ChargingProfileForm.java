@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.rwth.idsg.steve.web.api.OcppEnumDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -63,9 +65,11 @@ public class ChargingProfileForm {
     private Integer stackLevel;
 
     @NotNull(message = "Charging Profile Purpose has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingProfilePurposeType chargingProfilePurpose;
 
     @NotNull(message = "Charging Profile Kind has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingProfileKindType chargingProfileKind;
 
     private RecurrencyKindType recurrencyKind;
@@ -81,6 +85,7 @@ public class ChargingProfileForm {
     private DateTime startSchedule;
 
     @NotNull(message = "Charging Rate Unit has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingRateUnitType chargingRateUnit;
 
     private BigDecimal minChargingRate;

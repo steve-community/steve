@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
@@ -42,9 +43,13 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -133,6 +138,90 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].chargingProfilePk").value("42"))
             .andExpect(jsonPath("$[0].stackLevel").value("1"))
             .andExpect(jsonPath("$[0].profilePurpose").value("TxProfile"));
+    }
+
+    @Test
+    @DisplayName("GET all: with station/connector filters, expected 200")
+    public void test10() throws Exception {
+        // given
+        ArgumentCaptor<ChargingProfileQueryForm> captor = ArgumentCaptor.forClass(ChargingProfileQueryForm.class);
+
+        // when
+        when(chargingProfileRepository.getOverview(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/chargingProfiles")
+                .param("chargeBoxId", "CP001")
+                .param("connectorId", "2")
+                .param("active", "true"))
+            .andExpect(status().isOk());
+
+        verify(chargingProfileRepository).getOverview(captor.capture());
+        assertEquals("CP001", captor.getValue().getChargeBoxId());
+        assertEquals(2, captor.getValue().getConnectorId());
+        assertTrue(captor.getValue().getActive());
+    }
+
+    @Test
+    @DisplayName("GET all: OCPP value form of enum filter is accepted, expected 200")
+    public void test11() throws Exception {
+        // resources return OCPP values ("TxProfile"), so filtering by them must work
+        ArgumentCaptor<ChargingProfileQueryForm> captor = ArgumentCaptor.forClass(ChargingProfileQueryForm.class);
+
+        when(chargingProfileRepository.getOverview(any())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/v1/chargingProfiles")
+                .param("profilePurpose", "TxProfile"))
+            .andExpect(status().isOk());
+
+        verify(chargingProfileRepository).getOverview(captor.capture());
+        assertEquals(ChargingProfilePurposeType.TX_PROFILE, captor.getValue().getProfilePurpose());
+    }
+
+    @Test
+    @DisplayName("POST: OCPP value form of enums in body is accepted, expected 201")
+    public void test12() throws Exception {
+        // given
+        int chargingProfilePk = 123;
+
+        ChargingProfile.Overview result = ChargingProfile.Overview.builder()
+            .chargingProfilePk(chargingProfilePk)
+            .description("Night charging")
+            .build();
+
+        ArgumentCaptor<ChargingProfileForm> captor = ArgumentCaptor.forClass(ChargingProfileForm.class);
+
+        // when
+        when(chargingProfileRepository.add(any(ChargingProfileForm.class))).thenReturn(chargingProfilePk);
+        when(chargingProfileRepository.getOverview(any())).thenReturn(List.of(result));
+
+        // then
+        mockMvc.perform(
+                post("/api/v1/chargingProfiles")
+                    .content("""
+                        {"description": "Night charging", "stackLevel": 1,
+                         "chargingProfilePurpose": "TxProfile", "chargingProfileKind": "Absolute",
+                         "chargingRateUnit": "A",
+                         "schedulePeriods": [{"startPeriodInSeconds": 0, "powerLimit": 16, "numberPhases": 3}]}
+                        """)
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isCreated());
+
+        verify(chargingProfileRepository).add(captor.capture());
+        assertEquals(ChargingProfilePurposeType.TX_PROFILE, captor.getValue().getChargingProfilePurpose());
+    }
+
+    @Test
+    @DisplayName("POST: Malformed json, expected 400")
+    public void test13() throws Exception {
+        mockMvc.perform(
+                post("/api/v1/chargingProfiles")
+                    .content("{not-json")
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
     }
 
     @Test

@@ -73,8 +73,12 @@ public class TasksRestController {
     public TaskResponse getOne(@PathVariable("taskId") Integer taskId) {
         log.debug("Read request for taskId: {}", taskId);
 
-        CommunicationTask task = taskStore.get(taskId);
-        if (task == null) {
+        CommunicationTask task;
+        try {
+            task = taskStore.get(taskId);
+        } catch (SteveException e) {
+            // The store throws when the task is unknown. Expose it as 404, as documented
+            // in the OpenAPI description of this endpoint.
             throw new SteveException.NotFound(
                 "Could not find this task. Note that tasks are held in memory only and are removed when cleared via the manager UI.");
         }

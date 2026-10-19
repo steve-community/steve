@@ -79,10 +79,10 @@ public class TasksRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DisplayName("GET one: Unknown task id, expected 404")
+    @DisplayName("GET one: Unknown task id (store throws), expected 404")
     public void test2() throws Exception {
-        // when
-        when(taskStore.get(123)).thenReturn(null);
+        // The production TaskStore throws a SteveException for unknown ids
+        when(taskStore.get(123)).thenThrow(new SteveException("There is no task with taskId '123'"));
 
         // then
         mockMvc.perform(get("/api/v1/tasks/123"))

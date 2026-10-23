@@ -18,10 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */-->
 <!--/*
-    Thymeleaf counterpart of 00-header.jsp + 00-footer.jsp.
-
-    Thymeleaf cannot split an element's start and end tag across two files, so header and footer are merged into one
-    layout fragment. Pages wrap their content like this:
+    Common page layout: head (CSS/JS), top banner and navigation menu. Pages wrap their content like this:
 
     <html th:replace="~{00-layout :: layout(~{::pageContent})}">
     <body>

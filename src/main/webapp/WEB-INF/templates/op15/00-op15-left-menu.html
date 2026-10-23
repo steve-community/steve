@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */-->
-<!--/* Left menu of OCPP 1.5 operation pages (inlined in each JSP). activePage: name of the operation to highlight */-->
+<!--/* Left menu of OCPP 1.5 operation pages. activePage: name of the operation to highlight */-->
 <div class="left-menu" th:fragment="menu(activePage)">
 <ul>
     <li><a th:classappend="${activePage == 'ChangeAvailability'} ? highlight" th:href="@{/manager/operations/{v}/ChangeAvailability(v=${opVersion})}">Change Availability</a></li>

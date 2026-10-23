@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */-->
-<!--/* Thymeleaf counterpart of op-forms/UpdateFirmwareForm.jsp */-->
+<!--/* Form of the UpdateFirmware operation, shared by all OCPP versions that support it. Must be used where "params" and "opVersion" are in the model. */-->
 <form th:fragment="form" th:action="@{/manager/operations/{v}/UpdateFirmware(v=${opVersion})}" method="post" th:object="${params}">
     <section><span th:text="|Charge Points with OCPP ${opVersion}|"></span></section>
     <th:block th:replace="~{00-cp-multiple :: cpMultiple}" />

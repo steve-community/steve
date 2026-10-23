@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */-->
-<!--/* Thymeleaf counterpart of 00-address.jsp. Must be used inside a form with th:object that has an "address" property. */-->
+<!--/* "Address" section of the charge point and user forms. Must be used inside a form with th:object that has an "address" property. */-->
 <table class="userInput" th:fragment="address" th:with="boundAddress=*{address}">
     <thead><tr><th>Address</th><th></th></tr></thead>
     <tr><td>Street:</td><td><input type="text" th:field="*{address.street}"/></td></tr>

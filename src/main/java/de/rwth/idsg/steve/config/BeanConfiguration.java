@@ -44,7 +44,6 @@ import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import tools.jackson.datatype.joda.JodaModule;
 
 import javax.sql.DataSource;
@@ -204,20 +203,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
     // -------------------------------------------------------------------------
     // Web config
     // -------------------------------------------------------------------------
-
-    /**
-     * Resolver for JSP views/templates. Controller classes process the requests
-     * and forward to JSP files for rendering.
-     */
-    @Bean
-    public InternalResourceViewResolver jspViewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
-        resolver.setSuffix(".jsp");
-        // FIXME: Remove this resolver after all pages are migrated to Thymeleaf. Keep JSP fallback until then.
-        resolver.setOrder(2);
-        return resolver;
-    }
 
     /**
      * Resource path for static content of the Web interface.

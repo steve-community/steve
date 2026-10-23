@@ -27,8 +27,6 @@
     <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
     <logger name="org.jooq.Constants" level="WARN" />
 
-    <logger name="org.apache.jasper" level="WARN"/>
-    <logger name="org.apache.tomcat.util" level="WARN"/>
     <logger name="jndi" level="WARN"/>
 
 </configuration>

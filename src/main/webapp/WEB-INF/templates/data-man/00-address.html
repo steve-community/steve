@@ -1,0 +1,42 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Thymeleaf counterpart of 00-address.jsp. Must be used inside a form with th:object that has an "address" property. */-->
+<table class="userInput" th:fragment="address" th:with="boundAddress=*{address}">
+    <thead><tr><th>Address</th><th></th></tr></thead>
+    <tr><td>Street:</td><td><input type="text" th:field="*{address.street}"/></td></tr>
+    <tr><td>House Number:</td><td><input type="text" th:field="*{address.houseNumber}"/></td></tr>
+    <tr><td>Zip code:</td><td><input type="text" th:field="*{address.zipCode}"/></td></tr>
+    <tr><td>City:</td><td><input type="text" th:field="*{address.city}"/></td></tr>
+    <tr><td>Country:</td><td><select th:field="*{address.country}">
+        <option th:each="it : ${countryCodes}" th:value="${it.key}" th:text="${it.value}"></option>
+    </select></td></tr>
+    <tr><td>Latitude:</td><td><input type="text" th:field="*{address.latitude}"/></td></tr>
+    <tr><td>Longitude:</td><td><input type="text" th:field="*{address.longitude}"/></td></tr>
+    <tr><td>Time Zone:</td><td><select th:field="*{address.timeZone}">
+        <option th:each="it : ${timeZones}" th:value="${it.key}" th:text="${it.value}"></option>
+    </select></td></tr>
+
+    <tr th:if="${boundAddress?.latitude != null and boundAddress?.longitude != null}">
+        <td></td>
+        <td><a target="_blank" th:href="|https://maps.google.com/?q=${boundAddress.latitude},${boundAddress.longitude}|">
+            Show on Google Maps</a>
+        </td>
+    </tr>
+</table>

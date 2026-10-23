@@ -1,0 +1,136 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<th:block th:replace="~{00-op-bind-errors :: opBindErrors}" />
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker-past.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/periodTypeSelect.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content">
+<section><span>
+Transactions
+<a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+<span>If stop date/time and stop value are empty, this means that a transaction is still active
+(i.e. it has started but not stopped yet or the charging station did not inform SteVe about the stopped transaction yet).</span>
+</a>
+</span></section>
+    <form th:action="@{/manager/transactions/query}" method="get" th:object="${params}">
+        <table class="userInput">
+            <tr>
+                <td>Transaction ID:</td>
+                <td><input type="number" th:field="*{transactionPk}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>ChargeBox ID:</td>
+                <td><select th:field="*{chargeBoxId}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${cpList}" th:value="${it}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>OCPP ID Tag:</td>
+                <td><select th:field="*{ocppIdTag}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${idTagList}" th:value="${it}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>User ID:</td>
+                <td><input type="number" th:field="*{userId}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>Transaction Type:</td>
+                <td><select th:field="*{type}">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.TransactionQueryForm$QueryType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Period Type:</td>
+                <td><select th:field="*{periodType}" id="periodTypeSelect">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.QueryPeriodType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><input type="text" th:field="*{from}" id="intervalPeriodTypeFrom" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>To:</td>
+                <td><input type="text" th:field="*{to}" id="intervalPeriodTypeTo" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>Get as CSV?:</td>
+                <td><input type="checkbox" th:field="*{returnCSV}"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+
+    <table class="res action">
+        <thead>
+            <tr>
+                <th data-sort="int">Transaction ID</th>
+                <th data-sort="string">ChargeBox ID</th>
+                <th data-sort="int">Connector ID</th>
+                <th data-sort="string">OCPP ID Tag</th>
+                <th data-sort="int">User ID</th>
+                <th data-sort="date">Start Date/Time</th>
+                <th data-sort="int">Start Value</th>
+                <th data-sort="date">Stop Date/Time</th>
+                <th data-sort="int">Stop Value</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ta : ${transList}">
+                <td><a th:href="@{/manager/transactions/details/{id}(id=${ta.id})}" th:text="${ta.id}"></a></td>
+                <td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${ta.chargeBoxPk})}" th:text="${ta.chargeBoxId}"></a></td>
+                <td th:text="${ta.connectorId}"></td>
+                <td><a th:href="@{/manager/ocppTags/details/{pk}(pk=${ta.ocppTagPk})}" th:text="${ta.ocppIdTag}"></a></td>
+                <td><a th:href="@{/manager/users/details/{pk}(pk=${ta.userId})}" th:text="${ta.userId}"></a></td>
+                <td th:data-sort-value="${ta.startTimestamp?.millis}" th:text="${ta.startTimestampFormatted}"></td>
+                <td th:text="${ta.startValue}"></td>
+                <td th:data-sort-value="${ta.stopTimestamp?.millis}" th:text="${ta.stopTimestampFormatted}"></td>
+                <td th:text="${ta.stopValue}"></td>
+                <td>
+                    <form th:if="${#strings.isEmpty(ta.stopValue)}" th:action="@{/manager/transactions/stop/{id}(id=${ta.id})}" method="post">
+                        <input type="submit" class="redSubmit" title="Manually set this transaction from 'active' to 'stopped'. The actual transaction is not affected by this!" value="Stop">
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<br>
+</div>
+</th:block>
+</body>
+</html>

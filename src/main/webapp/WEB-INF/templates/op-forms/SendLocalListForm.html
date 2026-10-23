@@ -1,0 +1,56 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Thymeleaf counterpart of op-forms/SendLocalListForm.jsp */-->
+<form th:fragment="form" th:action="@{/manager/operations/{v}/SendLocalList(v=${opVersion})}" method="post" th:object="${params}">
+    <section><span th:text="|Charge Points with OCPP ${opVersion}|"></span></section>
+    <th:block th:replace="~{00-cp-multiple :: cpMultiple}" />
+    <section><span>Parameters</span></section>
+    <table class="userInput sll">
+        <tr><td>Hash (String):</td><td><i>Optional, omitted for now</i></td></tr>
+        <tr><td>List Version (integer):</td><td><input type="text" th:field="*{listVersion}"/></td></tr>
+        <tr><td>Update Type:</td>
+            <td>
+                <select th:field="*{updateType}">
+                    <option th:each="it : ${T(ocpp.cp._2015._10.UpdateType).values()}" th:value="${{it}}" th:text="${it}"></option>
+                </select>
+            </td>
+        </tr>
+        <tr><td>Add/Update List:</td>
+            <td>
+                <select th:field="*{addUpdateList}" disabled="disabled" multiple="multiple">
+                    <option th:each="it : ${idTagList}" th:value="${it}" th:text="${it}"></option>
+                </select>
+            </td>
+        </tr>
+        <tr><td>Delete List:</td>
+            <td>
+                <select th:field="*{deleteList}" disabled="disabled" multiple="multiple">
+                    <option th:each="it : ${idTagList}" th:value="${it}" th:text="${it}"></option>
+                </select>
+            </td>
+        </tr>
+        <tr><td>Send empty list?:</td><td><input type="checkbox" th:field="*{sendEmptyListWhenFull}" id="sendEmptyListWhenFull"/></td></tr>
+        <tr><td><i>
+            If selected and the update type is <b>FULL</b>, an empty list will be sent.<br>
+            As a result, the charge point will remove all idTags from its list.
+        </i></td><td></td></tr>
+        <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
+    </table>
+</form>

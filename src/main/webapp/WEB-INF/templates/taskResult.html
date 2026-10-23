@@ -1,0 +1,67 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<div class="content">
+<th:block th:unless="${task.isFinished()}">
+    <script>
+        $(document).ready(
+                setTimeout(function(){
+                    window.location.reload(1);
+                }, 5000));
+    </script>
+    <div class="info"><b>Info:</b> This page automatically reloads every 5 seconds until the task is finished.</div>
+</th:block>
+    <center>
+        <table id='details' class='cpd'>
+            <thead><tr><th>Task Details</th><th></th></tr></thead>
+            <tr><td>Operation name</td><td th:text="${task.operationName}"></td></tr>
+            <tr th:each="entry : ${task.customDetails}"><td th:text="${entry.key}"></td><td th:text="${entry.value}"></td></tr>
+            <tr><td>Origin</td><td th:text="|${task.origin} (${task.caller})|"></td></tr>
+            <tr><td>Start timestamp</td><td th:text="${task.startTimestamp}"></td></tr>
+            <tr><td>End timestamp</td><td th:text="${task.endTimestamp}"></td></tr>
+            <tr><td># of charge point requests</td><td th:text="${task.resultMap.size()}"></td></tr>
+            <tr><td># of responses</td><td th:text="${task.responseCount}"></td></tr>
+            <tr><td># of errors</td><td th:text="${task.errorCount}"></td></tr>
+        </table>
+    </center>
+    <br>
+    <section><span>Task Result</span></section>
+    <table class="res">
+        <thead><tr><th>ChargeBox ID</th><th>Response</th><th>Error</th></tr></thead>
+        <tbody>
+            <tr th:each="result : ${task.resultMap}">
+                <td th:text="${result.key}"></td>
+                <td>
+                    <th:block th:text="${result.value.response}" />
+                    <th:block th:if="${result.value.details != null}">
+                        (<a th:href="@{/manager/operations/tasks/{taskId}/details/{chargeBoxId}/(taskId=${taskId},chargeBoxId=${result.key})}">Details</a>)
+                    </th:block>
+                </td>
+                <td th:text="${result.value.errorMessage}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</th:block>
+</body>
+</html>

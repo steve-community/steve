@@ -1,0 +1,33 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Left menu of OCPP 1.2 operation pages (inlined in each JSP). activePage: name of the operation to highlight */-->
+<div class="left-menu" th:fragment="menu(activePage)">
+<ul>
+    <li><a th:classappend="${activePage == 'ChangeAvailability'} ? highlight" th:href="@{/manager/operations/{v}/ChangeAvailability(v=${opVersion})}">Change Availability</a></li>
+    <li><a th:classappend="${activePage == 'ChangeConfiguration'} ? highlight" th:href="@{/manager/operations/{v}/ChangeConfiguration(v=${opVersion})}">Change Configuration</a></li>
+    <li><a th:classappend="${activePage == 'ClearCache'} ? highlight" th:href="@{/manager/operations/{v}/ClearCache(v=${opVersion})}">Clear Cache</a></li>
+    <li><a th:classappend="${activePage == 'GetDiagnostics'} ? highlight" th:href="@{/manager/operations/{v}/GetDiagnostics(v=${opVersion})}">Get Diagnostics</a></li>
+    <li><a th:classappend="${activePage == 'RemoteStartTransaction'} ? highlight" th:href="@{/manager/operations/{v}/RemoteStartTransaction(v=${opVersion})}">Remote Start Transaction</a></li>
+    <li><a th:classappend="${activePage == 'RemoteStopTransaction'} ? highlight" th:href="@{/manager/operations/{v}/RemoteStopTransaction(v=${opVersion})}">Remote Stop Transaction</a></li>
+    <li><a th:classappend="${activePage == 'Reset'} ? highlight" th:href="@{/manager/operations/{v}/Reset(v=${opVersion})}">Reset</a></li>
+    <li><a th:classappend="${activePage == 'UnlockConnector'} ? highlight" th:href="@{/manager/operations/{v}/UnlockConnector(v=${opVersion})}">Unlock Connector</a></li>
+    <li><a th:classappend="${activePage == 'UpdateFirmware'} ? highlight" th:href="@{/manager/operations/{v}/UpdateFirmware(v=${opVersion})}">Update Firmware</a></li>
+</ul>
+</div>

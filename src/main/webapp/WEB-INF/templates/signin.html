@@ -1,0 +1,47 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/static/images/favicon.ico}" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="@{/static/images/favicon.ico}" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/style.css}">
+    <title>SteVe - Steckdosenverwaltung</title>
+</head>
+<body>
+<div class="main">
+<div class="top-banner"><div class="container"><a th:href="@{/manager/home}"><img th:src="@{/static/images/logo2.png}" height="80"></a></div></div>
+<div class="top-menu"></div>
+<div class="main-wrapper">
+    <div class="error" th:if="${param.error != null}">Your name or password is incorrect.</div>
+    <div class="content">
+        <section><span>Sign In</span></section>
+        <!--/* th:action adds the CSRF token as hidden input automatically */-->
+        <form method="POST" th:action="@{/manager/signin}">
+            <table class="userInput">
+                <tr><td>Name:</td><td><input type="text" name="username" id="username" required /></td></tr>
+                <tr><td>Password:</td><td><input type="password" name="password" id="password" required /></td></tr>
+                <tr><td></td><td id="add_space"><input type="submit" value="Sign In"></td></tr>
+            </table>
+        </form>
+    </div>
+</div></div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/*
+    Thymeleaf counterpart of 00-op-bind-errors.jsp (and of the inline <spring:hasBindErrors> blocks in other pages).
+
+    beanName : name of the model attribute whose BindingResult should be checked
+    message  : optional text shown above the error list
+    elementId: optional id of the error div (used by JS in some pages)
+*/-->
+<th:block th:fragment="bindErrors(beanName, message, elementId)"
+          th:with="bindingResult=${#ctx.getVariable('org.springframework.validation.BindingResult.' + beanName)}">
+    <div class="error" th:id="${elementId}" th:if="${bindingResult != null and bindingResult.hasErrors()}">
+        <th:block th:if="${message != null}" th:text="${message}" />
+        <ul>
+            <li th:each="error : ${bindingResult.allErrors}" th:text="${error.defaultMessage}"></li>
+        </ul>
+    </div>
+</th:block>
+
+<th:block th:fragment="opBindErrors">
+    <th:block th:replace="~{00-op-bind-errors :: bindErrors('params', null, null)}" />
+</th:block>

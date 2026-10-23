@@ -1,0 +1,73 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker-future.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#batch").click(function () {
+            $("#batchInsertForm, #ocppTagForm").slideToggle(250);
+        });
+
+        // According to the error type show/hide the corresponding view
+        if ($("#batchError").length) {
+            $("#batchInsertForm").show();
+            $("#ocppTagForm").hide();
+        }
+        if ($("#singleError").length) {
+            $("#batchInsertForm").hide();
+            $("#ocppTagForm").show();
+        }
+    });
+</script>
+<th:block th:replace="~{00-op-bind-errors :: bindErrors('batchInsertForm', 'Error while trying to add OCPP Tag list:', 'batchError')}" />
+<th:block th:replace="~{00-op-bind-errors :: bindErrors('ocppTagForm', 'Error while trying to add an OCPP Tag:', 'singleError')}" />
+<div class="content"><div>
+
+    <section><span id="batch" style="cursor: pointer">
+        Add OCPP Tag List
+        <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+            <span>Insert multiple OCPP Tags at once by entering one ID Tag per line. This operation will leave other fields empty, which can be set later.</span>
+        </a>
+    </span></section>
+    <form id="batchInsertForm" th:action="@{/manager/ocppTags/add/batch}" method="post" th:object="${batchInsertForm}" style="display: none">
+        <table class="userInput">
+            <tr>
+                <td>ID Tags:</td><td><textarea th:field="*{idList}"></textarea></td></tr>
+            <tr><td></td>
+                <td id="add_space">
+                    <input type="submit" value="Add All">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <section><span id="single">Add OCPP Tag</span></section>
+    <form id="ocppTagForm" th:action="@{/manager/ocppTags/add/single}" method="post" th:object="${ocppTagForm}">
+
+        <th:block th:replace="~{data-man/00-ocppTag :: ocppTag(false, 'add', 'Add')}" />
+
+    </form>
+</div></div>
+</th:block>
+</body>
+</html>

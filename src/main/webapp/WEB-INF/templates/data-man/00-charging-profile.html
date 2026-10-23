@@ -1,0 +1,98 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/*
+    Thymeleaf counterpart of 00-charging-profile.jsp. Must be used inside a form with th:object.
+    submitButtonName/submitButtonValue: name and label of the main submit button
+*/-->
+<th:block th:fragment="chargingProfile(submitButtonName, submitButtonValue)">
+<table class="userInput">
+    <thead><tr><th>Details</th><th></th></tr></thead>
+    <tr><td>Description:</td><td><input type="text" th:field="*{description}"/></td></tr>
+    <tr><td>Stack Level (integer):</td><td><input type="text" th:field="*{stackLevel}"/></td></tr>
+    <tr><td>Charging Profile Purpose:</td>
+        <td>
+            <select th:field="*{chargingProfilePurpose}">
+                <option th:each="it : ${T(ocpp.cp._2015._10.ChargingProfilePurposeType).values()}" th:value="${{it}}" th:text="${it}"></option>
+            </select>
+        </td>
+    </tr>
+    <tr><td>Charging Profile Kind:</td>
+        <td>
+            <select th:field="*{chargingProfileKind}">
+                <option th:each="it : ${T(ocpp.cp._2015._10.ChargingProfileKindType).values()}" th:value="${{it}}" th:text="${it}"></option>
+            </select>
+        </td>
+    </tr>
+    <tr><td>Recurrency Kind:</td>
+        <td>
+            <select th:field="*{recurrencyKind}">
+                <option value="" selected>-- Empty --</option>
+                <option th:each="it : ${T(ocpp.cp._2015._10.RecurrencyKindType).values()}" th:value="${{it}}" th:text="${it}"></option>
+            </select>
+        </td>
+    </tr>
+    <tr><td>Valid From:</td><td><input type="text" th:field="*{validFrom}" class="dateTimePicker"/></td></tr>
+    <tr><td>Valid To:</td><td><input type="text" th:field="*{validTo}" class="dateTimePicker"/></td></tr>
+    <tr><td>Duration (in seconds):</td><td><input type="text" th:field="*{durationInSeconds}"/></td></tr>
+    <tr><td>Start Schedule:</td><td><input type="text" th:field="*{startSchedule}" class="dateTimePicker"/></td></tr>
+    <tr><td>Charging Rate Unit:</td>
+        <td>
+            <select th:field="*{chargingRateUnit}">
+                <option th:each="it : ${T(ocpp.cp._2015._10.ChargingRateUnitType).values()}" th:value="${{it}}" th:text="${it}"></option>
+            </select>
+        </td>
+    </tr>
+    <tr><td>Min Charging Rate (decimal, multiple of 0.1):</td><td><input type="text" th:field="*{minChargingRate}"/></td></tr>
+
+    <tr><td>Additional Note:</td><td><textarea th:field="*{note}"></textarea></td></tr>
+</table>
+<br><br>
+<section><span>Schedule Periods</span></section>
+<table class="res" id="periodsTable">
+    <thead>
+    <tr>
+        <th>Start Period (in sec)</th>
+        <th>Power Limit (in Charging Rate Unit selected above)</th>
+        <th>Number Phases</th>
+        <th>
+            <input type="button" id="addRow" value="Add Period">
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:each="period, status : *{schedulePeriods}" th:id="${status.index}">
+            <td><input type="text" th:field="*{schedulePeriods[__${status.index}__].startPeriodInSeconds}"/></td>
+            <td><input type="text" th:field="*{schedulePeriods[__${status.index}__].powerLimit}"/></td>
+            <td><input type="text" th:field="*{schedulePeriods[__${status.index}__].numberPhases}" placeholder="if empty, 3 will be assumed"/></td>
+            <td><input type="button" class="removeRow" value="Delete"></td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="userInput">
+    <tr>
+        <td></td>
+        <td id="add_space">
+            <input type="submit" th:name="${submitButtonName}" th:value="${submitButtonValue}">
+            <input type="submit" name="backToOverview" value="Back to Overview">
+        </td>
+    </tr>
+</table>
+</th:block>

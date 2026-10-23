@@ -1,0 +1,33 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Thymeleaf counterpart of 00-cp-misc.jsp. Must be used inside a form with th:object. */-->
+<table class="userInput" th:fragment="cpMisc">
+    <thead><tr><th>Misc.</th><th></th></tr></thead>
+    <tr><td>Description:</td><td><input type="text" th:field="*{description}"/></td></tr>
+    <tr>
+        <td>Admin Address:</td>
+        <td>
+            <input type="text" th:field="*{adminAddress}"/>
+            <a target="_blank" th:if="${not #strings.isEmpty(cp?.chargeBox?.adminAddress)}" th:href="${cp.chargeBox.adminAddress}">Go</a>
+        </td>
+    </tr>
+
+    <tr><td>Additional Note:</td><td><textarea th:field="*{note}"></textarea></td></tr>
+</table>

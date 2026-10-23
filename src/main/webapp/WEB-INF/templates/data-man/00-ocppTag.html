@@ -1,0 +1,67 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/*
+    Thymeleaf counterpart of 00-ocppTag.jsp. Must be used inside a form with th:object.
+    isUpdateForm: true when editing an existing tag (ID tag becomes read-only)
+    submitButtonName/submitButtonValue: name and label of the main submit button
+*/-->
+<th:block th:fragment="ocppTag(isUpdateForm, submitButtonName, submitButtonValue)">
+<table class="userInput">
+    <thead><tr><th>OCPP</th><th></th></tr></thead>
+    <tbody>
+        <tr>
+            <td>ID Tag:</td>
+            <td>
+                <input type="text" th:field="*{idTag}" th:readonly="${isUpdateForm}"/>
+                <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+                    <span>This field is set when adding an OCPP Tag, and cannot be changed later</span>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Parent ID Tag:</td>
+            <td><select th:field="*{parentIdTag}">
+                <option th:each="it : ${idTagList}" th:value="${it.key}" th:text="${it.value}"></option>
+            </select></td>
+        </tr>
+        <tr><td>Expiry Date/Time:</td><td><input type="text" th:field="*{expiryDate}" class="dateTimePicker"/></td></tr>
+        <tr><td>Max. Active Transaction Count:</td><td><input type="text" th:field="*{maxActiveTransactionCount}" placeholder="if empty, 1 will be assumed"/></td></tr>
+        <tr><td><i>
+            Set to <b>0</b> to block this tag. Set to a <b>negative</b> value to disable concurrent transaction checks
+            (i.e. every transaction<br>will be allowed). Set to a <b>positive</b> value to control the number of
+            active transactions that is allowed.
+        </i></td><td></td></tr>
+    </tbody>
+</table>
+<table class="userInput">
+    <thead><tr><th>Misc.</th><th></th></tr></thead>
+    <tbody>
+    <!--/* print this only when updating, otherwise unnecessary */-->
+    <tr th:if="${isUpdateForm}"><td>Active Transaction Count:</td><td th:text="${activeTransactionCount}"></td></tr>
+    <tr><td>Additional Note:</td><td><textarea th:field="*{note}"></textarea></td></tr>
+    <tr><td></td>
+        <td id="add_space">
+            <input type="submit" th:name="${submitButtonName}" th:value="${submitButtonValue}">
+            <input type="submit" name="backToOverview" value="Back to Overview">
+        </td>
+    </tr>
+    </tbody>
+</table>
+</th:block>

@@ -1,0 +1,56 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/datePicker-past.js}"></script>
+<div class="content"><div th:switch="${eventType}">
+    <th:block th:case="'FirmwareUpdate'">
+        <section><span>Firmware Update Job Details</span></section>
+        <table class="userInput">
+            <tr><td>Job/Request ID:</td><td><a th:href="@{/manager/events/status(eventType=${eventType},jobId=${details.jobId})}" th:text="${details.jobId}"></a></td></tr>
+            <tr><td>Created at:</td><td th:text="${details.createdAt}"></td></tr>
+            <tr><td>Location:</td><td th:text="${details.firmwareLocation}"></td></tr>
+            <tr><td>Retrieve Date/Time:</td><td th:text="${details.retrieveDatetime}"></td></tr>
+            <tr><td>Install Date/Time:</td><td th:text="${details.installDatetime}"></td></tr>
+            <tr><td>Signature:</td><td th:text="${details.signature}"></td></tr>
+            <tr><td>Signing Certificate:</td><td th:text="${details.signingCertificate}"></td></tr>
+        </table>
+    </th:block>
+    <th:block th:case="'LogUpload'">
+        <section><span>Log Upload Job Details</span></section>
+        <table class="userInput">
+            <tr><td>Job/Request ID:</td><td><a th:href="@{/manager/events/status(eventType=${eventType},jobId=${details.jobId})}" th:text="${details.jobId}"></a></td></tr>
+            <tr><td>Created at:</td><td th:text="${details.createdAt}"></td></tr>
+            <tr><td>Log Type:</td><td th:text="${details.logType}"></td></tr>
+            <tr><td>Remote Location:</td><td th:text="${details.remoteLocation}"></td></tr>
+            <tr><td>Oldest timestamp:</td><td th:text="${details.oldestTimestamp}"></td></tr>
+            <tr><td>Latest timestamp:</td><td th:text="${details.latestTimestamp}"></td></tr>
+        </table>
+    </th:block>
+    <!--/* We should not go into this branch */-->
+    <th:block th:case="*">
+        Something went wrong.
+    </th:block>
+</div></div>
+</th:block>
+</body>
+</html>

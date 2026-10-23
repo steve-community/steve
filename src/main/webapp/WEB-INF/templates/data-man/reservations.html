@@ -1,0 +1,136 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<th:block th:replace="~{00-op-bind-errors :: opBindErrors}" />
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/periodTypeSelect.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content">
+    <section><span>
+        Reservations
+            <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+                <span>
+                Status definitions:
+                WAITING (Waiting for charge point to respond to a reservation request),
+                ACCEPTED (Charge point accepted - The only status for active, usable reservations),
+                USED (Reservation used by the user for a transaction),
+                CANCELLED (Reservation cancelled by the user)
+                </span>
+            </a>
+    </span></section>
+    <form th:action="@{/manager/reservations/query}" method="get" th:object="${params}">
+        <table class="userInput">
+            <tr>
+                <td>Reservation ID:</td>
+                <td><input type="number" th:field="*{reservationId}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>Transaction ID:</td>
+                <td><input type="number" th:field="*{transactionId}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>ChargeBox ID:</td>
+                <td><select th:field="*{chargeBoxId}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${cpList}" th:value="${it}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>OCPP ID Tag:</td>
+                <td><select th:field="*{ocppIdTag}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${idTagList}" th:value="${it}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>User ID:</td>
+                <td><input type="number" th:field="*{userId}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>Reservation Status:</td>
+                <td><select th:field="*{status}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${statusList}" th:value="${{it}}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Period Type:</td>
+                <td><select th:field="*{periodType}" id="periodTypeSelect">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.ReservationQueryForm$QueryPeriodType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><input type="text" th:field="*{from}" id="intervalPeriodTypeFrom" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>To:</td>
+                <td><input type="text" th:field="*{to}" id="intervalPeriodTypeTo" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+
+<table class="res">
+    <thead>
+        <tr>
+            <th data-sort="int">Reservation ID</th>
+            <th data-sort="int">Transaction ID</th>
+            <th data-sort="string">OCPP ID Tag</th>
+            <th data-sort="string">ChargeBox ID</th>
+            <th data-sort="int">Connector ID</th>
+            <th data-sort="date">Start Date/Time</th>
+            <th data-sort="date">Expiry Date/Time</th>
+            <th data-sort="string">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="res : ${reservList}">
+            <td th:text="${res.id}"></td>
+            <td>
+                <a th:if="${res.transactionId != null}" th:href="@{/manager/transactions/query(type='ALL',transactionPk=${res.transactionId})}" th:text="${res.transactionId}"></a>
+            </td>
+            <td><a th:href="@{/manager/ocppTags/details/{pk}(pk=${res.ocppTagPk})}" th:text="${res.ocppIdTag}"></a></td>
+            <td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${res.chargeBoxPk})}" th:text="${res.chargeBoxId}"></a></td>
+            <td th:text="${res.connectorId}"></td>
+            <td th:data-sort-value="${res.startDatetimeDT?.millis}" th:text="${res.startDatetime}"></td>
+            <td th:data-sort-value="${res.expiryDatetimeDT?.millis}" th:text="${res.expiryDatetime}"></td>
+            <td th:text="${res.status}"></td>
+        </tr>
+    </tbody>
+</table>
+<br>
+</div>
+</th:block>
+</body>
+</html>

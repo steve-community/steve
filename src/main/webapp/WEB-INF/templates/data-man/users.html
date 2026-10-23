@@ -1,0 +1,98 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content"><div>
+    <section><span>User Overview</span></section>
+    <form th:action="@{/manager/users/query}" method="get" th:object="${params}">
+        <table class="userInput">
+            <tr>
+                <td>User ID:</td>
+                <td><input type="text" th:field="*{userPk}"/></td>
+            </tr>
+            <tr>
+                <td>Ocpp ID Tag:</td>
+                <td><input type="text" th:field="*{ocppIdTag}"/></td>
+            </tr>
+            <tr>
+                <td>Ocpp ID Tag Relationship:</td>
+                <td>
+                    <select th:field="*{ocppTagFilter}">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.UserQueryForm$OcppTagFilter).values()}" th:value="${{it}}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" th:field="*{name}"/></td>
+            </tr>
+            <tr>
+                <td>E-Mail:</td>
+                <td><input type="text" th:field="*{email}"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+    <table class="res action">
+        <thead>
+            <tr>
+                <th data-sort="int">User ID</th>
+                <th data-sort="string">Ocpp ID Tags</th>
+                <th data-sort="string">Name</th>
+                <th data-sort="string">Phone</th>
+                <th data-sort="string">E-Mail</th>
+                <th data-sort="string">Notifications</th>
+                <th>
+                    <form th:action="@{/manager/users/add}" method="get">
+                        <input type="submit" class="blueSubmit" value="Add New">
+                    </form>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cr : ${userList}"><td><a th:href="@{/manager/users/details/{pk}(pk=${cr.userPk})}" th:text="${cr.userPk}"></a></td>
+                <td>
+                    <th:block th:each="it, loop : ${cr.ocppTagEntries}"><a th:href="@{/manager/ocppTags/details/{pk}(pk=${it.ocppTagPk})}" th:text="${it.idTag}"></a><th:block th:unless="${loop.last}">, </th:block></th:block>
+                </td>
+                <td th:text="${cr.name}"></td>
+                <td th:text="${cr.phone}"></td>
+                <td th:text="${cr.email}"></td>
+                <td><th:block th:each="eF : ${cr.notificationFeatures}"><th:block th:text="${eF}" /><br/></th:block>
+                </td>
+                <td><form th:action="@{/manager/users/delete/{pk}(pk=${cr.userPk})}" method="post">
+                        <input type="submit" class="redSubmit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div></div>
+</th:block>
+</body>
+</html>

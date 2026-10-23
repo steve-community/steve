@@ -1,0 +1,92 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<div class="content">
+<div class="tileWrapper">
+    <a class="tileRow1" th:href="@{/manager/chargepoints}">
+        Number of<br>Charge Points
+        <span class="base formatNumber" th:text="${stats.numChargeBoxes}"></span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/ocppTags}">
+        Number of<br>OCPP Tags
+        <span class="base formatNumber" th:text="${stats.numOcppTags}"></span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/users}">
+        Number of<br>Users
+        <span class="base formatNumber" th:text="${stats.numUsers}"></span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/reservations}">
+        Number of<br>Active Reservations
+        <span class="base formatNumber" th:text="${stats.numReservations}"></span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/transactions}">
+        Number of<br>Active Transactions
+        <span class="base formatNumber" th:text="${stats.numTransactions}"></span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/home/ocppJsonStatus}">
+        Number of Connected<br>JSON Charge Points
+        <span class="baseTable">
+            <span class="baseRow">
+                <span class="baseCell">OCPP 1.2 :</span>
+                <span class="baseCell formatNumber" th:text="${stats.numOcpp12JChargeBoxes}"></span>
+            </span>
+            <span class="baseRow">
+                <span class="baseCell">OCPP 1.5 :</span>
+                <span class="baseCell formatNumber" th:text="${stats.numOcpp15JChargeBoxes}"></span>
+            </span>
+            <span class="baseRow">
+                <span class="baseCell">OCPP 1.6 :</span>
+                <span class="baseCell formatNumber" th:text="${stats.numOcpp16JChargeBoxes}"></span>
+            </span>
+        </span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/chargepoints}">
+        Received Heartbeats
+        <span class="baseTable">
+            <span class="baseRow">
+                <span class="baseCell">Today :</span>
+                <span class="baseCell formatNumber" th:text="${stats.heartbeatToday}"></span>
+            </span>
+            <span class="baseRow">
+                <span class="baseCell">Yesterday :</span>
+                <span class="baseCell formatNumber" th:text="${stats.heartbeatYesterday}"></span>
+            </span>
+            <span class="baseRow">
+                <span class="baseCell">Earlier :</span>
+                <span class="baseCell formatNumber" th:text="${stats.heartbeatEarlier}"></span>
+            </span>
+        </span>
+    </a>
+    <a class="tileRow1" th:href="@{/manager/home/connectorStatus}">
+        Connector Status
+        <span class="baseTable">
+            <span class="baseRow" th:each="it : ${stats.statusCountMap}">
+                <span class="baseCell" th:text="|${it.key} :|"></span>
+                <span class="baseCell formatNumber" th:text="${it.value}"></span>
+            </span>
+        </span>
+    </a>
+</div></div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker.js}"></script>
+<div class="content">
+    <section><span>Charging Profile Overview</span></section>
+    <div id="overview">
+        <form th:action="@{/manager/chargingProfiles/query}" method="get" th:object="${params}">
+            <table class="userInput">
+                <tr>
+                    <td>Charging Profile ID (integer):</td>
+                    <td><input type="text" th:field="*{chargingProfilePk}"/></td>
+                </tr>
+                <tr>
+                    <td>Stack Level (integer):</td>
+                    <td><input type="text" th:field="*{stackLevel}"/></td>
+                </tr>
+                <tr>
+                    <td>Description:</td>
+                    <td><input type="text" th:field="*{description}"/></td>
+                </tr>
+                <tr>
+                    <td>Profile Purpose:</td>
+                    <td><select th:field="*{profilePurpose}">
+                        <option value="" selected>-- Empty --</option>
+                        <option th:each="it : ${T(ocpp.cp._2015._10.ChargingProfilePurposeType).values()}" th:value="${{it}}" th:text="${it}"></option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Profile Kind:</td>
+                    <td><select th:field="*{profileKind}">
+                        <option value="" selected>-- Empty --</option>
+                        <option th:each="it : ${T(ocpp.cp._2015._10.ChargingProfileKindType).values()}" th:value="${{it}}" th:text="${it}"></option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Recurrency Kind:</td>
+                    <td><select th:field="*{recurrencyKind}">
+                        <option value="" selected>-- Empty --</option>
+                        <option th:each="it : ${T(ocpp.cp._2015._10.RecurrencyKindType).values()}" th:value="${{it}}" th:text="${it}"></option>
+                    </select>
+                    </td>
+                </tr>
+                <tr><td>Valid From:</td><td><input type="text" th:field="*{validFrom}" class="dateTimePicker"/></td></tr>
+                <tr><td>Valid To:</td><td><input type="text" th:field="*{validTo}" class="dateTimePicker"/></td></tr>
+                <tr>
+                    <td></td>
+                    <td id="add_space">
+                        <input type="submit" value="Get">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <br>
+        <table class="res action">
+            <thead>
+            <tr>
+                <th data-sort="string">Charging Profile ID</th>
+                <th data-sort="string">Stack Level</th>
+                <th data-sort="string">Description</th>
+                <th data-sort="string">Profile Purpose</th>
+                <th data-sort="string">Profile Kind</th>
+                <th data-sort="string">Recurrency Kind</th>
+                <th data-sort="date">Valid From</th>
+                <th data-sort="date">Valid To</th>
+                <th>
+                    <form th:action="@{/manager/chargingProfiles/add}" method="get">
+                        <input type="submit" class="blueSubmit" value="Add New">
+                    </form>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="cp : ${profileList}">
+                    <td><a th:href="@{/manager/chargingProfiles/details/{pk}(pk=${cp.chargingProfilePk})}" th:text="${cp.chargingProfilePk}"></a></td>
+                    <td th:text="${cp.stackLevel}"></td>
+                    <td th:text="${cp.description}"></td>
+                    <td th:text="${cp.profilePurpose}"></td>
+                    <td th:text="${cp.profileKind}"></td>
+                    <td th:text="${cp.recurrencyKind}"></td>
+                    <td th:data-sort-value="${cp.validFrom?.millis}" th:text="${cp.validFrom}"></td>
+                    <td th:data-sort-value="${cp.validTo?.millis}" th:text="${cp.validTo}"></td>
+                    <td>
+                        <form th:action="@{/manager/chargingProfiles/delete/{pk}(pk=${cp.chargingProfilePk})}" method="post">
+                            <input type="submit" class="redSubmit" value="Delete">
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

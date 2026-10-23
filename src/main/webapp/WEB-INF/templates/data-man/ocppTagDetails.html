@@ -1,0 +1,59 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker-future.js}"></script>
+<th:block th:replace="~{00-op-bind-errors :: bindErrors('ocppTagForm', 'Error while trying to update an OCPP tag:', null)}" />
+<div class="content"><div>
+    <section><span>OCPP Tag Details</span></section>
+
+    <table class="userInput">
+        <thead><tr><th>See Operations</th><th></th></tr></thead>
+        <tbody>
+        <tr>
+            <td>Transactions:</td>
+            <td>
+                <a th:href="@{/manager/transactions/query(ocppIdTag=${ocppTagForm.idTag},type='ACTIVE')}">ACTIVE</a>
+                /
+                <a th:href="@{/manager/transactions/query(ocppIdTag=${ocppTagForm.idTag},type='ALL')}">ALL</a>
+            </td>
+        </tr>
+        <tr>
+            <td>Reservations:</td>
+            <td>
+                <a th:href="@{/manager/reservations/query(ocppIdTag=${ocppTagForm.idTag},periodType='ACTIVE')}">ACTIVE</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form th:action="@{/manager/ocppTags/update}" method="post" th:object="${ocppTagForm}">
+
+        <input type="hidden" th:field="*{ocppTagPk}" readonly="readonly"/>
+
+        <th:block th:replace="~{data-man/00-ocppTag :: ocppTag(true, 'update', 'Update')}" />
+
+    </form>
+</div></div>
+</th:block>
+</body>
+</html>

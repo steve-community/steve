@@ -1,0 +1,87 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<th:block th:replace="~{00-op-bind-errors :: bindErrors('settingsForm', null, null)}" />
+<div class="content">
+<form th:action="@{/manager/settings}" method="post" th:object="${settingsForm}">
+
+    <section><span>OCPP Settings</span></section>
+    <table class="userInputFullPage">
+        <tr><td>Heartbeat Interval:</td><td>
+            <input type="text" th:field="*{ocppSettings.heartbeat}"/>
+        </td></tr>
+        <tr><td><i>
+            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.<br>
+            The value 0 requests clients to use reasonable default values.
+        </i></td><td></td></tr>
+        <tr><td>Expiration:</td><td>
+            <input type="text" th:field="*{ocppSettings.expiration}"/>
+        </td></tr>
+        <tr><td><i>
+            The amount of time in <b>hours</b> for how long a charge point should cache <br> the authorization info of an
+            idTag in its local white list, if an expiry date is not explicitly set. <br>The value 0 disables this functionality (i.e. no expiry date will be set).
+        </i></td><td></td></tr>
+    </table>
+
+    <br>
+
+    <section><span>
+        Mail Notification Setting
+        <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+            <span>Specify the recipients of the notifications by entering one e-mail address per line</span>
+        </a>
+    </span></section>
+    <table class="userInputFullPage">
+        <tr><td>Enable Notifications?:</td><td><input type="checkbox" th:field="*{mailSettings.enabled}"/></td></tr>
+        <tr><td>Protocol:</td><td><input type="text" th:field="*{mailSettings.protocol}"/></td></tr>
+        <tr><td>Host:</td><td><input type="text" th:field="*{mailSettings.mailHost}"/></td></tr>
+        <tr><td>Port:</td><td><input type="text" th:field="*{mailSettings.port}"/></td></tr>
+        <tr><td>From:</td><td><input type="text" th:field="*{mailSettings.from}"/></td></tr>
+        <tr><td>User name:</td><td><input type="text" th:field="*{mailSettings.username}"/></td></tr>
+        <tr><td>Password:</td><td><input type="text" th:field="*{mailSettings.password}"/></td></tr>
+
+        <tr><td>Recipients:</td>
+            <td><textarea th:field="*{mailSettings.recipients}"></textarea></td>
+        </tr>
+        <tr>
+            <td>Notify when... </td>
+            <td>
+                <th:block th:each="f, stat : ${features}">
+                    <br th:unless="${stat.first}"/>
+                    <input type="checkbox" th:field="*{mailSettings.enabledFeatures}" th:value="${{f}}"/>
+                    <label th:for="${#ids.prev('mailSettings.enabledFeatures')}" th:text="${f.text}"></label>
+                </th:block>
+            </td>
+        </tr>
+        <tr><td></td>
+            <td id="add_space">
+                <input type="submit" name="change" value="Change">
+                <input type="submit" name="testMail" value="Send Test Mail">
+            </td></tr>
+    </table>
+
+</form>
+</div>
+</th:block>
+</body>
+</html>

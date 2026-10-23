@@ -1,0 +1,46 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Thymeleaf counterpart of 00-user-profile.jsp. Must be used inside a form with th:object. */-->
+<table class="userInput" th:fragment="userProfile">
+    <thead><tr><th>Profile</th><th></th></tr></thead>
+    <tr><td>First name:</td><td><input type="text" th:field="*{firstName}"/></td></tr>
+    <tr><td>Last name:</td><td><input type="text" th:field="*{lastName}"/></td></tr>
+    <tr><td>Birthday:</td><td><input type="text" th:field="*{birthDay}" class="datePicker"/></td></tr>
+    <tr>
+        <td>Sex:</td>
+        <td><select th:field="*{sex}">
+            <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.UserSex).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+        </select>
+        </td>
+    </tr>
+    <tr><td>Phone:</td><td><input type="text" th:field="*{phone}"/></td></tr>
+    <tr><td>E-mail:</td><td><input type="text" th:field="*{email}"/></td></tr>
+    <tr>
+        <td>Notify when... </td>
+        <td>
+            <th:block th:each="f, stat : ${features}">
+                <br th:unless="${stat.first}"/>
+                <input type="checkbox" th:field="*{notificationFeatures}" th:value="${{f}}"/>
+                <label th:for="${#ids.prev('notificationFeatures')}" th:text="${f.text}"></label>
+            </th:block>
+        </td>
+    </tr>
+    <tr><td>Additional Note:</td><td><textarea th:field="*{note}"></textarea></td></tr>
+</table>

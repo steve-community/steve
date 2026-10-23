@@ -1,0 +1,60 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<div class="content">
+    <div th:with="schedule=${response.chargingSchedule}">
+        <center>
+            <table id='details' class='cpd'>
+                <thead><tr><th>GetCompositeScheduleResponse</th><th></th></tr></thead>
+                <tr><td>ChargeBox ID:</td><td th:text="${chargeBoxId}"></td></tr>
+                <tr><td>Connector ID:</td><td th:text="${response.connectorId}"></td></tr>
+                <tr><td>Schedule Start:</td><td th:text="${response.scheduleStart}"></td></tr>
+                <tr><td>Duration (in seconds):</td><td th:text="${schedule?.duration}"></td></tr>
+                <tr><td>Start Schedule:</td><td th:text="${schedule?.startSchedule}"></td></tr>
+                <tr><td>Charging Rate Unit:</td><td th:text="${schedule?.chargingRateUnit}"></td></tr>
+                <tr><td>Min Charging Rate:</td><td th:text="${schedule?.minChargingRate}"></td></tr>
+            </table>
+        </center>
+        <br>
+        <section><span>Schedule Periods</span></section>
+        <table class="res">
+            <thead>
+            <tr>
+                <th>Start Period (in sec)</th>
+                <th>Power Limit (in amperes)</th>
+                <th>Number Phases</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="element : ${schedule?.chargingSchedulePeriod}">
+                    <td th:text="${element.startPeriod}"></td>
+                    <td th:text="${element.limit}"></td>
+                    <td th:text="${element.numberPhases}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

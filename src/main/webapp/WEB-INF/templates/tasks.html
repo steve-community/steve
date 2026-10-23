@@ -1,0 +1,56 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content">
+    <section><span>
+        Request Tasks <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle"><span>Click on Task IDs for detailed task information.</span></a>
+    </span></section>
+    <form th:action="@{/manager/operations/tasks}" method="post">
+        <input type="submit" name="finished" value="Delete Finished"/>
+        <input type="submit" name="unfinished" value="Delete Unfinished"/>
+    </form>
+    <br>
+    <table class="res">
+        <thead>
+            <tr>
+                <th data-sort="int">Task ID</th>
+                <th data-sort="string">Origin</th>
+                <th data-sort="date">Start Timestamp</th>
+                <th data-sort="date">End Timestamp</th>
+                <th>Responses / Requests</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="task : ${taskList}"><td><a th:href="@{/manager/operations/tasks/{id}(id=${task.taskId})}" th:text="${task.taskId}"></a></td>
+                <td th:text="${task.origin}"></td>
+                <td th:data-sort-value="${task.start?.millis}" th:text="${task.start}"></td>
+                <td th:data-sort-value="${task.end?.millis}" th:text="${task.end}"></td>
+                <td th:text="|${task.responseCount} / ${task.requestCount}|"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</th:block>
+</body>
+</html>

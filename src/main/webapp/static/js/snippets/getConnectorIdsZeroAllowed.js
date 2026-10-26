@@ -4,14 +4,15 @@ $(document).ready(function() {
 
     $("#chargePointSelectList").change(function() {
         var cp = $(this).find("option:selected").text();
-        $.getJSON(ctxPath + "manager/ajax/" + cp + "/connectorIds", function(data) {
-            var options = "<option value='0'>Not for a specific connector</option>";
-            $.each(data, function() {
-                options += "<option value='" + this + "'>" + this + "</option>";
-            });
+        $.getJSON(ctxPath + "manager/ajax/" + encodeURIComponent(cp) + "/connectorIds", function(data) {
             var select = $("#connectorId");
+            select.empty();
+            select.append($("<option>").val("0").text("Not for a specific connector"));
+            // build options via DOM, so that values are never interpreted as markup
+            $.each(data, function(index, value) {
+                select.append($("<option>").val(value).text(value));
+            });
             select.prop("disabled", false);
-            select.html(options);
         });
     });
 });

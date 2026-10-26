@@ -1,0 +1,34 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/*
+    Link to an external URL that comes from data (user input, DB, remote API).
+
+    Escaping alone does not make such a URL safe: a value like "javascript:..." stays executable in an href.
+    Therefore, the link is rendered only for http(s) URLs. Otherwise, nothing is rendered.
+
+    url  : the URL to link to (may be null)
+    label: the link text
+*/-->
+<th:block th:fragment="safeLink(url, label)"
+          th:with="trimmedUrl=${url == null ? null : #strings.trim(url)},
+                   lowerUrl=${trimmedUrl == null ? '' : #strings.toLowerCase(trimmedUrl)}">
+    <a th:if="${#strings.startsWith(lowerUrl, 'http://') or #strings.startsWith(lowerUrl, 'https://')}"
+       target="_blank" rel="noopener noreferrer" th:href="${trimmedUrl}" th:text="${label}"></a>
+</th:block>

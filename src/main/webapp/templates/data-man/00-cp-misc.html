@@ -25,7 +25,7 @@
         <td>Admin Address:</td>
         <td>
             <input type="text" th:field="*{adminAddress}"/>
-            <a target="_blank" th:if="${not #strings.isEmpty(cp?.chargeBox?.adminAddress)}" th:href="${cp.chargeBox.adminAddress}">Go</a>
+            <th:block th:replace="~{00-safe-link :: safeLink(${cp?.chargeBox?.adminAddress}, 'Go')}" />
         </td>
     </tr>
 

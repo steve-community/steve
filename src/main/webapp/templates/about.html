@@ -24,8 +24,8 @@
 <div class="content">
 <section><span>About SteVe</span></section>
     <div class="info" th:if="${releaseReport?.moreRecent}">A new version (<th:block th:text="${releaseReport.githubVersion}" />) is available!
-        <a target="_blank" th:href="${releaseReport.htmlUrl}">Release Info</a> -
-        <a target="_blank" th:href="${releaseReport.downloadUrl}">Download</a>
+        <th:block th:replace="~{00-safe-link :: safeLink(${releaseReport.htmlUrl}, 'Release Info')}" /> -
+        <th:block th:replace="~{00-safe-link :: safeLink(${releaseReport.downloadUrl}, 'Download')}" />
     </div>
 <table class="userInputFullPage">
     <tr><td>Version:</td><td th:text="${version}"></td></tr>

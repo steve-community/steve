@@ -72,7 +72,7 @@ public class ReservationQueryForm extends QueryForm {
         return !CollectionUtils.isEmpty(transactionId);
     }
 
-    @AssertTrue(message = "The values 'From' and 'To' must be both set")
+    @AssertTrue(message = "The values From and To must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }

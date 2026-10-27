@@ -40,7 +40,7 @@ public class QueryPeriodFromToFilter {
     private DateTime to;
 
     @Schema(hidden = true)
-    @AssertTrue(message = "'To' must be after 'From'")
+    @AssertTrue(message = "To must be after From")
     public boolean isFromToValid() {
         return !isFromToSet() || to.isAfter(from);
     }

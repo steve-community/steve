@@ -19,17 +19,18 @@
 */-->
 <!--/*
     Error box listing the validation errors of a form's model attribute.
+    Uses Thymeleaf's #fields helpers outside a form, see
+    https://www.thymeleaf.org/doc/tutorials/3.1/thymeleafspring.html#displaying-errors-outside-forms
 
-    beanName : name of the model attribute whose BindingResult should be checked
+    beanName : name of the model attribute whose errors should be shown (must be present in the model)
     message  : optional text shown above the error list
     elementId: optional id of the error div (used by JS in some pages)
 */-->
-<th:block th:fragment="bindErrors(beanName, message, elementId)"
-          th:with="bindingResult=${#ctx.getVariable('org.springframework.validation.BindingResult.' + beanName)}">
-    <div class="error" th:id="${elementId}" th:if="${bindingResult != null and bindingResult.hasErrors()}">
+<th:block th:fragment="bindErrors(beanName, message, elementId)">
+    <div class="error" th:id="${elementId}" th:if="${#fields.hasErrors('${__${beanName}__.*}')}">
         <th:block th:if="${message != null}" th:text="${message}" />
         <ul>
-            <li th:each="error : ${bindingResult.allErrors}" th:text="${error.defaultMessage}"></li>
+            <li th:each="error : ${#fields.errors('${__${beanName}__.*}')}" th:text="${error}"></li>
         </ul>
     </div>
 </th:block>

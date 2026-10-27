@@ -105,7 +105,7 @@ public class ChargingProfileForm {
         return true;
     }
 
-    @AssertTrue(message = "Valid From/To should not be used with the profile purpose 'TxProfile'")
+    @AssertTrue(message = "Valid From/To should not be used with the profile purpose TxProfile")
     public boolean isFromToAndProfileSettingCorrect() {
         boolean isTxProfile = (chargingProfilePurpose == ChargingProfilePurposeType.TX_PROFILE);
 

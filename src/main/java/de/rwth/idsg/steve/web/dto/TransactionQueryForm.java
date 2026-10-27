@@ -56,7 +56,7 @@ public class TransactionQueryForm extends QueryForm {
     private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @Schema(hidden = true)
-    @AssertTrue(message = "The values 'From' and 'To' must be both set")
+    @AssertTrue(message = "The values From and To must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }

@@ -66,8 +66,7 @@ public class SecurityConfiguration {
                         "/", // we have RootRedirectController to redirect "/" to "/manager"
                         "/static/**",
                         SteveProperties.CXF_MAPPING + "/**",
-                        WebSocketConfiguration.PATH_INFIX + "**",
-                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                        WebSocketConfiguration.PATH_INFIX + "**"
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )

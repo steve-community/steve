@@ -76,7 +76,7 @@ public class SettingsForm {
         @Min(value = 1, message = "Port must be positive")
         private Integer port;
 
-        @Email(message = "'From' field is not a valid e-mail address")
+        @Email(message = "From field is not a valid e-mail address")
         private String from;
 
         private String username;

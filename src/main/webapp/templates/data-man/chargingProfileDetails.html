@@ -1,0 +1,54 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/schedulePeriodsTable.js}"></script>
+<th:block th:replace="~{00-op-bind-errors :: bindErrors('form', 'Error while trying to update a charging profile:', null)}" />
+<div class="content">
+    <div>
+        <section><span>Charging Profile Details</span></section>
+
+        <table class="userInput">
+            <thead><tr><th>Related Data Pages</th><th></th></tr></thead>
+            <tbody>
+            <tr>
+                <td>Stations using this profile:</td>
+                <td>
+                    <a th:href="@{/manager/chargingProfiles/assignments(chargingProfilePk=${form.chargingProfilePk})}">ALL</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <form th:action="@{/manager/chargingProfiles/update}" method="post" th:object="${form}">
+
+            <input type="hidden" th:field="*{chargingProfilePk}" readonly="readonly"/>
+
+            <th:block th:replace="~{data-man/00-charging-profile :: chargingProfile('update', 'Update')}" />
+
+        </form>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

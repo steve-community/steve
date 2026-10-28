@@ -1,0 +1,81 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content"><div>
+    <section><span>Charging Profile Assignments</span></section>
+
+    <form th:action="@{/manager/chargingProfiles/assignments}" method="get" th:object="${params}">
+        <table class="userInput">
+            <tr>
+                <td>ChargeBox ID:</td>
+                <td><select th:field="*{chargeBoxId}">
+                    <option value="" selected>All</option>
+                    <option th:each="it : ${cpList}" th:value="${it}" th:text="${it}"></option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Charging Profile ID:</td>
+                <td><select th:field="*{chargingProfilePk}">
+                    <option value="" selected>All</option>
+                    <option th:each="it : ${profileList}" th:value="${it.chargingProfilePk}" th:text="${it.itemDescription}"></option>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Charging Profile Description:</td>
+                <td><input type="text" th:field="*{chargingProfileDescription}"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+
+    <table class="res" id="chargingProfileAssignmentTable">
+        <thead>
+        <tr>
+            <th data-sort="string">ChargeBox ID</th>
+            <th data-sort="int">Connector ID</th>
+            <th data-sort="int">Charging Profile ID</th>
+            <th data-sort="string">Charging Profile Description</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="a : ${assignments}">
+                <td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${a.chargeBoxPk})}" th:text="${a.chargeBoxId}"></a></td>
+                <td th:text="${a.connectorId}"></td>
+                <td><a th:href="@{/manager/chargingProfiles/details/{pk}(pk=${a.chargingProfilePk})}" th:text="${a.chargingProfilePk}"></a></td>
+                <td th:text="${a.chargingProfileDescription}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div></div>
+</th:block>
+</body>
+</html>

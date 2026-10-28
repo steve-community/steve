@@ -1,0 +1,87 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content"><div th:with="tx=${details.transaction}">
+    <center>
+        <table id="details" class="cpd">
+            <thead><tr><th>Transaction Overview</th><th></th></tr></thead>
+            <tr><td>Transaction ID</td><td th:text="${tx.id}"></td></tr>
+            <tr><td>ChargeBox ID</td><td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${tx.chargeBoxPk})}" th:text="${tx.chargeBoxId}"></a></td></tr>
+            <tr><td>Connector ID</td><td th:text="${tx.connectorId}"></td></tr>
+            <tr><td>OCPP ID Tag</td><td><a th:href="@{/manager/ocppTags/details/{pk}(pk=${tx.ocppTagPk})}" th:text="${tx.ocppIdTag}"></a></td></tr>
+            <tr><td>User ID</td><td><a th:href="@{/manager/users/details/{pk}(pk=${tx.userId})}" th:text="${tx.userId}"></a></td></tr>
+            <tr><td>Start Date/Time</td><td th:text="${tx.startTimestamp}"></td></tr>
+            <tr><td>Start Value</td><td th:text="${tx.startValue}"></td></tr>
+            <tr><td>Stop Date/Time</td><td th:text="${tx.stopTimestamp}"></td></tr>
+            <tr><td>Stop Value</td><td th:text="${tx.stopValue}"></td></tr>
+            <tr><td>Stop Reason</td><td th:text="${tx.stopReason}"></td></tr>
+            <tr><td>Stop Event Actor</td><td th:text="${tx.stopEventActor}"></td></tr>
+        </table>
+    </center>
+    <br>
+    <section><span>Intermediate Meter Values</span></section>
+    <div style="text-align: center;">
+        <form th:action="@{/manager/transactions/details/{id}(id=${tx.id})}" method="get" style="display: inline-block;">
+            <select name="energyValuesOnly" style="width: 180px;">
+                <option value="true" th:selected="${energyValuesOnly}">Energy values only</option>
+                <option value="false" th:selected="${not energyValuesOnly}">All meter values</option>
+            </select>
+            <input type="submit" value="Apply">
+        </form>
+        <form th:action="@{/manager/transactions/details/{id}/meterValues.csv(id=${tx.id})}" method="get" style="display: inline-block;">
+            <input type="hidden" name="energyValuesOnly" th:value="${energyValuesOnly}">
+            <input type="submit" value="Download CSV">
+        </form>
+    </div>
+    <br>
+    <table class="res">
+        <thead>
+        <tr>
+            <th data-sort="date">Value Timestamp</th>
+            <th data-sort="int">Value</th>
+            <th>Reading Context</th>
+            <th>Format</th>
+            <th>Measurand</th>
+            <th>Location</th>
+            <th>Unit</th>
+            <th>Phase</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="v : ${details.values}">
+                <td th:data-sort-value="${v.valueTimestamp?.millis}" th:text="${v.valueTimestamp}"></td>
+                <td th:text="${v.value}"></td>
+                <td th:text="${v.readingContext}"></td>
+                <td th:text="${v.format}"></td>
+                <td th:text="${v.measurand}"></td>
+                <td th:text="${v.location}"></td>
+                <td th:text="${v.unit}"></td>
+                <td th:text="${v.phase}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div></div>
+</th:block>
+</body>
+</html>

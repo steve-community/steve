@@ -1,0 +1,48 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Form of the SignedUpdateFirmware operation, shared by all OCPP versions that support it. Must be used where "params" and "opVersion" are in the model. */-->
+<form th:fragment="form" th:action="@{/manager/operations/{v}/SignedUpdateFirmware(v=${opVersion})}" method="post" th:object="${params}">
+    <section><span th:text="|Charge Points with OCPP ${opVersion}|"></span></section>
+    <th:block th:replace="~{00-cp-multiple :: cpMultiple}" />
+    <section><span>Parameters</span></section>
+    <div class="info"><b>Info:</b>
+    Once this operation is triggered at a station, it will send status notifications about the progress and result.
+    You can view them <a th:href="@{/manager/events/status(eventType='FirmwareUpdate')}">here</a>.
+    </div>
+    <table class="userInput">
+        <tr><td>Request ID:</td><td><i>Will be set automatically</i></td></tr>
+        <tr><td>Location (directory URI):</td><td><input type="text" th:field="*{location}" /></td></tr>
+        <tr><td>Retries (integer):</td><td><input type="text" th:field="*{retries}" placeholder="optional" /></td></tr>
+        <tr><td>Retry Interval (integer):</td><td><input type="text" th:field="*{retryInterval}" placeholder="optional" /></td></tr>
+        <tr><td>Retrieve Date/Time:</td>
+            <td>
+                <input type="text" th:field="*{retrieveDateTime}" class="dateTimePicker"/>
+            </td>
+        </tr>
+        <tr><td>Install Date/Time:</td>
+            <td>
+                <input type="text" th:field="*{installDateTime}" class="dateTimePicker" placeholder="optional"/>
+            </td>
+        </tr>
+        <tr><td>Signature (Base64 encoded):</td><td><textarea th:field="*{signature}"></textarea></td></tr>
+        <tr><td>Signing Certificate (PEM encoded, X.509):</td><td><textarea th:field="*{signingCertificate}"></textarea></td></tr>
+        <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
+    </table>
+</form>

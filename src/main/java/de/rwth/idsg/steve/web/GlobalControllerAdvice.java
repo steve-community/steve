@@ -65,6 +65,8 @@ public class GlobalControllerAdvice {
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("exception", exception);
+        // Thymeleaf forbids member access on JDK types (e.g. exception.cause) in expressions
+        mav.addObject("exceptionCause", exception.getCause());
         mav.setViewName("00-error");
         return mav;
     }

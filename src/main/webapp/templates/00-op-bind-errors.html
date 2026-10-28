@@ -1,0 +1,40 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/*
+    Error box listing the validation errors of a form's model attribute.
+    Uses Thymeleaf's #fields helpers outside a form, see
+    https://www.thymeleaf.org/doc/tutorials/3.1/thymeleafspring.html#displaying-errors-outside-forms
+
+    beanName : name of the model attribute whose errors should be shown (must be present in the model)
+    message  : optional text shown above the error list
+    elementId: optional id of the error div (used by JS in some pages)
+*/-->
+<th:block th:fragment="bindErrors(beanName, message, elementId)">
+    <div class="error" th:id="${elementId}" th:if="${#fields.hasErrors('${__${beanName}__.*}')}">
+        <th:block th:if="${message != null}" th:text="${message}" />
+        <ul>
+            <li th:each="error : ${#fields.errors('${__${beanName}__.*}')}" th:text="${error}"></li>
+        </ul>
+    </div>
+</th:block>
+
+<th:block th:fragment="opBindErrors">
+    <th:block th:replace="~{00-op-bind-errors :: bindErrors('params', null, null)}" />
+</th:block>

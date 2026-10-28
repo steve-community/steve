@@ -1,0 +1,149 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#unknown").click(function () {
+            $("#unknownTable, #overview").slideToggle(250);
+        });
+    });
+</script>
+<div class="content">
+    <div>
+    <section><span id="unknown" style="cursor: pointer">
+    Unknown Charge Points
+    <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+        <span>A list of charge points that attempted to connect and send a boot notification but were not present in database.</span>
+    </a>
+    </span></section>
+    <div id="unknownTable" style="display: none">
+        <table class="res add-margin-bottom">
+            <thead>
+            <tr>
+                <th data-sort="string">ChargeBox ID</th>
+                <th data-sort="int"># of Attempts</th>
+                <th data-sort="date">Last Attempt</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${unknownList}">
+                    <td th:text="${item.key}"></td>
+                    <td th:text="${item.numberOfAttempts}"></td>
+                    <td th:data-sort-value="${item.lastAttemptTimestamp?.millis}" th:text="${item.lastAttemptTimestamp}"></td>
+                    <td>
+                        <form class="inline" th:action="@{/manager/chargepoints/unknown/add/{id}/(id=${item.key})}" method="post">
+                            <input type="submit" class="blueSubmit" value="Add"/>
+                        </form>
+                        &nbsp;
+                        <form class="inline" th:action="@{/manager/chargepoints/unknown/remove/{id}/(id=${item.key})}" method="post">
+                            <input type="submit" class="redSubmit" value="Forget"/>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <section><span>
+    Charge Point Overview
+    <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+        <span>Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</span>
+    </a>
+    </span></section>
+    <div id="overview">
+        <form th:action="@{/manager/chargepoints/query}" method="get" th:object="${params}">
+            <table class="userInput">
+                <tr>
+                    <td>ChargeBox PK:</td>
+                    <td><input type="text" th:field="*{chargeBoxPk}"/></td>
+                </tr>
+                <tr>
+                    <td>ChargeBox ID:</td>
+                    <td><input type="text" th:field="*{chargeBoxId}"/></td>
+                </tr>
+                <tr>
+                    <td>Description:</td>
+                    <td><input type="text" th:field="*{description}"/></td>
+                </tr>
+                <tr>
+                    <td>Ocpp Version:</td>
+                    <td><select th:field="*{ocppVersion}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${T(de.rwth.idsg.steve.ocpp.OcppVersion).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Heartbeat Period:</td>
+                    <td><select th:field="*{heartbeatPeriod}">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.ChargePointQueryForm$QueryPeriodType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Note:</td>
+                    <td><input type="text" th:field="*{note}"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td id="add_space">
+                        <input type="submit" value="Get">
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <br>
+        <table class="res action">
+            <thead>
+            <tr>
+                <th data-sort="string">ChargeBox ID</th>
+                <th data-sort="string">Description</th>
+                <th data-sort="string">OCPP Protocol</th>
+                <th data-sort="date">Last Heartbeat</th>
+                <th>
+                    <form th:action="@{/manager/chargepoints/add}" method="get">
+                        <input type="submit" class="blueSubmit" value="Add New">
+                    </form>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="cp : ${cpList}"><td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${cp.chargeBoxPk})}" th:text="${cp.chargeBoxId}"></a></td>
+                    <td th:text="${cp.description}"></td>
+                    <td th:text="${cp.ocppProtocol}"></td>
+                    <td th:data-sort-value="${cp.lastHeartbeatTimestampDT?.millis}" th:text="${cp.lastHeartbeatTimestamp}"></td>
+                    <td>
+                        <form th:action="@{/manager/chargepoints/delete/{pk}(pk=${cp.chargeBoxPk})}" method="post">
+                            <input type="submit" class="redSubmit" value="Delete">
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div></div>
+</th:block>
+</body>
+</html>

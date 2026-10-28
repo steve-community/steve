@@ -1,0 +1,85 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{00-layout :: layout(~{::pageContent})}">
+<body>
+<th:block th:fragment="pageContent">
+<th:block th:replace="~{00-op-bind-errors :: opBindErrors}" />
+<script type="text/javascript" th:src="@{/static/js/snippets/dateTimePicker-past.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/periodTypeSelect.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/snippets/sortable.js}"></script>
+<div class="content">
+    <section><span>Security Events</span></section>
+    <form th:action="@{/manager/events/security}" method="get" th:object="${params}">
+        <table class="userInput">
+            <tr>
+                <td>ChargeBox ID:</td>
+                <td><select th:field="*{chargeBoxId}">
+                        <option value="" selected>All</option>
+                        <option th:each="it : ${cpList}" th:value="${it}" th:text="${it}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><i>Timestamp</i> Filter:</td>
+                <td><select th:field="*{periodType}" id="periodTypeSelect">
+                        <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.QueryPeriodType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><input type="text" th:field="*{from}" id="intervalPeriodTypeFrom" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td>To:</td>
+                <td><input type="text" th:field="*{to}" id="intervalPeriodTypeTo" class="dateTimePicker"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+    <table class="res">
+        <thead>
+        <tr>
+            <th data-sort="string">ChargeBox ID</th>
+            <th data-sort="string">Type</th>
+            <th data-sort="string">Technical Info</th>
+            <th data-sort="date">Timestamp</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${event.chargeBoxPk})}" th:text="${event.chargeBoxId}"></a></td>
+                <td th:text="${event.type}"></td>
+                <td th:text="${event.techInfo}"></td>
+                <td th:data-sort-value="${event.timestamp?.millis}" th:text="${event.timestamp}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</th:block>
+</body>
+</html>

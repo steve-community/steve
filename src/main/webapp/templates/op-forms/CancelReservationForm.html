@@ -1,0 +1,29 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* Form of the CancelReservation operation, shared by all OCPP versions that support it. Must be used where "params" and "opVersion" are in the model. */-->
+<form th:fragment="form" th:action="@{/manager/operations/{v}/CancelReservation(v=${opVersion})}" method="post" th:object="${params}">
+    <section><span th:text="|Charge Points with OCPP ${opVersion}|"></span></section>
+    <th:block th:replace="~{00-cp-single :: cpSingle}" />
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+        <tr><td>ID of the Existing Reservation:</td><td><select th:field="*{reservationId}" disabled="disabled"></select></td></tr>
+        <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
+    </table>
+</form>

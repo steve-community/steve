@@ -104,7 +104,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-        ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
+        ocppServerRepository.updateChargeboxPong(getChargeBoxId(session), DateTime.now());
     }
 
     private void handleBinaryMessage(WebSocketSession session) {

@@ -124,6 +124,17 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
+    public void updateChargeboxPong() {
+        DateTime ts = DateTime.now();
+        assertNoDatabaseException(() -> repository.updateChargeboxPong(KNOWN_CHARGE_BOX_ID, ts));
+        DateTime stored = dslContext.select(CHARGE_BOX.LAST_PONG_TIMESTAMP)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
+            .fetchOne(CHARGE_BOX.LAST_PONG_TIMESTAMP);
+        Assertions.assertNotNull(stored);
+    }
+
+    @Test
     public void insertConnectorStatus() {
         assertNoDatabaseException(() -> repository.insertConnectorStatus(connectorStatusParams()));
         Integer count = dslContext.selectCount()

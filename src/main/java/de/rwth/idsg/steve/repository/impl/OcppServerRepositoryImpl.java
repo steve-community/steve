@@ -140,6 +140,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
+    public void updateChargeboxPong(@NotNull String chargeBoxIdentity, @NotNull DateTime ts) {
+        ctx.update(CHARGE_BOX)
+           .set(CHARGE_BOX.LAST_PONG_TIMESTAMP, ts)
+           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
+           .execute();
+    }
+
+    @Override
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);

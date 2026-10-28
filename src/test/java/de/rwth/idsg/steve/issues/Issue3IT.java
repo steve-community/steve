@@ -44,8 +44,9 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
  * the idle timeout of most managed reverse proxies. It is now {@code steve.ocpp.ws-ping-interval}.
  *
  * <p>This is the wire-level statement of what the property is for: a station that sends no OCPP message
- * at all still exchanges ping/pong, and only a ping can move its last heartbeat here — nothing else in
- * this test talks to the server after the upgrade.
+ * at all still exchanges ping/pong, and only a ping can move its last pong here — nothing else in
+ * this test talks to the server after the upgrade. A pong is not an OCPP message, so the last heartbeat
+ * must stay untouched.
  *
  * @see <a href="https://github.com/steve-community/steve/issues/3">Issue 3</a>
  */
@@ -83,14 +84,12 @@ public class Issue3IT {
 
         OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, chargeBoxId, jsonPath()).start();
         try {
-            Assertions.assertNull(lastHeartbeat(chargeBoxId), "precondition: the station never reported yet");
+            Assertions.assertNull(lastPong(chargeBoxId), "precondition: the station never answered a ping yet");
 
-            DateTime heartbeat = awaitHeartbeat(chargeBoxId);
+            DateTime pong = awaitPong(chargeBoxId);
 
-            Assertions.assertNotNull(
-                heartbeat,
-                "an idle session should have been pinged, and the pong should have moved the heartbeat"
-            );
+            Assertions.assertNotNull(pong, "an idle session should have been pinged, and the pong recorded");
+            Assertions.assertNull(lastHeartbeat(chargeBoxId), "a pong should not move the last heartbeat");
         } finally {
             chargePoint.close();
         }
@@ -100,17 +99,24 @@ public class Issue3IT {
      * The pong is handled asynchronously, so we poll instead of sleeping for a fixed multiple of the
      * interval.
      */
-    private DateTime awaitHeartbeat(String chargeBoxId) throws InterruptedException {
+    private DateTime awaitPong(String chargeBoxId) throws InterruptedException {
         long deadline = System.currentTimeMillis() + TIMEOUT_IN_MILLIS;
 
         while (System.currentTimeMillis() < deadline) {
-            DateTime heartbeat = lastHeartbeat(chargeBoxId);
-            if (heartbeat != null) {
-                return heartbeat;
+            DateTime pong = lastPong(chargeBoxId);
+            if (pong != null) {
+                return pong;
             }
             Thread.sleep(250);
         }
         return null;
+    }
+
+    private DateTime lastPong(String chargeBoxId) {
+        return dslContext.select(CHARGE_BOX.LAST_PONG_TIMESTAMP)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+            .fetchOne(CHARGE_BOX.LAST_PONG_TIMESTAMP);
     }
 
     private DateTime lastHeartbeat(String chargeBoxId) {

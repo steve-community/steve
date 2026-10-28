@@ -43,6 +43,7 @@ public interface OcppServerRepository {
     void updateChargeboxFirmwareStatus(@NotNull String chargeBoxId, @NotNull String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxId, @NotNull String status);
     void updateChargeboxHeartbeat(@NotNull String chargeBoxId, @NotNull DateTime ts);
+    void updateChargeboxPong(@NotNull String chargeBoxId, @NotNull DateTime ts);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 

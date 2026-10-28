@@ -16,10 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws.custom;
+package de.rwth.idsg.steve.ocpp.ws;
 
 import tools.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import lombok.Data;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.08.2022
  */
-public class CustomStringModuleTest {
+public class JsonObjectMapperStringTest {
 
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 

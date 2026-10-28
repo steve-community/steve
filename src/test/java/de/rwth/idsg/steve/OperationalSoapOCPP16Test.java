@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import de.rwth.idsg.steve.service.ChargeBoxActivityService;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +96,9 @@ public class OperationalSoapOCPP16Test {
     @Autowired
     private DSLContext dslContext;
 
+    @Autowired
+    private ChargeBoxActivityService chargeBoxActivityService;
+
     private __DatabasePreparer__ databasePreparer;
     private String path;
 
@@ -115,15 +119,17 @@ public class OperationalSoapOCPP16Test {
         Assertions.assertFalse(steveProperties.getOcpp().isAutoRegisterUnknownStations());
 
         CentralSystemService client = getForOcpp16(path);
+        String unknownChargeBoxId = getRandomString();
 
         BootNotificationResponse boot = client.bootNotification(
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
-                getRandomString());
+                unknownChargeBoxId);
 
         Assertions.assertNotNull(boot);
         Assertions.assertNotEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        Assertions.assertNull(chargeBoxActivityService.getActivity(unknownChargeBoxId));
     }
 
     /**
@@ -163,7 +169,7 @@ public class OperationalSoapOCPP16Test {
     @Test
     public void testRegisteredIdTag() {
         CentralSystemService client = getForOcpp16(path);
-        Assertions.assertNull(lastOcppMessageTimestamp());
+        DateTime before = DateTime.now();
 
         AuthorizeResponse auth = client.authorize(
                 new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
@@ -171,7 +177,8 @@ public class OperationalSoapOCPP16Test {
 
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
-        Assertions.assertNotNull(lastOcppMessageTimestamp());
+        DateTime lastOcppMessage = chargeBoxActivityService.getActivity(REGISTERED_CHARGE_BOX_ID).lastOcppMessage();
+        Assertions.assertFalse(lastOcppMessage.isBefore(before));
     }
 
     @Test
@@ -660,9 +667,5 @@ public class OperationalSoapOCPP16Test {
      */
     private static DateTime nowWithoutMillis() {
         return DateTime.now().withMillisOfSecond(0);
-    }
-
-    private DateTime lastOcppMessageTimestamp() {
-        return databasePreparer.getCBDetails(REGISTERED_CHARGE_BOX_ID).getChargeBox().getLastOcppMessageTimestamp();
     }
 }

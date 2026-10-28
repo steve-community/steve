@@ -28,7 +28,6 @@ import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,8 +44,11 @@ public interface OcppServerRepository {
     void updateEndpointAddress(@NotNull String chargeBoxId, @NotNull String endpointAddress);
     void updateChargeboxFirmwareStatus(@NotNull String chargeBoxId, @NotNull String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxId, @NotNull String status);
-    void updateChargeboxLastOcppMessage(@NotNull String chargeBoxId, @NotNull DateTime ts);
-    void updateChargeboxPong(@NotNull String chargeBoxId, @NotNull DateTime ts);
+
+    /**
+     * Saves the non-null timestamps, in one batch, without ever moving a stored timestamp backwards.
+     */
+    void updateChargeboxActivity(Map<String, ChargeBoxActivity> activityByChargeBoxId);
     Map<String, ChargeBoxActivity> getChargeboxActivity(Collection<String> chargeBoxIds);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);

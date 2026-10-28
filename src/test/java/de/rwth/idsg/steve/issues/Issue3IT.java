@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.issues;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
+import de.rwth.idsg.steve.service.ChargeBoxActivityService;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
@@ -46,7 +49,7 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
  * <p>This is the wire-level statement of what the property is for: a station that sends no OCPP message
  * at all still exchanges ping/pong, and only a ping can move its last pong here — nothing else in
  * this test talks to the server after the upgrade. A pong is not an OCPP message, so the time of the last
- * OCPP message must stay untouched.
+ * OCPP message must stay untouched. Both are kept in memory, and saved periodically.
  *
  * @see <a href="https://github.com/steve-community/steve/issues/3">Issue 3</a>
  */
@@ -54,7 +57,7 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(
     webEnvironment = WebEnvironment.RANDOM_PORT,
-    properties = "steve.ocpp.ws-ping-interval=1s"
+    properties = {"steve.ocpp.ws-ping-interval=1s", "steve.ocpp.activity-save-interval=1s"}
 )
 public class Issue3IT {
 
@@ -62,6 +65,9 @@ public class Issue3IT {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private ChargeBoxActivityService chargeBoxActivityService;
 
     @Autowired
     private ServerProperties serverProperties;
@@ -84,42 +90,57 @@ public class Issue3IT {
 
         OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, chargeBoxId, jsonPath()).start();
         try {
-            Assertions.assertNull(lastPong(chargeBoxId), "precondition: the station never answered a ping yet");
+            Assertions.assertNull(
+                chargeBoxActivityService.getActivity(chargeBoxId),
+                "precondition: nothing received yet"
+            );
 
-            DateTime pong = awaitPong(chargeBoxId);
+            Assertions.assertNotNull(
+                await(this::lastPongInMemory),
+                "an idle session should have been pinged, and the pong recorded"
+            );
+            Assertions.assertNull(
+                chargeBoxActivityService.getActivity(chargeBoxId).lastOcppMessage(),
+                "a pong should not move the last OCPP message"
+            );
 
-            Assertions.assertNotNull(pong, "an idle session should have been pinged, and the pong recorded");
-            Assertions.assertNull(lastOcppMessage(chargeBoxId), "a pong should not move the last OCPP message");
+            Assertions.assertNotNull(await(this::lastPongInDatabase), "the last pong should have been saved");
+            Assertions.assertNull(lastOcppMessageInDatabase(), "a pong should not move the last OCPP message");
         } finally {
             chargePoint.close();
         }
     }
 
     /**
-     * The pong is handled asynchronously, so we poll instead of sleeping for a fixed multiple of the
-     * interval.
+     * The pong and the periodic save are handled asynchronously, so we poll instead of sleeping for a fixed
+     * multiple of the interval.
      */
-    private DateTime awaitPong(String chargeBoxId) throws InterruptedException {
+    private DateTime await(Supplier<DateTime> timestamp) throws InterruptedException {
         long deadline = System.currentTimeMillis() + TIMEOUT_IN_MILLIS;
 
         while (System.currentTimeMillis() < deadline) {
-            DateTime pong = lastPong(chargeBoxId);
-            if (pong != null) {
-                return pong;
+            DateTime value = timestamp.get();
+            if (value != null) {
+                return value;
             }
             Thread.sleep(250);
         }
         return null;
     }
 
-    private DateTime lastPong(String chargeBoxId) {
+    private DateTime lastPongInMemory() {
+        ChargeBoxActivity activity = chargeBoxActivityService.getActivity(chargeBoxId);
+        return activity == null ? null : activity.lastPong();
+    }
+
+    private DateTime lastPongInDatabase() {
         return dslContext.select(CHARGE_BOX.LAST_PONG_TIMESTAMP)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
             .fetchOne(CHARGE_BOX.LAST_PONG_TIMESTAMP);
     }
 
-    private DateTime lastOcppMessage(String chargeBoxId) {
+    private DateTime lastOcppMessageInDatabase() {
         return dslContext.select(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))

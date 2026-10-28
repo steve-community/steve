@@ -43,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
@@ -95,7 +96,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .set(CHARGE_BOX.IMSI, p.getImsi())
            .set(CHARGE_BOX.METER_TYPE, p.getMeterType())
            .set(CHARGE_BOX.METER_SERIAL_NUMBER, p.getMeterSerial())
-           .set(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, p.getLastOcppMessageTimestamp())
+           .set(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP,
+                latest(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, p.getLastOcppMessageTimestamp()))
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
            .execute();
     }
@@ -135,19 +137,24 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxLastOcppMessage(@NotNull String chargeBoxIdentity, @NotNull DateTime ts) {
-        ctx.update(CHARGE_BOX)
-           .set(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, ts)
-           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
-           .execute();
-    }
+    public void updateChargeboxActivity(Map<String, ChargeBoxActivity> activityByChargeBoxId) {
+        if (activityByChargeBoxId.isEmpty()) {
+            return;
+        }
 
-    @Override
-    public void updateChargeboxPong(@NotNull String chargeBoxIdentity, @NotNull DateTime ts) {
-        ctx.update(CHARGE_BOX)
-           .set(CHARGE_BOX.LAST_PONG_TIMESTAMP, ts)
-           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
-           .execute();
+        var updates = activityByChargeBoxId.entrySet().stream()
+            .map(entry -> {
+                var activity = entry.getValue();
+                return ctx.update(CHARGE_BOX)
+                          .set(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP,
+                               latest(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, activity.lastOcppMessage()))
+                          .set(CHARGE_BOX.LAST_PONG_TIMESTAMP,
+                               latest(CHARGE_BOX.LAST_PONG_TIMESTAMP, activity.lastPong()))
+                          .where(CHARGE_BOX.CHARGE_BOX_ID.equal(entry.getKey()));
+            })
+            .toList();
+
+        ctx.batch(updates).execute();
     }
 
     @Override
@@ -158,6 +165,18 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIds))
                   .fetchMap(CHARGE_BOX.CHARGE_BOX_ID, r -> new ChargeBoxActivity(r.value2(), r.value3()));
+    }
+
+    /**
+     * The later of the stored and the given timestamp, so that a save never moves the column backwards. Keeps the
+     * stored one when none is given.
+     */
+    private static Field<DateTime> latest(Field<DateTime> column, @Nullable DateTime ts) {
+        if (ts == null) {
+            return column;
+        }
+        var value = DSL.val(ts, column);
+        return DSL.greatest(DSL.coalesce(column, value), value);
     }
 
     @Override

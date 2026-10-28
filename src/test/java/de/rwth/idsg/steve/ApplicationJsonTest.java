@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.ChargeBoxActivityService;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -70,6 +71,9 @@ public class ApplicationJsonTest {
 
     @Autowired
     private ChargePointService chargePointService;
+
+    @Autowired
+    private ChargeBoxActivityService chargeBoxActivityService;
 
     private __DatabasePreparer__ databasePreparer;
 
@@ -182,14 +186,16 @@ public class ApplicationJsonTest {
     }
 
     @Test
-    public void testOcppMessageUpdatesLastOcppMessageTimestamp() {
-        Assertions.assertNull(lastOcppMessageTimestamp());
+    public void testOcppMessageUpdatesLastOcppMessage() {
+        DateTime before = DateTime.now();
 
         OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
         chargePoint.send(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), AuthorizeResponse.class);
-        chargePoint.close();
 
-        Assertions.assertNotNull(lastOcppMessageTimestamp());
+        DateTime lastOcppMessage = chargeBoxActivityService.getActivity(REGISTERED_CHARGE_BOX_ID).lastOcppMessage();
+        Assertions.assertFalse(lastOcppMessage.isBefore(before));
+
+        chargePoint.close();
     }
 
     @Test
@@ -267,9 +273,5 @@ public class ApplicationJsonTest {
         Assertions.assertEquals(PropertyConstraintViolation, error.getErrorCode());
 
         chargePoint.close();
-    }
-
-    private DateTime lastOcppMessageTimestamp() {
-        return databasePreparer.getCBDetails(REGISTERED_CHARGE_BOX_ID).getChargeBox().getLastOcppMessageTimestamp();
     }
 }

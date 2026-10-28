@@ -22,9 +22,31 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 /**
- * When we last received an OCPP message and a WebSocket pong from a station. A null value means never received.
+ * When we last received an OCPP message and a WebSocket pong from a station. A null value means unknown: not
+ * received since SteVe started tracking the station in memory, or never received when read from the database.
  */
 public record ChargeBoxActivity(@Nullable DateTime lastOcppMessage, @Nullable DateTime lastPong) {
 
     public static final ChargeBoxActivity NONE = new ChargeBoxActivity(null, null);
+
+    public ChargeBoxActivity withLastOcppMessage(DateTime ts) {
+        return new ChargeBoxActivity(ts, lastPong);
+    }
+
+    public ChargeBoxActivity withLastPong(DateTime ts) {
+        return new ChargeBoxActivity(lastOcppMessage, ts);
+    }
+
+    /**
+     * This activity, with each unknown timestamp taken from the other one.
+     */
+    public ChargeBoxActivity withDefaultsFrom(@Nullable ChargeBoxActivity other) {
+        if (other == null) {
+            return this;
+        }
+        return new ChargeBoxActivity(
+            lastOcppMessage != null ? lastOcppMessage : other.lastOcppMessage,
+            lastPong != null ? lastPong : other.lastPong
+        );
+    }
 }

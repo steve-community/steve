@@ -29,7 +29,6 @@ import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
@@ -88,7 +87,7 @@ public class ChargePointService {
     private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
     private final PasswordEncoder passwordEncoder;
-    private final OcppServerRepository ocppServerRepository;
+    private final ChargeBoxActivityService chargeBoxActivityService;
 
     // SOAP-based charge points are stored in DB with an endpoint address.
     // But, for WebSocket-based charge points, the active sessions are stored in memory.
@@ -357,7 +356,7 @@ public class ChargePointService {
             .collect(Collectors.toList());
 
         var primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
-        var activityLookup = ocppServerRepository.getChargeboxActivity(connectedJsonChargeBoxIds);
+        var activityLookup = chargeBoxActivityService.getLatestActivity(connectedJsonChargeBoxIds);
 
         var now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();

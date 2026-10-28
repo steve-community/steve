@@ -29,6 +29,8 @@ import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -86,6 +88,7 @@ public class ChargePointService {
     private final GenericRepository genericRepository;
     private final SteveProperties steveProperties;
     private final PasswordEncoder passwordEncoder;
+    private final OcppServerRepository ocppServerRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address.
     // But, for WebSocket-based charge points, the active sessions are stored in memory.
@@ -354,13 +357,14 @@ public class ChargePointService {
             .collect(Collectors.toList());
 
         var primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(connectedJsonChargeBoxIds);
+        var activityLookup = ocppServerRepository.getChargeboxActivity(connectedJsonChargeBoxIds);
 
         var now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
-        appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
-        appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup);
-        appendList(ocpp16Map, returnList, now, OcppVersion.V_16, primaryKeyLookup);
+        appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup, activityLookup);
+        appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup, activityLookup);
+        appendList(ocpp16Map, returnList, now, OcppVersion.V_16, primaryKeyLookup, activityLookup);
         return returnList;
     }
 
@@ -422,11 +426,16 @@ public class ChargePointService {
     }
 
     private static void appendList(Map<String, Collection<SessionContext>> map, List<OcppJsonStatus> returnList,
-                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
+                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup,
+                                   Map<String, ChargeBoxActivity> activityLookup) {
 
         for (var entry : map.entrySet()) {
             var chargeBoxId = entry.getKey();
             var sessionContexts = entry.getValue();
+
+            var activity = activityLookup.getOrDefault(chargeBoxId, ChargeBoxActivity.NONE);
+            DateTime lastOcppMessage = activity.lastOcppMessage();
+            DateTime lastPong = activity.lastPong();
 
             for (var ctx : sessionContexts) {
                 DateTime openSince = ctx.getOpenSince();
@@ -444,6 +453,10 @@ public class ChargePointService {
                     .connectedSinceDT(openSince)
                     .connectedSince(DateTimeUtils.humanize(openSince))
                     .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
+                    .lastOcppMessageDT(lastOcppMessage)
+                    .lastOcppMessage(DateTimeUtils.humanize(lastOcppMessage))
+                    .lastPongDT(lastPong)
+                    .lastPong(DateTimeUtils.humanize(lastPong))
                     .version(version)
                     .build();
 

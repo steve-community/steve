@@ -113,13 +113,13 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
-    public void updateChargeboxHeartbeat() {
+    public void updateChargeboxLastOcppMessage() {
         DateTime ts = DateTime.now();
-        assertNoDatabaseException(() -> repository.updateChargeboxHeartbeat(KNOWN_CHARGE_BOX_ID, ts));
-        DateTime stored = dslContext.select(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
+        assertNoDatabaseException(() -> repository.updateChargeboxLastOcppMessage(KNOWN_CHARGE_BOX_ID, ts));
+        DateTime stored = dslContext.select(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .fetchOne(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP);
+            .fetchOne(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP);
         Assertions.assertNotNull(stored);
     }
 
@@ -132,6 +132,18 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
             .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
             .fetchOne(CHARGE_BOX.LAST_PONG_TIMESTAMP);
         Assertions.assertNotNull(stored);
+    }
+
+    @Test
+    public void getChargeboxActivity() {
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+        repository.updateChargeboxLastOcppMessage(KNOWN_CHARGE_BOX_ID, ts);
+
+        var activity = repository.getChargeboxActivity(List.of(KNOWN_CHARGE_BOX_ID, "unknown"));
+
+        Assertions.assertEquals(1, activity.size());
+        Assertions.assertEquals(ts.getMillis(), activity.get(KNOWN_CHARGE_BOX_ID).lastOcppMessage().getMillis());
+        Assertions.assertNull(activity.get(KNOWN_CHARGE_BOX_ID).lastPong());
     }
 
     @Test
@@ -287,7 +299,7 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
         return UpdateChargeboxParams.builder()
             .chargeBoxId(KNOWN_CHARGE_BOX_ID)
             .ocppProtocol(OcppProtocol.V_16_JSON)
-            .heartbeatTimestamp(DateTime.now())
+            .lastOcppMessageTimestamp(DateTime.now())
             .vendor("vendor")
             .model("model")
             .build();

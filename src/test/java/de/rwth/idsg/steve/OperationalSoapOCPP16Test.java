@@ -163,6 +163,7 @@ public class OperationalSoapOCPP16Test {
     @Test
     public void testRegisteredIdTag() {
         CentralSystemService client = getForOcpp16(path);
+        Assertions.assertNull(lastOcppMessageTimestamp());
 
         AuthorizeResponse auth = client.authorize(
                 new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
@@ -170,6 +171,7 @@ public class OperationalSoapOCPP16Test {
 
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+        Assertions.assertNotNull(lastOcppMessageTimestamp());
     }
 
     @Test
@@ -658,5 +660,9 @@ public class OperationalSoapOCPP16Test {
      */
     private static DateTime nowWithoutMillis() {
         return DateTime.now().withMillisOfSecond(0);
+    }
+
+    private DateTime lastOcppMessageTimestamp() {
+        return databasePreparer.getCBDetails(REGISTERED_CHARGE_BOX_ID).getChargeBox().getLastOcppMessageTimestamp();
     }
 }

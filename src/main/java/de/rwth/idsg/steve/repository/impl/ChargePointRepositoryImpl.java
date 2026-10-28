@@ -178,8 +178,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                               .chargeBoxId(r.value2())
                                               .description(r.value3())
                                               .ocppProtocol(r.value4())
-                                              .lastHeartbeatTimestampDT(r.value5())
-                                              .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value5()))
+                                              .lastOcppMessageTimestampDT(r.value5())
+                                              .lastOcppMessageTimestamp(DateTimeUtils.humanize(r.value5()))
                                               .build()
                 );
     }
@@ -194,7 +194,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 CHARGE_BOX.CHARGE_BOX_ID,
                 CHARGE_BOX.DESCRIPTION,
                 CHARGE_BOX.OCPP_PROTOCOL,
-                CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP
+                CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP
         );
 
         if (form.isSetOcppVersion()) {
@@ -222,25 +222,25 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             selectQuery.addConditions(includes(CHARGE_BOX.NOTE, form.getNote()));
         }
 
-        switch (form.getHeartbeatPeriod()) {
+        switch (form.getLastOcppMessagePeriod()) {
             case ALL:
                 break;
 
             case TODAY:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now()))
+                        date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).eq(date(DateTime.now()))
                 );
                 break;
 
             case YESTERDAY:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now().minusDays(1)))
+                        date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).eq(date(DateTime.now().minusDays(1)))
                 );
                 break;
 
             case EARLIER:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(DateTime.now().minusDays(1)))
+                        date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).lessThan(date(DateTime.now().minusDays(1)))
                 );
                 break;
 

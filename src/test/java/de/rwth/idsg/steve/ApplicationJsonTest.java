@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,9 @@ public class ApplicationJsonTest {
 
     @Autowired
     private DSLContext dslContext;
+
+    @Autowired
+    private ChargePointService chargePointService;
 
     private __DatabasePreparer__ databasePreparer;
 
@@ -177,6 +181,33 @@ public class ApplicationJsonTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), actualCause.getResponseStatusCode());
     }
 
+    @Test
+    public void testOcppMessageUpdatesLastOcppMessageTimestamp() {
+        Assertions.assertNull(lastOcppMessageTimestamp());
+
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        chargePoint.send(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), AuthorizeResponse.class);
+        chargePoint.close();
+
+        Assertions.assertNotNull(lastOcppMessageTimestamp());
+    }
+
+    @Test
+    public void testOcppJsonStatusShowsLastOcppMessage() {
+        DateTime before = DateTime.now();
+
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH).start();
+        chargePoint.send(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), AuthorizeResponse.class);
+
+        var status = chargePointService.getOcppJsonStatus().stream()
+            .filter(it -> REGISTERED_CHARGE_BOX_ID.equals(it.getChargeBoxId()))
+            .findFirst()
+            .orElseThrow();
+        Assertions.assertFalse(status.getLastOcppMessageDT().isBefore(before));
+
+        chargePoint.close();
+    }
+
     /**
      * https://github.com/steve-community/steve/issues/1109
      */
@@ -238,4 +269,7 @@ public class ApplicationJsonTest {
         chargePoint.close();
     }
 
+    private DateTime lastOcppMessageTimestamp() {
+        return databasePreparer.getCBDetails(REGISTERED_CHARGE_BOX_ID).getChargeBox().getLastOcppMessageTimestamp();
+    }
 }

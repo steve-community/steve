@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -29,7 +30,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -42,8 +45,9 @@ public interface OcppServerRepository {
     void updateEndpointAddress(@NotNull String chargeBoxId, @NotNull String endpointAddress);
     void updateChargeboxFirmwareStatus(@NotNull String chargeBoxId, @NotNull String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxId, @NotNull String status);
-    void updateChargeboxHeartbeat(@NotNull String chargeBoxId, @NotNull DateTime ts);
+    void updateChargeboxLastOcppMessage(@NotNull String chargeBoxId, @NotNull DateTime ts);
     void updateChargeboxPong(@NotNull String chargeBoxId, @NotNull DateTime ts);
+    Map<String, ChargeBoxActivity> getChargeboxActivity(Collection<String> chargeBoxIds);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 

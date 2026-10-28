@@ -66,6 +66,11 @@ public final class WebSocketLogger {
         log.warn("[chargeBoxId={}, sessionId={}] Received empty text message. Will pretend this never happened.", chargeBoxId, session.getId());
     }
 
+    public static void lastOcppMessageError(String chargeBoxId, WebSocketSession session, Throwable t) {
+        log.error("[chargeBoxId={}, sessionId={}] Could not update the last OCPP message",
+            chargeBoxId, session.getId(), t);
+    }
+
     public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
         log.error("[chargeBoxId={}, sessionId={}] Ping error", chargeBoxId, session.getId(), t);
     }

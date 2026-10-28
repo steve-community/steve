@@ -45,8 +45,8 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
  *
  * <p>This is the wire-level statement of what the property is for: a station that sends no OCPP message
  * at all still exchanges ping/pong, and only a ping can move its last pong here — nothing else in
- * this test talks to the server after the upgrade. A pong is not an OCPP message, so the last heartbeat
- * must stay untouched.
+ * this test talks to the server after the upgrade. A pong is not an OCPP message, so the time of the last
+ * OCPP message must stay untouched.
  *
  * @see <a href="https://github.com/steve-community/steve/issues/3">Issue 3</a>
  */
@@ -89,7 +89,7 @@ public class Issue3IT {
             DateTime pong = awaitPong(chargeBoxId);
 
             Assertions.assertNotNull(pong, "an idle session should have been pinged, and the pong recorded");
-            Assertions.assertNull(lastHeartbeat(chargeBoxId), "a pong should not move the last heartbeat");
+            Assertions.assertNull(lastOcppMessage(chargeBoxId), "a pong should not move the last OCPP message");
         } finally {
             chargePoint.close();
         }
@@ -119,11 +119,11 @@ public class Issue3IT {
             .fetchOne(CHARGE_BOX.LAST_PONG_TIMESTAMP);
     }
 
-    private DateTime lastHeartbeat(String chargeBoxId) {
-        return dslContext.select(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
+    private DateTime lastOcppMessage(String chargeBoxId) {
+        return dslContext.select(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP)
             .from(CHARGE_BOX)
             .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-            .fetchOne(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP);
+            .fetchOne(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP);
     }
 
     private String registerStation() {

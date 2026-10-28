@@ -45,4 +45,14 @@ public final class OcppJsonStatus {
     private final String connectedSince;
     @JsonIgnore
     private final String connectionDuration;
+
+    @JsonProperty("lastOcppMessage")
+    private final DateTime lastOcppMessageDT;
+    @JsonIgnore
+    private final String lastOcppMessage;
+
+    @JsonProperty("lastPong")
+    private final DateTime lastPongDT;
+    @JsonIgnore
+    private final String lastPong;
 }

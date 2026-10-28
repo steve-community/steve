@@ -36,6 +36,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.joda.time.DateTime;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +52,8 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
  * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List, java.util.List)}.
+ *
+ * 3. Updates the time of the last OCPP message of the station in DB.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
@@ -107,6 +110,17 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
                 log.error("Exception occurred", e);
             }
         });
+
+        // -------------------------------------------------------------------------
+        // 3. update last OCPP message
+        // -------------------------------------------------------------------------
+
+        // An error here must not fail the OCPP request
+        try {
+            ocppServerRepository.updateChargeboxLastOcppMessage(chargeBoxId, DateTime.now());
+        } catch (Exception e) {
+            log.error("Could not update the last OCPP message of {}", chargeBoxId, e);
+        }
     }
 
     private String getChargeBoxId(Message message) {

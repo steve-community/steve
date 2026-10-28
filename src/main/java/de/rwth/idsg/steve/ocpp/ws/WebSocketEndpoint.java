@@ -90,6 +90,12 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
         }
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
+        // An error here must not close the session and lose the message
+        try {
+            ocppServerRepository.updateChargeboxLastOcppMessage(chargeBoxId, DateTime.now());
+        } catch (Exception e) {
+            WebSocketLogger.lastOcppMessageError(chargeBoxId, session, e);
+        }
 
         var inMsg = new CommunicationContext.In(
             chargeBoxId,

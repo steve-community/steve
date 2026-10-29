@@ -135,6 +135,10 @@ public class UsersRestController {
 
     @Operation(description = """
         Updates an existing domain user with the provided parameters.
+        The update is a full replacement: fields omitted from the request body are
+        cleared, and idTagList replaces the user's OCPP tag associations. The address
+        is always saved against the address record of the user identified by the path;
+        an address pk in the request body is not trusted.
         """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

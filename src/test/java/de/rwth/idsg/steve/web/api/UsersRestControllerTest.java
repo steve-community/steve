@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -198,7 +200,9 @@ public class UsersRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(userService.add(eq(form))).thenReturn(userPk);
+        // UserForm has no value equals; the request is a different instance, so
+        // match any form and verify the fields on the captured argument below.
+        when(userService.add(any(UserForm.class))).thenReturn(userPk);
         when(userService.getOverview(any())).thenReturn(List.of(result));
 
         // then
@@ -210,6 +214,11 @@ public class UsersRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.userPk").value("123"))
             .andExpect(jsonPath("$.name").value("First Last"));
+
+        ArgumentCaptor<UserForm> captor = ArgumentCaptor.forClass(UserForm.class);
+        verify(userService).add(captor.capture());
+        assertEquals("First", captor.getValue().getFirstName());
+        assertEquals("Last", captor.getValue().getLastName());
     }
 
     @Test
@@ -326,5 +335,30 @@ public class UsersRestControllerTest extends AbstractControllerTest {
             jsonPath("$.message").exists(),
             jsonPath("$.path").exists()
         };
+    }
+
+    @Test
+    @DisplayName("GET all: Explicitly empty ocppTagFilter does not fail, expected 200")
+    public void test14() throws Exception {
+        // The binder turns "ocppTagFilter=" into null; the repository falls back
+        // to the default filter instead of NPE-ing on it.
+        when(userService.getOverview(any())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/v1/users")
+                .param("ocppTagFilter", ""))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    @DisplayName("POST: Malformed json, expected 400")
+    public void test15() throws Exception {
+        mockMvc.perform(
+                post("/api/v1/users")
+                    .content("{not-json")
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
     }
 }

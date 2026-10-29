@@ -1,0 +1,46 @@
+<!--/*
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2026 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/-->
+<!--/* "Signed Meter Data" section of the transaction details page. Needs "signedData" (SignedTransaction) in the model. */-->
+<th:block th:fragment="signedMeterData">
+    <section><span>Signed Meter Data</span></section>
+    <div style="text-align: center;" th:with="count=${#lists.size(signedData.signedMeterValues)}">
+        <th:block th:if="${count == 0}">No signed meter values were received for this transaction.</th:block>
+        <th:block th:if="${count > 0}">
+            Signed meter values received: <span th:text="${count}"></span>.
+            <form th:if="${not #lists.isEmpty(signedData.safeXmlValues.values)}"
+                  th:action="@{/manager/transactions/details/{id}/safe.xml(id=${signedData.transactionId})}"
+                  method="get" style="display: inline-block;">
+                <input type="submit" value="Download S.A.F.E. XML">
+            </form>
+            <th:block th:if="${#lists.isEmpty(signedData.safeXmlValues.values)}">
+                There is no signed begin or end of the transaction, so there is no file for the S.A.F.E.
+                transparency software.
+            </th:block>
+            <th:block th:with="failed=${signedData.signedMeterValues.?[signedDataParseResult.parseError != null]}">
+                <div th:if="${not #lists.isEmpty(failed)}">
+                    <br>
+                    Could not read <span th:text="${#lists.size(failed)}"></span> of them:
+                    <div th:each="smv : ${failed}"
+                         th:text="|${smv.meterValue.valueTimestamp}: ${smv.signedDataParseResult.parseError}|"></div>
+                </div>
+            </th:block>
+        </th:block>
+    </div>
+</th:block>

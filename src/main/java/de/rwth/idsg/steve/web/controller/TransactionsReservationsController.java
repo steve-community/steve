@@ -66,6 +66,7 @@ public class TransactionsReservationsController {
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_METER_VALUES_CSV_PATH = TRANSACTIONS_DETAILS_PATH + "/meterValues.csv";
+    private static final String TRANSACTIONS_DETAILS_SAFE_XML_PATH = TRANSACTIONS_DETAILS_PATH + "/safe.xml";
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -95,6 +96,7 @@ public class TransactionsReservationsController {
                                         @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
                                         Model model) {
         model.addAttribute("details", transactionService.getDetails(transactionPk, energyValuesOnly));
+        model.addAttribute("signedData", transactionService.getSignedData(transactionPk));
         model.addAttribute("energyValuesOnly", energyValuesOnly);
         return "data-man/transactionDetails";
     }
@@ -109,6 +111,12 @@ public class TransactionsReservationsController {
         response.setContentType("text/csv");
         response.setHeader(headerKey, headerValue);
         transactionService.writeTransactionMeterValuesCSV(transactionPk, energyValuesOnly, response.getWriter());
+    }
+
+    @RequestMapping(value = TRANSACTIONS_DETAILS_SAFE_XML_PATH)
+    public void getTransactionDetailsSafeXml(@PathVariable("transactionPk") int transactionPk,
+                                             HttpServletResponse response) throws IOException {
+        transactionService.writeSafeXml(transactionPk, response);
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)

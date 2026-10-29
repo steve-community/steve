@@ -18,11 +18,13 @@
  */
 package de.rwth.idsg.steve.repository;
 
+import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.Result;
 
@@ -41,6 +43,11 @@ public interface TransactionRepository {
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
     TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly);
+
+    List<TransactionDetails.MeterValues> getMeterValues(int transactionPk, List<String> formats);
+
+    @Nullable
+    MeterPublicKeySources getMeterPublicKeySources(int transactionPk);
 
     Result<TransactionRecord> getStoppedTransactions(@NotNull DateTime from, @NotNull DateTime to);
 }

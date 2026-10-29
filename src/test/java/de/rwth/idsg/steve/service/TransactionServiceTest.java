@@ -18,13 +18,25 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.eichrecht.MeterPublicKeyService;
+import de.rwth.idsg.steve.eichrecht.safe.ValuesXmlWriter;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 public class TransactionServiceTest {
@@ -106,6 +118,106 @@ public class TransactionServiceTest {
         Assertions.assertNotNull(last);
         Assertions.assertEquals("1200", last.getValue());
         Assertions.assertEquals(t2, last.getValueTimestamp());
+    }
+
+    @Test
+    public void getSafeXml_beginAndEnd() throws Exception {
+        var service = serviceWithSignedData(ocmf("T1", "B"), ocmf("T2", "E"));
+
+        String xml = service.getSafeXml(TRANSACTION_PK);
+
+        Assertions.assertTrue(xml.contains("context=\"Transaction.Begin\""));
+        Assertions.assertTrue(xml.contains("context=\"Transaction.End\""));
+        Assertions.assertTrue(xml.contains("transactionId=\"" + TRANSACTION_PK + "\""));
+        Assertions.assertFalse(service.getSignedData(TRANSACTION_PK).safeXmlValues().getValues().isEmpty());
+    }
+
+    @Test
+    public void getSafeXml_queriesOnlySignedData() throws Exception {
+        var repository = Mockito.mock(TransactionRepository.class);
+        Mockito.when(repository.getMeterValues(TRANSACTION_PK, List.of("SignedData"))).thenReturn(List.of());
+        var service = new TransactionService(new EichrechtService(), new MeterPublicKeyService(), new ValuesXmlWriter(),
+            repository, Mockito.mock(OcppServerRepository.class));
+
+        service.getSignedData(TRANSACTION_PK);
+
+        Mockito.verify(repository).getMeterValues(TRANSACTION_PK, List.of("SignedData"));
+    }
+
+    @Test
+    public void getSafeXml_noBeginOrEnd() throws Exception {
+        for (var service : List.of(
+            serviceWithSignedData(),
+            serviceWithSignedData("<edl40/>"),
+            serviceWithSignedData(ocmf("T1", "C"))
+        )) {
+            Assertions.assertTrue(service.getSignedData(TRANSACTION_PK).safeXmlValues().getValues().isEmpty());
+            Assertions.assertThrows(SteveException.NotFound.class, () -> service.getSafeXml(TRANSACTION_PK));
+        }
+    }
+
+    @Test
+    public void getSafeXml_publicKeyFromConfiguration() throws Exception {
+        // Like the OCA application note: Base64 of "oca:base16:asn1:<key as printed on the meter>"
+        String ocaValue = Base64.getEncoder()
+            .encodeToString("oca:base16:asn1:3059 3013 0607".getBytes(StandardCharsets.US_ASCII));
+        var sources = sources(1, "MeterPublicKey1", ocaValue);
+        var service = serviceWithSignedData(sources, ocmf("T1", "B"), ocmf("T2", "E"));
+
+        String xml = service.getSafeXml(TRANSACTION_PK);
+
+        // For both begin and end
+        Assertions.assertEquals(2, xml.split("<publicKey encoding=\"hex\">305930130607</publicKey>", -1).length - 1);
+    }
+
+    @Test
+    public void getSafeXml_publicKeyFromConfigurationForWholeStation() throws Exception {
+        var sources = sources(1, "MeterPublicKey", "MFkwEwYHKoZIzj0CAQ==");
+        var service = serviceWithSignedData(sources, ocmf("T1", "B"), ocmf("T2", "E"));
+
+        String xml = service.getSafeXml(TRANSACTION_PK);
+
+        String publicKey = "<publicKey encoding=\"base64\">MFkwEwYHKoZIzj0CAQ==</publicKey>";
+        Assertions.assertEquals(2, xml.split(publicKey, -1).length - 1);
+    }
+
+    @Test
+    public void getSafeXml_publicKeyUnknown() throws Exception {
+        var service = serviceWithSignedData(ocmf("T1", "B"), ocmf("T2", "E"));
+
+        Assertions.assertFalse(service.getSafeXml(TRANSACTION_PK).contains("publicKey"));
+    }
+
+    private static MeterPublicKeySources sources(int connectorId, String configurationKey, String value) {
+        var config = JsonObjectMapper.INSTANCE.getMapper().createObjectNode().put(configurationKey, value);
+        return new MeterPublicKeySources(connectorId, config);
+    }
+
+    private static TransactionService serviceWithSignedData(String... values) throws Exception {
+        return serviceWithSignedData(null, values);
+    }
+
+    private static TransactionService serviceWithSignedData(MeterPublicKeySources sources,
+                                                            String... values) throws Exception {
+        var meterValues = Arrays.stream(values)
+            .map(v -> TransactionDetails.MeterValues.builder()
+                .value(v)
+                .valueTimestamp(START_TIMESTAMP)
+                .format("SignedData")
+                .build())
+            .toList();
+
+        var repository = Mockito.mock(TransactionRepository.class);
+        Mockito.when(repository.getMeterValues(Mockito.eq(TRANSACTION_PK), Mockito.anyList())).thenReturn(meterValues);
+        Mockito.when(repository.getMeterPublicKeySources(TRANSACTION_PK)).thenReturn(sources);
+
+        return new TransactionService(new EichrechtService(), new MeterPublicKeyService(), new ValuesXmlWriter(),
+            repository, Mockito.mock(OcppServerRepository.class));
+    }
+
+    private static String ocmf(String pagination, String transactionType) {
+        return "OCMF|{\"FV\":\"1.0\",\"PG\":\"" + pagination + "\",\"MS\":\"SN1\",\"RD\":[{\"TX\":\""
+            + transactionType + "\",\"RV\":1.5,\"RU\":\"kWh\",\"ST\":\"G\"}]}|{\"SD\":\"3045\"}";
     }
 
     private static Transaction transactionDetails() {

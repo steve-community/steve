@@ -19,9 +19,12 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppSecurityProfile;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointRegistration;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointService;
+import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -39,6 +42,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,6 +78,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new ChargePointsRestController(chargePointService))
             .setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
+            .setValidator(validatorWithChargePointService(chargePointService))
             .alwaysExpect(content().contentType(CONTENT_TYPE))
             .build();
     }
@@ -282,7 +287,8 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         ChargePoint.Overview overview = ChargePoint.Overview.builder()
             .chargeBoxPk(96)
             .chargeBoxId("CP001")
-            .lastHeartbeatTimestamp("2026-10-19 08:00")
+            .ocppProtocol("OCPP16J")
+            .lastHeartbeatTimestampDT(DateTime.parse("2026-10-19T08:00:00.000Z"))
             .build();
 
         List<ConnectorStatus> statuses = List.of(
@@ -306,8 +312,175 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.chargeBoxId").value("CP001"))
             .andExpect(jsonPath("$.connected").value("false"))
-            .andExpect(jsonPath("$.lastHeartbeatTimestamp").value("2026-10-19 08:00"))
+            .andExpect(jsonPath("$.ocppProtocol").value("OCPP16J"))
+            .andExpect(jsonPath("$.lastHeartbeatTimestamp").value("2026-10-19T08:00:00.000Z"))
             .andExpect(jsonPath("$.connectors", hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("GET connection: Station without connector statuses, expected 200")
+    public void test11() throws Exception {
+        // given
+        ChargePoint.Overview overview = ChargePoint.Overview.builder()
+            .chargeBoxPk(96)
+            .chargeBoxId("CP001")
+            .ocppProtocol("OCPP16J")
+            .lastHeartbeatTimestampDT(DateTime.parse("2026-10-19T08:00:00.000Z"))
+            .build();
+
+        when(chargePointService.getOverview(any(), any())).thenReturn(List.of(overview));
+        when(chargePointService.getChargePointConnectorStatus(any(ConnectorStatusForm.class)))
+            .thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/chargeBoxes/96/connection"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.chargeBoxId").value("CP001"))
+            .andExpect(jsonPath("$.connected").value("false"))
+            .andExpect(jsonPath("$.connectors", hasSize(0)));
+    }
+
+    @Test
+    @DisplayName("POST: Duplicate chargeBoxId, expected 422")
+    public void test12() throws Exception {
+        // given
+        var registration = new ChargePointRegistration(96, "CP-DUP", "Accepted",
+            OcppSecurityProfile.Profile_0, null, JsonUtils.toObjectNode(null), null);
+        when(chargePointService.getRegistrationDirect("CP-DUP")).thenReturn(Optional.of(registration));
+
+        // then
+        mockMvc.perform(
+                post("/api/v1/chargeBoxes")
+                    .content("""
+                        {"chargeBoxId": "CP-DUP", "registrationStatus": "Accepted",
+                         "insertConnectorStatusAfterTransactionMsg": true}
+                        """)
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpectAll(errorJsonMatchers());
+
+        verify(chargePointService, times(0)).addChargePoint(any());
+    }
+
+    @Test
+    @DisplayName("PUT: Body chargeBoxId does not match path, expected 400")
+    public void test13() throws Exception {
+        // given
+        ChargePoint.Overview result = ChargePoint.Overview.builder()
+            .chargeBoxPk(123)
+            .chargeBoxId("CP001")
+            .build();
+
+        when(chargePointService.getOverview(any(), any())).thenReturn(List.of(result));
+
+        // then
+        mockMvc.perform(
+                put("/api/v1/chargeBoxes/123")
+                    .content("""
+                        {"chargeBoxId": "CP-OTHER", "registrationStatus": "Accepted",
+                         "insertConnectorStatusAfterTransactionMsg": true}
+                        """)
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
+
+        verify(chargePointService, times(0)).updateChargePoint(any());
+    }
+
+    @Test
+    @DisplayName("GET one connector: Existing connector, expected 200")
+    public void test14() throws Exception {
+        // given
+        ChargePoint.Overview overview = ChargePoint.Overview.builder()
+            .chargeBoxPk(96)
+            .chargeBoxId("CP001")
+            .build();
+
+        List<ConnectorStatus> statuses = List.of(
+            ConnectorStatus.builder()
+                .chargeBoxPk(96)
+                .chargeBoxId("CP001")
+                .connectorId(1)
+                .ocppProtocol(OcppProtocol.V_16_JSON)
+                .status("Charging")
+                .errorCode("NoError")
+                .statusTimestamp(DateTime.parse("2026-10-19T08:00:00.000Z"))
+                .jsonAndDisconnected(false)
+                .build()
+        );
+
+        when(chargePointService.getOverview(any(), any())).thenReturn(List.of(overview));
+        when(chargePointService.getChargePointConnectorStatus(any(ConnectorStatusForm.class))).thenReturn(statuses);
+
+        // then
+        mockMvc.perform(get("/api/v1/chargeBoxes/96/connectors/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.connectorId").value("1"))
+            .andExpect(jsonPath("$.status").value("Charging"))
+            .andExpect(jsonPath("$.statusTimestamp").value("2026-10-19T08:00:00.000Z"));
+    }
+
+    @Test
+    @DisplayName("GET one connector: Unknown connector, expected 404")
+    public void test15() throws Exception {
+        // given
+        ChargePoint.Overview overview = ChargePoint.Overview.builder()
+            .chargeBoxPk(96)
+            .chargeBoxId("CP001")
+            .build();
+
+        when(chargePointService.getOverview(any(), any())).thenReturn(List.of(overview));
+        when(chargePointService.getChargePointConnectorStatus(any(ConnectorStatusForm.class)))
+            .thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/chargeBoxes/96/connectors/7"))
+            .andExpect(status().isNotFound())
+            .andExpectAll(errorJsonMatchers());
+    }
+
+    @Test
+    @DisplayName("GET connectors: Connector zero is not a physical connector, expected 200")
+    public void test16() throws Exception {
+        // given
+        ChargePoint.Overview overview = ChargePoint.Overview.builder()
+            .chargeBoxPk(96)
+            .chargeBoxId("CP001")
+            .build();
+
+        List<ConnectorStatus> statuses = List.of(
+            ConnectorStatus.builder()
+                .chargeBoxPk(96)
+                .chargeBoxId("CP001")
+                .connectorId(0)
+                .ocppProtocol(OcppProtocol.V_16_JSON)
+                .status("Available")
+                .errorCode("NoError")
+                .statusTimestamp(DateTime.parse("2026-10-19T08:00:00.000Z"))
+                .jsonAndDisconnected(false)
+                .build(),
+            ConnectorStatus.builder()
+                .chargeBoxPk(96)
+                .chargeBoxId("CP001")
+                .connectorId(1)
+                .ocppProtocol(OcppProtocol.V_16_JSON)
+                .status("Charging")
+                .errorCode("NoError")
+                .statusTimestamp(DateTime.parse("2026-10-19T08:00:00.000Z"))
+                .jsonAndDisconnected(false)
+                .build()
+        );
+
+        when(chargePointService.getOverview(any(), any())).thenReturn(List.of(overview));
+        when(chargePointService.getChargePointConnectorStatus(any(ConnectorStatusForm.class))).thenReturn(statuses);
+
+        // then
+        mockMvc.perform(get("/api/v1/chargeBoxes/96/connectors"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].connectorId").value("1"));
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

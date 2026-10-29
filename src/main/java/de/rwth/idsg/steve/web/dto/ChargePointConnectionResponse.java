@@ -18,14 +18,18 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
 /**
  * Current transport connection state of a charge point, aggregated over its
- * connectors.
+ * connectors. The heartbeat and protocol are taken from the charge point
+ * itself, not from connector status rows, since a connector status update is
+ * neither a heartbeat nor does every station report connector statuses.
  *
  * @author huangkongsheng
  * @since 19.10.2026
@@ -36,18 +40,23 @@ public record ChargePointConnectionResponse(
     @Schema(description = "True when the station is currently connected on the WebSocket transport. "
         + "For SOAP stations no transport-level state is tracked and this is always true.")
     boolean connected,
+    @Schema(description = "Composite protocol identifier of the station, e.g. OCPP16J (JSON) or "
+        + "OCPP16S (SOAP). Null if the station has no protocol assigned yet.")
     String ocppProtocol,
-    String lastHeartbeatTimestamp,
-    List<ConnectorStatusResponse> connectors
+    DateTime lastHeartbeatTimestamp,
+    List<ChargePointConnectorResponse> connectors
 ) {
 
-    public static ChargePointConnectionResponse of(ConnectorStatus first, List<ConnectorStatus> connectors) {
+    public static ChargePointConnectionResponse of(ChargePoint.Overview overview, List<ConnectorStatus> connectors) {
         return new ChargePointConnectionResponse(
-            first.getChargeBoxId(),
+            overview.getChargeBoxId(),
             connectors.stream().anyMatch(s -> !s.isJsonAndDisconnected()),
-            first.getOcppProtocol().getVersion().getValue(),
-            first.getTimeStamp(),
-            connectors.stream().map(ConnectorStatusResponse::of).toList()
+            overview.getOcppProtocol(),
+            overview.getLastHeartbeatTimestampDT(),
+            connectors.stream()
+                      .filter(s -> s.getConnectorId() > 0)
+                      .map(ChargePointConnectorResponse::of)
+                      .toList()
         );
     }
 }

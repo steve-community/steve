@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.joda.time.DateTime;
 
 /**
  * The last known OCPP status of a single connector, together with the current
@@ -39,7 +40,7 @@ public record ChargePointConnectorResponse(
     @Schema(description = "True when the station is currently connected on the WebSocket transport. "
         + "For SOAP stations no transport-level state is tracked and this is always true.")
     boolean transportConnected,
-    String statusTimestamp
+    DateTime statusTimestamp
 ) {
 
     public static ChargePointConnectorResponse of(ConnectorStatus s) {

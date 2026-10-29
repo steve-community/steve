@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -71,8 +73,12 @@ public class ReservationsRestController {
 
     @Operation(description = """
         Returns a list of persisted reservations based on the query parameters.
-        The query parameters can be used to filter by reservation id, transaction id,
-        status (active/expired/cancelled/consumed), and creation or expiry period.
+        Reservations can be filtered by reservation id, transaction id, connector id,
+        charge box id, id tag, status (one of WAITING, ACCEPTED, USED, CANCELLED)
+        and creation or expiry period. Note that whether a reservation is active or
+        expired is not a status: it is derived from the expiry timestamp. By default
+        the list only covers reservations whose period is still active; pass
+        periodType=ALL to include expired and historical reservations.
         """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -81,7 +87,7 @@ public class ReservationsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "")
-    public List<Reservation> get(@ParameterObject ReservationQueryForm params) {
+    public List<Reservation> get(@ParameterObject @Valid ReservationQueryForm params) {
         log.debug("Read request for query: {}", params);
 
         var response = reservationRepository.getReservations(params);
@@ -111,6 +117,9 @@ public class ReservationsRestController {
     private Reservation getOneInternal(int reservationPk) {
         ReservationQueryForm params = new ReservationQueryForm();
         params.setReservationId(List.of(reservationPk));
+        // A primary-key lookup must return persisted reservations regardless of expiry,
+        // so it must not inherit the form's default active-period filter.
+        params.setPeriodType(ReservationQueryForm.QueryPeriodType.ALL);
 
         List<Reservation> results = reservationRepository.getReservations(params);
         if (results.isEmpty()) {

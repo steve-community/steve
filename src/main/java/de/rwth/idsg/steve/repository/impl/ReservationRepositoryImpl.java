@@ -45,6 +45,7 @@ import java.util.Set;
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Evse.EVSE;
+import static jooq.steve.db.tables.EvseConnector.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 
@@ -87,6 +88,17 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         if (form.isTransactionIdSet()) {
             selectQuery.addConditions(RESERVATION.TRANSACTION_PK.in(form.getTransactionId()));
+        }
+
+        if (form.isConnectorIdSet()) {
+            selectQuery.addConditions(
+                DSL.exists(
+                    ctx.selectOne()
+                       .from(EVSE_CONNECTOR)
+                       .where(EVSE_CONNECTOR.EVSE_PK.eq(RESERVATION.EVSE_PK))
+                       .and(EVSE_CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()))
+                )
+            );
         }
 
         if (form.isChargeBoxIdSet()) {
@@ -284,6 +296,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
+            case ALL:
+                // no period restriction; covers expired and historical reservations
+                break;
+
             case ACTIVE:
                 selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()));
                 break;

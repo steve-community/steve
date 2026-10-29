@@ -160,6 +160,60 @@ public class ReservationsRestControllerTest extends AbstractControllerTest {
         assertEquals(List.of(42), captor.getValue().getReservationId());
     }
 
+    @Test
+    @DisplayName("GET one: Lookup by primary key ignores the active-period default, expected 200")
+    public void test7() throws Exception {
+        // given
+        Reservation result = Reservation.builder().id(42).chargeBoxId("CP001").build();
+
+        // when
+        when(reservationRepository.getReservations(any())).thenReturn(List.of(result));
+
+        // then
+        mockMvc.perform(get("/api/v1/reservations/42"))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<ReservationQueryForm> captor = ArgumentCaptor.forClass(ReservationQueryForm.class);
+        org.mockito.Mockito.verify(reservationRepository).getReservations(captor.capture());
+        assertEquals(ReservationQueryForm.QueryPeriodType.ALL, captor.getValue().getPeriodType());
+    }
+
+    @Test
+    @DisplayName("GET all: Blank chargeBoxId filter is rejected, expected 400")
+    public void test8() throws Exception {
+        // @Valid must activate the form constraints; a blank id would otherwise
+        // reach the repository IN predicates
+        mockMvc.perform(get("/api/v1/reservations")
+                .param("chargeBoxId", " "))
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
+    }
+
+    @Test
+    @DisplayName("GET all: Negative reservationId filter is rejected, expected 400")
+    public void test9() throws Exception {
+        mockMvc.perform(get("/api/v1/reservations")
+                .param("reservationId", "-1"))
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
+    }
+
+    @Test
+    @DisplayName("GET all: Connector filter is passed to the repository, expected 200")
+    public void test10() throws Exception {
+        // when
+        when(reservationRepository.getReservations(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/reservations")
+                .param("connectorId", "2"))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<ReservationQueryForm> captor = ArgumentCaptor.forClass(ReservationQueryForm.class);
+        org.mockito.Mockito.verify(reservationRepository).getReservations(captor.capture());
+        assertEquals(2, captor.getValue().getConnectorId());
+    }
+
     private static ResultMatcher[] errorJsonMatchers() {
         return new ResultMatcher[]{
             jsonPath("$.timestamp").exists(),

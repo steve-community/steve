@@ -46,6 +46,12 @@ public class ReservationQueryForm extends QueryForm {
     private List<@NotNull(message = "transactionId must not be null")
                  @Positive(message = "transactionId has to be a positive number") Integer> transactionId;
 
+    /**
+     * Only reservations for the connector with this id (on any charge box).
+     */
+    @Positive(message = "connectorId has to be a positive number")
+    private Integer connectorId;
+
     private ReservationStatus status;
 
     private QueryPeriodType periodType;
@@ -72,6 +78,11 @@ public class ReservationQueryForm extends QueryForm {
         return !CollectionUtils.isEmpty(transactionId);
     }
 
+    @Schema(hidden = true)
+    public boolean isConnectorIdSet() {
+        return connectorId != null;
+    }
+
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
@@ -83,6 +94,7 @@ public class ReservationQueryForm extends QueryForm {
 
     @RequiredArgsConstructor
     public enum QueryPeriodType {
+        ALL("All"),
         ACTIVE("Active"),
         FROM_TO("From/To");
 

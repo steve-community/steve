@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import de.rwth.idsg.steve.web.api.OcppEnumDeserializer;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +28,7 @@ import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
@@ -134,6 +134,12 @@ public class ChargingProfileForm {
         return schedulePeriods.stream()
             .filter(Objects::nonNull)
             .anyMatch(SchedulePeriod::isNonEmpty);
+    }
+
+    @AssertTrue(message = "Schedule Periods cannot contain null entries")
+    public boolean isSchedulePeriodsNotNull() {
+        // a null element slips past @Valid on the list and would crash persistence
+        return schedulePeriods == null || schedulePeriods.stream().allMatch(Objects::nonNull);
     }
 
     @Getter

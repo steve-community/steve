@@ -18,11 +18,14 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import org.jetbrains.annotations.Nullable;
+
 import java.beans.PropertyEditorSupport;
 
 /**
  * Binds OCPP enum query parameters by their Java constant name ("TX_PROFILE")
- * or by the OCPP value they serialise from/to ("TxProfile").
+ * or by the OCPP wire value they serialise from/to ("TxProfile").
  *
  * The REST layer returns OCPP values (e.g. profilePurpose "TxProfile"), so a
  * client that filters with a value it just read would otherwise get a binding
@@ -49,7 +52,24 @@ public class OcppEnumPropertyEditor extends PropertyEditorSupport {
                 return;
             }
         }
+        for (Enum<?> constant : enumType.getEnumConstants()) {
+            String wireValue = wireValueOf(constant);
+            if (wireValue != null && wireValue.equalsIgnoreCase(trimmed)) {
+                setValue(constant);
+                return;
+            }
+        }
         throw new IllegalArgumentException(
             "No value " + trimmed + " for enum " + enumType.getSimpleName());
+    }
+
+    @Nullable
+    private String wireValueOf(Enum<?> constant) {
+        try {
+            XmlEnumValue ann = enumType.getField(constant.name()).getAnnotation(XmlEnumValue.class);
+            return ann != null ? ann.value() : null;
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 }

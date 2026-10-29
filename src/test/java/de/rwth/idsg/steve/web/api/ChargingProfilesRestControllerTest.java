@@ -225,6 +225,25 @@ public class ChargingProfilesRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @DisplayName("POST: Null schedule period entry, expected 400")
+    public void test14() throws Exception {
+        mockMvc.perform(
+                post("/api/v1/chargingProfiles")
+                    .content("""
+                        {"description": "Night charging", "stackLevel": 1,
+                         "chargingProfilePurpose": "TxProfile", "chargingProfileKind": "Absolute",
+                         "chargingRateUnit": "A",
+                         "schedulePeriods": [null, {"startPeriodInSeconds": 0, "powerLimit": 16, "numberPhases": 3}]}
+                        """)
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpectAll(errorJsonMatchers());
+
+        verify(chargingProfileRepository, times(0)).add(any());
+    }
+
+    @Test
     @DisplayName("GET one: Entity not found, expected 404")
     public void test3() throws Exception {
         // when

@@ -18,17 +18,20 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import org.jetbrains.annotations.Nullable;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
  * Deserialises OCPP enums from their Java constant name ("TX_PROFILE") or from
- * the OCPP value ("TxProfile").
+ * the OCPP wire value ("TxProfile").
  *
  * REST resources return OCPP values (they are what is stored in the database
  * and what the OCPP wire format uses), so accepting the same spelling on
@@ -36,20 +39,40 @@ import java.util.Arrays;
  */
 public class OcppEnumDeserializer extends StdDeserializer<Enum<?>> {
 
+    private final Class<?> enumType;
+
     public OcppEnumDeserializer() {
         super(Enum.class);
+        this.enumType = null;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private OcppEnumDeserializer(Class<?> enumType) {
+        super((Class<Enum>) enumType);
+        this.enumType = enumType;
     }
 
     @Override
-    public Enum<?> deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+    public ValueDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
+        JavaType type = property != null ? property.getType() : ctxt.getContextualType();
+        Class<?> raw = type != null ? type.getRawClass() : null;
+        if (raw != null && raw.isEnum()) {
+            return new OcppEnumDeserializer(raw);
+        }
+        return this;
+    }
+
+    @Override
+    public Enum<?> deserialize(JsonParser parser, DeserializationContext context) {
         String text = parser.getValueAsString();
         if (text == null || text.trim().isEmpty()) {
             return null;
         }
         String trimmed = text.trim();
-        Class<?> enumType = context.getContextualType() != null
-            ? context.getContextualType().getRawClass()
-            : null;
+        Class<?> enumType = this.enumType;
+        if (enumType == null && context.getContextualType() != null) {
+            enumType = context.getContextualType().getRawClass();
+        }
         if (enumType == null || !enumType.isEnum()) {
             throw context.weirdStringException(
                 trimmed, Enum.class, "Cannot determine target enum type");
@@ -60,8 +83,27 @@ public class OcppEnumDeserializer extends StdDeserializer<Enum<?>> {
                 return e;
             }
         }
+        // Resources return the OCPP wire values stored in the database (e.g. "TxProfile"),
+        // which come from @XmlEnumValue on the generated constants, not the constant names.
+        for (Object constant : enumType.getEnumConstants()) {
+            Enum<?> e = (Enum<?>) constant;
+            String wireValue = wireValueOf(enumType, e);
+            if (wireValue != null && wireValue.equalsIgnoreCase(trimmed)) {
+                return e;
+            }
+        }
         throw context.weirdStringException(
             trimmed, enumType, "No enum constant matches value " + trimmed
                 + " (available: " + Arrays.toString(enumType.getEnumConstants()) + ")");
+    }
+
+    @Nullable
+    private static String wireValueOf(Class<?> enumType, Enum<?> constant) {
+        try {
+            XmlEnumValue ann = enumType.getField(constant.name()).getAnnotation(XmlEnumValue.class);
+            return ann != null ? ann.value() : null;
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
     }
 }

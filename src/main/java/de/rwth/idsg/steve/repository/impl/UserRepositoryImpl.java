@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.rwth.idsg.steve.web.dto.UserQueryForm.OcppTagFilter;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.web.dto.UserQueryForm.OcppTagFilter.OnlyUsersWithoutTags;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
@@ -66,12 +68,16 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
+        // The API binder converts an explicitly empty ocppTagFilter to null;
+        // fall back to the default instead of NPE-ing in the switch below.
+        OcppTagFilter tagFilter = (form.getOcppTagFilter() == null) ? OcppTagFilter.All : form.getOcppTagFilter();
+
         var userResults = getOverviewInternal(form);
         if (userResults.isEmpty()) {
             return List.of();
         }
 
-        Map<Integer, List<User.OcppTagEntry>> ocppTagsPerUser = (form.getOcppTagFilter() == OnlyUsersWithoutTags)
+        Map<Integer, List<User.OcppTagEntry>> ocppTagsPerUser = (tagFilter == OnlyUsersWithoutTags)
             ? Map.of()
             : getOcppTagsInternal(userResults.getValues(USER.USER_PK), form.getOcppIdTag());
 
@@ -112,13 +118,18 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void add(UserForm form) {
-        ctx.transaction(configuration -> {
+    public int add(UserForm form) {
+        return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
+                // A create must never write into an address row the caller claims by id
+                if (form.getAddress() != null) {
+                    form.getAddress().setAddressPk(null);
+                }
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 Integer userPk = addInternal(ctx, form, addressId);
                 refreshOcppTagsInternal(ctx, form, userPk);
+                return userPk;
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);
@@ -131,7 +142,7 @@ public class UserRepositoryImpl implements UserRepository {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                Integer addressId = addressRepository.updateOrInsert(ctx, scopedAddress(ctx, form));
                 updateInternal(ctx, form, addressId);
                 refreshOcppTagsInternal(ctx, form, form.getUserPk());
 
@@ -139,6 +150,21 @@ public class UserRepositoryImpl implements UserRepository {
                 throw new SteveException("Failed to update the user", e);
             }
         });
+    }
+
+    /**
+     * The address id in the request body is client-writable: submitting another user's
+     * address pk would overwrite that user's address row. Update always resolves the
+     * address id from the user being updated instead.
+     */
+    private Address scopedAddress(DSLContext ctx, UserForm form) {
+        Address address = form.getAddress();
+        if (address == null) {
+            return null;
+        }
+        var existingAddressId = selectAddressId(form.getUserPk()).fetchOne(USER.ADDRESS_PK);
+        address.setAddressPk(existingAddressId);
+        return address;
     }
 
     @Override
@@ -168,7 +194,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
         );
 
-        switch (form.getOcppTagFilter()) {
+        switch ((form.getOcppTagFilter() == null) ? OcppTagFilter.All : form.getOcppTagFilter()) {
             case OnlyUsersWithTags -> conditions.add(hasTagsQuery);
             case OnlyUsersWithoutTags -> conditions.add(hasTagsQuery.not());
             default -> { }
@@ -297,12 +323,25 @@ public class UserRepositoryImpl implements UserRepository {
      * - 2. Insert new OCPP tags from the form that do not already exist for the user.
      */
     private void refreshOcppTagsInternal(DSLContext ctx, UserForm form, Integer userPk) {
-        List<Integer> wantedOcppTagPks = CollectionUtils.isEmpty(form.getIdTagList())
-            ? List.of() // This user wants no OCPP tags
-            : ctx.select(OCPP_TAG.OCPP_TAG_PK)
-            .from(OCPP_TAG)
-            .where(OCPP_TAG.ID_TAG.in(form.getIdTagList()))
-            .fetch(OCPP_TAG.OCPP_TAG_PK);
+        List<Integer> wantedOcppTagPks = List.of(); // This user wants no OCPP tags
+        if (!CollectionUtils.isEmpty(form.getIdTagList())) {
+            var foundRows = ctx.select(OCPP_TAG.ID_TAG, OCPP_TAG.OCPP_TAG_PK)
+                .from(OCPP_TAG)
+                .where(OCPP_TAG.ID_TAG.in(form.getIdTagList()))
+                .fetch();
+
+            // Silently dropping requested tags that do not exist would make a PUT both
+            // report success and remove existing associations the caller expected to keep
+            java.util.Set<String> foundIds = new java.util.HashSet<>(foundRows.map(r -> r.value1()));
+            List<String> unknown = form.getIdTagList().stream()
+                .distinct()
+                .filter(id -> !foundIds.contains(id))
+                .toList();
+            if (!unknown.isEmpty()) {
+                throw new SteveException.BadRequest("Unknown OCPP tag(s): " + String.join(", ", unknown));
+            }
+            wantedOcppTagPks = foundRows.map(r -> r.value2());
+        }
 
         // Optimization: Execute the delete query only if we are processing an existing user.
         // A new user will not have any existing OCPP tags, so no delete is needed.

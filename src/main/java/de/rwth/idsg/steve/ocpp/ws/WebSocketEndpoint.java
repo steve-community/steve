@@ -25,10 +25,10 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OcppCallHandler;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.service.ChargeBoxActivityService;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -56,6 +56,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
 
     private final List<OcppCallHandler> versionHandlers;
     private final OcppServerRepository ocppServerRepository;
+    private final ChargeBoxActivityService chargeBoxActivityService;
     private final SessionContextStoreHolder sessionContextStoreHolder;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final Messaging.In.Producer inProducer;
@@ -90,6 +91,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
         }
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
+        chargeBoxActivityService.ocppMessageReceived(chargeBoxId);
 
         var inMsg = new CommunicationContext.In(
             chargeBoxId,
@@ -104,7 +106,7 @@ public class WebSocketEndpoint extends ConcurrentWebSocketHandler implements Sub
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-        ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
+        chargeBoxActivityService.pongReceived(getChargeBoxId(session));
     }
 
     private void handleBinaryMessage(WebSocketSession session) {

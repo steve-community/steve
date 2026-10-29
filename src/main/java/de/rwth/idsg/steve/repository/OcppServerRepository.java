@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -27,9 +28,10 @@ import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -42,7 +44,12 @@ public interface OcppServerRepository {
     void updateEndpointAddress(@NotNull String chargeBoxId, @NotNull String endpointAddress);
     void updateChargeboxFirmwareStatus(@NotNull String chargeBoxId, @NotNull String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(@NotNull String chargeBoxId, @NotNull String status);
-    void updateChargeboxHeartbeat(@NotNull String chargeBoxId, @NotNull DateTime ts);
+
+    /**
+     * Saves the non-null timestamps, in one batch, without ever moving a stored timestamp backwards.
+     */
+    void updateChargeboxActivity(Map<String, ChargeBoxActivity> activityByChargeBoxId);
+    Map<String, ChargeBoxActivity> getChargeboxActivity(Collection<String> chargeBoxIds);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 

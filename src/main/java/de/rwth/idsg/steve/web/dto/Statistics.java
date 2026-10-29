@@ -36,7 +36,7 @@ import java.util.Map;
 public final class Statistics {
     // Number of chargeboxes, ocppTags, users, reservations, transactions
     private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
+    // Stations by the day of their last OCPP message
     heartbeatToday, heartbeatYesterday, heartbeatEarlier;
 
     // Number of connected WebSocket/JSON chargeboxes

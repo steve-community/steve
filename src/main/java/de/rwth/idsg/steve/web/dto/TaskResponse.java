@@ -59,22 +59,31 @@ public record TaskResponse(
         List<StationResult> successResponses = new java.util.ArrayList<>();
         List<StationResult> errorResponses = new java.util.ArrayList<>();
 
+        // Read counters once and copy the result map, so a concurrent station callback
+        // cannot make one response contradict itself.
+        boolean finished = task.getEndTimestamp() != null;
+        int responseCount = task.getResponseCount().get();
+        int errorCount = task.getErrorCount().get();
+
         Map<String, RequestResult> resultMap = new TreeMap<>(task.getResultMap());
         resultMap.forEach((chargeBoxId, result) -> {
             if (result.getResponse() != null) {
                 successResponses.add(new StationResult(chargeBoxId, result.getResponse()));
             } else if (result.getErrorMessage() != null) {
                 errorResponses.add(new StationResult(chargeBoxId, result.getErrorMessage()));
+            } else if (finished) {
+                // A station whose callback threw a message-less exception is counted as an
+                // error but has no stored message; report it instead of dropping it silently.
+                errorResponses.add(new StationResult(chargeBoxId, "The operation failed without an error message"));
             }
         });
 
-        boolean finished = task.getEndTimestamp() != null;
         String state;
         if (!finished) {
             state = "RUNNING";
-        } else if (task.getErrorCount() == task.getResultSize()) {
+        } else if (errorCount == resultMap.size()) {
             state = "FAILED";
-        } else if (task.getErrorCount() > 0) {
+        } else if (errorCount > 0) {
             state = "COMPLETED_WITH_ERRORS";
         } else {
             state = "COMPLETED";
@@ -87,9 +96,9 @@ public record TaskResponse(
             task.getStartTimestamp(),
             task.getEndTimestamp(),
             finished,
-            task.getResponseCount().get(),
-            task.getErrorCount().get(),
-            task.getResultSize(),
+            responseCount,
+            errorCount,
+            resultMap.size(),
             successResponses,
             errorResponses
         );

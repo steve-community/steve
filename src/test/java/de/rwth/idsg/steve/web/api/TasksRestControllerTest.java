@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.TaskStore;
@@ -104,7 +105,7 @@ public class TasksRestControllerTest extends AbstractControllerTest {
         when(communicationTask.getResultMap()).thenReturn(resultMap);
         when(communicationTask.getResponseCount()).thenReturn(new AtomicInteger(0));
         when(communicationTask.getErrorCount()).thenReturn(new AtomicInteger(0));
-        when(communicationTask.getResultSize()).thenReturn(2);
+
         when(taskStore.get(123)).thenReturn(communicationTask);
 
         // then
@@ -133,7 +134,7 @@ public class TasksRestControllerTest extends AbstractControllerTest {
         when(communicationTask.getResultMap()).thenReturn(resultMap);
         when(communicationTask.getResponseCount()).thenReturn(new AtomicInteger(2));
         when(communicationTask.getErrorCount()).thenReturn(new AtomicInteger(0));
-        when(communicationTask.getResultSize()).thenReturn(2);
+
         when(taskStore.get(123)).thenReturn(communicationTask);
 
         // then
@@ -162,7 +163,7 @@ public class TasksRestControllerTest extends AbstractControllerTest {
         when(communicationTask.getResultMap()).thenReturn(resultMap);
         when(communicationTask.getResponseCount()).thenReturn(new AtomicInteger(1));
         when(communicationTask.getErrorCount()).thenReturn(new AtomicInteger(1));
-        when(communicationTask.getResultSize()).thenReturn(2);
+
         when(taskStore.get(123)).thenReturn(communicationTask);
 
         // then
@@ -190,7 +191,6 @@ public class TasksRestControllerTest extends AbstractControllerTest {
         when(communicationTask.getResultMap()).thenReturn(resultMap);
         when(communicationTask.getResponseCount()).thenReturn(new AtomicInteger(0));
         when(communicationTask.getErrorCount()).thenReturn(new AtomicInteger(1));
-        when(communicationTask.getResultSize()).thenReturn(1);
         when(taskStore.get(123)).thenReturn(communicationTask);
 
         // then
@@ -199,6 +199,31 @@ public class TasksRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$.state").value("FAILED"))
             .andExpect(jsonPath("$.successResponses", hasSize(0)))
             .andExpect(jsonPath("$.errorResponses", hasSize(1)));
+    }
+
+    @Test
+    @DisplayName("GET one: Message-less station failure is still reported, expected 200")
+    public void test7() throws Exception {
+        // given: the callback threw an exception without a message, which the task
+        // counts as an error but stores with a null errorMessage
+        Map<String, RequestResult> resultMap = new HashMap<>();
+        resultMap.put("CP001", result(null, null));
+
+        when(communicationTask.getOperationName()).thenReturn("ResetTask");
+        when(communicationTask.getStartTimestamp()).thenReturn(DateTime.parse("2026-10-19T08:00:00.000Z"));
+        when(communicationTask.getEndTimestamp()).thenReturn(DateTime.parse("2026-10-19T08:00:03.000Z"));
+        when(communicationTask.getResultMap()).thenReturn(resultMap);
+        when(communicationTask.getResponseCount()).thenReturn(new AtomicInteger(0));
+        when(communicationTask.getErrorCount()).thenReturn(new AtomicInteger(1));
+        when(taskStore.get(123)).thenReturn(communicationTask);
+
+        // then
+        mockMvc.perform(get("/api/v1/tasks/123"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.state").value("FAILED"))
+            .andExpect(jsonPath("$.successResponses", hasSize(0)))
+            .andExpect(jsonPath("$.errorResponses", hasSize(1)))
+            .andExpect(jsonPath("$.errorResponses[0].chargeBoxId").value("CP001"));
     }
 
     private static RequestResult result(String response, String errorMessage) {

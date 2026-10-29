@@ -54,6 +54,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
+import org.jooq.exception.IntegrityConstraintViolationException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -379,6 +380,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 return addChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
+                if (e instanceof IntegrityConstraintViolationException) {
+                    // Lost a race against a concurrent insert of the same chargeBoxId
+                    throw new SteveException.AlreadyExists("A charge point with chargeBoxId '%s' already exists",
+                            form.getChargeBoxId());
+                }
                 throw new SteveException("Failed to add the charge point with chargeBoxId '%s'",
                         form.getChargeBoxId(), e);
             }

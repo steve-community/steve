@@ -39,7 +39,8 @@ public class SecurityProfileValidator implements ConstraintValidator<SecurityPro
         OcppSecurityProfile securityProfile = form.getSecurityProfile();
         String newAuthPassword = form.getAuthPassword();
 
-        if (!securityProfile.isBasicAuth()) {
+        // A null profile violates the field's @NotNull constraint; defer to it instead of NPE-ing here.
+        if (securityProfile == null || !securityProfile.isBasicAuth()) {
             return true;
         }
 

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.web.api.OcppEnumDeserializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,6 +28,7 @@ import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
@@ -63,9 +65,11 @@ public class ChargingProfileForm {
     private Integer stackLevel;
 
     @NotNull(message = "Charging Profile Purpose has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingProfilePurposeType chargingProfilePurpose;
 
     @NotNull(message = "Charging Profile Kind has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingProfileKindType chargingProfileKind;
 
     private RecurrencyKindType recurrencyKind;
@@ -81,6 +85,7 @@ public class ChargingProfileForm {
     private DateTime startSchedule;
 
     @NotNull(message = "Charging Rate Unit has to be set")
+    @JsonDeserialize(using = OcppEnumDeserializer.class)
     private ChargingRateUnitType chargingRateUnit;
 
     private BigDecimal minChargingRate;
@@ -129,6 +134,12 @@ public class ChargingProfileForm {
         return schedulePeriods.stream()
             .filter(Objects::nonNull)
             .anyMatch(SchedulePeriod::isNonEmpty);
+    }
+
+    @AssertTrue(message = "Schedule Periods cannot contain null entries")
+    public boolean isSchedulePeriodsNotNull() {
+        // a null element slips past @Valid on the list and would crash persistence
+        return schedulePeriods == null || schedulePeriods.stream().allMatch(Objects::nonNull);
     }
 
     @Getter

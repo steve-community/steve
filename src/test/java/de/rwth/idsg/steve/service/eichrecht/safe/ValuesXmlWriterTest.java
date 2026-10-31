@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht.safe;
+package de.rwth.idsg.steve.service.eichrecht.safe;
 
-import de.rwth.idsg.steve.eichrecht.EichrechtService;
-import de.rwth.idsg.steve.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.eichrecht.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import jakarta.xml.bind.JAXBContext;

@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
@@ -29,8 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-import static de.rwth.idsg.steve.eichrecht.OcmfParserTest.OCMF;
-import static de.rwth.idsg.steve.eichrecht.OcmfParserTest.PAYLOAD;
+import static de.rwth.idsg.steve.service.eichrecht.OcmfParserTest.OCMF;
+import static de.rwth.idsg.steve.service.eichrecht.OcmfParserTest.PAYLOAD;
 
 public class EichrechtServiceTest {
 

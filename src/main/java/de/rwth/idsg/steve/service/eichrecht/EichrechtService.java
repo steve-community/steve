@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import ocpp.cs._2015._10.ValueFormat;
@@ -32,7 +32,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
-import static de.rwth.idsg.steve.eichrecht.OcmfUtils.PREFIX;
+import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 
 @Service
 public class EichrechtService {

@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht;
 
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
-import static de.rwth.idsg.steve.eichrecht.OcmfUtils.PREFIX;
+import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 
 /**
  * Parses OCMF records and reads values from them.

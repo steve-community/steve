@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.eichrecht.EichrechtService;
-import de.rwth.idsg.steve.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.eichrecht.safe.ValuesXmlWriter;
+import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
+import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;

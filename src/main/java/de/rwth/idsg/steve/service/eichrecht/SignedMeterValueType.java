@@ -16,24 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
-
-import org.jetbrains.annotations.Nullable;
+package de.rwth.idsg.steve.service.eichrecht;
 
 /**
- * Result of one check of the signed data of a transaction.
- *
- * @param note details, e.g. why it failed
+ * JSON object in the value of a signed meter value, like OCPP 2.x SignedMeterValueType:
+ * {"signedMeterData": "...", "encodingMethod": "OCMF", "publicKey": "..."}
  */
-public record SignedDataCheck(
-    String description,
-    Result result,
-    @Nullable String note
+public record SignedMeterValueType(
+    String signedMeterData,
+    String encodingMethod,
+    String publicKey
 ) {
-
-    public enum Result {
-        Passed,
-        Failed,
-        NotChecked
-    }
 }

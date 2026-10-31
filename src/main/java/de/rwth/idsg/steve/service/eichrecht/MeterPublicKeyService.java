@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;

@@ -40,6 +40,8 @@
         </table>
     </center>
     <br>
+    <th:block th:replace="~{data-man/transactionDetails-signedData :: signedMeterData}"></th:block>
+    <br>
     <section><span>Intermediate Meter Values</span></section>
     <div style="text-align: center;">
         <form th:action="@{/manager/transactions/details/{id}(id=${tx.id})}" method="get" style="display: inline-block;">

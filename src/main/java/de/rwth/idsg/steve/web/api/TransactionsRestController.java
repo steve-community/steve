@@ -101,6 +101,23 @@ public class TransactionsRestController {
     }
 
     @Operation(description = """
+        Returns the signed begin and end meter values of this transaction (Eichrecht) as XML file for the
+        S.A.F.E. transparency software, with which the customer can verify them.
+        Contains the public key of the meter, if it is known.
+        Returns 404, if the transaction has no signed begin or end meter value.
+        """)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK", content = {@Content(mediaType = "application/xml", schema = @Schema(type = "string", format = "binary"))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+    )
+    @GetMapping(value = "/{transactionPk}/safe.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    public void getSafeXml(@PathVariable("transactionPk") int transactionPk,
+                           HttpServletResponse response) throws IOException {
+        transactionService.writeSafeXml(transactionPk, response);
+    }
+
+    @Operation(description = """
         Manually changes this transaction from 'active' to 'stopped'.
         """)
     @PatchMapping(value = "/{transactionPk}/stop")

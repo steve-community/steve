@@ -34,7 +34,8 @@ public class MeterPublicKeyServiceTest {
 
     private static final String HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004E5CE";
     private static final String OTHER_HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004AAAA";
-    private static final String OCMF = "OCMF|{\"FV\":\"1.0\",\"PG\":\"T1\",\"RD\":[{\"TX\":\"B\"}]}|{\"SD\":\"3045\"}";
+    private static final String OCMF = """
+        OCMF|{"FV":"1.0","PG":"T1","RD":[{"TX":"B"}]}|{"SD":"3045"}""";
 
     private final MeterPublicKeyService service = new MeterPublicKeyService();
 
@@ -49,6 +50,7 @@ public class MeterPublicKeyServiceTest {
             IyOWIxNjNhMDFkOGE2Mjk3Yzg0YmM1MzBmODY0MzFlOTJmOGQ0NmFiMzc4MzAyNDdjMDVjYmQ5MmZhYzI1M
             jkyOWU3ZjYx
             """;
+
         String printedOnMeter = "3056301006072a8648ce3d020106052b8104000a03420004460a02ba2766d9c44f023ecc0e4e58644a87"
             + "add1aadd6317e5fe4dccdb29b163a01d8a6297c84bc530f86431e92f8d46ab37830247c05cbd92fac252929e7f61";
 
@@ -112,8 +114,9 @@ public class MeterPublicKeyServiceTest {
     }
 
     private static String wrapper(String ocmf, String publicKey) {
-        return "{\"signedMeterData\":\"" + base64(ocmf) + "\",\"encodingMethod\":\"OCMF\",\"publicKey\":\""
-            + publicKey + "\"}";
+        return """
+            {"signedMeterData":"%s","encodingMethod":"OCMF","publicKey":"%s"}"""
+            .formatted(base64(ocmf), publicKey);
     }
 
     private static String base64(String text) {

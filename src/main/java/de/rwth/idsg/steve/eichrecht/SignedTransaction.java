@@ -18,37 +18,46 @@
  */
 package de.rwth.idsg.steve.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.safe.Values;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import lombok.Builder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * The signed meter values of a transaction.
+ *
+ * @param signedMeterValues all meter values with format "SignedData"
+ * @param begin             the signed begin record, null if missing
+ * @param end               the signed end record, null if missing or if the begin record carries both readings
+ * @param publicKey         of the meter in hex or base64, null if unknown
+ * @param checks            whether the signed data is valid and matches the transaction. Empty, if there is no
+ *                          signed begin or end.
+ */
 public record SignedTransaction(
     int transactionId,
     List<SignedMeterValue> signedMeterValues,
-    Values safeXmlValues
+    @Nullable OcmfRecord begin,
+    @Nullable OcmfRecord end,
+    @Nullable String publicKey,
+    List<SignedDataCheck> checks
 ) {
 
-    public record SignedMeterValue(
-        TransactionDetails.MeterValues meterValue,
-        SignedDataParseResult signedDataParseResult
-    ) {
+    /**
+     * @return false, if there is no file for the S.A.F.E. transparency software
+     */
+    public boolean hasBeginOrEnd() {
+        return begin != null || end != null;
     }
 
     /**
-     * Result of parsing the value of one meter value with format "SignedData".
+     * @param ocmfRecord null, if we could not read it (see parseError)
+     * @param publicKey  sent with the value (OCPP SignedMeterValue JSON), not decoded
      */
-    @Builder
-    public record SignedDataParseResult(
-        SignedDataSource source,
-        OcmfRecord ocmfRecord,
-        String parseError,
-
-        // These are only for JSON_WRAPPER source
-        String signingMethod,
-        String encodingMethod,
-        String publicKey
+    public record SignedMeterValue(
+        TransactionDetails.MeterValues meterValue,
+        @Nullable OcmfRecord ocmfRecord,
+        @Nullable String publicKey,
+        @Nullable String parseError
     ) {
     }
 }

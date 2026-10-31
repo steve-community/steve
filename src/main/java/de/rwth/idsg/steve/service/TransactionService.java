@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.eichrecht.EichrechtService;
 import de.rwth.idsg.steve.eichrecht.MeterPublicKeyService;
 import de.rwth.idsg.steve.eichrecht.SignedTransaction;
-import de.rwth.idsg.steve.eichrecht.safe.ValuesMapper;
 import de.rwth.idsg.steve.eichrecht.safe.ValuesXmlWriter;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
@@ -101,16 +100,18 @@ public class TransactionService {
         return transactionRepository.getDetails(transactionPk, energyValuesOnly);
     }
 
-    public SignedTransaction getSignedData(int transactionPk) {
-        var signedDataRows = transactionRepository.getMeterValues(transactionPk, List.of(ValueFormat.SIGNED_DATA.value()));
+    public SignedTransaction getSignedData(Transaction transaction) {
+        int transactionPk = transaction.getId();
+        var signedDataRows = transactionRepository.getMeterValues(
+            transactionPk, List.of(ValueFormat.SIGNED_DATA.value())
+        );
         var signedValues = eichrechtService.parse(signedDataRows);
 
         String publicKey = signedValues.isEmpty()
             ? null
             : meterPublicKeyService.find(signedValues, transactionRepository.getMeterPublicKeySources(transactionPk));
 
-        var safeXmlValues = ValuesMapper.map(transactionPk, signedValues, publicKey);
-        return new SignedTransaction(transactionPk, signedValues, safeXmlValues);
+        return eichrechtService.toSignedTransaction(transaction, signedValues, publicKey);
     }
 
     /**
@@ -129,13 +130,18 @@ public class TransactionService {
     }
 
     String getSafeXml(int transactionPk) {
-        var safeXmlValues = getSignedData(transactionPk).safeXmlValues();
-        if (safeXmlValues.getValues().isEmpty()) {
+        var transaction = getTransaction(transactionPk);
+        if (transaction == null) {
+            throw new SteveException.NotFound("Transaction %s not found", transactionPk);
+        }
+
+        var signedData = getSignedData(transaction);
+        if (!signedData.hasBeginOrEnd()) {
             throw new SteveException.NotFound("Transaction %s has no signed begin or end record", transactionPk);
         }
 
         try {
-            return valuesXmlWriter.createXML(safeXmlValues);
+            return valuesXmlWriter.createXML(signedData);
         } catch (JAXBException e) {
             throw new SteveException("Could not create the S.A.F.E. XML of transaction %s", transactionPk, e);
         }

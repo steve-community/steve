@@ -24,23 +24,36 @@
         <th:block th:if="${count == 0}">No signed meter values were received for this transaction.</th:block>
         <th:block th:if="${count > 0}">
             Signed meter values received: <span th:text="${count}"></span>.
-            <form th:if="${not #lists.isEmpty(signedData.safeXmlValues.values)}"
+            <form th:if="${signedData.hasBeginOrEnd()}"
                   th:action="@{/manager/transactions/details/{id}/safe.xml(id=${signedData.transactionId})}"
                   method="get" style="display: inline-block;">
                 <input type="submit" value="Download S.A.F.E. XML">
             </form>
-            <th:block th:if="${#lists.isEmpty(signedData.safeXmlValues.values)}">
+            <th:block th:unless="${signedData.hasBeginOrEnd()}">
                 There is no signed begin or end of the transaction, so there is no file for the S.A.F.E.
                 transparency software.
             </th:block>
-            <th:block th:with="failed=${signedData.signedMeterValues.?[signedDataParseResult.parseError != null]}">
-                <div th:if="${not #lists.isEmpty(failed)}">
-                    <br>
-                    Could not read <span th:text="${#lists.size(failed)}"></span> of them:
-                    <div th:each="smv : ${failed}"
-                         th:text="|${smv.meterValue.valueTimestamp}: ${smv.signedDataParseResult.parseError}|"></div>
-                </div>
-            </th:block>
+        </th:block>
+    </div>
+    <center th:if="${not #lists.isEmpty(signedData.checks)}">
+        <br>
+        <table class="cpd">
+            <tr th:each="c : ${signedData.checks}">
+                <td style="font-weight: bold;" th:switch="${c.result.name()}">
+                    <span th:case="'Passed'" style="color: green;">&#x2713;</span>
+                    <span th:case="'Failed'" style="color: red;">&#x2717;</span>
+                    <span th:case="*" style="color: gray;">?</span>
+                </td>
+                <td th:text="${c.description}"></td>
+                <td th:text="${c.note}"></td>
+            </tr>
+        </table>
+    </center>
+    <div style="text-align: center;" th:with="failed=${signedData.signedMeterValues.?[parseError != null]}">
+        <th:block th:if="${not #lists.isEmpty(failed)}">
+            <br>
+            Could not read <span th:text="${#lists.size(failed)}"></span> of the signed meter values:
+            <div th:each="smv : ${failed}" th:text="|${smv.meterValue.valueTimestamp}: ${smv.parseError}|"></div>
         </th:block>
     </div>
 </th:block>

@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.eichrecht.safe;
 
 import de.rwth.idsg.steve.eichrecht.EichrechtService;
 import de.rwth.idsg.steve.eichrecht.MeterPublicKeyService;
+import de.rwth.idsg.steve.eichrecht.SignedTransaction;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import jakarta.xml.bind.JAXBContext;
 import org.joda.time.DateTime;
@@ -36,8 +38,11 @@ public class ValuesXmlWriterTest {
 
     private static final int TX_ID = 42;
 
-    private static final String BEGIN = ocmf("T1", "{\"TX\":\"B\",\"RV\":2935.6,\"RU\":\"kWh\",\"ST\":\"G\"}");
-    private static final String END = ocmf("T2", "{\"TX\":\"E\",\"RV\":2947.85,\"RU\":\"kWh\",\"ST\":\"G\"}");
+    private static final String BEGIN = ocmf("T1", """
+        {"TX":"B","RV":2935.6,"RU":"kWh","ST":"G"}""");
+
+    private static final String END = ocmf("T2", """
+        {"TX":"E","RV":2947.85,"RU":"kWh","ST":"G"}""");
 
     private final EichrechtService eichrechtService = new EichrechtService();
     private final ValuesXmlWriter writer = createWriter();
@@ -59,7 +64,9 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void unreadableAndOtherValuesAreSkipped() throws Exception {
-        String periodic = ocmf("T3", "{\"TX\":\"T\",\"RV\":2940.0,\"RU\":\"kWh\"}");
+        String periodic = ocmf("T3", """
+            {"TX":"T","RV":2940.0,"RU":"kWh"}""");
+
         List<Values.Value> values = roundTrip(writer.createXML(tx("<edl40/>", "OCMF|{broken|{}", BEGIN, periodic, END)));
 
         Assertions.assertEquals(2, values.size());
@@ -91,7 +98,9 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void sameRecordRepeated_firstBeginAndLastEnd() throws Exception {
-        String laterEnd = ocmf("T9", "{\"TX\":\"E\",\"RV\":2950.0,\"RU\":\"kWh\"}");
+        String laterEnd = ocmf("T9", """
+            {"TX":"E","RV":2950.0,"RU":"kWh"}""");
+
         List<Values.Value> values = roundTrip(writer.createXML(tx(BEGIN, BEGIN, END, laterEnd, laterEnd)));
 
         Assertions.assertEquals(2, values.size());
@@ -101,7 +110,9 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void oneRecordWithBeginAndEnd_includedOnce() throws Exception {
-        String both = ocmf("T1", "{\"TX\":\"B\",\"RV\":1.0,\"RU\":\"kWh\"},{\"TX\":\"E\",\"RV\":3.5,\"RU\":\"kWh\"}");
+        String both = ocmf("T1", """
+            {"TX":"B","RV":1.0,"RU":"kWh"},{"TX":"E","RV":3.5,"RU":"kWh"}""");
+
         List<Values.Value> values = roundTrip(writer.createXML(tx(both, both)));
 
         Assertions.assertEquals(1, values.size());
@@ -110,8 +121,9 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void publicKeyFromJsonWrapper() throws Exception {
-        String wrapper = "{\"signedMeterData\":\"" + base64(BEGIN) + "\",\"encodingMethod\":\"OCMF\","
-            + "\"publicKey\":\"MFkwEwYHKoZIzj0CAQ==\"}";
+        String wrapper = """
+            {"signedMeterData":"%s","encodingMethod":"OCMF","publicKey":"MFkwEwYHKoZIzj0CAQ=="}"""
+            .formatted(base64(BEGIN));
 
         List<Values.Value> values = roundTrip(writer.createXML(tx(wrapper, END)));
 
@@ -125,6 +137,37 @@ public class ValuesXmlWriterTest {
     }
 
     @Test
+    public void publicKeyHex() throws Exception {
+        String xml = writer.createXML(txWithPublicKey("305930130607", BEGIN, END));
+        List<Values.Value> values = roundTrip(xml);
+
+        for (var value : values) {
+            Assertions.assertEquals(Values.EncodingType.hex, value.getPublicKey().getEncoding());
+            Assertions.assertEquals("305930130607", value.getPublicKey().getValue());
+        }
+
+        // For both begin and end
+        String publicKey = """
+            <publicKey encoding="hex">305930130607</publicKey>""";
+        Assertions.assertEquals(2, xml.split(publicKey, -1).length - 1);
+    }
+
+    @Test
+    public void publicKeyBase64() throws Exception {
+        String xml = writer.createXML(txWithPublicKey("MFkwEwYHKoZIzj0CAQ==", BEGIN, END));
+        List<Values.Value> values = roundTrip(xml);
+
+        for (var value : values) {
+            Assertions.assertEquals(Values.EncodingType.base64, value.getPublicKey().getEncoding());
+            Assertions.assertEquals("MFkwEwYHKoZIzj0CAQ==", value.getPublicKey().getValue());
+        }
+
+        String publicKey = """
+            <publicKey encoding="base64">MFkwEwYHKoZIzj0CAQ==</publicKey>""";
+        Assertions.assertEquals(2, xml.split(publicKey, -1).length - 1);
+    }
+
+    @Test
     public void base64ValueIsWrittenAsPlainOcmf() throws Exception {
         List<Values.Value> values = roundTrip(writer.createXML(tx(base64(BEGIN))));
 
@@ -135,7 +178,9 @@ public class ValuesXmlWriterTest {
     @Test
     public void otherStopTypesAreEnd() throws Exception {
         for (String tx : List.of("L", "R", "A", "P", " E ")) {
-            String end = ocmf("T2", "{\"TX\":\"" + tx + "\",\"RV\":2947.85,\"RU\":\"kWh\"}");
+            String end = ocmf("T2", """
+                {"TX":"%s","RV":2947.85,"RU":"kWh"}""".formatted(tx));
+
             List<Values.Value> values = roundTrip(writer.createXML(tx(BEGIN, end)));
 
             Assertions.assertEquals(2, values.size(), "TX: " + tx);
@@ -146,9 +191,14 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void onlyTransactionPagination() throws Exception {
-        String fiscalBegin = ocmf("F1", "{\"TX\":\"B\",\"RV\":1.0,\"RU\":\"kWh\"}");
-        String fiscalEnd = ocmf("F2", "{\"TX\":\"E\",\"RV\":9.0,\"RU\":\"kWh\"}");
-        String noPagination = BEGIN.replace("\"PG\":\"T1\",", "");
+        String fiscalBegin = ocmf("F1", """
+            {"TX":"B","RV":1.0,"RU":"kWh"}""");
+
+        String fiscalEnd = ocmf("F2", """
+            {"TX":"E","RV":9.0,"RU":"kWh"}""");
+
+        String noPagination = BEGIN.replace("""
+            "PG":"T1",""", "");
 
         List<Values.Value> values = roundTrip(writer.createXML(tx(fiscalBegin, noPagination, BEGIN, END, fiscalEnd)));
 
@@ -162,7 +212,8 @@ public class ValuesXmlWriterTest {
     @Test
     public void singleValue_hasNoTransactionIdInXml() throws Exception {
         Assertions.assertFalse(writer.createXML(tx(BEGIN)).contains("transactionId"));
-        Assertions.assertTrue(writer.createXML(tx(BEGIN, END)).contains("transactionId=\"" + TX_ID + "\""));
+        Assertions.assertTrue(writer.createXML(tx(BEGIN, END)).contains("""
+            transactionId="%s\"""".formatted(TX_ID)));
     }
 
     /**
@@ -183,7 +234,19 @@ public class ValuesXmlWriterTest {
         return values.getValues() == null ? List.of() : values.getValues();
     }
 
-    private Values tx(String... rawValues) {
+    /**
+     * The public key, if one of the values carries it
+     */
+    private SignedTransaction tx(String... rawValues) {
+        var signedValues = parse(rawValues);
+        return toSignedTransaction(signedValues, new MeterPublicKeyService().find(signedValues, null));
+    }
+
+    private SignedTransaction txWithPublicKey(String publicKey, String... rawValues) {
+        return toSignedTransaction(parse(rawValues), publicKey);
+    }
+
+    private List<SignedTransaction.SignedMeterValue> parse(String... rawValues) {
         var meterValues = Arrays.stream(rawValues)
             .map(v -> TransactionDetails.MeterValues.builder()
                 .valueTimestamp(DateTime.now())
@@ -191,13 +254,20 @@ public class ValuesXmlWriterTest {
                 .format("SignedData")
                 .build())
             .toList();
-        var signedValues = eichrechtService.parse(meterValues);
-        return ValuesMapper.map(TX_ID, signedValues, new MeterPublicKeyService().find(signedValues, null));
+        return eichrechtService.parse(meterValues);
+    }
+
+    private SignedTransaction toSignedTransaction(List<SignedTransaction.SignedMeterValue> signedValues,
+                                                  String publicKey) {
+        var transaction = Transaction.builder().id(TX_ID).build();
+        return eichrechtService.toSignedTransaction(transaction, signedValues, publicKey);
     }
 
     private static String ocmf(String pagination, String readings) {
-        return "OCMF|{\"FV\":\"1.0\",\"PG\":\"" + pagination + "\",\"MS\":\"SN1\",\"TT\":\"0,30 EUR & more\","
-            + "\"RD\":[" + readings + "]}|{\"SA\":\"ECDSA-secp256r1-SHA256\",\"SD\":\"3045022100AB\"}";
+        return """
+            OCMF|{"FV":"1.0","PG":"%s","MS":"SN1","TT":"0,30 EUR & more",\
+            "RD":[%s]}|{"SA":"ECDSA-secp256r1-SHA256","SD":"3045022100AB"}"""
+            .formatted(pagination, readings);
     }
 
     private static String base64(String s) {

@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Finds the public key of the meter, with which the signed values of a transaction can be verified.
@@ -36,6 +37,15 @@ import java.util.List;
 public class MeterPublicKeyService {
 
     private static final String CONFIGURATION_KEY = "MeterPublicKey";
+    private static final Pattern HEX = Pattern.compile("[0-9a-fA-F]+");
+
+    /**
+     * @param publicKey as returned by {@link #find}
+     * @return true for hex, false for base64
+     */
+    public static boolean isHex(String publicKey) {
+        return HEX.matcher(publicKey).matches();
+    }
 
     /**
      * A transaction has one meter, so one key. Either sent with a signed value (some stations send it only once
@@ -46,7 +56,7 @@ public class MeterPublicKeyService {
     @Nullable
     public String find(List<SignedMeterValue> signedValues, @Nullable MeterPublicKeySources sources) {
         for (var smv : signedValues) {
-            String key = unwrap(smv.signedDataParseResult().publicKey());
+            String key = unwrap(smv.publicKey());
             if (key != null) {
                 return key;
             }

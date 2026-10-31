@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve.eichrecht;
 
-import com.google.common.base.Strings;
-import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedDataParseResult;
 import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import ocpp.cs._2015._10.ValueFormat;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
@@ -30,13 +30,12 @@ import tools.jackson.core.JacksonException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
-import static de.rwth.idsg.steve.eichrecht.OcmfParser.OCMF_PREFIX;
+import static de.rwth.idsg.steve.eichrecht.OcmfUtils.PREFIX;
 
 @Service
 public class EichrechtService {
-
-    private final OcmfParser ocmfParser = new OcmfParser();
 
     /**
      * Parses all meter values with format "SignedData" of one transaction. Other meter values are ignored.
@@ -46,102 +45,127 @@ public class EichrechtService {
 
         return values.stream()
             .filter(it -> signedData.equals(it.getFormat()))
-            .map(it -> new SignedMeterValue(it, this.parse(it.getValue())))
+            .map(EichrechtService::parse)
             .toList();
     }
 
-    public SignedDataParseResult parse(@Nullable String rawValue) {
-        if (Strings.isNullOrEmpty(rawValue)) {
-            return unsupported("Empty value");
+    /**
+     * Picks the signed begin and end records of the transaction, and checks them.
+     *
+     * @param publicKey of the meter in hex or base64, null if unknown
+     */
+    public SignedTransaction toSignedTransaction(Transaction transaction,
+                                                 List<SignedMeterValue> signedValues,
+                                                 @Nullable String publicKey) {
+        var records = signedValues.stream()
+            .map(SignedMeterValue::ocmfRecord)
+            .filter(Objects::nonNull)
+            .filter(OcmfUtils::isTransactionRecord)
+            .toList();
+
+        var begin = records.stream()
+            .filter(r -> OcmfUtils.beginReading(r) != null)
+            .findFirst()
+            .orElse(null);
+
+        var end = records.stream()
+            .filter(r -> OcmfUtils.endReading(r) != null)
+            .reduce((first, second) -> second)
+            .orElse(null);
+
+        // One record can carry both readings. Then it is enough to have it once.
+        if (begin != null && end != null && begin.rawInput().equals(end.rawInput())) {
+            end = null;
         }
 
-        String trimmed = rawValue.trim();
-        if (trimmed.startsWith(OCMF_PREFIX)) {
-            return fromOcmf(trimmed, SignedDataSource.OCMF_PLAIN);
-        }
-        if (trimmed.startsWith("{")) {
-            return fromJsonWrapper(trimmed);
-        }
-
-        String decoded = tryBase64(trimmed);
-        if (decoded != null) {
-            if (decoded.startsWith(OCMF_PREFIX)) {
-                return fromOcmf(decoded, SignedDataSource.OCMF_BASE64);
-            }
-            if (decoded.startsWith("{")) {
-                return fromJsonWrapper(decoded);
-            }
-        }
-
-        return unsupported("Not an OCMF record");
+        return new SignedTransaction(
+            transaction.getId(),
+            signedValues,
+            begin,
+            end,
+            publicKey,
+            SignedDataChecker.check(begin, end, publicKey, transaction)
+        );
     }
 
-    private SignedDataParseResult fromOcmf(String val, SignedDataSource source) {
-        var builder = SignedDataParseResult.builder().source(source);
-        try {
-            return builder.ocmfRecord(ocmfParser.parse(val)).build();
-        } catch (Exception e) {
-            return builder.parseError("Malformed OCMF record: " + e.getMessage()).build();
+    private static SignedMeterValue parse(TransactionDetails.MeterValues meterValue) {
+        String rawValue = meterValue.getValue();
+        if (StringUtils.isBlank(rawValue)) {
+            return error(meterValue, null, "Empty value");
         }
+
+        String value = decodeBase64Maybe(rawValue.trim());
+
+        if (value.startsWith(PREFIX)) {
+            return fromOcmf(meterValue, value, null);
+        }
+        if (value.startsWith("{")) {
+            return fromJsonWrapper(meterValue, value);
+        }
+        return error(meterValue, null, "Not an OCMF record");
     }
 
-    private SignedDataParseResult fromJsonWrapper(String val) {
-        SignedMeterValueType signedMeterWrapper;
+    private static SignedMeterValue fromJsonWrapper(TransactionDetails.MeterValues meterValue, String json) {
+        SignedMeterValueType wrapper;
         try {
-            signedMeterWrapper = OcmfParser.MAPPER.readValue(val, SignedMeterValueType.class);
+            wrapper = OcmfParser.MAPPER.readValue(json, SignedMeterValueType.class);
         } catch (JacksonException e) {
-            return unsupported("Malformed JSON: " + e.getOriginalMessage());
+            return error(meterValue, null, "Malformed JSON: " + e.getOriginalMessage());
         }
 
-        var builder = SignedDataParseResult.builder()
-            .source(SignedDataSource.JSON_WRAPPER)
-            .signingMethod(signedMeterWrapper.signingMethod)
-            .encodingMethod(signedMeterWrapper.encodingMethod)
-            .publicKey(signedMeterWrapper.publicKey);
-
-        var signedMeterData = signedMeterWrapper.signedMeterData;
-        if (Strings.isNullOrEmpty(signedMeterData)) {
-            return builder.parseError("JSON has no 'signedMeterData'").build();
+        if (StringUtils.isEmpty(wrapper.signedMeterData())) {
+            return error(meterValue, wrapper.publicKey(), "JSON has no 'signedMeterData'");
         }
 
         // OCPP 2.x says base64, but some stations put the plain OCMF string there
-        String ocmf = signedMeterData.startsWith(OCMF_PREFIX)
-            ? signedMeterData
-            : tryBase64(signedMeterData);
+        String ocmf = decodeBase64Maybe(wrapper.signedMeterData().trim());
 
-        if (ocmf == null || !ocmf.startsWith(OCMF_PREFIX)) {
-            return builder.parseError("'signedMeterData' is not OCMF (encodingMethod=" + signedMeterWrapper.encodingMethod + ")").build();
+        if (!ocmf.startsWith(PREFIX)) {
+            String error = "'signedMeterData' is not OCMF (encodingMethod=" + wrapper.encodingMethod() + ")";
+            return error(meterValue, wrapper.publicKey(), error);
         }
 
+        return fromOcmf(meterValue, ocmf, wrapper.publicKey());
+    }
+
+    private static SignedMeterValue fromOcmf(TransactionDetails.MeterValues meterValue, String ocmf,
+                                             @Nullable String publicKey) {
         try {
-            return builder.ocmfRecord(ocmfParser.parse(ocmf)).build();
+            return new SignedMeterValue(meterValue, OcmfParser.parse(ocmf), publicKey, null);
         } catch (Exception e) {
-            return builder.parseError("Malformed OCMF record: " + e.getMessage()).build();
+            return error(meterValue, publicKey, "Malformed OCMF record: " + e.getMessage());
         }
+    }
+
+    private static SignedMeterValue error(TransactionDetails.MeterValues meterValue, @Nullable String publicKey,
+                                          String error) {
+        return new SignedMeterValue(meterValue, null, publicKey, error);
+    }
+
+    private static String decodeBase64Maybe(String raw) {
+        if (isOcmfOrJson(raw)) {
+            return raw;
+        }
+
+        String decoded = tryBase64(raw);
+        if (decoded == null || !isOcmfOrJson(decoded)) {
+            return raw;
+        }
+
+        return decoded;
+    }
+
+    private static boolean isOcmfOrJson(String value) {
+        return value.startsWith(PREFIX) || value.startsWith("{");
     }
 
     @Nullable
     private static String tryBase64(String s) {
         try {
-            String out = new String(Base64.getMimeDecoder().decode(s), StandardCharsets.UTF_8);
-            return out.trim();
+            return new String(Base64.getMimeDecoder().decode(s), StandardCharsets.UTF_8).trim();
         } catch (IllegalArgumentException e) {
             return null;
         }
     }
 
-    private static SignedDataParseResult unsupported(String error) {
-        return SignedDataParseResult.builder()
-            .source(SignedDataSource.UNSUPPORTED)
-            .parseError(error)
-            .build();
-    }
-
-    public record SignedMeterValueType(
-        String signedMeterData,
-        String signingMethod,
-        String encodingMethod,
-        String publicKey
-    ) {
-    }
 }

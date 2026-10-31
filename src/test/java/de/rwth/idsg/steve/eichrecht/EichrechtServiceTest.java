@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.eichrecht;
 
-import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedDataParseResult;
 import de.rwth.idsg.steve.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -31,7 +31,6 @@ import java.util.List;
 
 import static de.rwth.idsg.steve.eichrecht.OcmfParserTest.OCMF;
 import static de.rwth.idsg.steve.eichrecht.OcmfParserTest.PAYLOAD;
-import static de.rwth.idsg.steve.eichrecht.OcmfParserTest.SIGNATURE;
 
 public class EichrechtServiceTest {
 
@@ -39,9 +38,7 @@ public class EichrechtServiceTest {
 
     @Test
     public void plainOcmf() {
-        SignedDataParseResult r = service.parse(OCMF);
-
-        Assertions.assertEquals(SignedDataSource.OCMF_PLAIN, r.source());
+        SignedMeterValue r = parse(OCMF);
         Assertions.assertNull(r.parseError());
         assertSameRecord(r.ocmfRecord());
         Assertions.assertNull(r.publicKey());
@@ -49,55 +46,53 @@ public class EichrechtServiceTest {
 
     @Test
     public void plainOcmf_surroundingWhitespace() {
-        SignedDataParseResult r = service.parse("  " + OCMF + "\n");
-        Assertions.assertEquals(SignedDataSource.OCMF_PLAIN, r.source());
+        SignedMeterValue r = parse("  " + OCMF + "\n");
         assertSameRecord(r.ocmfRecord());
     }
 
     @Test
     public void base64Ocmf() {
-        SignedDataParseResult r = service.parse(base64(OCMF));
-
-        Assertions.assertEquals(SignedDataSource.OCMF_BASE64, r.source());
+        SignedMeterValue r = parse(base64(OCMF));
         Assertions.assertNull(r.parseError());
         assertSameRecord(r.ocmfRecord());
     }
 
     @Test
     public void jsonWrapper_base64SignedMeterData() {
-        String json = "{\"signedMeterData\":\"" + base64(OCMF) + "\",\"signingMethod\":\"ECDSA-secp256r1-SHA256\","
-            + "\"encodingMethod\":\"OCMF\",\"publicKey\":\"MFkwEwYHKoZIzj0CAQ\"}";
+        String json = """
+            {"signedMeterData":"%s","signingMethod":"ECDSA-secp256r1-SHA256","encodingMethod":"OCMF","publicKey":"MFkwEwYHKoZIzj0CAQ"}"""
+            .formatted(base64(OCMF));
 
-        SignedDataParseResult r = service.parse(json);
-
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
+        SignedMeterValue r = parse(json);
         Assertions.assertNull(r.parseError());
         assertSameRecord(r.ocmfRecord());
-        Assertions.assertEquals("ECDSA-secp256r1-SHA256", r.signingMethod());
-        Assertions.assertEquals("OCMF", r.encodingMethod());
         Assertions.assertEquals("MFkwEwYHKoZIzj0CAQ", r.publicKey());
     }
 
     @Test
     public void jsonWrapper_plainSignedMeterData() {
-        SignedDataParseResult r = service.parse("{\"signedMeterData\":" + quote(OCMF) + ",\"encodingMethod\":\"OCMF\"}");
+        SignedMeterValue r = parse("""
+            {"signedMeterData":%s,"encodingMethod":"OCMF"}"""
+            .formatted(quote(OCMF)));
 
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
         assertSameRecord(r.ocmfRecord());
         Assertions.assertNull(r.publicKey());
     }
 
     @Test
     public void jsonWrapper_base64OfWholeObject() {
-        SignedDataParseResult r = service.parse(base64("{\"signedMeterData\":" + quote(OCMF) + "}"));
+        SignedMeterValue r = parse(base64("""
+            {"signedMeterData":%s}"""
+            .formatted(quote(OCMF))));
 
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
         assertSameRecord(r.ocmfRecord());
     }
 
     @Test
     public void jsonWrapper_unknownFieldsIgnored() {
-        SignedDataParseResult r = service.parse("{\"signedMeterData\":" + quote(OCMF) + ",\"customData\":{\"vendorId\":\"x\"}}");
+        SignedMeterValue r = parse("""
+            {"signedMeterData":%s,"customData":{"vendorId":"x"}}"""
+            .formatted(quote(OCMF)));
 
         Assertions.assertNull(r.parseError());
         assertSameRecord(r.ocmfRecord());
@@ -105,20 +100,20 @@ public class EichrechtServiceTest {
 
     @Test
     public void jsonWrapper_notOcmf() {
-        String json = "{\"signedMeterData\":\"" + base64("<edl40>...</edl40>") + "\",\"encodingMethod\":\"EDL\"}";
+        String json = """
+            {"signedMeterData":"%s","encodingMethod":"EDL"}"""
+            .formatted(base64("<edl40>...</edl40>"));
 
-        SignedDataParseResult r = service.parse(json);
-
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
+        SignedMeterValue r = parse(json);
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertTrue(r.parseError().contains("EDL"));
     }
 
     @Test
     public void jsonWrapper_missingSignedMeterData() {
-        SignedDataParseResult r = service.parse("{\"publicKey\":\"abc\"}");
+        SignedMeterValue r = parse("""
+            {"publicKey":"abc"}""");
 
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertEquals("abc", r.publicKey());
         Assertions.assertNotNull(r.parseError());
@@ -126,25 +121,27 @@ public class EichrechtServiceTest {
 
     @Test
     public void jsonWrapper_malformedOcmfInside() {
-        SignedDataParseResult r = service.parse("{\"signedMeterData\":" + quote("OCMF|{broken|{}") + "}");
+        SignedMeterValue r = parse("""
+            {"signedMeterData":%s}"""
+            .formatted(quote("OCMF|{broken|{}")));
 
-        Assertions.assertEquals(SignedDataSource.JSON_WRAPPER, r.source());
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertTrue(r.parseError().startsWith("Malformed OCMF record"));
     }
 
     @Test
     public void malformedOcmf() {
-        SignedDataParseResult r = service.parse("OCMF|{\"FV\":\"1.0\"");
+        SignedMeterValue r = parse("""
+            OCMF|{"FV":"1.0\"""");
 
-        Assertions.assertEquals(SignedDataSource.OCMF_PLAIN, r.source());
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertTrue(r.parseError().startsWith("Malformed OCMF record"));
     }
 
     @Test
     public void ocmf_fieldWithUnexpectedType() {
-        SignedDataParseResult r = service.parse("OCMF|{\"FV\":{\"x\":1}}|{\"SD\":\"AB\"}");
+        SignedMeterValue r = parse("""
+            OCMF|{"RD":[{"RV":{"x":1}}]}|{"SD":"AB"}""");
 
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertTrue(r.parseError().startsWith("Malformed OCMF record"));
@@ -152,9 +149,7 @@ public class EichrechtServiceTest {
 
     @Test
     public void malformedJson() {
-        SignedDataParseResult r = service.parse("{not json");
-
-        Assertions.assertEquals(SignedDataSource.UNSUPPORTED, r.source());
+        SignedMeterValue r = parse("{not json");
         Assertions.assertNull(r.ocmfRecord());
         Assertions.assertNotNull(r.parseError());
     }
@@ -162,8 +157,7 @@ public class EichrechtServiceTest {
     @Test
     public void unsupported() {
         for (String v : new String[]{null, "", "   ", "1234.5", "<signedMeterValue/>", "[1,2]", "OCMFX|{}|{}"}) {
-            SignedDataParseResult r = service.parse(v);
-            Assertions.assertEquals(SignedDataSource.UNSUPPORTED, r.source(), "value: " + v);
+            SignedMeterValue r = parse(v);
             Assertions.assertNull(r.ocmfRecord(), "value: " + v);
             Assertions.assertNotNull(r.parseError(), "value: " + v);
         }
@@ -181,10 +175,11 @@ public class EichrechtServiceTest {
         Assertions.assertEquals(2, result.size());
 
         Assertions.assertSame(signed, result.get(0).meterValue());
-        assertSameRecord(result.get(0).signedDataParseResult().ocmfRecord());
+        assertSameRecord(result.get(0).ocmfRecord());
 
         Assertions.assertSame(broken, result.get(1).meterValue());
-        Assertions.assertEquals(SignedDataSource.UNSUPPORTED, result.get(1).signedDataParseResult().source());
+        Assertions.assertNull(result.get(1).ocmfRecord());
+        Assertions.assertNotNull(result.get(1).parseError());
     }
 
     @Test
@@ -195,8 +190,11 @@ public class EichrechtServiceTest {
     private static void assertSameRecord(OcmfRecord o) {
         Assertions.assertNotNull(o);
         Assertions.assertEquals(PAYLOAD, o.rawPayload());
-        Assertions.assertEquals(SIGNATURE, o.rawSignature());
-        Assertions.assertEquals("T12345", o.payloadSection().pagination());
+        Assertions.assertEquals("T12345", o.payload().pagination());
+    }
+
+    private SignedMeterValue parse(String value) {
+        return service.parse(List.of(mv(value, "SignedData"))).getFirst();
     }
 
     private static TransactionDetails.MeterValues mv(String value, String format) {
@@ -212,7 +210,10 @@ public class EichrechtServiceTest {
         return Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * @return the text as JSON string, with quotes
+     */
     private static String quote(String s) {
-        return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
+        return JsonMapper.shared().writeValueAsString(s);
     }
 }

@@ -21,131 +21,114 @@ package de.rwth.idsg.steve.eichrecht;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 public class OcmfParserTest {
 
     // Example record in the shape of the OCMF spec example
-    static final String PAYLOAD = "{\"FV\":\"1.0\",\"GI\":\"ABL SBC-301\",\"GS\":\"808829900001\",\"GV\":\"1.4p3\","
-        + "\"PG\":\"T12345\",\"MV\":\"Phoenix Contact\",\"MM\":\"EEM-350-D-MCB\",\"MS\":\"BQ27400330016\","
-        + "\"MF\":\"1.0\",\"IS\":true,\"IL\":\"VERIFIED\",\"IF\":[\"RFID_PLAIN\",\"OCPP_RS_TLS\"],"
-        + "\"IT\":\"ISO14443\",\"ID\":\"1F2D3A4F5506C7\",\"TT\":\"Tarif 1\",\"CF\":\"1.2\","
-        + "\"LC\":{\"LN\":\"cable\",\"LI\":1,\"LR\":25,\"LU\":\"mOhm\"},\"CT\":\"EVSEID\",\"CI\":\"DE*ABC*E123\","
-        + "\"RD\":[{\"TM\":\"2018-07-24T13:22:04,000+0200 S\",\"TX\":\"B\",\"RV\":2935.6,\"RI\":\"1-b:1.8.0\","
-        + "\"RU\":\"kWh\",\"RT\":\"AC\",\"CL\":0.0,\"EF\":\"\",\"ST\":\"G\"}]}";
-    static final String SIGNATURE = "{\"SA\":\"ECDSA-secp256r1-SHA256\",\"SE\":\"hex\",\"SM\":\"application/x-der\","
-        + "\"SD\":\"887FABF407AC82782EEFFF2220C2F856AEB0BC22364BBCC6B55761911ED651D1A922BADA88818C9671AFEE7094D7F536\"}";
+    static final String PAYLOAD = """
+        {"FV":"1.0","GI":"ABL SBC-301","GS":"808829900001","GV":"1.4p3",\
+        "PG":"T12345","MV":"Phoenix Contact","MM":"EEM-350-D-MCB","MS":"BQ27400330016",\
+        "MF":"1.0","IS":true,"IL":"VERIFIED","IF":["RFID_PLAIN","OCPP_RS_TLS"],\
+        "IT":"ISO14443","ID":"1F2D3A4F5506C7","TT":"Tarif 1","CF":"1.2",\
+        "LC":{"LN":"cable","LI":1,"LR":25,"LU":"mOhm"},"CT":"EVSEID","CI":"DE*ABC*E123",\
+        "RD":[{"TM":"2018-07-24T13:22:04,000+0200 S","TX":"B","RV":2935.6,"RI":"1-b:1.8.0",\
+        "RU":"kWh","RT":"AC","CL":0.0,"EF":"","ST":"G"}]}""";
+
+    static final String SIGNATURE = """
+        {"SA":"ECDSA-secp256r1-SHA256","SE":"hex","SM":"application/x-der",\
+        "SD":"887FABF407AC82782EEFFF2220C2F856AEB0BC22364BBCC6B55761911ED651D1A922BADA88818C9671AFEE7094D7F536"}""";
+
     static final String OCMF = "OCMF|" + PAYLOAD + "|" + SIGNATURE;
 
-    private final OcmfParser parser = new OcmfParser();
-
     @Test
-    public void allFields() {
-        OcmfRecord o = parser.parse(OCMF);
+    public void parse() {
+        OcmfRecord o = OcmfParser.parse(OCMF);
 
+        Assertions.assertEquals(OCMF, o.rawInput());
         Assertions.assertEquals(PAYLOAD, o.rawPayload());
-        Assertions.assertEquals(SIGNATURE, o.rawSignature());
+        Assertions.assertEquals("T12345", o.payload().pagination());
+        Assertions.assertTrue(OcmfUtils.isTransactionRecord(o));
 
-        var p = o.payloadSection();
-        Assertions.assertEquals("1.0", p.formatVersion());
-        Assertions.assertEquals("ABL SBC-301", p.gatewayId());
-        Assertions.assertEquals("808829900001", p.gatewaySerial());
-        Assertions.assertEquals("1.4p3", p.gatewayVersion());
-        Assertions.assertEquals("T12345", p.pagination());
-        Assertions.assertEquals("Phoenix Contact", p.meterVendor());
-        Assertions.assertEquals("EEM-350-D-MCB", p.meterModel());
-        Assertions.assertEquals("BQ27400330016", p.meterSerial());
-        Assertions.assertEquals("1.0", p.meterFirmware());
-        Assertions.assertEquals("true", p.identificationStatus());
-        Assertions.assertEquals("VERIFIED", p.identificationLevel());
-        Assertions.assertEquals(List.of("RFID_PLAIN", "OCPP_RS_TLS"), p.identificationFlags());
-        Assertions.assertEquals("ISO14443", p.identificationType());
-        Assertions.assertEquals("1F2D3A4F5506C7", p.identificationData());
-        Assertions.assertEquals("Tarif 1", p.tariffText());
-        Assertions.assertEquals("1.2", p.chargeControllerFirmwareVersion());
-        Assertions.assertEquals("EVSEID", p.chargePointIdType());
-        Assertions.assertEquals("DE*ABC*E123", p.chargePointId());
-
-        var lc = p.lossCompensation();
-        Assertions.assertEquals("cable", lc.naming());
-        Assertions.assertEquals("1", lc.identification());
-        Assertions.assertEquals("25", lc.cableResistance());
-        Assertions.assertEquals("mOhm", lc.cableResistanceUnit());
-
-        Assertions.assertEquals(1, p.readings().size());
-        var r = p.readings().getFirst();
-        Assertions.assertEquals("2018-07-24T13:22:04,000+0200 S", r.time());
+        Assertions.assertEquals(1, o.payload().readings().size());
+        var r = OcmfUtils.beginReading(o);
         Assertions.assertEquals("B", r.transactionType());
-        Assertions.assertEquals("2935.6", r.value());
-        Assertions.assertEquals("1-b:1.8.0", r.identifier());
+        Assertions.assertEquals(new BigDecimal("2935.6"), r.value());
         Assertions.assertEquals("kWh", r.unit());
-        Assertions.assertEquals("AC", r.currentType());
-        Assertions.assertEquals("0.0", r.cumulatedLoss());
-        Assertions.assertEquals("", r.errorFlags());
-        Assertions.assertEquals("G", r.status());
+        Assertions.assertNull(OcmfUtils.endReading(o));
 
-        var s = o.signatureSection();
-        Assertions.assertEquals("ECDSA-secp256r1-SHA256", s.signatureAlgorithm());
-        Assertions.assertEquals("hex", s.signatureEncoding());
-        Assertions.assertEquals("application/x-der", s.signatureMimeType());
-        Assertions.assertTrue(s.signatureData().startsWith("887FAB"));
+        Assertions.assertEquals("ECDSA-secp256r1-SHA256", o.signature().algorithm());
+        Assertions.assertEquals("hex", o.signature().encoding());
+        Assertions.assertTrue(o.signature().data().startsWith("887FAB"));
     }
 
     @Test
-    public void minimalRecord_missingFieldsAreNullOrEmpty() {
-        OcmfRecord o = parser.parse("OCMF|{}|{\"SD\":\"AB\"}");
+    public void minimalRecord() {
+        OcmfRecord o = OcmfParser.parse("""
+            OCMF|{}|{"SD":"AB"}""");
 
-        var p = o.payloadSection();
-        Assertions.assertNull(p.formatVersion());
-        Assertions.assertNull(p.lossCompensation());
-        Assertions.assertTrue(p.identificationFlags().isEmpty());
-        Assertions.assertTrue(p.readings().isEmpty());
-        Assertions.assertNull(o.signatureSection().signatureAlgorithm());
-        Assertions.assertEquals("AB", o.signatureSection().signatureData());
+        Assertions.assertNull(o.payload().pagination());
+        Assertions.assertFalse(OcmfUtils.isTransactionRecord(o));
+        Assertions.assertNull(OcmfUtils.beginReading(o));
+        Assertions.assertNull(OcmfUtils.endReading(o));
+        Assertions.assertNull(o.signature().algorithm());
+        Assertions.assertEquals("AB", o.signature().data());
     }
 
     @Test
     public void surroundingWhitespace() {
-        OcmfRecord o = parser.parse("  " + OCMF + "\n");
+        OcmfRecord o = OcmfParser.parse("  " + OCMF + "\n");
+        Assertions.assertEquals(OCMF, o.rawInput());
         Assertions.assertEquals(PAYLOAD, o.rawPayload());
-        Assertions.assertEquals(SIGNATURE, o.rawSignature());
-    }
-
-    @Test
-    public void readingValue_keptAsSent() {
-        OcmfRecord o = parser.parse("OCMF|{\"RD\":[{\"TX\":\"E\",\"RV\":0.0300,\"RU\":\"kWh\"}]}|{\"SD\":\"AB\"}");
-        Assertions.assertEquals("0.0300", o.payloadSection().readings().getFirst().value());
     }
 
     @Test
     public void pipeInsidePayloadValue() {
-        String payload = "{\"TT\":\"0,30 EUR | kWh\",\"CI\":\"A|B\"}";
-        OcmfRecord o = parser.parse("OCMF|" + payload + "|{\"SD\":\"AB\"}");
+        String payload = """
+            {"TT":"0,30 EUR | kWh","PG":"T1"}""";
+
+        OcmfRecord o = OcmfParser.parse("""
+            OCMF|%s|{"SD":"AB"}"""
+            .formatted(payload));
 
         Assertions.assertEquals(payload, o.rawPayload());
-        Assertions.assertEquals("0,30 EUR | kWh", o.payloadSection().tariffText());
-        Assertions.assertEquals("A|B", o.payloadSection().chargePointId());
+        Assertions.assertEquals("T1", o.payload().pagination());
     }
 
     @Test
-    public void wrongPrefix() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> parser.parse("OCMFX|{}|{}"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> parser.parse("{}|{}"));
+    public void endReadings() {
+        for (String type : new String[]{"E", "L", "R", "A", "P"}) {
+            var o = OcmfParser.parse("""
+                OCMF|{"RD":[{"TX":"%s"}]}|{}"""
+                .formatted(type));
+
+            Assertions.assertNotNull(OcmfUtils.endReading(o), type);
+        }
+
+        var other = OcmfParser.parse("""
+            OCMF|{"RD":[{"TX":"T"}]}|{}""");
+
+        Assertions.assertNull(OcmfUtils.endReading(other));
     }
 
     @Test
-    public void missingSignatureSection() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> parser.parse("OCMF|{}"));
+    public void valueInWh() {
+        Assertions.assertEquals(0, new BigDecimal("2935600")
+            .compareTo(OcmfUtils.valueInWh(new OcmfRecord.Reading("B", new BigDecimal("2935.6"), "kWh"))));
+
+        var wh = new OcmfRecord.Reading("B", new BigDecimal("7753"), "Wh");
+        Assertions.assertEquals(new BigDecimal("7753"), OcmfUtils.valueInWh(wh));
+        Assertions.assertNull(OcmfUtils.valueInWh(new OcmfRecord.Reading("B", BigDecimal.ONE, "varh")));
+        Assertions.assertNull(OcmfUtils.valueInWh(new OcmfRecord.Reading("B", null, "kWh")));
     }
 
     @Test
-    public void sectionNotAnObject() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> parser.parse("OCMF|[]|{}"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> parser.parse("OCMF|{}|\"x\""));
-    }
-
-    @Test
-    public void malformedJson() {
-        Assertions.assertThrows(RuntimeException.class, () -> parser.parse("OCMF|{broken|{}"));
+    public void invalid() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> OcmfParser.parse("OCMFX|{}|{}"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> OcmfParser.parse("OCMF|{}"));
+        Assertions.assertThrows(RuntimeException.class, () -> OcmfParser.parse("OCMF|[]|{}"));
+        Assertions.assertThrows(RuntimeException.class, () -> OcmfParser.parse("OCMF|{broken|{}"));
+        Assertions.assertThrows(RuntimeException.class, () -> OcmfParser.parse("""
+            OCMF|{"RD":[{"RV":{}}]}|{}"""));
     }
 }

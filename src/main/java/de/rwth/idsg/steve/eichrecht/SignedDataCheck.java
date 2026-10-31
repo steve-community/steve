@@ -18,27 +18,22 @@
  */
 package de.rwth.idsg.steve.eichrecht;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
- * How a meter value with format "SignedData" carries its signed data.
+ * Result of one check of the signed data of a transaction.
+ *
+ * @param note details, e.g. why it failed
  */
-public enum SignedDataSource {
-    /**
-     * The value is the OCMF string itself.
-     */
-    OCMF_PLAIN,
+public record SignedDataCheck(
+    String description,
+    Result result,
+    @Nullable String note
+) {
 
-    /**
-     * The value is base64 of the OCMF string.
-     */
-    OCMF_BASE64,
-
-    /**
-     * The value is a JSON object like OCPP 2.0.1 SignedMeterValueType, which wraps the signed data.
-     */
-    JSON_WRAPPER,
-
-    /**
-     * We could not recognize the format.
-     */
-    UNSUPPORTED
+    public enum Result {
+        Passed,
+        Failed,
+        NotChecked
+    }
 }

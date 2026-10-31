@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * https://github.com/SAFE-eV/transparenzsoftware
  * https://github.com/SAFE-eV/transparenzsoftware/blob/main/XML_Format.md
- * https://github.com/SAFE-eV/transparenzsoftware/tree/main/src/main/java/de/safe_ev/transparenzsoftware/verification/xml
+ * See also the package de.safe_ev.transparenzsoftware.verification.xml in the repository above.
  */
 @Accessors(chain = true)
 @Data

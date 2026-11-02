@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -37,4 +38,16 @@ public class ConnectorStatusForm {
 
     @Schema(allowableValues = {"Available", "Charging", "Faulted", "Finishing", "Occupied", "Preparing", "Reserved", "SuspendedEV", "SuspendedEVSE", "Unavailable"})
     private String status;
+
+    @Schema(defaultValue = "ReplaceWithStation",
+        description = """
+        How to handle the status of connector 0 (the whole station) if it is more recent than the status of
+        the other connectors of the station.
+        - ReplaceWithStation: return only connector 0 (default).
+        - InheritFromStation: return the other connectors with the status of connector 0.
+        - AsReported: no interpretation, return the latest status of every connector including 0.
+        
+        In all cases, only the latest status per connector is returned (no history).
+        """)
+    private ConnectorStatusFilter.Strategy connectorZeroStrategy = ConnectorStatusFilter.DEFAULT_STRATEGY;
 }

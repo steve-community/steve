@@ -37,6 +37,7 @@ import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.service.notification.OcppStationSecurityBasicAuthChanged;
 import de.rwth.idsg.steve.service.notification.OcppStationSecurityProfileChanged;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
+import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
@@ -331,7 +332,7 @@ public class ChargePointService {
             }
         }
 
-        return latestList;
+        return ConnectorStatusFilter.processAndFilterList(latestList, params.getConnectorZeroStrategy());
     }
 
     public Set<String> getChargeBoxIdsOfConnectedJsonStations() {

@@ -37,12 +37,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectorStatusFilter {
 
-    public static List<ConnectorStatus> filterAndPreferZero(List<ConnectorStatus> initialList) {
-        return processAndFilterList(initialList, Strategy.PreferZero);
-    }
+    public static final Strategy DEFAULT_STRATEGY = Strategy.ReplaceWithStation;
 
-    public static List<ConnectorStatus> filterAndPreferOthersWithStatusOfZero(List<ConnectorStatus> initialList) {
-        return processAndFilterList(initialList, Strategy.PreferOthersWithStatusOfZero);
+    public static List<ConnectorStatus> processUsingDefault(List<ConnectorStatus> initialList) {
+        return processAndFilterList(initialList, DEFAULT_STRATEGY);
     }
 
     /**
@@ -62,12 +60,18 @@ public final class ConnectorStatusFilter {
      * 3) compare the two, which timestamp is more recent: 0 or others?
      * 4) depending on the previous step, build the list to return
      */
-    private static List<ConnectorStatus> processAndFilterList(List<ConnectorStatus> initialList, Strategy strategy) {
+    public static List<ConnectorStatus> processAndFilterList(List<ConnectorStatus> initialList, Strategy strategy) {
+        var strategyToUse = (strategy == null) ? DEFAULT_STRATEGY : strategy;
+
+        if (Strategy.AsReported.equals(strategyToUse)) {
+            return initialList;
+        }
+
         return initialList.stream()
                           .collect(Collectors.groupingBy(ConnectorStatus::getChargeBoxId))
                           .values()
                           .stream()
-                          .flatMap(val -> processForOneStation(val, strategy).stream())
+                          .flatMap(val -> processForOneStation(val, strategyToUse).stream())
                           .collect(Collectors.toList());
     }
 
@@ -100,7 +104,11 @@ public final class ConnectorStatusFilter {
 
             if (maxNonZero.filter(pr).isPresent()) {
                 // this is the special case we need to handle
-                return strategy.process(zero, nonZero);
+                return switch (strategy) {
+                    case AsReported -> throw new IllegalStateException("Implementation error. We should have handled this case earlier");
+                    case ReplaceWithStation -> zero;
+                    case InheritFromStation -> preferOthersWithStatusOfZero(zero, nonZero);
+                };
             } else {
                 return nonZero;
             }
@@ -113,44 +121,46 @@ public final class ConnectorStatusFilter {
     // Strategy stuff
     // -------------------------------------------------------------------------
 
-    private enum Strategy implements ZeroMoreRecentStrategy {
-
-        PreferZero {
-            @Override
-            public List<ConnectorStatus> process(List<ConnectorStatus> zero, List<ConnectorStatus> nonZero) {
-                return zero;
-            }
-        },
+    /**
+     * How to handle the status of connector id 0 (represents the whole station), if it is more recent than the
+     * status of the other connectors of the same station. All strategies work on the latest status per connector.
+     * None of them returns the status history.
+     */
+    public enum Strategy {
 
         /**
-         * If connector 0 is more recent, copy the status of connector 0 to
-         * other connector ids, and return ONLY others.
+         * Do not interpret connector 0 at all: return the latest status of every connector, including 0.
          */
-        PreferOthersWithStatusOfZero {
-            @Override
-            public List<ConnectorStatus> process(List<ConnectorStatus> zero, List<ConnectorStatus> nonZero) {
+        AsReported,
 
-                ConnectorStatus zeroStat = zero.get(0); // we are sure that there is only one
+        /**
+         * If connector 0 is more recent, return ONLY connector 0 and drop the others.
+         */
+        ReplaceWithStation,
 
-                return nonZero.stream()
-                              .map(cs -> ConnectorStatus.builder()
-                                                        .chargeBoxPk(cs.getChargeBoxPk())
-                                                        .chargeBoxId(cs.getChargeBoxId())
-                                                        .connectorId(cs.getConnectorId())
-                                                        .timeStamp(zeroStat.getTimeStamp())
-                                                        .statusTimestamp(zeroStat.getStatusTimestamp())
-                                                        .status(zeroStat.getStatus())
-                                                        .errorCode(zeroStat.getErrorCode())
-                                                        .ocppProtocol(cs.getOcppProtocol())
-                                                        .jsonAndDisconnected(cs.isJsonAndDisconnected())
-                                                        .build())
-                              .collect(Collectors.toList());
-            }
-        }
+        /**
+         * If connector 0 is more recent, copy the status of connector 0 to other connector ids, and return ONLY others.
+         */
+        InheritFromStation
     }
 
-    private interface ZeroMoreRecentStrategy {
-        List<ConnectorStatus> process(List<ConnectorStatus> zero, List<ConnectorStatus> nonZero);
+    private static List<ConnectorStatus> preferOthersWithStatusOfZero(List<ConnectorStatus> zero,
+                                                                      List<ConnectorStatus> nonZero) {
+        ConnectorStatus zeroStat = zero.get(0); // we are sure that there is only one
+
+        return nonZero.stream()
+            .map(cs -> ConnectorStatus.builder()
+                .chargeBoxPk(cs.getChargeBoxPk())
+                .chargeBoxId(cs.getChargeBoxId())
+                .connectorId(cs.getConnectorId())
+                .timeStamp(zeroStat.getTimeStamp())
+                .statusTimestamp(zeroStat.getStatusTimestamp())
+                .status(zeroStat.getStatus())
+                .errorCode(zeroStat.getErrorCode())
+                .ocppProtocol(cs.getOcppProtocol())
+                .jsonAndDisconnected(cs.isJsonAndDisconnected())
+                .build())
+            .collect(Collectors.toList());
     }
 
 }

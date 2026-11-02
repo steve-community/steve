@@ -113,18 +113,18 @@ public class ConnectorStatusFilterTest {
 
     @Test
     public void testInherit_zeroIsLater() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").errorCode("OtherError").connectorId(0).build();
-        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
-        ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").errorCode("OtherError").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
 
-        List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
+        var list = List.of(cs0, cs1, cs2);
         var result = ConnectorStatusFilter.processAndFilterList(list, InheritFromStation);
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertEquals(Set.of(1, 2), result.stream().map(ConnectorStatus::getConnectorId).collect(Collectors.toSet()));
-        for (ConnectorStatus cs : result) {
+        for (var cs : result) {
             Assertions.assertEquals("Faulted", cs.getStatus());
             Assertions.assertEquals("OtherError", cs.getErrorCode());
             Assertions.assertEquals(cs0.getStatusTimestamp(), cs.getStatusTimestamp());
@@ -133,13 +133,13 @@ public class ConnectorStatusFilterTest {
 
     @Test
     public void testInherit_zeroIsEarlier() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
-        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
-        ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
 
-        List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
+        var list = List.of(cs0, cs1, cs2);
         var result = ConnectorStatusFilter.processAndFilterList(list, InheritFromStation);
 
         Assertions.assertEquals(2, result.size());
@@ -149,13 +149,13 @@ public class ConnectorStatusFilterTest {
 
     @Test
     public void testAsReported_zeroIsLater() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
-        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
-        ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("bar").status("Charging").connectorId(1).build();
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("bar").status("Charging").connectorId(1).build();
 
-        List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
+        var list = List.of(cs0, cs1, cs2);
         var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
 
         Assertions.assertEquals(list, result);
@@ -163,12 +163,12 @@ public class ConnectorStatusFilterTest {
 
     @Test
     public void testAsReported_zeroIsEarlier() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
-        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
 
-        List<ConnectorStatus> list = List.of(cs0, cs1);
+        var list = List.of(cs0, cs1);
         var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
 
         Assertions.assertEquals(list, result);
@@ -176,12 +176,12 @@ public class ConnectorStatusFilterTest {
 
     @Test
     public void testAsReported_sameTimestamp() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Faulted").connectorId(0).build();
-        ConnectorStatus cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
 
-        List<ConnectorStatus> list = List.of(cs0, cs1);
+        var list = List.of(cs0, cs1);
         var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
 
         Assertions.assertEquals(list, result);
@@ -192,12 +192,12 @@ public class ConnectorStatusFilterTest {
      */
     @Test
     public void testAsReported_duplicateLatest() {
-        DateTime dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
 
-        ConnectorStatus cs1a = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
-        ConnectorStatus cs1b = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Preparing").connectorId(1).build();
+        var cs1a = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs1b = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Preparing").connectorId(1).build();
 
-        List<ConnectorStatus> list = List.of(cs1a, cs1b);
+        var list = List.of(cs1a, cs1b);
         var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
 
         Assertions.assertEquals(list, result);

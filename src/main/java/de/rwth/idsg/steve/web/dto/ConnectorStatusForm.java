@@ -48,6 +48,7 @@ public class ConnectorStatusForm {
         - AsReported: no interpretation, return the latest status of every connector including 0.
         
         In all cases, only the latest status per connector is returned (no history).
+        The status filter is applied to the result of this strategy.
         """)
     private ConnectorStatusFilter.Strategy connectorZeroStrategy = ConnectorStatusFilter.DEFAULT_STRATEGY;
 }

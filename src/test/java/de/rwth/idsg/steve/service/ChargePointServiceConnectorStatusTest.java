@@ -39,6 +39,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,6 +93,51 @@ public class ChargePointServiceConnectorStatusTest {
     @Test
     public void asReported() {
         Assertions.assertEquals(List.of(cs0, cs1), service.getChargePointConnectorStatus(form(Strategy.AsReported)));
+    }
+
+    /**
+     * Connector 1 originally says Available, but inherits Faulted from the more recent connector 0.
+     */
+    @Test
+    public void inheritFromStation_statusFilterAppliedAfterStrategy() {
+        var form = form(Strategy.InheritFromStation);
+        form.setStatus("Faulted");
+
+        var result = service.getChargePointConnectorStatus(form);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(1, result.get(0).getConnectorId());
+        Assertions.assertEquals("Faulted", result.get(0).getStatus());
+
+        form.setStatus("Available");
+        Assertions.assertTrue(service.getChargePointConnectorStatus(form).isEmpty());
+    }
+
+    /**
+     * Connector 1 is masked by the more recent connector 0, so it must not show up for its original status.
+     */
+    @Test
+    public void replaceWithStation_statusFilterAppliedAfterStrategy() {
+        var form = form(Strategy.ReplaceWithStation);
+        form.setStatus("Available");
+        Assertions.assertTrue(service.getChargePointConnectorStatus(form).isEmpty());
+
+        form.setStatus("Faulted");
+        Assertions.assertEquals(List.of(cs0), service.getChargePointConnectorStatus(form));
+    }
+
+    @Test
+    public void asReported_statusFilter() {
+        var form = form(Strategy.AsReported);
+        form.setStatus("Available");
+        Assertions.assertEquals(List.of(cs1), service.getChargePointConnectorStatus(form));
+    }
+
+    @Test
+    public void repositoryIsQueriedWithChargeBoxIdOnly() {
+        var form = form(Strategy.AsReported);
+        form.setStatus("Available");
+        service.getChargePointConnectorStatus(form);
+        verify(chargePointRepository).getChargePointConnectorStatus("foo");
     }
 
     private static ConnectorStatusForm form(Strategy strategy) {

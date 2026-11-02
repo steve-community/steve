@@ -320,7 +320,7 @@ public class ChargePointService {
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params.getChargeBoxId());
 
         // iterate over JSON stations and mark disconnected ones
         // https://github.com/steve-community/steve/issues/355
@@ -332,7 +332,12 @@ public class ChargePointService {
             }
         }
 
-        return ConnectorStatusFilter.processAndFilterList(latestList, params.getConnectorZeroStrategy());
+        var filteredList = ConnectorStatusFilter.processAndFilterList(latestList, params.getConnectorZeroStrategy());
+
+        // filter by status only after the strategy, since the strategy can change the status of connectors
+        return StringUtils.isBlank(params.getStatus())
+            ? filteredList
+            : filteredList.stream().filter(cs -> params.getStatus().equals(cs.getStatus())).toList();
     }
 
     public Set<String> getChargeBoxIdsOfConnectedJsonStations() {

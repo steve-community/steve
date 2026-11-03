@@ -24,6 +24,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static de.rwth.idsg.steve.utils.ConnectorStatusFilter.Strategy.AsReported;
+import static de.rwth.idsg.steve.utils.ConnectorStatusFilter.Strategy.InheritFromStation;
+import static de.rwth.idsg.steve.utils.ConnectorStatusFilter.Strategy.ReplaceWithStation;
 
 public class ConnectorStatusFilterTest {
 
@@ -34,7 +40,7 @@ public class ConnectorStatusFilterTest {
         ConnectorStatus cs0 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(0).build();
 
         List<ConnectorStatus> list = List.of(cs0);
-        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+        var result = ConnectorStatusFilter.processAndFilterList(list, ReplaceWithStation);
 
         Assertions.assertEquals(1, result.size());
         Assertions.assertTrue(result.contains(cs0));
@@ -48,7 +54,7 @@ public class ConnectorStatusFilterTest {
         ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(2).build();
 
         List<ConnectorStatus> list = List.of(cs1, cs2);
-        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+        var result = ConnectorStatusFilter.processAndFilterList(list, ReplaceWithStation);
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertTrue(result.contains(cs1));
@@ -64,7 +70,7 @@ public class ConnectorStatusFilterTest {
         ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(2).build();
 
         List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
-        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+        var result = ConnectorStatusFilter.processAndFilterList(list, ReplaceWithStation);
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertTrue(result.contains(cs1));
@@ -80,7 +86,7 @@ public class ConnectorStatusFilterTest {
         ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(2).build();
 
         List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
-        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+        var result = ConnectorStatusFilter.processAndFilterList(list, ReplaceWithStation);
 
         Assertions.assertEquals(1, result.size());
         Assertions.assertTrue(result.contains(cs0));
@@ -98,10 +104,102 @@ public class ConnectorStatusFilterTest {
         ConnectorStatus cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(2).build();
 
         List<ConnectorStatus> list = List.of(cs0, cs1, cs2);
-        var result = ConnectorStatusFilter.filterAndPreferZero(list);
+        var result = ConnectorStatusFilter.processAndFilterList(list, ReplaceWithStation);
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertTrue(result.contains(cs1));
         Assertions.assertTrue(result.contains(cs2));
+    }
+
+    @Test
+    public void testInherit_zeroIsLater() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").errorCode("OtherError").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
+
+        var list = List.of(cs0, cs1, cs2);
+        var result = ConnectorStatusFilter.processAndFilterList(list, InheritFromStation);
+
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals(Set.of(1, 2), result.stream().map(ConnectorStatus::getConnectorId).collect(Collectors.toSet()));
+        for (var cs : result) {
+            Assertions.assertEquals("Faulted", cs.getStatus());
+            Assertions.assertEquals("OtherError", cs.getErrorCode());
+            Assertions.assertEquals(cs0.getStatusTimestamp(), cs.getStatusTimestamp());
+        }
+    }
+
+    @Test
+    public void testInherit_zeroIsEarlier() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Charging").connectorId(2).build();
+
+        var list = List.of(cs0, cs1, cs2);
+        var result = ConnectorStatusFilter.processAndFilterList(list, InheritFromStation);
+
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertTrue(result.contains(cs1));
+        Assertions.assertTrue(result.contains(cs2));
+    }
+
+    @Test
+    public void testAsReported_zeroIsLater() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.plusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs2 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("bar").status("Charging").connectorId(1).build();
+
+        var list = List.of(cs0, cs1, cs2);
+        var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
+
+        Assertions.assertEquals(list, result);
+    }
+
+    @Test
+    public void testAsReported_zeroIsEarlier() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt.minusHours(1)).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+
+        var list = List.of(cs0, cs1);
+        var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
+
+        Assertions.assertEquals(list, result);
+    }
+
+    @Test
+    public void testAsReported_sameTimestamp() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs0 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Faulted").connectorId(0).build();
+        var cs1 = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+
+        var list = List.of(cs0, cs1);
+        var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
+
+        Assertions.assertEquals(list, result);
+    }
+
+    /**
+     * Two rows with the same latest timestamp for one connector can come back from the DB. AsReported keeps both.
+     */
+    @Test
+    public void testAsReported_duplicateLatest() {
+        var dt = DateTime.parse("2025-12-10T12:00:00.000Z");
+
+        var cs1a = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Available").connectorId(1).build();
+        var cs1b = ConnectorStatus.builder().statusTimestamp(dt).chargeBoxId("foo").status("Preparing").connectorId(1).build();
+
+        var list = List.of(cs1a, cs1b);
+        var result = ConnectorStatusFilter.processAndFilterList(list, AsReported);
+
+        Assertions.assertEquals(list, result);
     }
 }

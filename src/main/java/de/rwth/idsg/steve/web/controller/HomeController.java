@@ -19,10 +19,8 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
-import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -32,8 +30,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 /**
  *
@@ -79,10 +75,7 @@ public class HomeController {
         model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
-
-        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
-        List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
-        model.addAttribute("connectorStatusList", filteredList);
+        model.addAttribute("connectorStatusList", chargePointService.getChargePointConnectorStatus(params));
         return "connectorStatus";
     }
 

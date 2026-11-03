@@ -33,7 +33,6 @@ import de.rwth.idsg.steve.web.dto.ChargePointFormForCreate;
 import de.rwth.idsg.steve.web.dto.ChargePointFormForUpdate;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm.ChargeBoxIdMatchType;
-import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.enums.EvseTopologySource;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import jooq.steve.db.tables.records.EvseConnectorRecord;
@@ -285,7 +284,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
+    public List<ConnectorStatus> getChargePointConnectorStatus(String chargeBoxId) {
         // find out the latest timestamp for each connector
         Field<Integer> t1Pk = CONNECTOR_STATUS.EVSE_PK.as("t1_pk");
         Field<DateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
@@ -312,12 +311,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         // https://github.com/steve-community/steve/issues/691
         conditions.add(CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value()));
 
-        if (form != null && StringUtils.isNotBlank(form.getChargeBoxId())) {
-            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
-        }
-
-        if (form != null && StringUtils.isNotBlank(form.getStatus())) {
-            conditions.add(t2.field(t2Status).eq(form.getStatus()));
+        if (StringUtils.isNotBlank(chargeBoxId)) {
+            conditions.add(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
         }
 
         return ctx.select(

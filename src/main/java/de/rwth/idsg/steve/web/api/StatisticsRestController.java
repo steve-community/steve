@@ -18,13 +18,11 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.web.dto.ConnectorStatusList;
-import de.rwth.idsg.steve.web.dto.WebSocketConnectionList;
-import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointService;
-import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import de.rwth.idsg.steve.web.dto.ConnectorStatusList;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import de.rwth.idsg.steve.web.dto.WebSocketConnectionList;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
 @Tag(name = "statistics-controller")
 @Slf4j
@@ -61,9 +58,7 @@ public class StatisticsRestController {
         """)
     @GetMapping(value = "/status")
     public ConnectorStatusList getConnectorStatus(@Valid @ParameterObject ConnectorStatusForm params) {
-        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
-        List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
-        return new ConnectorStatusList(filteredList);
+        return new ConnectorStatusList(chargePointService.getChargePointConnectorStatus(params));
     }
 
     @Operation(description = """

@@ -50,6 +50,21 @@ Connector Status
             </td>
         </tr>
         <tr>
+            <td>Connector 0 Strategy:</td>
+            <td><select th:field="*{connectorZeroStrategy}">
+                <option th:each="it : ${T(de.rwth.idsg.steve.utils.ConnectorStatusFilter$Strategy).values()}" th:value="${{it}}" th:text="${it}"></option>
+            </select>
+                <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+                    <span>Connector 0 represents the whole station. This setting decides what to show when the status
+                        of connector 0 is more recent than the status of the other connectors of the station.
+                        <br><br><b>ReplaceWithStation:</b> Show only connector 0 (default).
+                        <br><b>InheritFromStation:</b> Show the other connectors with the status of connector 0.
+                        <br><b>AsReported:</b> Show the latest status of every connector including 0, without interpretation.
+                        <br><br>The status filter is applied to the result of this setting.</span>
+                </a>
+            </td>
+        </tr>
+        <tr>
             <td></td>
             <td id="add_space">
                 <input type="submit" value="Get">

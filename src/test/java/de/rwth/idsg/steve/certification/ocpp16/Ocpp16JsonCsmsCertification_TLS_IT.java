@@ -149,6 +149,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile3(serverProperties.getSsl());
+        awaitStationConnected();
 
         // 1-2) Trigger SignChargePointCertificate
         {
@@ -232,6 +233,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultSecureStation().startWithProfile2(password, serverProperties.getSsl());
+        awaitStationConnected();
 
         // change config
         {
@@ -379,6 +381,7 @@ public class Ocpp16JsonCsmsCertification_TLS_IT extends AbstractOcpp16JsonCsms {
                                                 int expectedMinKeySize) throws Exception {
         Ssl ssl = sslWithCustomTrustStore("src/test/resources/certificates/cp-client.p12");
         var chargePoint = defaultSecureStation().startWithProfile3(ssl);
+        awaitStationConnected();
 
         // ExtendedTriggerMessage
         {

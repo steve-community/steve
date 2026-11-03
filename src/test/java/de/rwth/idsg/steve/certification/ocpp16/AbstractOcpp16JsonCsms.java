@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.certification.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreHolder;
 import de.rwth.idsg.steve.service.OcppOperationsService;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
@@ -50,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -58,6 +60,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Slf4j
 public abstract class AbstractOcpp16JsonCsms {
@@ -76,6 +79,8 @@ public abstract class AbstractOcpp16JsonCsms {
     PasswordEncoder passwordEncoder;
     @Autowired
     OcppOperationsService operationsService;
+    @Autowired
+    SessionContextStoreHolder sessionContextStoreHolder;
 
     private __DatabasePreparer__ databasePreparer;
 
@@ -238,6 +243,28 @@ public abstract class AbstractOcpp16JsonCsms {
 
     OcppJsonChargePoint defaultStation() {
         return new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, Helpers.getJsonPath(serverProperties));
+    }
+
+    /**
+     * The client's handshake completes before the server has stored the session (WebSocketEndpoint.onOpen).
+     * Call this after start() in tests that begin with a server-initiated call. Otherwise, these would fail with
+     * "No stations are eligible for communication".
+     */
+    void awaitStationConnected() {
+        var store = sessionContextStoreHolder.getOrCreate(OcppVersion.V_16);
+        long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+
+        while (store.getSize(REGISTERED_CHARGE_BOX_ID) == 0) {
+            if (System.nanoTime() > deadline) {
+                fail("Server did not register the WebSocket session of " + REGISTERED_CHARGE_BOX_ID + " in time");
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**

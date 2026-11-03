@@ -287,6 +287,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_061_CSMS_ClearAuthorizationDataInAuthorizationCache() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -340,6 +341,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_011_1_CSMS_RemoteStartChargingSession_RemoteStartFirst() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -375,6 +377,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_011_2_CSMS_RemoteStartChargingSession_Timeout() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -448,6 +451,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_013_CSMS_HardReset() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new ResetParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -472,6 +476,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_014_CSMS_SoftReset() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new ResetParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -496,6 +501,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_017_1_CSMS_UnlockConnector_NoTransaction_NotFixedCable() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -515,6 +521,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_017_2_CSMS_UnlockConnector_NoTransaction_FixedCable() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -534,6 +541,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_018_1_CSMS_UnlockConnector_WithChargingSession() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var startTransactionResponse = enterChargingState(chargePoint, 1, REGISTERED_OCPP_TAG, 0);
 
@@ -564,6 +572,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_019_1_CSMS_RetrieveAllConfigurationKeys() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new GetConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -627,6 +636,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_019_2_CSMS_RetrieveSpecificConfigurationKey() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new GetConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -652,6 +662,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_021_CSMS_ChangeSetConfiguration() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -739,6 +750,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_026_CSMS_RemoteStartChargingSession_Rejected() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new RemoteStartTransactionParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -766,6 +778,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_028_CSMS_RemoteStopTransaction_Rejected() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var startTransactionResponse = enterChargingState(chargePoint, 1, REGISTERED_OCPP_TAG, 0);
         int unknownTransactionId = startTransactionResponse.getTransactionId();
@@ -788,6 +801,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_030_CSMS_UnlockConnector_UnlockFailure() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -807,6 +821,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_031_CSMS_UnlockConnector_UnknownConnector() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UnlockConnectorParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -913,6 +928,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_040_1_CSMS_ConfigurationKeys_NotSupported() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var key = "UnknownConfigKey_" + getRandomString();
 
         var params = new ChangeConfigurationParams();
@@ -935,6 +951,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_040_2_CSMS_ConfigurationKeys_InvalidValue() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -955,6 +972,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_042_1_CSMS_GetLocalListVersion_NotSupported() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -973,6 +991,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_042_2_CSMS_GetLocalListVersion_Empty() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new MultipleChargePointSelect();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -991,6 +1010,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_043_1_CSMS_SendLocalAuthorizationList_NotSupported() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1019,6 +1039,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_043_3_CSMS_SendLocalAuthorizationList_Failed() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1047,6 +1068,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_043_4_CSMS_SendLocalAuthorizationList_Full() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new SendLocalListParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1075,6 +1097,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_043_5_CSMS_SendLocalAuthorizationList_Differential() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         // Memory state per spec: initial local list set with updateType Full.
         var initialListVersion = 1;
@@ -1123,6 +1146,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_044_1_CSMS_FirmwareUpdate_DownloadAndInstall() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1176,6 +1200,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_044_2_CSMS_FirmwareUpdate_DownloadFailed() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1212,6 +1237,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_044_3_CSMS_FirmwareUpdate_InstallationFailed() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new UpdateFirmwareParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1265,6 +1291,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_045_1_CSMS_GetDiagnostics() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new GetDiagnosticsParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1303,6 +1330,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_045_2_CSMS_GetDiagnostics_UploadFailed() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new GetDiagnosticsParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1341,6 +1369,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_046_CSMS_ReservationOfConnector_Transaction() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var expiry = DateTime.now().plusMinutes(5);
@@ -1390,6 +1419,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_047_CSMS_ReservationOfConnector_Expire() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var expiry = DateTime.now().plusMinutes(2);
@@ -1425,6 +1455,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_048_1_CSMS_ReservationOfConnector_Faulted() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var params = new ReserveNowParams();
@@ -1487,6 +1518,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_048_3_CSMS_ReservationOfConnector_Unavailable() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var availabilityParams = new ChangeAvailabilityParams();
@@ -1534,6 +1566,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_048_4_CSMS_ReservationOfConnector_Rejected() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var params = new ReserveNowParams();
@@ -1564,6 +1597,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_049_CSMS_ReservationOfChargePoint_Transaction() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var params = new ReserveNowParams();
@@ -1608,6 +1642,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_051_CSMS_CancelReservation() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var reserve = new ReserveNowParams();
@@ -1666,6 +1701,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_052_CSMS_CancelReservation_Rejected() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
         var expectedReservationId = 1;
 
         var reserve = new ReserveNowParams();
@@ -1737,6 +1773,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var reserve = new ReserveNowParams();
         reserve.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1794,6 +1831,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_054_CSMS_TriggerMessage() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         {
             var p1 = new TriggerMessageParams();
@@ -1889,6 +1927,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_055_CSMS_TriggerMessage_Rejected() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var p = new TriggerMessageParams();
         p.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1930,6 +1969,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         var details = chargingProfileRepository.getDetails(profilePk);
 
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new SetChargingProfileParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -1950,6 +1990,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_057_CSMS_CentralSmartCharging_TxProfile() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var start = enterChargingState(chargePoint, 1, REGISTERED_OCPP_TAG, 0);
         var txId = start.getTransactionId();
@@ -2006,6 +2047,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
         var details = chargingProfileRepository.getDetails(profilePk);
 
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         // remote start block
         {
@@ -2073,6 +2115,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_066_CSMS_GetCompositeSchedule() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var params = new GetCompositeScheduleParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2104,6 +2147,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_067_CSMS_ClearChargingProfile() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var startTransactionResponse = enterChargingState(chargePoint, 1, REGISTERED_OCPP_TAG, 0);
         var transactionId = startTransactionResponse.getTransactionId();
@@ -2272,6 +2316,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
             .execute();
 
         var chargePoint = defaultStation().startWithProfile1(password);
+        awaitStationConnected();
 
         var params = new ChangeConfigurationParams();
         params.setChargeBoxIdList(List.of(REGISTERED_CHARGE_BOX_ID));
@@ -2308,6 +2353,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_075_1_CSMS_InstallManufacturerRootCertificate() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         // install cert
         {
@@ -2364,6 +2410,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_075_2_CSMS_InstallCentralSystemRootCertificate() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         // install cert
         {
@@ -2420,6 +2467,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_076_CSMS_DeleteSpecificInstalledCertificate() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var certificateType = InstallCertificate.CertificateUseEnumType.CENTRAL_SYSTEM_ROOT_CERTIFICATE;
 
@@ -2545,6 +2593,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_078_CSMS_InvalidCentralSystemCertificateSecurityEvent() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var certificate = "-----BEGIN CERTIFICATE-----\\nINVALID-CSMS-ROOT-" + getRandomString() + "\\n-----END CERTIFICATE-----";
 
@@ -2579,6 +2628,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_079_CSMS_GetSecurityLog() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var latestJobId = dslContext.select(DSL.max(CHARGE_BOX_LOG_UPLOAD_JOB.JOB_ID))
             .from(CHARGE_BOX_LOG_UPLOAD_JOB)
@@ -2636,6 +2686,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_080_CSMS_SecureFirmwareUpdate() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var latestJobId = dslContext.select(DSL.max(CHARGE_BOX_FIRMWARE_UPDATE_JOB.JOB_ID))
             .from(CHARGE_BOX_FIRMWARE_UPDATE_JOB)
@@ -2736,6 +2787,7 @@ public class Ocpp16JsonCsmsCertificationIT extends AbstractOcpp16JsonCsms {
     @Test
     public void test_TC_081_CSMS_SecureFirmwareUpdateInvalidSignature() {
         var chargePoint = defaultStation().start();
+        awaitStationConnected();
 
         var latestJobId = dslContext.select(DSL.max(CHARGE_BOX_FIRMWARE_UPDATE_JOB.JOB_ID))
             .from(CHARGE_BOX_FIRMWARE_UPDATE_JOB)

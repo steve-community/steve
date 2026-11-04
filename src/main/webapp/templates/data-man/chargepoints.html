@@ -96,8 +96,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Heartbeat Period:</td>
-                    <td><select th:field="*{heartbeatPeriod}">
+                    <td>Last OCPP Message Period:</td>
+                    <td><select th:field="*{lastOcppMessagePeriod}">
                         <option th:each="it : ${T(de.rwth.idsg.steve.web.dto.ChargePointQueryForm$QueryPeriodType).values()}" th:value="${{it}}" th:text="${it.value}"></option>
                     </select>
                     </td>
@@ -121,7 +121,7 @@
                 <th data-sort="string">ChargeBox ID</th>
                 <th data-sort="string">Description</th>
                 <th data-sort="string">OCPP Protocol</th>
-                <th data-sort="date">Last Heartbeat</th>
+                <th data-sort="date">Last OCPP Message</th>
                 <th>
                     <form th:action="@{/manager/chargepoints/add}" method="get">
                         <input type="submit" class="blueSubmit" value="Add New">
@@ -133,7 +133,7 @@
                 <tr th:each="cp : ${cpList}"><td><a th:href="@{/manager/chargepoints/details/{pk}(pk=${cp.chargeBoxPk})}" th:text="${cp.chargeBoxId}"></a></td>
                     <td th:text="${cp.description}"></td>
                     <td th:text="${cp.ocppProtocol}"></td>
-                    <td th:data-sort-value="${cp.lastHeartbeatTimestampDT?.millis}" th:text="${cp.lastHeartbeatTimestamp}"></td>
+                    <td th:data-sort-value="${cp.lastOcppMessageTimestampDT?.millis}" th:text="${cp.lastOcppMessageTimestamp}"></td>
                     <td>
                         <form th:action="@{/manager/chargepoints/delete/{pk}(pk=${cp.chargeBoxPk})}" method="post">
                             <input type="submit" class="redSubmit" value="Delete">

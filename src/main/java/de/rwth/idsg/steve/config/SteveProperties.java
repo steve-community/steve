@@ -72,6 +72,7 @@ public class SteveProperties {
         Protocols enabledProtocols;
         boolean octtQuirksEnabled;
         Duration wsPingInterval = Duration.ofMinutes(15);
+        Duration activitySaveInterval = Duration.ofMinutes(5);
         Security security = new Security();
 
         @Data

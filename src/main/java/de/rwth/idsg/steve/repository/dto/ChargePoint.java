@@ -44,8 +44,8 @@ public final class ChargePoint {
     @Builder
     public static final class Overview {
         private final int chargeBoxPk;
-        private final String chargeBoxId, description, ocppProtocol, lastHeartbeatTimestamp;
-        private final DateTime lastHeartbeatTimestampDT;
+        private final String chargeBoxId, description, ocppProtocol, lastOcppMessageTimestamp;
+        private final DateTime lastOcppMessageTimestampDT;
     }
 
     @Getter

@@ -42,5 +42,17 @@ public class ChargingProfileQueryForm {
     private RecurrencyKindType recurrencyKind;
     private DateTime validFrom;
     private DateTime validTo;
+    /**
+     * Only profiles assigned to a connector of this charge box.
+     */
+    private String chargeBoxId;
+    /**
+     * Only profiles assigned to this connector (of any charge box).
+     */
+    private Integer connectorId;
+    /**
+     * When true, only profiles whose validity period contains now.
+     */
+    private Boolean active;
 
 }

@@ -22,9 +22,14 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.web.DateTimeEditor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cp._2015._10.ChargingProfileKindType;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import ocpp.cp._2015._10.ChargingRateUnitType;
+import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.DateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +52,16 @@ public class ApiControllerAdvice {
     public void binder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(DateTime.class, DateTimeEditor.forApi());
+        // Accept both the Java constant name ("TX_PROFILE") and the OCPP value
+        // ("TxProfile") for OCPP enums, since resources return the OCPP values.
+        binder.registerCustomEditor(ChargingProfilePurposeType.class,
+            new OcppEnumPropertyEditor(ChargingProfilePurposeType.class));
+        binder.registerCustomEditor(ChargingProfileKindType.class,
+            new OcppEnumPropertyEditor(ChargingProfileKindType.class));
+        binder.registerCustomEditor(ChargingRateUnitType.class,
+            new OcppEnumPropertyEditor(ChargingRateUnitType.class));
+        binder.registerCustomEditor(RecurrencyKindType.class,
+            new OcppEnumPropertyEditor(RecurrencyKindType.class));
     }
 
     @ExceptionHandler(BindException.class)
@@ -87,6 +102,14 @@ public class ApiControllerAdvice {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleHttpMessageNotReadableException(HttpServletRequest req, HttpMessageNotReadableException exception) {
+        String url = req.getRequestURL().toString();
+        log.error("Request: {} raised following exception.", url, exception);
+        return createResponse(url, HttpStatus.BAD_REQUEST, "Malformed request body");
     }
 
     @ExceptionHandler(Exception.class)

@@ -79,8 +79,8 @@ public class UserService {
         return userRepository.getDetails(userPk);
     }
 
-    public void add(UserForm form) {
-        userRepository.add(form);
+    public int add(UserForm form) {
+        return userRepository.add(form);
     }
 
     public void update(UserForm form) {

@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -87,6 +88,14 @@ public class ApiControllerAdvice {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleHttpMessageNotReadableException(HttpServletRequest req, HttpMessageNotReadableException exception) {
+        String url = req.getRequestURL().toString();
+        log.error("Request: {} raised following exception.", url, exception);
+        return createResponse(url, HttpStatus.BAD_REQUEST, "Error understanding the request");
     }
 
     @ExceptionHandler(Exception.class)

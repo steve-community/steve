@@ -67,8 +67,9 @@ public class AddressRepositoryImpl implements AddressRepository {
      */
     @Override
     @Nullable
-    public Integer updateOrInsert(DSLContext ctx, Address address) {
-        if (address.isEmpty()) {
+    public Integer updateOrInsert(DSLContext ctx, @Nullable Address address) {
+        // An omitted address is a valid payload, not an error
+        if (address == null || address.isEmpty()) {
             return null;
 
         } else if (address.getAddressPk() == null) {

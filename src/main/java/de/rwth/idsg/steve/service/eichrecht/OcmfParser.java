@@ -37,25 +37,30 @@ public final class OcmfParser {
     }
 
     public static OcmfRecord parse(String rawValue) {
-        String rawInput = rawValue.trim();
+        var rawInput = rawValue.trim();
         if (!rawInput.startsWith(PREFIX)) {
             throw new IllegalArgumentException("Does not start with '" + PREFIX + "'");
         }
 
         // The signature section never contains '|', so the last '|' separates payload and signature
-        int lastPipe = rawInput.lastIndexOf('|');
+        var lastPipe = rawInput.lastIndexOf('|');
         if (lastPipe < PREFIX.length()) {
             throw new IllegalArgumentException("Missing signature section");
         }
 
-        String rawPayload = rawInput.substring(PREFIX.length(), lastPipe);
-        String rawSignature = rawInput.substring(lastPipe + 1);
+        var rawPayload = rawInput.substring(PREFIX.length(), lastPipe);
+        var rawSignature = rawInput.substring(lastPipe + 1);
 
-        return new OcmfRecord(
-            rawInput,
-            rawPayload,
-            MAPPER.readValue(rawPayload, OcmfRecord.Payload.class),
-            MAPPER.readValue(rawSignature, OcmfRecord.Signature.class)
-        );
+        // A section with the JSON value null is read as null
+        var payload = MAPPER.readValue(rawPayload, OcmfRecord.Payload.class);
+        if (payload == null) {
+            throw new IllegalArgumentException("Missing payload");
+        }
+        var signature = MAPPER.readValue(rawSignature, OcmfRecord.Signature.class);
+        if (signature == null) {
+            throw new IllegalArgumentException("Missing signature");
+        }
+
+        return new OcmfRecord(rawInput, rawPayload, payload, signature);
     }
 }

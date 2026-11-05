@@ -131,4 +131,15 @@ public class OcmfParserTest {
         Assertions.assertThrows(RuntimeException.class, () -> OcmfParser.parse("""
             OCMF|{"RD":[{"RV":{}}]}|{}"""));
     }
+
+    @Test
+    public void nullSections() {
+        var payload = Assertions.assertThrows(IllegalArgumentException.class, () -> OcmfParser.parse("""
+            OCMF|null|{"SD":"3045"}"""));
+        Assertions.assertEquals("Missing payload", payload.getMessage());
+
+        var signature = Assertions.assertThrows(IllegalArgumentException.class, () -> OcmfParser.parse("""
+            OCMF|{"PG":"T1"}|null"""));
+        Assertions.assertEquals("Missing signature", signature.getMessage());
+    }
 }

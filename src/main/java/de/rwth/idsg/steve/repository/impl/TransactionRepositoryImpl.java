@@ -266,7 +266,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public List<TransactionDetails.MeterValues> getMeterValues(int transactionPk, List<String> formats) {
-        List<Condition> conditions = new ArrayList<>();
+        var conditions = new ArrayList<Condition>();
         conditions.add(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk));
 
         if (!CollectionUtils.isEmpty(formats)) {

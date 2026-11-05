@@ -43,7 +43,7 @@ public final class OcmfUtils {
      * we only treat "T" records as transaction data.
      */
     static boolean isTransactionRecord(OcmfRecord record) {
-        String pagination = record.payload().pagination();
+        var pagination = record.payload().pagination();
         return pagination != null && pagination.length() > 1 && pagination.startsWith("T");
     }
 

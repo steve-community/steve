@@ -156,6 +156,27 @@ public class TransactionServiceTest {
     }
 
     @Test
+    public void getSignedData_nullPayloadOrSignature() throws Exception {
+        var nullPayload = """
+            OCMF|null|{"SD":"3045"}""";
+        var nullSignature = """
+            OCMF|{"FV":"1.0","PG":"T3","RD":[{"TX":"B","RV":1.5,"RU":"kWh"}]}|null""";
+        var service = serviceWithSignedData(ocmf("T1", "B"), nullPayload, nullSignature, ocmf("T2", "E"));
+
+        var signedData = service.getSignedData(transactionDetails());
+
+        // The broken values are kept with an error, the valid ones are still used
+        var values = signedData.signedMeterValues();
+        Assertions.assertEquals(4, values.size());
+        Assertions.assertEquals("Malformed OCMF record: Missing payload", values.get(1).parseError());
+        Assertions.assertNull(values.get(1).ocmfRecord());
+        Assertions.assertEquals("Malformed OCMF record: Missing signature", values.get(2).parseError());
+        Assertions.assertNull(values.get(2).ocmfRecord());
+        Assertions.assertNotNull(signedData.begin());
+        Assertions.assertNotNull(signedData.end());
+    }
+
+    @Test
     public void getSignedData_publicKeyFromConfiguration() throws Exception {
         // Like the OCA application note: Base64 of "oca:base16:asn1:<key as printed on the meter>"
         String ocaValue = Base64.getEncoder()

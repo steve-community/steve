@@ -29,7 +29,6 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Writes the signed begin and end records of a transaction in the S.A.F.E. XML format.
@@ -53,7 +52,7 @@ public class ValuesXmlWriter {
         var marshaller = jc.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-        StringWriter sw = new StringWriter();
+        var sw = new StringWriter();
         marshaller.marshal(toValues(signed), sw);
         return sw.toString();
     }
@@ -61,7 +60,7 @@ public class ValuesXmlWriter {
     private static Values toValues(SignedTransaction signed) {
         Integer transactionId = (signed.begin() != null && signed.end() != null) ? signed.transactionId() : null;
 
-        List<Values.Value> values = new ArrayList<>();
+        var values = new ArrayList<Values.Value>();
         if (signed.begin() != null) {
             values.add(toValue("Transaction.Begin", signed.begin(), transactionId, signed.publicKey()));
         }

@@ -56,7 +56,7 @@ public class MeterPublicKeyService {
     @Nullable
     public String find(List<SignedMeterValue> signedValues, @Nullable MeterPublicKeySources sources) {
         for (var smv : signedValues) {
-            String key = unwrap(smv.publicKey());
+            var key = unwrap(smv.publicKey());
             if (key != null) {
                 return key;
             }
@@ -67,13 +67,13 @@ public class MeterPublicKeyService {
         }
 
         // "MeterPublicKey1" for connector 1 according to the note. Some stations have one for all connectors.
-        List<String> names = List.of(
+        var names = List.of(
             CONFIGURATION_KEY + sources.connectorId(),
             CONFIGURATION_KEY + "[" + sources.connectorId() + "]",
             CONFIGURATION_KEY
         );
         for (String name : names) {
-            String key = unwrap(sources.ocppConfiguration().path(name).asString());
+            var key = unwrap(sources.ocppConfiguration().path(name).asString());
             if (key != null) {
                 return key;
             }
@@ -87,7 +87,7 @@ public class MeterPublicKeyService {
      */
     @Nullable
     static String unwrap(@Nullable String raw) {
-        String value = StringUtils.deleteWhitespace(raw);
+        var value = StringUtils.deleteWhitespace(raw);
         if (StringUtils.isEmpty(value)) {
             return null;
         }
@@ -103,7 +103,7 @@ public class MeterPublicKeyService {
             return value;
         }
 
-        String[] parts = decoded.split(":", 4);
+        var parts = decoded.split(":", 4);
         if (parts.length != 4) {
             return null;
         }

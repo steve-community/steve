@@ -41,7 +41,7 @@ public class EichrechtService {
      * Parses all meter values with format "SignedData" of one transaction. Other meter values are ignored.
      */
     public List<SignedMeterValue> parse(List<TransactionDetails.MeterValues> values) {
-        String signedData = ValueFormat.SIGNED_DATA.value();
+        var signedData = ValueFormat.SIGNED_DATA.value();
 
         return values.stream()
             .filter(it -> signedData.equals(it.getFormat()))
@@ -89,12 +89,12 @@ public class EichrechtService {
     }
 
     private static SignedMeterValue parse(TransactionDetails.MeterValues meterValue) {
-        String rawValue = meterValue.getValue();
+        var rawValue = meterValue.getValue();
         if (StringUtils.isBlank(rawValue)) {
             return error(meterValue, null, "Empty value");
         }
 
-        String value = decodeBase64Maybe(rawValue.trim());
+        var value = decodeBase64Maybe(rawValue.trim());
 
         if (value.startsWith(PREFIX)) {
             return fromOcmf(meterValue, value, null);
@@ -118,10 +118,10 @@ public class EichrechtService {
         }
 
         // OCPP 2.x says base64, but some stations put the plain OCMF string there
-        String ocmf = decodeBase64Maybe(wrapper.signedMeterData().trim());
+        var ocmf = decodeBase64Maybe(wrapper.signedMeterData().trim());
 
         if (!ocmf.startsWith(PREFIX)) {
-            String error = "'signedMeterData' is not OCMF (encodingMethod=" + wrapper.encodingMethod() + ")";
+            var error = "'signedMeterData' is not OCMF (encodingMethod=" + wrapper.encodingMethod() + ")";
             return error(meterValue, wrapper.publicKey(), error);
         }
 
@@ -147,7 +147,7 @@ public class EichrechtService {
             return raw;
         }
 
-        String decoded = tryBase64(raw);
+        var decoded = tryBase64(raw);
         if (decoded == null || !isOcmfOrJson(decoded)) {
             return raw;
         }

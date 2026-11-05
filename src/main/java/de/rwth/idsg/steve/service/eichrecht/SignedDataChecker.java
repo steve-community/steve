@@ -70,7 +70,7 @@ public final class SignedDataChecker {
         // The begin record can carry both readings
         var endRecord = (end == null && OcmfUtils.endReading(begin) != null) ? begin : end;
 
-        List<SignedDataCheck> checks = new ArrayList<>();
+        var checks = new ArrayList<SignedDataCheck>();
 
         if (begin == null) {
             checks.add(new SignedDataCheck("Signed begin value", Result.Failed, "Not received"));
@@ -105,7 +105,7 @@ public final class SignedDataChecker {
     private static SignedDataCheck value(String description,
                                          OcmfRecord.Reading reading,
                                          @Nullable String transactionValue) {
-        BigDecimal signedWh = OcmfUtils.valueInWh(reading);
+        var signedWh = OcmfUtils.valueInWh(reading);
         if (signedWh == null) {
             return new SignedDataCheck(description, Result.NotChecked, "Unknown unit " + reading.unit());
         }
@@ -120,7 +120,7 @@ public final class SignedDataChecker {
             return new SignedDataCheck(description, Result.NotChecked, "The transaction value is not a number");
         }
 
-        String note = "Signed: %s %s, transaction: %s Wh"
+        var note = "Signed: %s %s, transaction: %s Wh"
             .formatted(
                 reading.value().toPlainString(),
                 reading.unit(),
@@ -151,7 +151,7 @@ public final class SignedDataChecker {
 
         PublicKey key;
         try {
-            byte[] encoded = MeterPublicKeyService.isHex(publicKey)
+            var encoded = MeterPublicKeyService.isHex(publicKey)
                 ? HexFormat.of().parseHex(publicKey)
                 : Base64.getDecoder().decode(publicKey);
 
@@ -164,7 +164,7 @@ public final class SignedDataChecker {
         }
 
         try {
-            byte[] signatureData = "base64".equalsIgnoreCase(signature.encoding())
+            var signatureData = "base64".equalsIgnoreCase(signature.encoding())
                 ? Base64.getDecoder().decode(signature.data())
                 : HexFormat.of().parseHex(signature.data());
 
@@ -177,7 +177,7 @@ public final class SignedDataChecker {
                 : new SignedDataCheck(description, Result.Failed, "The signature does not match the data");
 
         } catch (GeneralSecurityException | RuntimeException e) {
-            String errorMsg = "Malformed signature";
+            var errorMsg = "Malformed signature";
             log.error(errorMsg, e);
             return new SignedDataCheck(description, Result.Failed, errorMsg);
         }

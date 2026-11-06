@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -73,7 +73,10 @@ public class MeterPublicKeyService {
                 : Base64.getDecoder().decode(publicKey);
 
             var key = KeyFactory.getInstance("EC", PROVIDER).generatePublic(new X509EncodedKeySpec(encoded));
-            return key instanceof ECPublicKey ecKey ? ecKey : null;
+
+            return (key instanceof ECPublicKey ecKey)
+                ? ecKey
+                : null;
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             return null;
         }

@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValueType;
 import ocpp.cs._2015._10.ValueFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -93,13 +95,13 @@ public class EichrechtService {
         }
 
         var value = decodeBase64Maybe(rawValue.trim());
-
         if (value.startsWith(PREFIX)) {
             return fromOcmf(meterValue, value, null, null);
         }
         if (value.startsWith("{")) {
             return fromJsonWrapper(meterValue, value);
         }
+
         return error(meterValue, null, "Not an OCMF record");
     }
 

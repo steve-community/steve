@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

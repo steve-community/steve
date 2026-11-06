@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

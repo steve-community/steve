@@ -18,7 +18,8 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.service.eichrecht.safe;
 
 import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.service.eichrecht.OcmfRecord;
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -58,13 +58,13 @@ public class ValuesXmlWriter {
     }
 
     private static Values toValues(SignedTransaction signed) {
-        Integer transactionId = (signed.begin() != null && signed.end() != null) ? signed.transactionId() : null;
+        Integer transactionId = (signed.hasBegin() && signed.hasEnd()) ? signed.transactionId() : null;
 
         var values = new ArrayList<Values.Value>();
-        if (signed.begin() != null) {
+        if (signed.hasBegin()) {
             values.add(toValue("Transaction.Begin", signed.begin().ocmfRecord(), transactionId, signed.publicKey()));
         }
-        if (signed.end() != null) {
+        if (signed.hasEnd()) {
             values.add(toValue("Transaction.End", signed.end().ocmfRecord(), transactionId, signed.publicKey()));
         }
         return new Values().setValues(values);

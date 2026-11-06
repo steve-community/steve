@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
+import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;

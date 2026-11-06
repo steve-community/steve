@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
+import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -27,13 +28,13 @@ public final class OcmfUtils {
 
     static final String PREFIX = "OCMF|";
 
-    static final Set<String> BEGIN_TYPES = Set.of("B");
+    private static final Set<String> BEGIN_TYPES = Set.of("B");
 
     /**
      * Besides E (end), a transaction can also stop with L (stopped locally), R (stopped remotely),
      * A (aborted) or P (power failure). Same as the S.A.F.E. transparency software.
      */
-    static final Set<String> END_TYPES = Set.of("E", "L", "R", "A", "P");
+    private static final Set<String> END_TYPES = Set.of("E", "L", "R", "A", "P");
 
     private OcmfUtils() {
     }

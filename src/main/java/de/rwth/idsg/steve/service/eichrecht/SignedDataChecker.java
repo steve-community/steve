@@ -18,19 +18,19 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.security.Provider;
 import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Base64;

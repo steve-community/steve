@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.service.eichrecht.safe;
 
 import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
 import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import jakarta.xml.bind.JAXBContext;

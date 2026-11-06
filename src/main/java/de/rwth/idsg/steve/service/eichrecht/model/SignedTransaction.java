@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service.eichrecht;
+package de.rwth.idsg.steve.service.eichrecht.model;
 
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +46,15 @@ public record SignedTransaction(
      * @return false, if there is no file for the S.A.F.E. transparency software
      */
     public boolean hasBeginOrEnd() {
-        return begin != null || end != null;
+        return hasBegin() || hasEnd();
+    }
+
+    public boolean hasBegin() {
+        return begin != null && begin.ocmfRecord != null;
+    }
+
+    public boolean hasEnd() {
+        return end != null && end.ocmfRecord != null;
     }
 
     /**

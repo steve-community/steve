@@ -22,6 +22,8 @@ import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Set;
 
 public final class OcmfUtils {
@@ -71,6 +73,32 @@ public final class OcmfUtils {
             case "Wh" -> reading.value();
             default -> null;
         };
+    }
+
+    static String decodeBase64Maybe(String raw) {
+        if (isOcmfOrJson(raw)) {
+            return raw;
+        }
+
+        var decoded = tryBase64(raw);
+        if (decoded == null || !isOcmfOrJson(decoded)) {
+            return raw;
+        }
+
+        return decoded;
+    }
+
+    private static boolean isOcmfOrJson(String value) {
+        return value.startsWith(PREFIX) || value.startsWith("{");
+    }
+
+    @Nullable
+    private static String tryBase64(String s) {
+        try {
+            return new String(Base64.getMimeDecoder().decode(s), StandardCharsets.UTF_8).trim();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Nullable

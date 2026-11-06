@@ -38,6 +38,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
+import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.decodeBase64Maybe;
 
 @Service
 public class EichrechtService {
@@ -150,32 +151,6 @@ public class EichrechtService {
     private static SignedMeterValue error(TransactionDetails.MeterValues meterValue, @Nullable String publicKey,
                                           String error) {
         return new SignedMeterValue(meterValue, null, publicKey, null, error);
-    }
-
-    private static String decodeBase64Maybe(String raw) {
-        if (isOcmfOrJson(raw)) {
-            return raw;
-        }
-
-        var decoded = tryBase64(raw);
-        if (decoded == null || !isOcmfOrJson(decoded)) {
-            return raw;
-        }
-
-        return decoded;
-    }
-
-    private static boolean isOcmfOrJson(String value) {
-        return value.startsWith(PREFIX) || value.startsWith("{");
-    }
-
-    @Nullable
-    private static String tryBase64(String s) {
-        try {
-            return new String(Base64.getMimeDecoder().decode(s), StandardCharsets.UTF_8).trim();
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 
 }

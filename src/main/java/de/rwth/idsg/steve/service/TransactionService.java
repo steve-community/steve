@@ -19,11 +19,14 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.collect.Ordering;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
@@ -34,18 +37,23 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tools.jackson.dataformat.csv.CsvMapper;
 import tools.jackson.dataformat.csv.CsvSchema;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhDouble;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
+import static ocpp.cs._2015._10.ValueFormat.SIGNED_DATA;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -56,6 +64,7 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
 @RequiredArgsConstructor
 public class TransactionService {
 
+    private final EichrechtService eichrechtService;
     private final TransactionRepository transactionRepository;
     private final OcppServerRepository ocppServerRepository;
 
@@ -84,6 +93,42 @@ public class TransactionService {
 
     public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
         return transactionRepository.getDetails(transactionPk, energyValuesOnly);
+    }
+
+    public SignedTransaction getSignedData(Transaction transaction) {
+        int transactionPk = transaction.getId();
+        var signedDataRows = transactionRepository.getMeterValues(transactionPk, List.of(SIGNED_DATA.value()));
+        var meterPublicKeySources = transactionRepository.getMeterPublicKeySources(transactionPk);
+        return eichrechtService.getSignedTransaction(transaction, meterPublicKeySources, signedDataRows);
+    }
+
+    /**
+     * Writes the S.A.F.E. XML as file download.
+     */
+    public void writeSafeXml(int transactionPk, HttpServletResponse response) throws IOException {
+        // Create it before setting the headers, so that an error is not downloaded as the file
+        String xml = getSafeXml(transactionPk);
+
+        String fileName = "transaction_%s_safe.xml".formatted(transactionPk);
+        response.setContentType(MediaType.APPLICATION_XML_VALUE);
+        // The XML declaration says UTF-8, so the response must be UTF-8 as well
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(fileName));
+        response.getWriter().write(xml);
+    }
+
+    String getSafeXml(int transactionPk) {
+        var transaction = getTransaction(transactionPk);
+        if (transaction == null) {
+            throw new SteveException.NotFound("Transaction %s not found", transactionPk);
+        }
+
+        var signedData = getSignedData(transaction);
+        if (!signedData.hasBeginOrEnd()) {
+            throw new SteveException.NotFound("Transaction %s has no signed begin or end record", transactionPk);
+        }
+
+        return eichrechtService.createXML(signedData);
     }
 
     public Transaction getTransaction(int transactionPk) {

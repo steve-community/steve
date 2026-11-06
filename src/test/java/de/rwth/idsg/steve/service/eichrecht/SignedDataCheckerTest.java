@@ -36,6 +36,8 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 
+import static de.rwth.idsg.steve.service.eichrecht.SignedDataChecker.KEY_NOTE;
+
 /**
  * Uses signed samples of the S.A.F.E. transparency software
  */
@@ -84,7 +86,9 @@ public class SignedDataCheckerTest {
         var checks = check(tx("7753", "7753"), EBEE_KEY, EBEE_BEGIN, EBEE_END);
 
         assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+        Assertions.assertEquals(KEY_NOTE, checks.get(0).note());
         Assertions.assertEquals("Signed: 7753 Wh, transaction: 7753 Wh", checks.get(1).note());
+        Assertions.assertEquals(KEY_NOTE, checks.get(2).note());
     }
 
     @Test
@@ -173,7 +177,7 @@ public class SignedDataCheckerTest {
             wrapper(EBEE_BEGIN, "ECDSA-secp256r1-SHA256"), wrapper(EBEE_END, "ECDSA-secp256r1-SHA256"));
         assertResults(matching, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
         // Same as the default, so S.A.F.E. comes to the same result
-        Assertions.assertNull(matching.get(0).note());
+        Assertions.assertEquals(KEY_NOTE, matching.get(0).note());
 
         var otherCurve = check(tx("7753", "7753"), EBEE_KEY,
             wrapper(EBEE_BEGIN, "ECDSA-brainpool256r1-SHA256"), wrapper(EBEE_END, "ECDSA-brainpool256r1-SHA256"));
@@ -195,15 +199,15 @@ public class SignedDataCheckerTest {
         // S.A.F.E. cannot see the signing method of the wrapper, so the page says so
         var checks = check(tx("7753", "7753"), publicKey, wrapper(begin, brainpool), wrapper(end, brainpool));
         assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
-        var hint = "Signing method from the charging station, not in the OCMF record: S.A.F.E. uses "
-            + "ECDSA-secp256r1-SHA256";
-        Assertions.assertEquals(hint, checks.get(0).note());
-        Assertions.assertEquals(hint, checks.get(2).note());
+        var note = KEY_NOTE + " Signing method from the charging station, not in the OCMF record: S.A.F.E. uses "
+            + "ECDSA-secp256r1-SHA256.";
+        Assertions.assertEquals(note, checks.get(0).note());
+        Assertions.assertEquals(note, checks.get(2).note());
 
         // With SA in the OCMF record, S.A.F.E. knows it as well
         checks = check(tx("7753", "7753"), publicKey, withAlgorithm(begin, brainpool), withAlgorithm(end, brainpool));
         assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
-        Assertions.assertNull(checks.get(0).note());
+        Assertions.assertEquals(KEY_NOTE, checks.get(0).note());
     }
 
     @Test

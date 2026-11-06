@@ -70,6 +70,9 @@ public final class SignedDataChecker {
         "ECDSA-brainpool384r1-SHA256", "brainpoolP384r1"
     );
 
+    static final String KEY_NOTE =
+        "Valid for the public key reported by the charging station. Compare it with the key on the meter.";
+
     private SignedDataChecker() {
     }
 
@@ -203,10 +206,14 @@ public final class SignedDataChecker {
             verifier.initVerify(key);
             verifier.update(record.rawPayload().getBytes(StandardCharsets.UTF_8));
 
+            // The key always comes from the charging station, whether sent with the value or from its
+            // configuration. Only the key on the meter (or of the Bundesnetzagentur) is trustworthy.
+            var passedNote = KEY_NOTE;
+
             // S.A.F.E. only gets the OCMF record, so it can only know the default
-            var passedNote = StringUtils.isBlank(signature.algorithm()) && !DEFAULT_ALGORITHM.equals(algorithm)
-                ? "Signing method from the charging station, not in the OCMF record: S.A.F.E. uses " + DEFAULT_ALGORITHM
-                : null;
+            if (StringUtils.isBlank(signature.algorithm()) && !DEFAULT_ALGORITHM.equals(algorithm)) {
+                passedNote += " Signing method from the charging station, not in the OCMF record: S.A.F.E. uses " + DEFAULT_ALGORITHM + ".";
+            }
 
             return verifier.verify(signatureData)
                 ? new SignedDataCheck(description, Result.Passed, passedNote)

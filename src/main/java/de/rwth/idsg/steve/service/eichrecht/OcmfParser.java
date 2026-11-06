@@ -26,7 +26,7 @@ import tools.jackson.databind.json.JsonMapper;
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 
 /**
- * Parses OCMF records and reads values from them.
+ * Parses an OCMF record in plain text into its payload and signature sections.
  */
 public final class OcmfParser {
 

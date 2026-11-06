@@ -27,8 +27,8 @@ import java.util.List;
  * The fields of an OCMF record that we need.
  * https://github.com/SAFE-eV/OCMF-Open-Charge-Metering-Format/blob/master/OCMF-en.md
  *
- * @param rawInput   the whole record as received. Goes unchanged into the S.A.F.E. XML.
- * @param rawPayload the payload as received. The signature is over these bytes.
+ * @param rawInput   the whole OCMF record as plain text (after base64 decoding and trimming). Goes unchanged into the S.A.F.E. XML.
+ * @param rawPayload the payload, exactly as in rawInput. The signature is over these bytes.
  */
 public record OcmfRecord(
     String rawInput,

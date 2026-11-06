@@ -28,12 +28,18 @@ import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HexFormat;
 import java.util.List;
 
 public class MeterPublicKeyServiceTest {
 
     private static final String HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004E5CE";
     private static final String OTHER_HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004AAAA";
+
+    // The key of the eBee sample in SignedDataCheckerTest. The keys above are too short to read.
+    private static final String READABLE_KEY =
+        "3059301306072A8648CE3D020106082A8648CE3D03010703420004E5CE2801D716BF55B71477CA666BE6A8B8994FEBBF05"
+        + "B04BC0AE7879A62AE77460A14335F3F30657DD7ADC4338398C837DD2DE52D8FCAAE78601D1476FE1C21F";
     private static final String OCMF = """
         OCMF|{"FV":"1.0","PG":"T1","RD":[{"TX":"B"}]}|{"SD":"3045"}""";
 
@@ -85,6 +91,30 @@ public class MeterPublicKeyServiceTest {
         Assertions.assertEquals(HEX_KEY, service.find(values, new MeterPublicKeySources(2, config)));
         // Another connector falls back to the key for all connectors
         Assertions.assertEquals(OTHER_HEX_KEY, service.find(values, new MeterPublicKeySources(1, config)));
+    }
+
+    @Test
+    public void find_skipsUnreadableKey() {
+        // A placeholder sent with the first value does not hide a readable key that comes later
+        var values = parse(wrapper(OCMF, "N/A"), wrapper(OCMF, READABLE_KEY));
+        Assertions.assertEquals(READABLE_KEY, service.find(values, null));
+
+        // ... or the one in the configuration
+        values = parse(wrapper(OCMF, "N/A"));
+        Assertions.assertEquals(READABLE_KEY, service.find(values, sources("MeterPublicKey", READABLE_KEY)));
+
+        // Nothing readable: the first one, so that the check can say that it cannot read it
+        Assertions.assertEquals("N/A", service.find(values, sources("MeterPublicKey", HEX_KEY)));
+    }
+
+    @Test
+    public void decode() {
+        Assertions.assertNotNull(MeterPublicKeyService.decode(READABLE_KEY));
+        Assertions.assertNotNull(MeterPublicKeyService.decode(
+            Base64.getEncoder().encodeToString(HexFormat.of().parseHex(READABLE_KEY))));
+
+        Assertions.assertNull(MeterPublicKeyService.decode(HEX_KEY));
+        Assertions.assertNull(MeterPublicKeyService.decode("N/A"));
     }
 
     @Test

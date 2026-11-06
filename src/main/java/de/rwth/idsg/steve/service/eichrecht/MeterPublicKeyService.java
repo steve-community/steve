@@ -21,12 +21,21 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.interfaces.ECPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.Provider;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HexFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +49,11 @@ public class MeterPublicKeyService {
     private static final Pattern HEX = Pattern.compile("[0-9a-fA-F]+");
 
     /**
+     * Bouncy Castle, because the JDK does not support all curves of OCMF (e.g. brainpool)
+     */
+    static final Provider PROVIDER = new BouncyCastleProvider();
+
+    /**
      * @param publicKey as returned by {@link #find}
      * @return true for hex, false for base64
      */
@@ -48,37 +62,53 @@ public class MeterPublicKeyService {
     }
 
     /**
+     * @param publicKey as returned by {@link #find}: ASN.1 (X.509 SubjectPublicKeyInfo) in hex or base64
+     * @return null, if it is not an EC public key
+     */
+    @Nullable
+    public static ECPublicKey decode(String publicKey) {
+        try {
+            var encoded = isHex(publicKey)
+                ? HexFormat.of().parseHex(publicKey)
+                : Base64.getDecoder().decode(publicKey);
+
+            var key = KeyFactory.getInstance("EC", PROVIDER).generatePublic(new X509EncodedKeySpec(encoded));
+            return key instanceof ECPublicKey ecKey ? ecKey : null;
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    /**
      * A transaction has one meter, so one key. Either sent with a signed value (some stations send it only once
-     * per transaction), or from the configuration key of the charge point.
+     * per transaction), or from the configuration key of the charge point. The first one that we can read wins.
      *
-     * @return the key in hex or base64, or null, if unknown
+     * @return the key in hex or base64. The first one, if we cannot read any. Null, if unknown.
      */
     @Nullable
     public String find(List<SignedMeterValue> signedValues, @Nullable MeterPublicKeySources sources) {
-        for (var smv : signedValues) {
-            var key = unwrap(smv.publicKey());
-            if (key != null) {
-                return key;
-            }
+        var candidates = new ArrayList<String>();
+        signedValues.forEach(smv -> candidates.add(smv.publicKey()));
+
+        if (sources != null && sources.ocppConfiguration() != null) {
+            // "MeterPublicKey1" for connector 1 according to the note. Some stations have one for all connectors.
+            var names = List.of(
+                CONFIGURATION_KEY + sources.connectorId(),
+                CONFIGURATION_KEY + "[" + sources.connectorId() + "]",
+                CONFIGURATION_KEY
+            );
+            names.forEach(name -> candidates.add(sources.ocppConfiguration().path(name).asString()));
         }
 
-        if (sources == null || sources.ocppConfiguration() == null) {
-            return null;
-        }
+        var keys = candidates.stream()
+            .map(MeterPublicKeyService::unwrap)
+            .filter(Objects::nonNull)
+            .toList();
 
-        // "MeterPublicKey1" for connector 1 according to the note. Some stations have one for all connectors.
-        var names = List.of(
-            CONFIGURATION_KEY + sources.connectorId(),
-            CONFIGURATION_KEY + "[" + sources.connectorId() + "]",
-            CONFIGURATION_KEY
-        );
-        for (String name : names) {
-            var key = unwrap(sources.ocppConfiguration().path(name).asString());
-            if (key != null) {
-                return key;
-            }
-        }
-        return null;
+        return keys.stream()
+            .filter(key -> decode(key) != null)
+            .findFirst()
+            .orElse(keys.isEmpty() ? null : keys.getFirst());
     }
 
     /**

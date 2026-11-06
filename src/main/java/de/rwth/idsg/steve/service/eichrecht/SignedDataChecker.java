@@ -24,34 +24,27 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.Provider;
-import java.security.PublicKey;
 import java.security.Signature;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
+import static de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService.PROVIDER;
+
 /**
  * Checks that the signed data of a transaction is valid and matches the transaction.
  */
 @Slf4j
 public final class SignedDataChecker {
-
-    /**
-     * Bouncy Castle, because the JDK does not support all curves of OCMF (e.g. brainpool)
-     */
-    private static final Provider PROVIDER = new BouncyCastleProvider();
 
     private static final String DEFAULT_ALGORITHM = "ECDSA-secp256r1-SHA256";
 
@@ -174,24 +167,15 @@ public final class SignedDataChecker {
             return new SignedDataCheck(description, Result.NotChecked, "Unsupported algorithm " + algorithm);
         }
 
-        PublicKey key;
-        try {
-            var encoded = MeterPublicKeyService.isHex(publicKey)
-                ? HexFormat.of().parseHex(publicKey)
-                : Base64.getDecoder().decode(publicKey);
-
-            key = KeyFactory.getInstance("EC", PROVIDER).generatePublic(new X509EncodedKeySpec(encoded));
-
-        } catch (GeneralSecurityException | IllegalArgumentException e) {
-            String errorMsg = "Cannot read the public key of the meter";
-            log.error(errorMsg, e);
-            return new SignedDataCheck(description, Result.NotChecked, errorMsg);
+        var key = MeterPublicKeyService.decode(publicKey);
+        if (key == null) {
+            return new SignedDataCheck(description, Result.NotChecked, "Cannot read the public key of the meter");
         }
 
         // The key carries its own curve, which we verify with. S.A.F.E. instead uses the curve of the
         // algorithm. Both have to be the same, so that S.A.F.E. comes to the same result.
         var expected = ECNamedCurveTable.getParameterSpec(curve);
-        var actual = ((ECPublicKey) key).getParameters();
+        var actual = key.getParameters();
         if (!expected.getCurve().equals(actual.getCurve()) || !expected.getG().equals(actual.getG())) {
             var note = "The public key of the meter does not match the algorithm " + algorithm;
             return new SignedDataCheck(description, Result.Failed, note);

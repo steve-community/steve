@@ -18,13 +18,12 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -42,8 +41,7 @@ import java.util.regex.Pattern;
  * Finds the public key of the meter, with which the signed values of a transaction can be verified.
  * See the OCA application note "Signed Meter Values in OCPP" (v1.0).
  */
-@Service
-public class MeterPublicKeyService {
+public final class MeterPublicKeyExtractor {
 
     private static final String CONFIGURATION_KEY = "MeterPublicKey";
     private static final Pattern HEX = Pattern.compile("[0-9a-fA-F]+");
@@ -52,6 +50,9 @@ public class MeterPublicKeyService {
      * Bouncy Castle, because the JDK does not support all curves of OCMF (e.g. brainpool)
      */
     static final Provider PROVIDER = new BouncyCastleProvider();
+
+    private MeterPublicKeyExtractor() {
+    }
 
     /**
      * @param publicKey as returned by {@link #find}
@@ -89,7 +90,7 @@ public class MeterPublicKeyService {
      * @return the key in hex or base64. The first one, if we cannot read any. Null, if unknown.
      */
     @Nullable
-    public String find(List<SignedMeterValue> signedValues, @Nullable MeterPublicKeySources sources) {
+    public static String find(List<SignedMeterValue> signedValues, @Nullable MeterPublicKeySources sources) {
         var candidates = new ArrayList<String>();
         signedValues.forEach(smv -> candidates.add(smv.publicKey()));
 
@@ -104,7 +105,7 @@ public class MeterPublicKeyService {
         }
 
         var keys = candidates.stream()
-            .map(MeterPublicKeyService::unwrap)
+            .map(MeterPublicKeyExtractor::unwrap)
             .filter(Objects::nonNull)
             .toList();
 

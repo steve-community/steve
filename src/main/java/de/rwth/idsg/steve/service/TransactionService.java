@@ -20,15 +20,13 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.collect.Ordering;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
-import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
-import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
@@ -37,7 +35,6 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.UnitOfMeasure;
-import ocpp.cs._2015._10.ValueFormat;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.http.MediaType;
@@ -47,7 +44,6 @@ import tools.jackson.dataformat.csv.CsvMapper;
 import tools.jackson.dataformat.csv.CsvSchema;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -57,6 +53,7 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhDouble;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
+import static ocpp.cs._2015._10.ValueFormat.SIGNED_DATA;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -68,8 +65,6 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
 public class TransactionService {
 
     private final EichrechtService eichrechtService;
-    private final MeterPublicKeyService meterPublicKeyService;
-    private final ValuesXmlWriter valuesXmlWriter;
     private final TransactionRepository transactionRepository;
     private final OcppServerRepository ocppServerRepository;
 
@@ -102,16 +97,9 @@ public class TransactionService {
 
     public SignedTransaction getSignedData(Transaction transaction) {
         int transactionPk = transaction.getId();
-        var signedDataRows = transactionRepository.getMeterValues(
-            transactionPk, List.of(ValueFormat.SIGNED_DATA.value())
-        );
-        var signedValues = eichrechtService.parse(signedDataRows);
-
-        String publicKey = signedValues.isEmpty()
-            ? null
-            : meterPublicKeyService.find(signedValues, transactionRepository.getMeterPublicKeySources(transactionPk));
-
-        return eichrechtService.toSignedTransaction(transaction, signedValues, publicKey);
+        var signedDataRows = transactionRepository.getMeterValues(transactionPk, List.of(SIGNED_DATA.value()));
+        var meterPublicKeySources = transactionRepository.getMeterPublicKeySources(transactionPk);
+        return eichrechtService.getSignedTransaction(transaction, meterPublicKeySources, signedDataRows);
     }
 
     /**
@@ -140,11 +128,7 @@ public class TransactionService {
             throw new SteveException.NotFound("Transaction %s has no signed begin or end record", transactionPk);
         }
 
-        try {
-            return valuesXmlWriter.createXML(signedData);
-        } catch (JAXBException e) {
-            throw new SteveException("Could not create the S.A.F.E. XML of transaction %s", transactionPk, e);
-        }
+        return eichrechtService.createXML(signedData);
     }
 
     public Transaction getTransaction(int transactionPk) {

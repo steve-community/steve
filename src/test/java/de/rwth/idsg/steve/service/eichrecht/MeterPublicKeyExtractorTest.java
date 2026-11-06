@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import org.joda.time.DateTime;
@@ -32,7 +33,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 
-public class MeterPublicKeyServiceTest {
+public class MeterPublicKeyExtractorTest {
 
     private static final String HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004E5CE";
     private static final String OTHER_HEX_KEY = "3059301306072A8648CE3D020106082A8648CE3D03010703420004AAAA";
@@ -43,8 +44,6 @@ public class MeterPublicKeyServiceTest {
         + "B04BC0AE7879A62AE77460A14335F3F30657DD7ADC4338398C837DD2DE52D8FCAAE78601D1476FE1C21F";
     private static final String OCMF = """
         OCMF|{"FV":"1.0","PG":"T1","RD":[{"TX":"B"}]}|{"SD":"3045"}""";
-
-    private final MeterPublicKeyService service = new MeterPublicKeyService();
 
     /**
      * Example of the OCA application note "Signed Meter Values in OCPP" (v1.0, chapter 5.3)
@@ -61,25 +60,25 @@ public class MeterPublicKeyServiceTest {
         String printedOnMeter = "3056301006072a8648ce3d020106052b8104000a03420004460a02ba2766d9c44f023ecc0e4e58644a87"
             + "add1aadd6317e5fe4dccdb29b163a01d8a6297c84bc530f86431e92f8d46ab37830247c05cbd92fac252929e7f61";
 
-        Assertions.assertEquals(printedOnMeter, MeterPublicKeyService.unwrap(noteExample));
+        Assertions.assertEquals(printedOnMeter, MeterPublicKeyExtractor.unwrap(noteExample));
         String base16 = base64("oca:base16:asn1:0x3059 3013 0607");
-        Assertions.assertEquals("305930130607", MeterPublicKeyService.unwrap(base16));
-        Assertions.assertEquals("MFkwEw==", MeterPublicKeyService.unwrap(base64("oca:base64:asn1:MFkw Ew==")));
+        Assertions.assertEquals("305930130607", MeterPublicKeyExtractor.unwrap(base16));
+        Assertions.assertEquals("MFkwEw==", MeterPublicKeyExtractor.unwrap(base64("oca:base64:asn1:MFkw Ew==")));
     }
 
     @Test
     public void unwrap_keyItself() {
-        Assertions.assertEquals("305930130607", MeterPublicKeyService.unwrap(" 3059 3013\n0607 "));
-        Assertions.assertEquals("MFkwEwYHKoZIzj0CAQ==", MeterPublicKeyService.unwrap("MFkwEwYHKoZIzj0CAQ=="));
-        Assertions.assertNull(MeterPublicKeyService.unwrap(null));
-        Assertions.assertNull(MeterPublicKeyService.unwrap(" "));
+        Assertions.assertEquals("305930130607", MeterPublicKeyExtractor.unwrap(" 3059 3013\n0607 "));
+        Assertions.assertEquals("MFkwEwYHKoZIzj0CAQ==", MeterPublicKeyExtractor.unwrap("MFkwEwYHKoZIzj0CAQ=="));
+        Assertions.assertNull(MeterPublicKeyExtractor.unwrap(null));
+        Assertions.assertNull(MeterPublicKeyExtractor.unwrap(" "));
     }
 
     @Test
     public void find_sentWithSignedValue() {
         var values = parse(OCMF, wrapper(OCMF, base64("oca:base16:asn1:" + HEX_KEY)));
 
-        Assertions.assertEquals(HEX_KEY, service.find(values, sources("MeterPublicKey", OTHER_HEX_KEY)));
+        Assertions.assertEquals(HEX_KEY, MeterPublicKeyExtractor.find(values, sources("MeterPublicKey", OTHER_HEX_KEY)));
     }
 
     @Test
@@ -89,43 +88,43 @@ public class MeterPublicKeyServiceTest {
             .put("MeterPublicKey", OTHER_HEX_KEY)
             .put("MeterPublicKey2", HEX_KEY);
 
-        Assertions.assertEquals(HEX_KEY, service.find(values, new MeterPublicKeySources(2, config)));
+        Assertions.assertEquals(HEX_KEY, MeterPublicKeyExtractor.find(values, new MeterPublicKeySources(2, config)));
         // Another connector falls back to the key for all connectors
-        Assertions.assertEquals(OTHER_HEX_KEY, service.find(values, new MeterPublicKeySources(1, config)));
+        Assertions.assertEquals(OTHER_HEX_KEY, MeterPublicKeyExtractor.find(values, new MeterPublicKeySources(1, config)));
     }
 
     @Test
     public void find_skipsUnreadableKey() {
         // A placeholder sent with the first value does not hide a readable key that comes later
         var values = parse(wrapper(OCMF, "N/A"), wrapper(OCMF, READABLE_KEY));
-        Assertions.assertEquals(READABLE_KEY, service.find(values, null));
+        Assertions.assertEquals(READABLE_KEY, MeterPublicKeyExtractor.find(values, null));
 
         // ... or the one in the configuration
         values = parse(wrapper(OCMF, "N/A"));
-        Assertions.assertEquals(READABLE_KEY, service.find(values, sources("MeterPublicKey", READABLE_KEY)));
+        Assertions.assertEquals(READABLE_KEY, MeterPublicKeyExtractor.find(values, sources("MeterPublicKey", READABLE_KEY)));
 
         // Nothing readable: the first one, so that the check can say that it cannot read it
-        Assertions.assertEquals("N/A", service.find(values, sources("MeterPublicKey", HEX_KEY)));
+        Assertions.assertEquals("N/A", MeterPublicKeyExtractor.find(values, sources("MeterPublicKey", HEX_KEY)));
     }
 
     @Test
     public void decode() {
-        Assertions.assertNotNull(MeterPublicKeyService.decode(READABLE_KEY));
-        Assertions.assertNotNull(MeterPublicKeyService.decode(
+        Assertions.assertNotNull(MeterPublicKeyExtractor.decode(READABLE_KEY));
+        Assertions.assertNotNull(MeterPublicKeyExtractor.decode(
             Base64.getEncoder().encodeToString(HexFormat.of().parseHex(READABLE_KEY))));
 
-        Assertions.assertNull(MeterPublicKeyService.decode(HEX_KEY));
-        Assertions.assertNull(MeterPublicKeyService.decode("N/A"));
+        Assertions.assertNull(MeterPublicKeyExtractor.decode(HEX_KEY));
+        Assertions.assertNull(MeterPublicKeyExtractor.decode("N/A"));
     }
 
     @Test
     public void find_unknown() {
         var values = parse(OCMF);
 
-        Assertions.assertNull(service.find(values, null));
-        Assertions.assertNull(service.find(values, sources("OtherKey", HEX_KEY)));
+        Assertions.assertNull(MeterPublicKeyExtractor.find(values, null));
+        Assertions.assertNull(MeterPublicKeyExtractor.find(values, sources("OtherKey", HEX_KEY)));
         // Bender's default is an empty value
-        Assertions.assertNull(service.find(values, sources("MeterPublicKey", "")));
+        Assertions.assertNull(MeterPublicKeyExtractor.find(values, sources("MeterPublicKey", "")));
     }
 
     private static MeterPublicKeySources sources(String configurationKey, String value) {
@@ -141,7 +140,8 @@ public class MeterPublicKeyServiceTest {
                 .format("SignedData")
                 .build())
             .toList();
-        return new EichrechtService().parse(meterValues);
+        var transaction = Transaction.builder().id(1).build();
+        return new EichrechtService().getSignedTransaction(transaction, null, meterValues).signedMeterValues();
     }
 
     private static String wrapper(String ocmf, String publicKey) {

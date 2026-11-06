@@ -18,11 +18,10 @@
  */
 package de.rwth.idsg.steve.service.eichrecht.safe;
 
-import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
+import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyExtractor;
 import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
 import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.stereotype.Service;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -39,13 +38,16 @@ import java.util.ArrayList;
  * one begin and one end value, and fails. Without it, the record is verified on its own. If it carries both
  * readings, the software still recognizes it as a complete transaction.
  */
-@Service
 public class ValuesXmlWriter {
 
     private final JAXBContext jc;
 
-    public ValuesXmlWriter() throws JAXBException {
-        jc = JAXBContext.newInstance(Values.class);
+    public ValuesXmlWriter() {
+        try {
+            jc = JAXBContext.newInstance(Values.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public String createXML(SignedTransaction signed) throws JAXBException {
@@ -95,7 +97,7 @@ public class ValuesXmlWriter {
             return null;
         }
         return new Values.PublicKey()
-            .setEncoding(MeterPublicKeyService.isHex(publicKey) ? Values.EncodingType.hex : Values.EncodingType.base64)
+            .setEncoding(MeterPublicKeyExtractor.isHex(publicKey) ? Values.EncodingType.hex : Values.EncodingType.base64)
             .setValue(publicKey);
     }
 }

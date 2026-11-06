@@ -18,11 +18,14 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -270,8 +273,19 @@ public class SignedDataCheckerTest {
                 .format("SignedData")
                 .build())
             .toList();
-        return eichrechtService.toSignedTransaction(transaction, eichrechtService.parse(meterValues), publicKey)
-            .checks();
+        return eichrechtService.getSignedTransaction(transaction, sources(publicKey), meterValues).checks();
+    }
+
+    /**
+     * The key as configuration of the charging station, so that it is the one found for the transaction
+     */
+    @Nullable
+    public static MeterPublicKeySources sources(@Nullable String publicKey) {
+        if (publicKey == null) {
+            return null;
+        }
+        var config = JsonObjectMapper.INSTANCE.getMapper().createObjectNode().put("MeterPublicKey", publicKey);
+        return new MeterPublicKeySources(1, config);
     }
 
     private static String withAlgorithm(String ocmf, String algorithm) {

@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
-import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
 import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -135,8 +134,7 @@ public class TransactionServiceTest {
     public void getSafeXml_queriesOnlySignedData() throws Exception {
         var repository = Mockito.mock(TransactionRepository.class);
         Mockito.when(repository.getMeterValues(TRANSACTION_PK, List.of("SignedData"))).thenReturn(List.of());
-        var service = new TransactionService(new EichrechtService(), new MeterPublicKeyService(), new ValuesXmlWriter(),
-            repository, Mockito.mock(OcppServerRepository.class));
+        var service = new TransactionService(new EichrechtService(), repository, Mockito.mock(OcppServerRepository.class));
 
         service.getSignedData(transactionDetails());
 
@@ -199,8 +197,7 @@ public class TransactionServiceTest {
     public void getSafeXml_transactionNotFound() throws Exception {
         var repository = Mockito.mock(TransactionRepository.class);
         Mockito.when(repository.getTransactions(Mockito.any())).thenReturn(List.of());
-        var service = new TransactionService(new EichrechtService(), new MeterPublicKeyService(), new ValuesXmlWriter(),
-            repository, Mockito.mock(OcppServerRepository.class));
+        var service = new TransactionService(new EichrechtService(), repository, Mockito.mock(OcppServerRepository.class));
 
         Assertions.assertThrows(SteveException.NotFound.class, () -> service.getSafeXml(TRANSACTION_PK));
     }
@@ -236,8 +233,7 @@ public class TransactionServiceTest {
         Mockito.when(repository.getMeterPublicKeySources(TRANSACTION_PK)).thenReturn(sources);
         Mockito.when(repository.getTransactions(Mockito.any())).thenReturn(List.of(transactionDetails()));
 
-        return new TransactionService(new EichrechtService(), new MeterPublicKeyService(), new ValuesXmlWriter(),
-            repository, Mockito.mock(OcppServerRepository.class));
+        return new TransactionService(new EichrechtService(), repository, Mockito.mock(OcppServerRepository.class));
     }
 
     private static String ocmf(String pagination, String transactionType) {

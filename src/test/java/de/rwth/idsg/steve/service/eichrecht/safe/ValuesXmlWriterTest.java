@@ -19,10 +19,10 @@
 package de.rwth.idsg.steve.service.eichrecht.safe;
 
 import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
-import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.SignedDataCheckerTest;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import jakarta.xml.bind.JAXBContext;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
@@ -253,15 +253,10 @@ public class ValuesXmlWriterTest {
      * The public key, if one of the values carries it
      */
     private SignedTransaction tx(String... rawValues) {
-        var signedValues = parse(rawValues);
-        return toSignedTransaction(signedValues, new MeterPublicKeyService().find(signedValues, null));
+        return txWithPublicKey(null, rawValues);
     }
 
     private SignedTransaction txWithPublicKey(String publicKey, String... rawValues) {
-        return toSignedTransaction(parse(rawValues), publicKey);
-    }
-
-    private List<SignedTransaction.SignedMeterValue> parse(String... rawValues) {
         var meterValues = Arrays.stream(rawValues)
             .map(v -> TransactionDetails.MeterValues.builder()
                 .valueTimestamp(DateTime.now())
@@ -269,13 +264,8 @@ public class ValuesXmlWriterTest {
                 .format("SignedData")
                 .build())
             .toList();
-        return eichrechtService.parse(meterValues);
-    }
-
-    private SignedTransaction toSignedTransaction(List<SignedTransaction.SignedMeterValue> signedValues,
-                                                  String publicKey) {
         var transaction = Transaction.builder().id(TX_ID).build();
-        return eichrechtService.toSignedTransaction(transaction, signedValues, publicKey);
+        return eichrechtService.getSignedTransaction(transaction, SignedDataCheckerTest.sources(publicKey), meterValues);
     }
 
     private static String ocmf(String pagination, String readings) {

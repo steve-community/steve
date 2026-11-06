@@ -18,17 +18,21 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValueType;
 import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
 import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValueType;
+import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
 import ocpp.cs._2015._10.ValueFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 
+import jakarta.xml.bind.JAXBException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -38,26 +42,25 @@ import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 @Service
 public class EichrechtService {
 
-    /**
-     * Parses all meter values with format "SignedData" of one transaction. Other meter values are ignored.
-     */
-    public List<SignedMeterValue> parse(List<TransactionDetails.MeterValues> values) {
-        var signedData = ValueFormat.SIGNED_DATA.value();
+    private final ValuesXmlWriter valuesXmlWriter = new ValuesXmlWriter();
 
-        return values.stream()
-            .filter(it -> signedData.equals(it.getFormat()))
-            .map(EichrechtService::parse)
-            .toList();
+    public String createXML(SignedTransaction signed) {
+        try {
+            return valuesXmlWriter.createXML(signed);
+        } catch (JAXBException e) {
+            throw new SteveException("Could not create the S.A.F.E. XML of transaction %s", signed.transactionId(), e);
+        }
     }
 
-    /**
-     * Picks the signed begin and end records of the transaction, and checks them.
-     *
-     * @param publicKey of the meter in hex or base64, null if unknown
-     */
-    public SignedTransaction toSignedTransaction(Transaction transaction,
-                                                 List<SignedMeterValue> signedValues,
-                                                 @Nullable String publicKey) {
+    public SignedTransaction getSignedTransaction(Transaction transaction,
+                                                  MeterPublicKeySources meterPublicKeySources,
+                                                  List<TransactionDetails.MeterValues> values) {
+        // Get all meter values with format "SignedData" of one transaction
+        var signedValues = values.stream()
+            .filter(it -> ValueFormat.SIGNED_DATA.value().equals(it.getFormat()))
+            .map(EichrechtService::parse)
+            .toList();
+
         var records = signedValues.stream()
             .filter(v -> v.ocmfRecord() != null)
             .filter(v -> OcmfUtils.isTransactionRecord(v.ocmfRecord()))
@@ -78,13 +81,20 @@ public class EichrechtService {
             end = null;
         }
 
+        // publicKey of the meter in hex or base64, null if unknown
+        var publicKey = signedValues.isEmpty()
+            ? null
+            : MeterPublicKeyExtractor.find(signedValues, meterPublicKeySources);
+
+        var checks = SignedDataChecker.check(begin, end, publicKey, transaction);
+
         return new SignedTransaction(
             transaction.getId(),
             signedValues,
             begin,
             end,
             publicKey,
-            SignedDataChecker.check(begin, end, publicKey, transaction)
+            checks
         );
     }
 

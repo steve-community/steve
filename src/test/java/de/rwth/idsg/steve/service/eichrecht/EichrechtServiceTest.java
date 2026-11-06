@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -193,7 +194,7 @@ public class EichrechtServiceTest {
         var signed = mv(OCMF, "SignedData");
         var broken = mv("<edl40/>", "SignedData");
 
-        List<SignedMeterValue> result = service.parse(List.of(raw, noFormat, signed, broken));
+        List<SignedMeterValue> result = parse(List.of(raw, noFormat, signed, broken));
 
         Assertions.assertEquals(2, result.size());
 
@@ -207,7 +208,7 @@ public class EichrechtServiceTest {
 
     @Test
     public void list_empty() {
-        Assertions.assertTrue(service.parse(List.<TransactionDetails.MeterValues>of()).isEmpty());
+        Assertions.assertTrue(parse(List.of()).isEmpty());
     }
 
     private static void assertSameRecord(OcmfRecord o) {
@@ -223,7 +224,12 @@ public class EichrechtServiceTest {
     }
 
     private SignedMeterValue parse(String value) {
-        return service.parse(List.of(mv(value, "SignedData"))).getFirst();
+        return parse(List.of(mv(value, "SignedData"))).getFirst();
+    }
+
+    private List<SignedMeterValue> parse(List<TransactionDetails.MeterValues> values) {
+        var transaction = Transaction.builder().id(1).build();
+        return service.getSignedTransaction(transaction, null, values).signedMeterValues();
     }
 
     private static TransactionDetails.MeterValues mv(String value, String format) {

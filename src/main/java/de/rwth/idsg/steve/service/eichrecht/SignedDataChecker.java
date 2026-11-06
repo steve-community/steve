@@ -38,7 +38,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyService.PROVIDER;
+import static de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyExtractor.PROVIDER;
 
 /**
  * Checks that the signed data of a transaction is valid and matches the transaction.
@@ -167,7 +167,7 @@ public final class SignedDataChecker {
             return new SignedDataCheck(description, Result.NotChecked, "Unsupported algorithm " + algorithm);
         }
 
-        var key = MeterPublicKeyService.decode(publicKey);
+        var key = MeterPublicKeyExtractor.decode(publicKey);
         if (key == null) {
             return new SignedDataCheck(description, Result.NotChecked, "Cannot read the public key of the meter");
         }

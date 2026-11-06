@@ -21,6 +21,9 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Checks that the signed data of a transaction is valid and matches the transaction.
@@ -49,6 +53,21 @@ public final class SignedDataChecker {
     private static final Provider PROVIDER = new BouncyCastleProvider();
 
     private static final String DEFAULT_ALGORITHM = "ECDSA-secp256r1-SHA256";
+
+    /**
+     * The supported signing methods, with the name of their curve in Bouncy Castle. All use SHA-256.
+     * From "Table 12. signingMethod values" in
+     * https://openchargealliance.org/wp-content/uploads/2025/05/signed_meter_values-v10-1.pdf
+     */
+    private static final Map<String, String> CURVES = Map.of(
+        "ECDSA-secp192k1-SHA256", "secp192k1",
+        "ECDSA-secp256k1-SHA256", "secp256k1",
+        "ECDSA-secp192r1-SHA256", "secp192r1",
+        "ECDSA-secp256r1-SHA256", "secp256r1",
+        "ECDSA-brainpool256r1-SHA256", "brainpoolP256r1",
+        "ECDSA-secp384r1-SHA256", "secp384r1",
+        "ECDSA-brainpool384r1-SHA256", "brainpoolP384r1"
+    );
 
     private SignedDataChecker() {
     }
@@ -144,8 +163,9 @@ public final class SignedDataChecker {
         }
 
         var signature = record.signature();
-        var algorithm = signature.algorithm() == null ? DEFAULT_ALGORITHM : signature.algorithm();
-        if (!algorithm.startsWith("ECDSA-") || !algorithm.endsWith("-SHA256")) {
+        var algorithm = StringUtils.isBlank(signature.algorithm()) ? DEFAULT_ALGORITHM : signature.algorithm();
+        var curve = CURVES.get(algorithm);
+        if (curve == null) {
             return new SignedDataCheck(description, Result.NotChecked, "Unsupported algorithm " + algorithm);
         }
 
@@ -161,6 +181,15 @@ public final class SignedDataChecker {
             String errorMsg = "Cannot read the public key of the meter";
             log.error(errorMsg, e);
             return new SignedDataCheck(description, Result.NotChecked, errorMsg);
+        }
+
+        // The key carries its own curve, which we verify with. S.A.F.E. instead uses the curve of the
+        // algorithm. Both have to be the same, so that S.A.F.E. comes to the same result.
+        var expected = ECNamedCurveTable.getParameterSpec(curve);
+        var actual = ((ECPublicKey) key).getParameters();
+        if (!expected.getCurve().equals(actual.getCurve()) || !expected.getG().equals(actual.getG())) {
+            var note = "The public key of the meter does not match the algorithm " + algorithm;
+            return new SignedDataCheck(description, Result.Failed, note);
         }
 
         try {

@@ -80,6 +80,21 @@ public class EichrechtServiceTest {
     }
 
     @Test
+    public void jsonWrapper_signingMethod() {
+        var ocmfWithoutAlgorithm = """
+            OCMF|%s|{"SD":"AB"}""".formatted(PAYLOAD);
+        var brainpool = "ECDSA-brainpool256r1-SHA256";
+
+        // Used, if the OCMF record has no algorithm
+        Assertions.assertEquals(brainpool, algorithmOf(wrapper(ocmfWithoutAlgorithm, brainpool)));
+        // The algorithm of the OCMF record wins
+        Assertions.assertEquals("ECDSA-secp256r1-SHA256", algorithmOf(wrapper(OCMF, brainpool)));
+        // Empty, if the signed data has it. Then the default applies later.
+        Assertions.assertNull(algorithmOf(wrapper(ocmfWithoutAlgorithm, "")));
+        Assertions.assertNull(algorithmOf(wrapper(ocmfWithoutAlgorithm, null)));
+    }
+
+    @Test
     public void jsonWrapper_base64OfWholeObject() {
         SignedMeterValue r = parse(base64("""
             {"signedMeterData":%s}"""
@@ -191,6 +206,18 @@ public class EichrechtServiceTest {
         Assertions.assertNotNull(o);
         Assertions.assertEquals(PAYLOAD, o.rawPayload());
         Assertions.assertEquals("T12345", o.payload().pagination());
+    }
+
+    private String algorithmOf(String value) {
+        var r = parse(value);
+        Assertions.assertNull(r.parseError());
+        return r.ocmfRecord().signature().algorithm();
+    }
+
+    private static String wrapper(String ocmf, String signingMethod) {
+        return """
+            {"signedMeterData":"%s","signingMethod":%s,"encodingMethod":"OCMF"}"""
+            .formatted(base64(ocmf), signingMethod == null ? "null" : quote(signingMethod));
     }
 
     private SignedMeterValue parse(String value) {

@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import ocpp.cs._2015._10.ValueFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -97,7 +97,7 @@ public class EichrechtService {
         var value = decodeBase64Maybe(rawValue.trim());
 
         if (value.startsWith(PREFIX)) {
-            return fromOcmf(meterValue, value, null);
+            return fromOcmf(meterValue, value, null, null);
         }
         if (value.startsWith("{")) {
             return fromJsonWrapper(meterValue, value);
@@ -125,16 +125,27 @@ public class EichrechtService {
             return error(meterValue, wrapper.publicKey(), error);
         }
 
-        return fromOcmf(meterValue, ocmf, wrapper.publicKey());
+        return fromOcmf(meterValue, ocmf, wrapper.publicKey(), wrapper.signingMethod());
     }
 
+    /**
+     * @param signingMethod from the JSON wrapper. Only used, if the OCMF record does not have one.
+     */
     private static SignedMeterValue fromOcmf(TransactionDetails.MeterValues meterValue, String ocmf,
-                                             @Nullable String publicKey) {
+                                             @Nullable String publicKey, @Nullable String signingMethod) {
+        OcmfRecord record;
         try {
-            return new SignedMeterValue(meterValue, OcmfParser.parse(ocmf), publicKey, null);
+            record = OcmfParser.parse(ocmf);
         } catch (Exception e) {
             return error(meterValue, publicKey, "Malformed OCMF record: " + e.getMessage());
         }
+
+        var signature = record.signature();
+        if (StringUtils.isBlank(signature.algorithm()) && StringUtils.isNotBlank(signingMethod)) {
+            var withMethod = new OcmfRecord.Signature(signingMethod.trim(), signature.encoding(), signature.data());
+            record = new OcmfRecord(record.rawInput(), record.rawPayload(), record.payload(), withMethod);
+        }
+        return new SignedMeterValue(meterValue, record, publicKey, null);
     }
 
     private static SignedMeterValue error(TransactionDetails.MeterValues meterValue, @Nullable String publicKey,

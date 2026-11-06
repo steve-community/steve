@@ -20,10 +20,13 @@ package de.rwth.idsg.steve.service.eichrecht;
 
 /**
  * JSON object in the value of a signed meter value, like OCPP 2.x SignedMeterValueType:
- * {"signedMeterData": "...", "encodingMethod": "OCMF", "publicKey": "..."}
+ * {"signedMeterData": "...", "signingMethod": "...", "encodingMethod": "OCMF", "publicKey": "..."}
+ *
+ * @param signingMethod empty, if the signed meter data contains it (e.g. OCMF "SA")
  */
 public record SignedMeterValueType(
     String signedMeterData,
+    String signingMethod,
     String encodingMethod,
     String publicKey
 ) {

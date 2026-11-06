@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
@@ -139,6 +140,54 @@ public class SignedDataCheckerTest {
     }
 
     @Test
+    public void algorithmMatchesKey() {
+        // The signature section is not signed, so adding SA keeps the signature valid. Empty means default.
+        for (var algorithm : List.of("ECDSA-secp256r1-SHA256", "")) {
+            var checks = check(tx("7753", "7753"), EBEE_KEY,
+                withAlgorithm(EBEE_BEGIN, algorithm), withAlgorithm(EBEE_END, algorithm));
+
+            assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+        }
+    }
+
+    @Test
+    public void algorithmNamesOtherCurve() {
+        var algorithm = "ECDSA-brainpool256r1-SHA256";
+        var checks = check(tx("7753", "7753"), EBEE_KEY,
+            withAlgorithm(EBEE_BEGIN, algorithm), withAlgorithm(EBEE_END, algorithm));
+
+        assertResults(checks, Result.Failed, Result.Passed, Result.Failed, Result.Passed);
+        Assertions.assertEquals("The public key of the meter does not match the algorithm " + algorithm,
+            checks.get(0).note());
+    }
+
+    @Test
+    public void signingMethodOfJsonWrapper() {
+        // The eBee records have no SA, so the signingMethod of the wrapper applies
+        var matching = check(tx("7753", "7753"), EBEE_KEY,
+            wrapper(EBEE_BEGIN, "ECDSA-secp256r1-SHA256"), wrapper(EBEE_END, "ECDSA-secp256r1-SHA256"));
+        assertResults(matching, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+
+        var otherCurve = check(tx("7753", "7753"), EBEE_KEY,
+            wrapper(EBEE_BEGIN, "ECDSA-brainpool256r1-SHA256"), wrapper(EBEE_END, "ECDSA-brainpool256r1-SHA256"));
+        assertResults(otherCurve, Result.Failed, Result.Passed, Result.Failed, Result.Passed);
+    }
+
+    @Test
+    public void unsupportedAlgorithm() {
+        // Only the exact values of the OCA application note, Table 12
+        for (var algorithm : List.of("ECDSA-secp999r1-SHA256", "ECDSA-secp256r1", "ECDSA-secp256r1-SHA512",
+            "RSA-secp256r1-SHA256", "ECDSA-secp256r1-SHA256-x", "ECDSA-SECP256R1-SHA256",
+            "ECDSA-brainpoolP256r1-SHA256")) {
+            var checks = check(tx("7753", "7753"), EBEE_KEY,
+                withAlgorithm(EBEE_BEGIN, algorithm), withAlgorithm(EBEE_END, algorithm));
+
+            assertResults(checks, Result.NotChecked, Result.Passed, Result.NotChecked, Result.Passed);
+            Assertions.assertEquals("Unsupported algorithm " + algorithm, checks.get(0).note());
+        }
+    }
+
+    @Test
     public void transactionNotStopped() {
         var checks = check(tx("7753", null), EBEE_KEY, EBEE_BEGIN);
 
@@ -175,6 +224,19 @@ public class SignedDataCheckerTest {
             .toList();
         return eichrechtService.toSignedTransaction(transaction, eichrechtService.parse(meterValues), publicKey)
             .checks();
+    }
+
+    private static String withAlgorithm(String ocmf, String algorithm) {
+        return ocmf.replace("""
+            |{"SD":""", """
+            |{"SA":"%s","SD":""".formatted(algorithm));
+    }
+
+    private static String wrapper(String ocmf, String signingMethod) {
+        var signedMeterData = Base64.getEncoder().encodeToString(ocmf.getBytes(StandardCharsets.UTF_8));
+        return """
+            {"signedMeterData":"%s","signingMethod":"%s","encodingMethod":"OCMF"}"""
+            .formatted(signedMeterData, signingMethod);
     }
 
     private static Transaction tx(String startValue, String stopValue) {

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.SignedTransaction.SignedMeterValue;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -73,13 +74,13 @@ public final class SignedDataChecker {
     }
 
     /**
-     * @param begin     the signed begin record, null if missing
-     * @param end       the signed end record, null if missing or if the begin record carries both readings
+     * @param begin     the signed begin value, null if missing
+     * @param end       the signed end value, null if missing or if the begin record carries both readings
      * @param publicKey of the meter in hex or base64, null if unknown
      * @return empty, if there is no signed begin or end
      */
-    public static List<SignedDataCheck> check(@Nullable OcmfRecord begin,
-                                              @Nullable OcmfRecord end,
+    public static List<SignedDataCheck> check(@Nullable SignedMeterValue begin,
+                                              @Nullable SignedMeterValue end,
                                               @Nullable String publicKey,
                                               Transaction transaction) {
         if (begin == null && end == null) {
@@ -87,7 +88,7 @@ public final class SignedDataChecker {
         }
 
         // The begin record can carry both readings
-        var endRecord = (end == null && OcmfUtils.endReading(begin) != null) ? begin : end;
+        var endValue = (end == null && OcmfUtils.endReading(begin.ocmfRecord()) != null) ? begin : end;
 
         var checks = new ArrayList<SignedDataCheck>();
 
@@ -97,23 +98,23 @@ public final class SignedDataChecker {
             checks.add(signature("Signature of the begin value", begin, publicKey));
             checks.add(value(
                 "Begin value equals the start value of the transaction",
-                OcmfUtils.beginReading(begin),
+                OcmfUtils.beginReading(begin.ocmfRecord()),
                 transaction.getStartValue()
             ));
         }
 
-        if (endRecord == null) {
+        if (endValue == null) {
             var stopped = transaction.getStopValue() != null;
             var result = stopped ? Result.Failed : Result.NotChecked;
             var note = stopped ? "Not received" : "The transaction is not stopped yet";
             checks.add(new SignedDataCheck("Signed end value", result, note));
         } else {
-            if (endRecord != begin) {
-                checks.add(signature("Signature of the end value", endRecord, publicKey));
+            if (endValue != begin) {
+                checks.add(signature("Signature of the end value", endValue, publicKey));
             }
             checks.add(value(
                 "End value equals the stop value of the transaction",
-                OcmfUtils.endReading(endRecord),
+                OcmfUtils.endReading(endValue.ocmfRecord()),
                 transaction.getStopValue()
             ));
         }
@@ -156,14 +157,15 @@ public final class SignedDataChecker {
      * Same as the S.A.F.E. transparency software: ECDSA with SHA-256 over the payload as received
      */
     private static SignedDataCheck signature(String description,
-                                             OcmfRecord record,
+                                             SignedMeterValue value,
                                              @Nullable String publicKey) {
         if (publicKey == null) {
             return new SignedDataCheck(description, Result.NotChecked, "The public key of the meter is unknown");
         }
 
+        var record = value.ocmfRecord();
         var signature = record.signature();
-        var algorithm = StringUtils.isBlank(signature.algorithm()) ? DEFAULT_ALGORITHM : signature.algorithm();
+        var algorithm = signingMethod(value);
         var curve = CURVES.get(algorithm);
         if (curve == null) {
             return new SignedDataCheck(description, Result.NotChecked, "Unsupported algorithm " + algorithm);
@@ -201,8 +203,13 @@ public final class SignedDataChecker {
             verifier.initVerify(key);
             verifier.update(record.rawPayload().getBytes(StandardCharsets.UTF_8));
 
+            // S.A.F.E. only gets the OCMF record, so it can only know the default
+            var passedNote = StringUtils.isBlank(signature.algorithm()) && !DEFAULT_ALGORITHM.equals(algorithm)
+                ? "Signing method from the charging station, not in the OCMF record: S.A.F.E. uses " + DEFAULT_ALGORITHM
+                : null;
+
             return verifier.verify(signatureData)
-                ? new SignedDataCheck(description, Result.Passed, null)
+                ? new SignedDataCheck(description, Result.Passed, passedNote)
                 : new SignedDataCheck(description, Result.Failed, "The signature does not match the data");
 
         } catch (GeneralSecurityException | RuntimeException e) {
@@ -210,5 +217,21 @@ public final class SignedDataChecker {
             log.error(errorMsg, e);
             return new SignedDataCheck(description, Result.Failed, errorMsg);
         }
+    }
+
+    /**
+     * 1. "SA" of the OCMF record, if the signed meter data contains it.
+     * 2. Otherwise, signingMethod of the OCPP SignedMeterValue JSON (see Table 1 of the OCA application note).
+     * 3. Otherwise, the default of OCMF.
+     */
+    private static String signingMethod(SignedMeterValue value) {
+        var fromOcmf = value.ocmfRecord().signature().algorithm();
+        if (StringUtils.isNotBlank(fromOcmf)) {
+            return fromOcmf;
+        }
+        if (StringUtils.isNotBlank(value.signingMethod())) {
+            return value.signingMethod().trim();
+        }
+        return DEFAULT_ALGORITHM;
     }
 }

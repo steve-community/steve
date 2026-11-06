@@ -27,8 +27,8 @@ import java.util.List;
  * The signed meter values of a transaction.
  *
  * @param signedMeterValues all meter values with format "SignedData"
- * @param begin             the signed begin record, null if missing
- * @param end               the signed end record, null if missing or if the begin record carries both readings
+ * @param begin             the signed begin value, null if missing
+ * @param end               the signed end value, null if missing or if the begin record carries both readings
  * @param publicKey         of the meter in hex or base64, null if unknown
  * @param checks            whether the signed data is valid and matches the transaction. Empty, if there is no
  *                          signed begin or end.
@@ -36,8 +36,8 @@ import java.util.List;
 public record SignedTransaction(
     int transactionId,
     List<SignedMeterValue> signedMeterValues,
-    @Nullable OcmfRecord begin,
-    @Nullable OcmfRecord end,
+    @Nullable SignedMeterValue begin,
+    @Nullable SignedMeterValue end,
     @Nullable String publicKey,
     List<SignedDataCheck> checks
 ) {
@@ -50,13 +50,15 @@ public record SignedTransaction(
     }
 
     /**
-     * @param ocmfRecord null, if we could not read it (see parseError)
-     * @param publicKey  sent with the value (OCPP SignedMeterValue JSON), not decoded
+     * @param ocmfRecord    null, if we could not read it (see parseError)
+     * @param publicKey     sent with the value (OCPP SignedMeterValue JSON), not decoded
+     * @param signingMethod sent with the value (OCPP SignedMeterValue JSON)
      */
     public record SignedMeterValue(
         TransactionDetails.MeterValues meterValue,
         @Nullable OcmfRecord ocmfRecord,
         @Nullable String publicKey,
+        @Nullable String signingMethod,
         @Nullable String parseError
     ) {
     }

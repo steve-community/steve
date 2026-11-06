@@ -21,11 +21,16 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.service.eichrecht.SignedDataCheck.Result;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HexFormat;
@@ -167,10 +172,48 @@ public class SignedDataCheckerTest {
         var matching = check(tx("7753", "7753"), EBEE_KEY,
             wrapper(EBEE_BEGIN, "ECDSA-secp256r1-SHA256"), wrapper(EBEE_END, "ECDSA-secp256r1-SHA256"));
         assertResults(matching, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+        // Same as the default, so S.A.F.E. comes to the same result
+        Assertions.assertNull(matching.get(0).note());
 
         var otherCurve = check(tx("7753", "7753"), EBEE_KEY,
             wrapper(EBEE_BEGIN, "ECDSA-brainpool256r1-SHA256"), wrapper(EBEE_END, "ECDSA-brainpool256r1-SHA256"));
         assertResults(otherCurve, Result.Failed, Result.Passed, Result.Failed, Result.Passed);
+        Assertions.assertEquals("The public key of the meter does not match the algorithm ECDSA-brainpool256r1-SHA256",
+            otherCurve.get(0).note());
+    }
+
+    @Test
+    public void signingMethodOnlyFromJsonWrapper_hint() throws Exception {
+        var brainpool = "ECDSA-brainpool256r1-SHA256";
+        var generator = KeyPairGenerator.getInstance("EC", new BouncyCastleProvider());
+        generator.initialize(new ECGenParameterSpec("brainpoolP256r1"));
+        var keyPair = generator.generateKeyPair();
+        var publicKey = HexFormat.of().formatHex(keyPair.getPublic().getEncoded());
+        var begin = resign(EBEE_BEGIN, keyPair.getPrivate());
+        var end = resign(EBEE_END, keyPair.getPrivate());
+
+        // S.A.F.E. cannot see the signing method of the wrapper, so the page says so
+        var checks = check(tx("7753", "7753"), publicKey, wrapper(begin, brainpool), wrapper(end, brainpool));
+        assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+        var hint = "Signing method from the charging station, not in the OCMF record: S.A.F.E. uses "
+            + "ECDSA-secp256r1-SHA256";
+        Assertions.assertEquals(hint, checks.get(0).note());
+        Assertions.assertEquals(hint, checks.get(2).note());
+
+        // With SA in the OCMF record, S.A.F.E. knows it as well
+        checks = check(tx("7753", "7753"), publicKey, withAlgorithm(begin, brainpool), withAlgorithm(end, brainpool));
+        assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
+        Assertions.assertNull(checks.get(0).note());
+    }
+
+    @Test
+    public void signingMethodOfOcmfWinsOverJsonWrapper() {
+        var algorithm = "ECDSA-secp256r1-SHA256";
+        var checks = check(tx("7753", "7753"), EBEE_KEY,
+            wrapper(withAlgorithm(EBEE_BEGIN, algorithm), "ECDSA-brainpool256r1-SHA256"),
+            wrapper(withAlgorithm(EBEE_END, algorithm), "ECDSA-brainpool256r1-SHA256"));
+
+        assertResults(checks, Result.Passed, Result.Passed, Result.Passed, Result.Passed);
     }
 
     @Test
@@ -230,6 +273,18 @@ public class SignedDataCheckerTest {
         return ocmf.replace("""
             |{"SD":""", """
             |{"SA":"%s","SD":""".formatted(algorithm));
+    }
+
+    /**
+     * @return the OCMF record with the same payload, but signed with the given key and without SA
+     */
+    private static String resign(String ocmf, PrivateKey privateKey) throws Exception {
+        var payload = OcmfParser.parse(ocmf).rawPayload();
+        var signer = Signature.getInstance("SHA256withECDSA", new BouncyCastleProvider());
+        signer.initSign(privateKey);
+        signer.update(payload.getBytes(StandardCharsets.UTF_8));
+        return """
+            OCMF|%s|{"SD":"%s"}""".formatted(payload, HexFormat.of().formatHex(signer.sign()));
     }
 
     private static String wrapper(String ocmf, String signingMethod) {

@@ -62,10 +62,10 @@ public class ValuesXmlWriter {
 
         var values = new ArrayList<Values.Value>();
         if (signed.begin() != null) {
-            values.add(toValue("Transaction.Begin", signed.begin(), transactionId, signed.publicKey()));
+            values.add(toValue("Transaction.Begin", signed.begin().ocmfRecord(), transactionId, signed.publicKey()));
         }
         if (signed.end() != null) {
-            values.add(toValue("Transaction.End", signed.end(), transactionId, signed.publicKey()));
+            values.add(toValue("Transaction.End", signed.end().ocmfRecord(), transactionId, signed.publicKey()));
         }
         return new Values().setValues(values);
     }

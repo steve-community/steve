@@ -85,13 +85,20 @@ public class EichrechtServiceTest {
             OCMF|%s|{"SD":"AB"}""".formatted(PAYLOAD);
         var brainpool = "ECDSA-brainpool256r1-SHA256";
 
-        // Used, if the OCMF record has no algorithm
-        Assertions.assertEquals(brainpool, algorithmOf(wrapper(ocmfWithoutAlgorithm, brainpool)));
-        // The algorithm of the OCMF record wins
-        Assertions.assertEquals("ECDSA-secp256r1-SHA256", algorithmOf(wrapper(OCMF, brainpool)));
-        // Empty, if the signed data has it. Then the default applies later.
-        Assertions.assertNull(algorithmOf(wrapper(ocmfWithoutAlgorithm, "")));
-        Assertions.assertNull(algorithmOf(wrapper(ocmfWithoutAlgorithm, null)));
+        // Kept next to the OCMF record, which stays as received. The checker decides which one applies.
+        var r = parse(wrapper(ocmfWithoutAlgorithm, brainpool));
+        Assertions.assertNull(r.parseError());
+        Assertions.assertEquals(brainpool, r.signingMethod());
+        Assertions.assertNull(r.ocmfRecord().signature().algorithm());
+        Assertions.assertEquals(ocmfWithoutAlgorithm, r.ocmfRecord().rawInput());
+
+        r = parse(wrapper(OCMF, brainpool));
+        Assertions.assertEquals(brainpool, r.signingMethod());
+        Assertions.assertEquals("ECDSA-secp256r1-SHA256", r.ocmfRecord().signature().algorithm());
+        Assertions.assertEquals(OCMF, r.ocmfRecord().rawInput());
+
+        Assertions.assertNull(parse(wrapper(ocmfWithoutAlgorithm, null)).signingMethod());
+        Assertions.assertNull(parse(ocmfWithoutAlgorithm).signingMethod());
     }
 
     @Test
@@ -206,12 +213,6 @@ public class EichrechtServiceTest {
         Assertions.assertNotNull(o);
         Assertions.assertEquals(PAYLOAD, o.rawPayload());
         Assertions.assertEquals("T12345", o.payload().pagination());
-    }
-
-    private String algorithmOf(String value) {
-        var r = parse(value);
-        Assertions.assertNull(r.parseError());
-        return r.ocmfRecord().signature().algorithm();
     }
 
     private static String wrapper(String ocmf, String signingMethod) {

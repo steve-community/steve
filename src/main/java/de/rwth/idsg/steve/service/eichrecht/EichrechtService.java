@@ -30,7 +30,6 @@ import tools.jackson.core.JacksonException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 
@@ -58,23 +57,22 @@ public class EichrechtService {
                                                  List<SignedMeterValue> signedValues,
                                                  @Nullable String publicKey) {
         var records = signedValues.stream()
-            .map(SignedMeterValue::ocmfRecord)
-            .filter(Objects::nonNull)
-            .filter(OcmfUtils::isTransactionRecord)
+            .filter(v -> v.ocmfRecord() != null)
+            .filter(v -> OcmfUtils.isTransactionRecord(v.ocmfRecord()))
             .toList();
 
         var begin = records.stream()
-            .filter(r -> OcmfUtils.beginReading(r) != null)
+            .filter(v -> OcmfUtils.beginReading(v.ocmfRecord()) != null)
             .findFirst()
             .orElse(null);
 
         var end = records.stream()
-            .filter(r -> OcmfUtils.endReading(r) != null)
+            .filter(v -> OcmfUtils.endReading(v.ocmfRecord()) != null)
             .reduce((first, second) -> second)
             .orElse(null);
 
         // One record can carry both readings. Then it is enough to have it once.
-        if (begin != null && end != null && begin.rawInput().equals(end.rawInput())) {
+        if (begin != null && end != null && begin.ocmfRecord().rawInput().equals(end.ocmfRecord().rawInput())) {
             end = null;
         }
 
@@ -128,29 +126,18 @@ public class EichrechtService {
         return fromOcmf(meterValue, ocmf, wrapper.publicKey(), wrapper.signingMethod());
     }
 
-    /**
-     * @param signingMethod from the JSON wrapper. Only used, if the OCMF record does not have one.
-     */
     private static SignedMeterValue fromOcmf(TransactionDetails.MeterValues meterValue, String ocmf,
                                              @Nullable String publicKey, @Nullable String signingMethod) {
-        OcmfRecord record;
         try {
-            record = OcmfParser.parse(ocmf);
+            return new SignedMeterValue(meterValue, OcmfParser.parse(ocmf), publicKey, signingMethod, null);
         } catch (Exception e) {
             return error(meterValue, publicKey, "Malformed OCMF record: " + e.getMessage());
         }
-
-        var signature = record.signature();
-        if (StringUtils.isBlank(signature.algorithm()) && StringUtils.isNotBlank(signingMethod)) {
-            var withMethod = new OcmfRecord.Signature(signingMethod.trim(), signature.encoding(), signature.data());
-            record = new OcmfRecord(record.rawInput(), record.rawPayload(), record.payload(), withMethod);
-        }
-        return new SignedMeterValue(meterValue, record, publicKey, null);
     }
 
     private static SignedMeterValue error(TransactionDetails.MeterValues meterValue, @Nullable String publicKey,
                                           String error) {
-        return new SignedMeterValue(meterValue, null, publicKey, error);
+        return new SignedMeterValue(meterValue, null, publicKey, null, error);
     }
 
     private static String decodeBase64Maybe(String raw) {

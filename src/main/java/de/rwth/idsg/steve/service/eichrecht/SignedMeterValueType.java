@@ -22,7 +22,8 @@ package de.rwth.idsg.steve.service.eichrecht;
  * JSON object in the value of a signed meter value, like OCPP 2.x SignedMeterValueType:
  * {"signedMeterData": "...", "signingMethod": "...", "encodingMethod": "OCMF", "publicKey": "..."}
  *
- * @param signingMethod empty, if the signed meter data contains it (e.g. OCMF "SA")
+ * @param signingMethod empty, if the signed meter data contains it (OCMF "SA"). Otherwise, it has to be set.
+ *                      See Table 1 in https://openchargealliance.org/wp-content/uploads/2025/05/signed_meter_values-v10-1.pdf
  */
 public record SignedMeterValueType(
     String signedMeterData,

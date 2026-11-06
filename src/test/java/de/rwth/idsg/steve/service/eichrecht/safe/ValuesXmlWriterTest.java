@@ -137,6 +137,21 @@ public class ValuesXmlWriterTest {
     }
 
     @Test
+    public void signingMethodFromJsonWrapper_recordUnchanged() throws Exception {
+        var method = "ECDSA-brainpool256r1-SHA256";
+        var withoutAlgorithm = """
+            "SA":"ECDSA-secp256r1-SHA256",""";
+        var beginWithoutAlgorithm = BEGIN.replace(withoutAlgorithm, "");
+
+        var values = roundTrip(writer.createXML(tx(wrapper(beginWithoutAlgorithm, method), wrapper(END, method))));
+
+        // The OCMF records go into the XML as received, with or without SA
+        Assertions.assertEquals(2, values.size());
+        assertValue(values.get(0), "Transaction.Begin", beginWithoutAlgorithm, TX_ID);
+        assertValue(values.get(1), "Transaction.End", END, TX_ID);
+    }
+
+    @Test
     public void publicKeyHex() throws Exception {
         String xml = writer.createXML(txWithPublicKey("305930130607", BEGIN, END));
         List<Values.Value> values = roundTrip(xml);
@@ -268,6 +283,12 @@ public class ValuesXmlWriterTest {
             OCMF|{"FV":"1.0","PG":"%s","MS":"SN1","TT":"0,30 EUR & more",\
             "RD":[%s]}|{"SA":"ECDSA-secp256r1-SHA256","SD":"3045022100AB"}"""
             .formatted(pagination, readings);
+    }
+
+    private static String wrapper(String ocmf, String signingMethod) {
+        return """
+            {"signedMeterData":"%s","signingMethod":"%s","encodingMethod":"OCMF"}"""
+            .formatted(base64(ocmf), signingMethod);
     }
 
     private static String base64(String s) {

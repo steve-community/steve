@@ -33,8 +33,6 @@ import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 
 import jakarta.xml.bind.JAXBException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;

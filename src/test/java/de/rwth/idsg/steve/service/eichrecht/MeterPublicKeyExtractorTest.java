@@ -75,6 +75,24 @@ public class MeterPublicKeyExtractorTest {
     }
 
     @Test
+    public void unwrap_pem() {
+        var key = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEk8KrjsUI5XSAIucl0rhYW8ZhcLwVR0BhfJ0YBjDAHURgGyQXcPvaECQjCXi4girXrNiOzVFsdo9QGEtc8fR2jQ==";
+        var pem = """
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEk8KrjsUI5XSAIucl0rhYW8ZhcLwV
+            R0BhfJ0YBjDAHURgGyQXcPvaECQjCXi4girXrNiOzVFsdo9QGEtc8fR2jQ==
+            -----END PUBLIC KEY-----
+            """;
+
+        // Not standard, but sent by some stations: Base64 of the PEM file, or the PEM file itself
+        var sentByStation = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFazhLcmpzVUk1WFNBSXVjbDByaFlXOFpoY0x3VgpSMEJoZkowWUJqREFIVVJnR3lRWGNQdmFFQ1FqQ1hpNGdpclhyTmlPelZGc2RvOVFHRXRjOGZSMmpRPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==";
+        Assertions.assertEquals(base64(pem), sentByStation);
+        Assertions.assertEquals(key, MeterPublicKeyExtractor.unwrap(sentByStation));
+        Assertions.assertEquals(key, MeterPublicKeyExtractor.unwrap(pem));
+        Assertions.assertNotNull(MeterPublicKeyExtractor.decode(key));
+    }
+
+    @Test
     public void find_sentWithSignedValue() {
         var values = parse(OCMF, wrapper(OCMF, base64("oca:base16:asn1:" + HEX_KEY)));
 

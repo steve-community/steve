@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -41,10 +42,15 @@ import java.util.regex.Pattern;
  * Finds the public key of the meter, with which the signed values of a transaction can be verified.
  * See the OCA application note "Signed Meter Values in OCPP" (v1.0).
  */
+@Slf4j
 public final class MeterPublicKeyExtractor {
 
     private static final String CONFIGURATION_KEY = "MeterPublicKey";
     private static final Pattern HEX = Pattern.compile("[0-9a-fA-F]+");
+
+    // Without whitespace, as we compare them with values from which we removed it
+    private static final String PEM_BEGIN = "-----BEGINPUBLICKEY-----";
+    private static final String PEM_END = "-----ENDPUBLICKEY-----";
 
     /**
      * Bouncy Castle, because the JDK does not support all curves of OCMF (e.g. brainpool)
@@ -118,6 +124,9 @@ public final class MeterPublicKeyExtractor {
     /**
      * The note specifies the value as Base64 of "oca:encoding:content-type:key", e.g. "oca:base16:asn1:3059...".
      * Otherwise, we take the value as the key itself.
+     * <p>
+     * Some stations send a PEM file ("-----BEGIN PUBLIC KEY-----..."), as it is or in Base64. This is not
+     * standard, but the base64 between the header and footer is the key itself.
      */
     @Nullable
     static String unwrap(@Nullable String raw) {
@@ -128,12 +137,21 @@ public final class MeterPublicKeyExtractor {
 
         String decoded;
         try {
-            decoded = new String(Base64.getDecoder().decode(value), StandardCharsets.US_ASCII);
+            decoded = StringUtils.deleteWhitespace(new String(Base64.getDecoder().decode(value), StandardCharsets.US_ASCII));
         } catch (IllegalArgumentException e) {
-            return value;
+            decoded = null;
         }
 
-        if (!decoded.startsWith("oca:")) {
+        var pem = StringUtils.substringBetween(value, PEM_BEGIN, PEM_END);
+        if (pem == null && decoded != null) {
+            pem = StringUtils.substringBetween(decoded, PEM_BEGIN, PEM_END);
+        }
+        if (pem != null) {
+            log.warn("The public key of the meter is in PEM format, which is not standard.");
+            return pem;
+        }
+
+        if (decoded == null || !decoded.startsWith("oca:")) {
             return value;
         }
 
@@ -143,6 +161,6 @@ public final class MeterPublicKeyExtractor {
         }
         return "base16".equals(parts[1])
             ? parts[3].replaceAll("0[xX]|[^0-9a-fA-F]", "") // the note says to ignore these
-            : StringUtils.deleteWhitespace(parts[3]);
+            : parts[3];
     }
 }

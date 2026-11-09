@@ -20,35 +20,37 @@
 <!--/* "Signed Meter Data" section of the transaction details page. Needs "signedData" (SignedTransaction) in the model. */-->
 <th:block th:fragment="signedMeterData">
     <section><span>Signed Meter Data</span></section>
-    <div style="text-align: center;" th:with="count=${#lists.size(signedData.signedMeterValues)}">
-        <th:block th:if="${count == 0}">No signed meter values were received for this transaction.</th:block>
+    <div class="signedSummary" th:with="count=${#lists.size(signedData.signedMeterValues)}">
+        <p th:if="${count == 0}">No signed meter values were received for this transaction.</p>
         <th:block th:if="${count > 0}">
-            Signed meter values received: <span th:text="${count}"></span>.
+            <p>Signed meter values received: <span th:text="${count}"></span>.</p>
             <form th:if="${signedData.hasBeginOrEnd()}"
                   th:action="@{/manager/transactions/details/{id}/safe.xml(id=${signedData.transactionId})}"
-                  method="get" style="display: inline-block;">
+                  method="get">
                 <input type="submit" value="Download S.A.F.E. XML">
             </form>
-            <th:block th:unless="${signedData.hasBeginOrEnd()}">
+            <p th:unless="${signedData.hasBeginOrEnd()}">
                 There is no signed begin or end of the transaction, so there is no file for the S.A.F.E.
                 transparency software.
-            </th:block>
+            </p>
         </th:block>
     </div>
-    <center th:if="${not #lists.isEmpty(signedData.checks)}">
-        <br>
-        <table class="cpd">
+    <table class="signedChecks" th:if="${not #lists.isEmpty(signedData.checks)}">
+        <thead>
+            <tr><th>Result</th><th>Check</th><th>Details</th></tr>
+        </thead>
+        <tbody>
             <tr th:each="c : ${signedData.checks}">
-                <td style="font-weight: bold;" th:switch="${c.result.name()}">
-                    <span th:case="'Passed'" style="color: green;">&#x2713;</span>
-                    <span th:case="'Failed'" style="color: red;">&#x2717;</span>
-                    <span th:case="*" style="color: gray;">?</span>
+                <td th:switch="${c.result.name()}">
+                    <span th:case="'Passed'" class="checkResult passed">&#x2713; Passed</span>
+                    <span th:case="'Failed'" class="checkResult failed">&#x2717; Failed</span>
+                    <span th:case="*" class="checkResult notChecked">? Not checked</span>
                 </td>
                 <td th:text="${c.description}"></td>
-                <td th:text="${c.note}"></td>
+                <td class="checkNote" th:text="${c.note}"></td>
             </tr>
-        </table>
-    </center>
+        </tbody>
+    </table>
     <div style="text-align: center;" th:with="failed=${signedData.signedMeterValues.?[parseError != null]}">
         <th:block th:if="${not #lists.isEmpty(failed)}">
             <br>

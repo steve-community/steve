@@ -19,7 +19,15 @@
 */-->
 <!--/* "Signed Meter Data" section of the transaction details page. Needs "signedData" (SignedTransaction) in the model. */-->
 <th:block th:fragment="signedMeterData">
-    <section><span>Signed Meter Data</span></section>
+    <section><span>
+        Signed Meter Data
+        <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
+            <span>SteVe only checks the basics: the signatures of the begin and end values with the public key
+                reported by the charging station, and whether the signed readings match the start and stop values
+                of the transaction. For a full and independent verification, download the S.A.F.E. XML and open it
+                in the S.A.F.E. Transparenzsoftware (safe-ev.org).</span>
+        </a>
+    </span></section>
     <div class="signedSummary" th:with="count=${#lists.size(signedData.signedMeterValues)}">
         <p th:if="${count == 0}">No signed meter values were received for this transaction.</p>
         <th:block th:if="${count > 0}">

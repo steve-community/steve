@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.Builder;
 import lombok.Getter;
 import org.joda.time.DateTime;
@@ -45,4 +46,17 @@ public class TransactionMeterValue {
 
     // New in OCPP 1.6
     private final String phase;
+
+    public static TransactionMeterValue fromRecord(ConnectorMeterValueRecord r) {
+        return TransactionMeterValue.builder()
+            .valueTimestamp(r.getValueTimestamp())
+            .value(r.getValue())
+            .readingContext(r.getReadingContext())
+            .format(r.getFormat())
+            .measurand(r.getMeasurand())
+            .location(r.getLocation())
+            .unit(r.getUnit())
+            .phase(r.getPhase())
+            .build();
+    }
 }

@@ -243,16 +243,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .where(conditions)
                    .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                    .fetch()
-                   .map(r -> TransactionMeterValue.builder()
-                                                           .valueTimestamp(r.getValueTimestamp())
-                                                           .value(r.getValue())
-                                                           .readingContext(r.getReadingContext())
-                                                           .format(r.getFormat())
-                                                           .measurand(r.getMeasurand())
-                                                           .location(r.getLocation())
-                                                           .unit(r.getUnit())
-                                                           .phase(r.getPhase())
-                                                           .build())
+                   .map(TransactionMeterValue::fromRecord)
                    .stream()
                    .filter(v -> {
                        if (energyValuesOnly) {
@@ -278,16 +269,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .where(conditions)
                 .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                 .fetch()
-                .map(r -> TransactionMeterValue.builder()
-                    .valueTimestamp(r.getValueTimestamp())
-                    .value(r.getValue())
-                    .readingContext(r.getReadingContext())
-                    .format(r.getFormat())
-                    .measurand(r.getMeasurand())
-                    .location(r.getLocation())
-                    .unit(r.getUnit())
-                    .phase(r.getPhase())
-                    .build());
+                .map(TransactionMeterValue::fromRecord);
     }
 
     @Override

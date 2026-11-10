@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_empty() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .build();
 
         Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
@@ -55,7 +55,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_onlyValue() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .build();
 
@@ -64,7 +64,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_onlyValueDecimal() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22.5")
             .build();
 
@@ -73,7 +73,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_signedData() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("some gibberish that is not an energy value")
             .format("SignedData")
             .build();
@@ -83,7 +83,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_notEnergyUnit() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .format("Raw")
             .unit("Celsius")
@@ -95,7 +95,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_notActiveImportMeasurand() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .format("Raw")
             .unit("Wh")
@@ -107,7 +107,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_nullFormat() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .format(null)
             .unit("Wh")
@@ -119,7 +119,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_rawFormat() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .format("Raw")
             .unit("Wh")
@@ -131,7 +131,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_kWhUnit() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .format("Raw")
             .unit("kWh")
@@ -143,7 +143,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_nonNumericValue() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22a819()b")
             .format("Raw")
             .unit("Wh")
@@ -155,7 +155,7 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_valueAndUnit() {
-        var value = TransactionDetails.MeterValues.builder()
+        var value = TransactionMeterValue.builder()
             .value("22")
             .unit("Wh")
             .build();

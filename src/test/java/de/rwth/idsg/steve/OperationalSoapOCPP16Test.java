@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import jooq.steve.db.tables.records.TransactionRecord;
@@ -613,7 +612,7 @@ public class OperationalSoapOCPP16Test {
     }
 
     private void checkMeterValues(List<MeterValue> meterValues, int transactionPk) {
-        TransactionDetails details = databasePreparer.getDetails(transactionPk);
+        var context = databasePreparer.getContext(transactionPk);
 
         // iterate over all created meter values
         for (MeterValue meterValue : meterValues) {
@@ -621,7 +620,7 @@ public class OperationalSoapOCPP16Test {
             Assertions.assertFalse(sampledValues.isEmpty());
             boolean thisValueFound = false;
             // and check, if it can be found in the DB
-            for (TransactionDetails.MeterValues values : details.getValues()) {
+            for (var values : context.values()) {
                 if (values.getValue().equals(sampledValues.get(0).getValue())) {
                     thisValueFound = true;
                     break;

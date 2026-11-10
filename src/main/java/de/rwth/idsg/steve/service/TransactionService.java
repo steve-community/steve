@@ -19,33 +19,42 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.collect.Ordering;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionContext;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
-import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import tools.jackson.dataformat.csv.CsvMapper;
 import tools.jackson.dataformat.csv.CsvSchema;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhDouble;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
+import static ocpp.cs._2015._10.ValueFormat.SIGNED_DATA;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -56,11 +65,12 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
 @RequiredArgsConstructor
 public class TransactionService {
 
+    private final EichrechtService eichrechtService;
     private final TransactionRepository transactionRepository;
     private final OcppServerRepository ocppServerRepository;
 
     private final CsvMapper csvMapper = CsvMapper.builder().findAndAddModules().build();
-    private final CsvSchema schema = csvMapper.schemaFor(TransactionDetails.MeterValues.class)
+    private final CsvSchema schema = csvMapper.schemaFor(TransactionMeterValue.class)
         .withHeader()
         .withNullValue("\"\""); // to be consistent with JOOQ's CSV behavior
 
@@ -74,7 +84,7 @@ public class TransactionService {
 
     public void writeTransactionMeterValuesCSV(int transactionPk, boolean energyValuesOnly, Writer writer) {
         try (var seqWriter = csvMapper.writer(schema).writeValues(writer)) {
-            seqWriter.writeAll(getDetails(transactionPk, energyValuesOnly).getValues());
+            seqWriter.writeAll(getDetails(transactionPk, energyValuesOnly, false).getValues());
         }
     }
 
@@ -82,8 +92,51 @@ public class TransactionService {
         return transactionRepository.getActiveTransactionIds(chargeBoxId);
     }
 
-    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
-        return transactionRepository.getDetails(transactionPk, energyValuesOnly);
+    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly, boolean withSignedMeterData) {
+        var context = transactionRepository.getContext(transactionPk, energyValuesOnly);
+        var signedMeterData = withSignedMeterData ? getSignedMeterData(context.transaction()) : null;
+
+        return new TransactionDetails(
+            context.transaction(),
+            context.values(),
+            signedMeterData
+        );
+    }
+
+    /**
+     * Writes the S.A.F.E. XML as file download.
+     */
+    public void writeSafeXml(int transactionPk, HttpServletResponse response) throws IOException {
+        // Create it before setting the headers, so that an error is not downloaded as the file
+        String xml = getSafeXml(transactionPk);
+
+        String fileName = "transaction_%s_safe.xml".formatted(transactionPk);
+        response.setContentType(MediaType.APPLICATION_XML_VALUE);
+        // The XML declaration says UTF-8, so the response must be UTF-8 as well
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setHeader("Content-Disposition", "attachment; filename=\"%s\"".formatted(fileName));
+        response.getWriter().write(xml);
+    }
+
+    String getSafeXml(int transactionPk) {
+        var transaction = getTransaction(transactionPk);
+        if (transaction == null) {
+            throw new SteveException.NotFound("Transaction %s not found", transactionPk);
+        }
+
+        var signedMeterData = getSignedMeterData(transaction);
+        if (!signedMeterData.safeXmlAvailable()) {
+            throw new SteveException.NotFound("Transaction %s has no signed begin or end record", transactionPk);
+        }
+
+        return eichrechtService.createXML(transactionPk, signedMeterData);
+    }
+
+    SignedMeterData getSignedMeterData(Transaction transaction) {
+        int transactionPk = transaction.getId();
+        var signedDataRows = transactionRepository.getMeterValues(transactionPk, List.of(SIGNED_DATA.value()));
+        var meterPublicKeySources = transactionRepository.getMeterPublicKeySources(transactionPk);
+        return eichrechtService.getSignedMeterData(transaction, meterPublicKeySources, signedDataRows);
     }
 
     public Transaction getTransaction(int transactionPk) {
@@ -126,15 +179,15 @@ public class TransactionService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, true);
-        Transaction thisTx = thisTxDetails.getTransaction();
+        var context = transactionRepository.getContext(transactionPk, true);
+        var thisTx = context.transaction();
 
         // early exit, if transaction is already stopped
         if (thisTx.getStopValue() != null && thisTx.getStopTimestamp() != null) {
             return;
         }
 
-        TerminationValues values = findNeededValues(thisTxDetails);
+        TerminationValues values = findNeededValues(context);
 
         ocppServerRepository.updateTransaction(UpdateTransactionParams.builder()
                                                                       .transactionId(thisTx.getId())
@@ -146,16 +199,16 @@ public class TransactionService {
                                                                       .build());
     }
 
-    private static TerminationValues findNeededValues(TransactionDetails thisTxDetails) {
-        Transaction thisTx = thisTxDetails.getTransaction();
-        TransactionStartRecord nextTx = thisTxDetails.getNextTransactionStart();
-        List<TransactionDetails.MeterValues> intermediateValues = thisTxDetails.getValues();
+    private static TerminationValues findNeededValues(TransactionContext context) {
+        var thisTx = context.transaction();
+        var nextTx = context.nextTransactionStart();
+        var intermediateValues = context.values();
 
         // -------------------------------------------------------------------------
         // 1. intermediate meter values have priority (most accurate data)
         // -------------------------------------------------------------------------
 
-        TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues, thisTx);
+        TransactionMeterValue last = findLastMeterValue(intermediateValues, thisTx);
         if (last != null) {
             return TerminationValues.builder()
                                     .stopValue(floatingStringToIntString(last.getValue()))
@@ -195,14 +248,13 @@ public class TransactionService {
     }
 
     @Nullable
-    static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values,
-                                                             Transaction thisTx) {
+    static TransactionMeterValue findLastMeterValue(List<TransactionMeterValue> values, Transaction thisTx) {
         var treatedValues = values.stream()
             .filter(TransactionStopServiceHelper::isEnergyValue)
-            .sorted(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
+            .sorted(Comparator.comparing(TransactionMeterValue::getValueTimestamp))
             .toList();
 
-        TransactionDetails.MeterValues v = findLastMeterValueFromMonotonicStreak(
+        TransactionMeterValue v = findLastMeterValueFromMonotonicStreak(
             treatedValues,
             Double.parseDouble(thisTx.getStartValue())
         );
@@ -214,30 +266,29 @@ public class TransactionService {
 
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
-            return TransactionDetails.MeterValues.builder()
-                                                 .value(kWhStringToWhString(v.getValue()))
-                                                 .valueTimestamp(v.getValueTimestamp())
-                                                 .readingContext(v.getReadingContext())
-                                                 .format(v.getFormat())
-                                                 .measurand(v.getMeasurand())
-                                                 .location(v.getLocation())
-                                                 .unit(UnitOfMeasure.WH.value())
-                                                 .phase(v.getPhase())
-                                                 .build();
+            return TransactionMeterValue.builder()
+                .value(kWhStringToWhString(v.getValue()))
+                .valueTimestamp(v.getValueTimestamp())
+                .readingContext(v.getReadingContext())
+                .format(v.getFormat())
+                .measurand(v.getMeasurand())
+                .location(v.getLocation())
+                .unit(UnitOfMeasure.WH.value())
+                .phase(v.getPhase())
+                .build();
         }
 
         return v;
     }
 
     @Nullable
-    private static TransactionDetails.MeterValues findLastMeterValueFromMonotonicStreak(List<TransactionDetails.MeterValues> values,
-                                                                                        double startValueWh) {
-        TransactionDetails.MeterValues lastMatchingValue = null;
+    private static TransactionMeterValue findLastMeterValueFromMonotonicStreak(List<TransactionMeterValue> values, double startValueWh) {
+        TransactionMeterValue lastMatchingValue = null;
         Double previousValueWh = null;
         int currentStreakLength = 0;
         boolean firstStreak = true;
 
-        for (TransactionDetails.MeterValues value : values) {
+        for (TransactionMeterValue value : values) {
             double valueWh = toWh(value);
 
             if (previousValueWh != null && valueWh < previousValueWh) {
@@ -257,7 +308,7 @@ public class TransactionService {
         return lastMatchingValue;
     }
 
-    private static double toWh(TransactionDetails.MeterValues meterValue) {
+    private static double toWh(TransactionMeterValue meterValue) {
         return UnitOfMeasure.K_WH.value().equals(meterValue.getUnit())
             ? kWhStringToWhDouble(meterValue.getValue())
             : Double.parseDouble(meterValue.getValue());

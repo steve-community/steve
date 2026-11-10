@@ -460,3 +460,47 @@ input, select, textarea {
 .inline {
 	display:inline-block;
 }
+/*** Signed meter data of a transaction ***/
+.signedSummary {
+	text-align: center;
+}
+.signedSummary p {
+	margin: 0 0 10px 0;
+}
+.signedSummary form {
+	margin-bottom: 15px;
+}
+table.signedChecks {
+	border-collapse: collapse;
+	width: 70%;
+	margin: 0 auto;
+}
+table.signedChecks th {
+	text-align: left;
+	padding: 6px 10px;
+	border-bottom: double #CCC;
+}
+table.signedChecks td {
+	text-align: left;
+	vertical-align: top;
+	padding: 8px 10px;
+	border-bottom: 1px solid #CCC;
+}
+table.signedChecks td:first-child {
+	width: 110px;
+	white-space: nowrap;
+}
+table.signedChecks td.checkNote {
+	color: #5c5c5c;
+	word-break: break-word;
+}
+.checkResult {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-weight: bold;
+}
+.checkResult.passed { color: #2e7d32; background-color: #e3f1e3; }
+.checkResult.failed { color: #D8000C; background-color: #fdd0d0; }
+.checkResult.notChecked { color: #5c5c5c; background-color: #eeeeee; }
+/*** Fin ***/

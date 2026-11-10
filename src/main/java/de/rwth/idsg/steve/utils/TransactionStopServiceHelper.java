@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.UnitOfMeasure;
@@ -57,7 +57,7 @@ public class TransactionStopServiceHelper {
         return Double.toString(kWhStringToWhDouble(s));
     }
 
-    public static boolean isEnergyValue(TransactionDetails.MeterValues v) {
+    public static boolean isEnergyValue(TransactionMeterValue v) {
         // should not happen, but check it to be safe.
         // https://github.com/steve-community/steve/issues/249
         if (Strings.isNullOrEmpty(v.getValue())) {

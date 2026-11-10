@@ -16,16 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository.dto;
+package de.rwth.idsg.steve.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import jooq.steve.db.tables.records.TransactionStartRecord;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
 import java.util.List;
 
@@ -35,35 +34,9 @@ import java.util.List;
  */
 @Getter
 @RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDetails {
     private final Transaction transaction;
-    private final List<MeterValues> values;
-
-    /**
-     * Subsequent transaction's start event (to the transaction that we give details about),
-     * that is at the same chargebox and connector
-     */
-    @Nullable
-    @JsonIgnore
-    private final TransactionStartRecord nextTransactionStart;
-
-    @JsonPropertyOrder(value = {
-        "valueTimestamp",
-        "value",
-        "readingContext",
-        "format",
-        "measurand",
-        "location",
-        "unit",
-        "phase"
-    })
-    @Getter
-    @Builder
-    public static class MeterValues {
-        private final DateTime valueTimestamp;
-        private final String value, readingContext, format, measurand, location, unit;
-
-        // New in OCPP 1.6
-        private final String phase;
-    }
+    private final List<TransactionMeterValue> values;
+    @Nullable private final SignedMeterData signedMeterData;
 }

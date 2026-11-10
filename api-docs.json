@@ -2902,7 +2902,7 @@
 		},
 		"/api/v1/transactions/{transactionPk}": {
 			"get": {
-				"description": "Returns the details of a single transaction based on the transactionPk.\nThe details are the intermediate values of the transaction.\n",
+				"description": "Returns the details of a single transaction based on the transactionPk.\nThe details are the intermediate values of the transaction.\nWith `withSignedMeterData=true`, they also contain the signed meter data (Eichrecht): the signed begin and end\nvalues, the public key of the meter, and the results of basic checks. For a full verification, use the\nS.A.F.E. XML of this transaction with the S.A.F.E. transparency software.\n",
 				"operationId": "getTransactionDetails",
 				"parameters": [
 					{
@@ -2921,6 +2921,15 @@
 						"schema": {
 							"type": "boolean",
 							"default": true
+						}
+					},
+					{
+						"in": "query",
+						"name": "withSignedMeterData",
+						"required": false,
+						"schema": {
+							"type": "boolean",
+							"default": false
 						}
 					}
 				],
@@ -2948,6 +2957,89 @@
 					"404": {
 						"content": {
 							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Not Found"
+					},
+					"422": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unprocessable Content"
+					},
+					"500": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Internal Server Error"
+					}
+				},
+				"tags": [
+					"transaction-controller"
+				]
+			}
+		},
+		"/api/v1/transactions/{transactionPk}/safe.xml": {
+			"get": {
+				"description": "Returns the signed begin and end meter values of this transaction (Eichrecht) as XML file for the\nS.A.F.E. transparency software, with which the customer can verify them.\nContains the public key of the meter, if it is known.\nReturns 404, if the transaction has no signed begin or end meter value.\n",
+				"operationId": "getSafeXml",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionPk",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/xml": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"400": {
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Bad Request"
+					},
+					"401": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiErrorResponse"
+								}
+							}
+						},
+						"description": "Unauthorized"
+					},
+					"404": {
+						"content": {
+							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/ApiErrorResponse"
 								}
@@ -3950,36 +4042,6 @@
 					}
 				}
 			},
-			"MeterValues": {
-				"type": "object",
-				"properties": {
-					"format": {
-						"type": "string"
-					},
-					"location": {
-						"type": "string"
-					},
-					"measurand": {
-						"type": "string"
-					},
-					"phase": {
-						"type": "string"
-					},
-					"readingContext": {
-						"type": "string"
-					},
-					"unit": {
-						"type": "string"
-					},
-					"value": {
-						"type": "string"
-					},
-					"valueTimestamp": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
 			"MultipleChargePointSelect": {
 				"type": "object",
 				"properties": {
@@ -4925,6 +4987,24 @@
 					}
 				}
 			},
+			"PublicKey": {
+				"type": "object",
+				"description": "Public key of the meter",
+				"properties": {
+					"encoding": {
+						"type": "string",
+						"description": "Encoding of the value",
+						"enum": [
+							"hex",
+							"base64"
+						]
+					},
+					"value": {
+						"type": "string",
+						"description": "The key in ASN.1 (X.509 SubjectPublicKeyInfo) format, encoded as given in 'encoding'"
+					}
+				}
+			},
 			"RemoteStartTransactionParams": {
 				"type": "object",
 				"properties": {
@@ -5128,6 +5208,116 @@
 					"chargingProfilePk",
 					"connectorId"
 				]
+			},
+			"SignedDataCheck": {
+				"type": "object",
+				"description": "Result of one check of the signed data of a transaction",
+				"properties": {
+					"description": {
+						"type": "string",
+						"description": "Description of the check, for humans"
+					},
+					"note": {
+						"type": "string",
+						"description": "Details, e.g. why it failed. Omitted, if there are none."
+					},
+					"result": {
+						"type": "string",
+						"description": "Result of the check",
+						"enum": [
+							"Passed",
+							"Failed",
+							"NotChecked"
+						]
+					},
+					"type": {
+						"type": "string",
+						"description": "Stable identifier of the check",
+						"enum": [
+							"BeginReceived",
+							"BeginSignature",
+							"BeginValue",
+							"EndReceived",
+							"EndSignature",
+							"EndValue"
+						]
+					}
+				}
+			},
+			"SignedMeterData": {
+				"type": "object",
+				"description": "The signed meter data of a transaction (Eichrecht), with the results of basic checks.\nFor a full verification, use the S.A.F.E. XML of the transaction with the S.A.F.E. transparency software.\nFields without a value are omitted.\n",
+				"properties": {
+					"begin": {
+						"$ref": "#/components/schemas/SignedReading",
+						"description": "The signed begin value. Omitted, if not received."
+					},
+					"checks": {
+						"type": "array",
+						"description": "Whether the signed data is valid and matches the transaction. Empty, if there is no signed begin or end.",
+						"items": {
+							"$ref": "#/components/schemas/SignedDataCheck"
+						}
+					},
+					"end": {
+						"$ref": "#/components/schemas/SignedReading",
+						"description": "The signed end value. Omitted, if not received. If one signed record carries both readings, begin and end have the same 'signedData'."
+					},
+					"publicKey": {
+						"$ref": "#/components/schemas/PublicKey",
+						"description": "Public key of the meter, as reported by the charging station. Omitted, if unknown."
+					},
+					"receivedCount": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of meter values with format 'SignedData'"
+					},
+					"safeXmlAvailable": {
+						"type": "boolean",
+						"description": "Whether the S.A.F.E. XML of this transaction is available, i.e. there is a signed begin or end value."
+					},
+					"unreadable": {
+						"type": "array",
+						"description": "The signed meter values that could not be read",
+						"items": {
+							"$ref": "#/components/schemas/UnreadableValue"
+						}
+					}
+				}
+			},
+			"SignedReading": {
+				"type": "object",
+				"description": "A signed reading of the meter, with the signed record that carries it",
+				"properties": {
+					"format": {
+						"type": "string",
+						"description": "Format of the signed record",
+						"enum": [
+							"OCMF"
+						]
+					},
+					"signedData": {
+						"type": "string",
+						"description": "The whole signed record in its format, as it goes into the S.A.F.E. XML"
+					},
+					"signingMethod": {
+						"type": "string",
+						"description": "Signing method with which the signature is checked (e.g. 'ECDSA-secp256r1-SHA256')"
+					},
+					"unit": {
+						"type": "string",
+						"description": "Unit of the signed reading, as in the signed record (e.g. 'kWh')"
+					},
+					"value": {
+						"type": "number",
+						"description": "The signed reading, in 'unit'"
+					},
+					"valueTimestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp of the meter value that carried the signed record"
+					}
+				}
 			},
 			"SignedUpdateFirmwareParams": {
 				"type": "object",
@@ -5669,14 +5859,47 @@
 			"TransactionDetails": {
 				"type": "object",
 				"properties": {
+					"signedMeterData": {
+						"$ref": "#/components/schemas/SignedMeterData"
+					},
 					"transaction": {
 						"$ref": "#/components/schemas/Transaction"
 					},
 					"values": {
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/MeterValues"
+							"$ref": "#/components/schemas/TransactionMeterValue"
 						}
+					}
+				}
+			},
+			"TransactionMeterValue": {
+				"type": "object",
+				"properties": {
+					"format": {
+						"type": "string"
+					},
+					"location": {
+						"type": "string"
+					},
+					"measurand": {
+						"type": "string"
+					},
+					"phase": {
+						"type": "string"
+					},
+					"readingContext": {
+						"type": "string"
+					},
+					"unit": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					},
+					"valueTimestamp": {
+						"type": "string",
+						"format": "date-time"
 					}
 				}
 			},
@@ -5737,6 +5960,21 @@
 					"chargeBoxIdList",
 					"connectorId"
 				]
+			},
+			"UnreadableValue": {
+				"type": "object",
+				"description": "A signed meter value that could not be read",
+				"properties": {
+					"error": {
+						"type": "string",
+						"description": "Why it could not be read"
+					},
+					"valueTimestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp of the meter value"
+					}
+				}
 			},
 			"UpdateFirmwareParams": {
 				"type": "object",

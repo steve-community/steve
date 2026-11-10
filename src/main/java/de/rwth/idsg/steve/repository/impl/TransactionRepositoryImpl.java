@@ -20,9 +20,12 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionContext;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.QueryPeriodType;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -37,6 +40,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Writer;
 import java.util.ArrayList;
@@ -149,7 +153,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
+    public TransactionContext getContext(int transactionPk, boolean energyValuesOnly) {
 
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
@@ -234,21 +238,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             conditions.add(unitCondition);
         }
 
-        List<TransactionDetails.MeterValues> values =
+        List<TransactionMeterValue> values =
                 ctx.selectFrom(CONNECTOR_METER_VALUE)
                    .where(conditions)
                    .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                    .fetch()
-                   .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(r.getValueTimestamp())
-                                                           .value(r.getValue())
-                                                           .readingContext(r.getReadingContext())
-                                                           .format(r.getFormat())
-                                                           .measurand(r.getMeasurand())
-                                                           .location(r.getLocation())
-                                                           .unit(r.getUnit())
-                                                           .phase(r.getPhase())
-                                                           .build())
+                   .map(TransactionMeterValue::fromRecord)
                    .stream()
                    .filter(v -> {
                        if (energyValuesOnly) {
@@ -258,7 +253,42 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    })
                    .toList();
 
-        return new TransactionDetails(transaction, values, nextTx);
+        return new TransactionContext(transaction, values, nextTx);
+    }
+
+    @Override
+    public List<TransactionMeterValue> getMeterValues(int transactionPk, List<String> formats) {
+        var conditions = new ArrayList<Condition>();
+        conditions.add(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk));
+
+        if (!CollectionUtils.isEmpty(formats)) {
+            conditions.add(CONNECTOR_METER_VALUE.FORMAT.in(formats));
+        }
+
+        return ctx.selectFrom(CONNECTOR_METER_VALUE)
+                .where(conditions)
+                .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
+                .fetch()
+                .map(TransactionMeterValue::fromRecord);
+    }
+
+    @Override
+    public MeterPublicKeySources getMeterPublicKeySources(int transactionPk) {
+        var rec = ctx.select(EVSE.EVSE_ID, CHARGE_BOX.OCPP_CONFIGURATION)
+                     .from(TRANSACTION)
+                     .join(EVSE).on(TRANSACTION.EVSE_PK.eq(EVSE.EVSE_PK))
+                     .join(CHARGE_BOX).on(CHARGE_BOX.CHARGE_BOX_ID.eq(EVSE.CHARGE_BOX_ID))
+                     .where(TRANSACTION.TRANSACTION_PK.eq(transactionPk))
+                     .fetchOne();
+
+        if (rec == null) {
+            return null;
+        }
+
+        return new MeterPublicKeySources(
+            rec.value1(),
+            JsonUtils.toObjectNode(rec.value2())
+        );
     }
 
     @Override

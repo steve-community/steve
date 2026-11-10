@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionContext;
 import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
 import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.Encoding;
 import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.PublicKey;
 import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
@@ -165,6 +166,18 @@ public class TransactionServiceTest {
         service.getSignedMeterData(transactionDetails());
 
         Mockito.verify(repository).getMeterValues(TRANSACTION_PK, List.of("SignedData"));
+    }
+
+    @Test
+    public void getSignedMeterData_noSignedValues() throws Exception {
+        var repository = Mockito.mock(TransactionRepository.class);
+        Mockito.when(repository.getMeterValues(TRANSACTION_PK, List.of("SignedData"))).thenReturn(List.of());
+        var service = new TransactionService(new EichrechtService(), repository, Mockito.mock(OcppServerRepository.class));
+
+        var signedMeterData = service.getSignedMeterData(transactionDetails());
+
+        Assertions.assertSame(SignedMeterData.EMPTY, signedMeterData);
+        Mockito.verify(repository, Mockito.never()).getMeterPublicKeySources(Mockito.anyInt());
     }
 
     @Test

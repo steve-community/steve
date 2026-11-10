@@ -135,6 +135,10 @@ public class TransactionService {
     SignedMeterData getSignedMeterData(Transaction transaction) {
         int transactionPk = transaction.getId();
         var signedDataRows = transactionRepository.getMeterValues(transactionPk, List.of(SIGNED_DATA.value()));
+        if (signedDataRows.isEmpty()) {
+            return SignedMeterData.EMPTY;
+        }
+
         var meterPublicKeySources = transactionRepository.getMeterPublicKeySources(transactionPk);
         return eichrechtService.getSignedMeterData(transaction, meterPublicKeySources, signedDataRows);
     }

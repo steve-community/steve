@@ -117,4 +117,9 @@ public record SignedMeterData(
     public boolean safeXmlAvailable() {
         return begin != null || end != null;
     }
+
+    /**
+     * No signed meter values were received.
+     */
+    public static final SignedMeterData EMPTY = new SignedMeterData(0, null, null, null, List.of(), List.of());
 }

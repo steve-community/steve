@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve.service.eichrecht.safe;
 
+import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.service.eichrecht.EichrechtService;
 import de.rwth.idsg.steve.service.eichrecht.SignedDataCheckerTest;
-import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
 import jakarta.xml.bind.JAXBContext;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +49,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void beginAndEnd() throws Exception {
-        String xml = writer.createXML(tx(BEGIN, END));
+        String xml = writer.createXML(TX_ID, tx(BEGIN, END));
         List<Values.Value> values = roundTrip(xml);
 
         Assertions.assertEquals(2, values.size());
@@ -67,7 +67,7 @@ public class ValuesXmlWriterTest {
         String periodic = ocmf("T3", """
             {"TX":"T","RV":2940.0,"RU":"kWh"}""");
 
-        List<Values.Value> values = roundTrip(writer.createXML(tx("<edl40/>", "OCMF|{broken|{}", BEGIN, periodic, END)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx("<edl40/>", "OCMF|{broken|{}", BEGIN, periodic, END)));
 
         Assertions.assertEquals(2, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, TX_ID);
@@ -76,7 +76,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void missingEnd() throws Exception {
-        List<Values.Value> values = roundTrip(writer.createXML(tx(BEGIN)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(BEGIN)));
 
         Assertions.assertEquals(1, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, null);
@@ -84,7 +84,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void missingBegin() throws Exception {
-        List<Values.Value> values = roundTrip(writer.createXML(tx(END)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(END)));
 
         Assertions.assertEquals(1, values.size());
         assertValue(values.get(0), "Transaction.End", END, null);
@@ -92,8 +92,8 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void noBeginAndNoEnd() throws Exception {
-        Assertions.assertTrue(roundTrip(writer.createXML(tx("<edl40/>"))).isEmpty());
-        Assertions.assertTrue(roundTrip(writer.createXML(tx())).isEmpty());
+        Assertions.assertTrue(roundTrip(writer.createXML(TX_ID, tx("<edl40/>"))).isEmpty());
+        Assertions.assertTrue(roundTrip(writer.createXML(TX_ID, tx())).isEmpty());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class ValuesXmlWriterTest {
         String laterEnd = ocmf("T9", """
             {"TX":"E","RV":2950.0,"RU":"kWh"}""");
 
-        List<Values.Value> values = roundTrip(writer.createXML(tx(BEGIN, BEGIN, END, laterEnd, laterEnd)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(BEGIN, BEGIN, END, laterEnd, laterEnd)));
 
         Assertions.assertEquals(2, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, TX_ID);
@@ -113,7 +113,7 @@ public class ValuesXmlWriterTest {
         String both = ocmf("T1", """
             {"TX":"B","RV":1.0,"RU":"kWh"},{"TX":"E","RV":3.5,"RU":"kWh"}""");
 
-        List<Values.Value> values = roundTrip(writer.createXML(tx(both, both)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(both, both)));
 
         Assertions.assertEquals(1, values.size());
         assertValue(values.get(0), "Transaction.Begin", both, null);
@@ -125,7 +125,7 @@ public class ValuesXmlWriterTest {
             {"signedMeterData":"%s","encodingMethod":"OCMF","publicKey":"MFkwEwYHKoZIzj0CAQ=="}"""
             .formatted(base64(BEGIN));
 
-        List<Values.Value> values = roundTrip(writer.createXML(tx(wrapper, END)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(wrapper, END)));
 
         Assertions.assertEquals(2, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, TX_ID);
@@ -143,7 +143,7 @@ public class ValuesXmlWriterTest {
             "SA":"ECDSA-secp256r1-SHA256",""";
         var beginWithoutAlgorithm = BEGIN.replace(withoutAlgorithm, "");
 
-        var values = roundTrip(writer.createXML(tx(wrapper(beginWithoutAlgorithm, method), wrapper(END, method))));
+        var values = roundTrip(writer.createXML(TX_ID, tx(wrapper(beginWithoutAlgorithm, method), wrapper(END, method))));
 
         // The OCMF records go into the XML as received, with or without SA
         Assertions.assertEquals(2, values.size());
@@ -153,7 +153,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void publicKeyHex() throws Exception {
-        String xml = writer.createXML(txWithPublicKey("305930130607", BEGIN, END));
+        String xml = writer.createXML(TX_ID, txWithPublicKey("305930130607", BEGIN, END));
         List<Values.Value> values = roundTrip(xml);
 
         for (var value : values) {
@@ -169,7 +169,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void publicKeyBase64() throws Exception {
-        String xml = writer.createXML(txWithPublicKey("MFkwEwYHKoZIzj0CAQ==", BEGIN, END));
+        String xml = writer.createXML(TX_ID, txWithPublicKey("MFkwEwYHKoZIzj0CAQ==", BEGIN, END));
         List<Values.Value> values = roundTrip(xml);
 
         for (var value : values) {
@@ -184,7 +184,7 @@ public class ValuesXmlWriterTest {
 
     @Test
     public void base64ValueIsWrittenAsPlainOcmf() throws Exception {
-        List<Values.Value> values = roundTrip(writer.createXML(tx(base64(BEGIN))));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(base64(BEGIN))));
 
         Assertions.assertEquals(1, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, null);
@@ -196,7 +196,7 @@ public class ValuesXmlWriterTest {
             String end = ocmf("T2", """
                 {"TX":"%s","RV":2947.85,"RU":"kWh"}""".formatted(tx));
 
-            List<Values.Value> values = roundTrip(writer.createXML(tx(BEGIN, end)));
+            List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(BEGIN, end)));
 
             Assertions.assertEquals(2, values.size(), "TX: " + tx);
             assertValue(values.get(0), "Transaction.Begin", BEGIN, TX_ID);
@@ -215,19 +215,19 @@ public class ValuesXmlWriterTest {
         String noPagination = BEGIN.replace("""
             "PG":"T1",""", "");
 
-        List<Values.Value> values = roundTrip(writer.createXML(tx(fiscalBegin, noPagination, BEGIN, END, fiscalEnd)));
+        List<Values.Value> values = roundTrip(writer.createXML(TX_ID, tx(fiscalBegin, noPagination, BEGIN, END, fiscalEnd)));
 
         Assertions.assertEquals(2, values.size());
         assertValue(values.get(0), "Transaction.Begin", BEGIN, TX_ID);
         assertValue(values.get(1), "Transaction.End", END, TX_ID);
 
-        Assertions.assertTrue(roundTrip(writer.createXML(tx(fiscalBegin, fiscalEnd))).isEmpty());
+        Assertions.assertTrue(roundTrip(writer.createXML(TX_ID, tx(fiscalBegin, fiscalEnd))).isEmpty());
     }
 
     @Test
     public void singleValue_hasNoTransactionIdInXml() throws Exception {
-        Assertions.assertFalse(writer.createXML(tx(BEGIN)).contains("transactionId"));
-        Assertions.assertTrue(writer.createXML(tx(BEGIN, END)).contains("""
+        Assertions.assertFalse(writer.createXML(TX_ID, tx(BEGIN)).contains("transactionId"));
+        Assertions.assertTrue(writer.createXML(TX_ID, tx(BEGIN, END)).contains("""
             transactionId="%s\"""".formatted(TX_ID)));
     }
 
@@ -252,20 +252,20 @@ public class ValuesXmlWriterTest {
     /**
      * The public key, if one of the values carries it
      */
-    private SignedTransaction tx(String... rawValues) {
+    private SignedMeterData tx(String... rawValues) {
         return txWithPublicKey(null, rawValues);
     }
 
-    private SignedTransaction txWithPublicKey(String publicKey, String... rawValues) {
+    private SignedMeterData txWithPublicKey(String publicKey, String... rawValues) {
         var meterValues = Arrays.stream(rawValues)
-            .map(v -> TransactionDetails.MeterValues.builder()
+            .map(v -> TransactionMeterValue.builder()
                 .valueTimestamp(DateTime.now())
                 .value(v)
                 .format("SignedData")
                 .build())
             .toList();
         var transaction = Transaction.builder().id(TX_ID).build();
-        return eichrechtService.getSignedTransaction(transaction, SignedDataCheckerTest.sources(publicKey), meterValues);
+        return eichrechtService.getSignedMeterData(transaction, SignedDataCheckerTest.sources(publicKey), meterValues);
     }
 
     private static String ocmf(String pagination, String readings) {

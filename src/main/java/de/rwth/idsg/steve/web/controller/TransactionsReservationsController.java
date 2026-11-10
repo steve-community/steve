@@ -95,9 +95,8 @@ public class TransactionsReservationsController {
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk,
                                         @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
                                         Model model) {
-        var details = transactionService.getDetails(transactionPk, energyValuesOnly);
+        var details = transactionService.getDetails(transactionPk, energyValuesOnly, true);
         model.addAttribute("details", details);
-        model.addAttribute("signedData", transactionService.getSignedData(details.getTransaction()));
         model.addAttribute("energyValuesOnly", energyValuesOnly);
         return "data-man/transactionDetails";
     }

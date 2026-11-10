@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.service.eichrecht;
 
-import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.input.OcmfRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

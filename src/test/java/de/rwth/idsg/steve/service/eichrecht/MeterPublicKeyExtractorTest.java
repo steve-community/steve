@@ -20,9 +20,8 @@ package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
-import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValue;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -150,16 +149,15 @@ public class MeterPublicKeyExtractorTest {
         return new MeterPublicKeySources(1, config);
     }
 
-    private static List<SignedTransaction.SignedMeterValue> parse(String... rawValues) {
-        var meterValues = Arrays.stream(rawValues)
-            .map(v -> TransactionDetails.MeterValues.builder()
+    private static List<SignedMeterValue> parse(String... rawValues) {
+        return Arrays.stream(rawValues)
+            .map(v -> TransactionMeterValue.builder()
                 .valueTimestamp(DateTime.now())
                 .value(v)
                 .format("SignedData")
                 .build())
+            .map(EichrechtService::parse)
             .toList();
-        var transaction = Transaction.builder().id(1).build();
-        return new EichrechtService().getSignedTransaction(transaction, null, meterValues).signedMeterValues();
     }
 
     private static String wrapper(String ocmf, String publicKey) {

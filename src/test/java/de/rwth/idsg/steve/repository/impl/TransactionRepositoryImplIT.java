@@ -69,7 +69,7 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
-    public void getDetails() {
+    public void getContext() {
         Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
             .from(EVSE)
             .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
@@ -87,13 +87,13 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
             .fetchOne()
             .getTransactionPk();
 
-        var details = assertNoDatabaseException(() -> repository.getDetails(txId, true));
+        var details = assertNoDatabaseException(() -> repository.getContext(txId, true));
         Assertions.assertNotNull(details);
-        Assertions.assertEquals(txId, details.getTransaction().getId());
+        Assertions.assertEquals(txId, details.transaction().getId());
     }
 
     @Test
-    public void getDetailsForZombieTransactionDoesNotIncludeNextTransactionStartValue() {
+    public void getContextForZombieTransactionDoesNotIncludeNextTransactionStartValue() {
         Integer connectorPk = dslContext.select(EVSE.EVSE_PK)
             .from(EVSE)
             .where(EVSE.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
@@ -121,11 +121,11 @@ public class TransactionRepositoryImplIT extends AbstractRepositoryITBase {
             .set(CONNECTOR_METER_VALUE.UNIT, "Wh")
             .execute();
 
-        var details = assertNoDatabaseException(() -> repository.getDetails(firstTxId, true));
+        var details = assertNoDatabaseException(() -> repository.getContext(firstTxId, true));
 
-        Assertions.assertEquals(1, details.getValues().size());
-        Assertions.assertEquals("150", details.getValues().getFirst().getValue());
-        Assertions.assertEquals(nextStart, details.getNextTransactionStart().getStartTimestamp());
+        Assertions.assertEquals(1, details.values().size());
+        Assertions.assertEquals("150", details.values().getFirst().getValue());
+        Assertions.assertEquals(nextStart, details.nextTransactionStart().getStartTimestamp());
     }
 
     @Test

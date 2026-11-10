@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionContext;
 import de.rwth.idsg.steve.repository.impl.AddressRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.OcppTagRepositoryImpl;
@@ -131,9 +131,9 @@ public class __DatabasePreparer__ {
         return impl.getChargePointConnectorStatus(null);
     }
 
-    public TransactionDetails getDetails(int transactionPk) {
+    public TransactionContext getContext(int transactionPk) {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
-        return impl.getDetails(transactionPk, true);
+        return impl.getContext(transactionPk, true);
     }
 
     public OcppTagActivityRecord getOcppTagRecord(String idTag) {

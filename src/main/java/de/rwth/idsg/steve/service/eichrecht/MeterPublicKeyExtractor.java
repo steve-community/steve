@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.interfaces.ECPublicKey;

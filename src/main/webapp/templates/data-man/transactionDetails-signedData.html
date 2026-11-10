@@ -17,8 +17,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */-->
-<!--/* "Signed Meter Data" section of the transaction details page. Needs "signedData" (SignedTransaction) in the model. */-->
-<th:block th:fragment="signedMeterData">
+<!--/* "Signed Meter Data" section of the transaction details page. Needs "tx" (Transaction) in scope. */-->
+<th:block th:fragment="signedMeterData(signedMeterData)">
     <section><span>
         Signed Meter Data
         <a class="tooltip" href="#"><img th:src="@{/static/images/info.png}" style="vertical-align:middle">
@@ -28,27 +28,27 @@
                 in the S.A.F.E. Transparenzsoftware (safe-ev.org).</span>
         </a>
     </span></section>
-    <div class="signedSummary" th:with="count=${#lists.size(signedData.signedMeterValues)}">
+    <div class="signedSummary" th:with="count=${signedMeterData.receivedCount}">
         <p th:if="${count == 0}">No signed meter values were received for this transaction.</p>
         <th:block th:if="${count > 0}">
             <p>Signed meter values received: <span th:text="${count}"></span>.</p>
-            <form th:if="${signedData.hasBeginOrEnd()}"
-                  th:action="@{/manager/transactions/details/{id}/safe.xml(id=${signedData.transactionId})}"
+            <form th:if="${signedMeterData.safeXmlAvailable}"
+                  th:action="@{/manager/transactions/details/{id}/safe.xml(id=${tx.id})}"
                   method="get">
                 <input type="submit" value="Download S.A.F.E. XML">
             </form>
-            <p th:unless="${signedData.hasBeginOrEnd()}">
+            <p th:unless="${signedMeterData.safeXmlAvailable}">
                 There is no signed begin or end of the transaction, so there is no file for the S.A.F.E.
                 transparency software.
             </p>
         </th:block>
     </div>
-    <table class="signedChecks" th:if="${not #lists.isEmpty(signedData.checks)}">
+    <table class="signedChecks" th:if="${not #lists.isEmpty(signedMeterData.checks)}">
         <thead>
             <tr><th>Result</th><th>Check</th><th>Details</th></tr>
         </thead>
         <tbody>
-            <tr th:each="c : ${signedData.checks}">
+            <tr th:each="c : ${signedMeterData.checks}">
                 <td th:switch="${c.result.name()}">
                     <span th:case="'Passed'" class="checkResult passed">&#x2713; Passed</span>
                     <span th:case="'Failed'" class="checkResult failed">&#x2717; Failed</span>
@@ -59,11 +59,9 @@
             </tr>
         </tbody>
     </table>
-    <div style="text-align: center;" th:with="failed=${signedData.signedMeterValues.?[parseError != null]}">
-        <th:block th:if="${not #lists.isEmpty(failed)}">
-            <br>
-            Could not read <span th:text="${#lists.size(failed)}"></span> of the signed meter values:
-            <div th:each="smv : ${failed}" th:text="|${smv.meterValue.valueTimestamp}: ${smv.parseError}|"></div>
-        </th:block>
+    <div style="text-align: center;" th:if="${not #lists.isEmpty(signedMeterData.unreadable)}">
+        <br>
+        Could not read <span th:text="${#lists.size(signedMeterData.unreadable)}"></span> of the signed meter values:
+        <div th:each="u : ${signedMeterData.unreadable}" th:text="|${u.valueTimestamp}: ${u.error}|"></div>
     </div>
 </th:block>

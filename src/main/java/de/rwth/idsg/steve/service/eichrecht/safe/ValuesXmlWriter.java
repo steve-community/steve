@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.service.eichrecht.safe;
 
-import de.rwth.idsg.steve.service.eichrecht.MeterPublicKeyExtractor;
-import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.PublicKey;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.SignedReading;
 import org.jetbrains.annotations.Nullable;
 
 import jakarta.xml.bind.JAXBContext;
@@ -50,40 +50,52 @@ public class ValuesXmlWriter {
         }
     }
 
-    public String createXML(SignedTransaction signed) throws JAXBException {
+    /**
+     * @param transactionId pairs the begin and end value
+     */
+    public String createXML(int transactionId, SignedMeterData signedMeterData) throws JAXBException {
         var marshaller = jc.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
         var sw = new StringWriter();
-        marshaller.marshal(toValues(signed), sw);
+        marshaller.marshal(toValues(transactionId, signedMeterData), sw);
         return sw.toString();
     }
 
-    private static Values toValues(SignedTransaction signed) {
-        Integer transactionId = (signed.hasBegin() && signed.hasEnd()) ? signed.transactionId() : null;
+    private static Values toValues(int transactionId, SignedMeterData data) {
+        var begin = data.begin();
+
+        // One record with both readings goes into the file once
+        var end = (begin != null && data.end() != null && begin.signedData().equals(data.end().signedData()))
+            ? null
+            : data.end();
+
+        Integer pairId = (begin != null && end != null)
+            ? transactionId
+            : null;
 
         var values = new ArrayList<Values.Value>();
-        if (signed.hasBegin()) {
-            values.add(toValue("Transaction.Begin", signed.begin().ocmfRecord(), transactionId, signed.publicKey()));
+        if (begin != null) {
+            values.add(toValue("Transaction.Begin", begin, pairId, data.publicKey()));
         }
-        if (signed.hasEnd()) {
-            values.add(toValue("Transaction.End", signed.end().ocmfRecord(), transactionId, signed.publicKey()));
+        if (end != null) {
+            values.add(toValue("Transaction.End", end, pairId, data.publicKey()));
         }
         return new Values().setValues(values);
     }
 
     private static Values.Value toValue(String context,
-                                        OcmfRecord record,
+                                        SignedReading reading,
                                         @Nullable Integer transactionId,
-                                        @Nullable String publicKey) {
+                                        @Nullable PublicKey publicKey) {
         return new Values.Value()
             .setContext(context)
             .setTransactionId(transactionId)
             .setPublicKey(toPublicKey(publicKey))
             .setSignedData(new Values.SignedData()
-                .setFormat("OCMF")
+                .setFormat(reading.format().name())
                 .setEncoding(Values.EncodingType.plain)
-                .setValue(record.rawInput())
+                .setValue(reading.signedData())
             );
     }
 
@@ -92,12 +104,16 @@ public class ValuesXmlWriter {
      * software rejects an empty publicKey element. The user can then enter the key in the software.
      */
     @Nullable
-    private static Values.PublicKey toPublicKey(@Nullable String publicKey) {
+    private static Values.PublicKey toPublicKey(@Nullable PublicKey publicKey) {
         if (publicKey == null) {
             return null;
         }
+        var encoding = switch (publicKey.encoding()) {
+            case hex -> Values.EncodingType.hex;
+            case base64 -> Values.EncodingType.base64;
+        };
         return new Values.PublicKey()
-            .setEncoding(MeterPublicKeyExtractor.isHex(publicKey) ? Values.EncodingType.hex : Values.EncodingType.base64)
-            .setValue(publicKey);
+            .setEncoding(encoding)
+            .setValue(publicKey.value());
     }
 }

@@ -20,7 +20,8 @@ package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionContext;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.jetbrains.annotations.NotNull;
@@ -42,9 +43,9 @@ public interface TransactionRepository {
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
-    TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly);
+    TransactionContext getContext(int transactionPk, boolean energyValuesOnly);
 
-    List<TransactionDetails.MeterValues> getMeterValues(int transactionPk, List<String> formats);
+    List<TransactionMeterValue> getMeterValues(int transactionPk, List<String> formats);
 
     @Nullable
     MeterPublicKeySources getMeterPublicKeySources(int transactionPk);

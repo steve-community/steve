@@ -21,10 +21,16 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValueType;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.input.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.Encoding;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.Format;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.PublicKey;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.SignedReading;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData.UnreadableValue;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.input.SignedMeterValueType;
 import de.rwth.idsg.steve.service.eichrecht.safe.ValuesXmlWriter;
 import ocpp.cs._2015._10.ValueFormat;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +40,7 @@ import tools.jackson.core.JacksonException;
 
 import jakarta.xml.bind.JAXBException;
 import java.util.List;
+import java.util.function.Function;
 
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.PREFIX;
 import static de.rwth.idsg.steve.service.eichrecht.OcmfUtils.decodeBase64Maybe;
@@ -43,17 +50,20 @@ public class EichrechtService {
 
     private final ValuesXmlWriter valuesXmlWriter = new ValuesXmlWriter();
 
-    public String createXML(SignedTransaction signed) {
+    /**
+     * @param transactionId pairs the begin and end value in the S.A.F.E. XML
+     */
+    public String createXML(int transactionId, SignedMeterData signedMeterData) {
         try {
-            return valuesXmlWriter.createXML(signed);
+            return valuesXmlWriter.createXML(transactionId, signedMeterData);
         } catch (JAXBException e) {
-            throw new SteveException("Could not create the S.A.F.E. XML of transaction %s", signed.transactionId(), e);
+            throw new SteveException("Could not create the S.A.F.E. XML of transaction %s", transactionId, e);
         }
     }
 
-    public SignedTransaction getSignedTransaction(Transaction transaction,
-                                                  MeterPublicKeySources meterPublicKeySources,
-                                                  List<TransactionDetails.MeterValues> values) {
+    public SignedMeterData getSignedMeterData(Transaction transaction,
+                                              @Nullable MeterPublicKeySources meterPublicKeySources,
+                                              List<TransactionMeterValue> values) {
         // Get all meter values with format "SignedData" of one transaction
         var signedValues = values.stream()
             .filter(it -> ValueFormat.SIGNED_DATA.value().equals(it.getFormat()))
@@ -75,11 +85,6 @@ public class EichrechtService {
             .reduce((first, second) -> second)
             .orElse(null);
 
-        // One record can carry both readings. Then it is enough to have it once.
-        if (begin != null && end != null && begin.ocmfRecord().rawInput().equals(end.ocmfRecord().rawInput())) {
-            end = null;
-        }
-
         // publicKey of the meter in hex or base64, null if unknown
         var publicKey = signedValues.isEmpty()
             ? null
@@ -87,17 +92,25 @@ public class EichrechtService {
 
         var checks = SignedDataChecker.check(begin, end, publicKey, transaction);
 
-        return new SignedTransaction(
-            transaction.getId(),
-            signedValues,
-            begin,
-            end,
-            publicKey,
-            checks
+        var unreadable = signedValues.stream()
+            .filter(v -> v.parseError() != null)
+            .map(v -> new UnreadableValue(v.meterValue().getValueTimestamp(), v.parseError()))
+            .toList();
+
+        return new SignedMeterData(
+            signedValues.size(),
+            toPublicKey(publicKey),
+            toSignedReading(begin, OcmfUtils::beginReading),
+            toSignedReading(end, OcmfUtils::endReading),
+            checks,
+            unreadable
         );
     }
 
-    private static SignedMeterValue parse(TransactionDetails.MeterValues meterValue) {
+    /**
+     * Package-private for tests
+     */
+    static SignedMeterValue parse(TransactionMeterValue meterValue) {
         var rawValue = meterValue.getValue();
         if (StringUtils.isBlank(rawValue)) {
             return error(meterValue, null, "Empty value");
@@ -114,7 +127,7 @@ public class EichrechtService {
         return error(meterValue, null, "Not an OCMF record");
     }
 
-    private static SignedMeterValue fromJsonWrapper(TransactionDetails.MeterValues meterValue, String json) {
+    private static SignedMeterValue fromJsonWrapper(TransactionMeterValue meterValue, String json) {
         SignedMeterValueType wrapper;
         try {
             wrapper = OcmfParser.MAPPER.readValue(json, SignedMeterValueType.class);
@@ -137,7 +150,7 @@ public class EichrechtService {
         return fromOcmf(meterValue, ocmf, wrapper.publicKey(), wrapper.signingMethod());
     }
 
-    private static SignedMeterValue fromOcmf(TransactionDetails.MeterValues meterValue, String ocmf,
+    private static SignedMeterValue fromOcmf(TransactionMeterValue meterValue, String ocmf,
                                              @Nullable String publicKey, @Nullable String signingMethod) {
         try {
             return new SignedMeterValue(meterValue, OcmfParser.parse(ocmf), publicKey, signingMethod, null);
@@ -146,9 +159,34 @@ public class EichrechtService {
         }
     }
 
-    private static SignedMeterValue error(TransactionDetails.MeterValues meterValue, @Nullable String publicKey,
+    private static SignedMeterValue error(TransactionMeterValue meterValue, @Nullable String publicKey,
                                           String error) {
         return new SignedMeterValue(meterValue, null, publicKey, null, error);
     }
 
+    @Nullable
+    private static PublicKey toPublicKey(@Nullable String publicKey) {
+        if (publicKey == null) {
+            return null;
+        }
+        var encoding = MeterPublicKeyExtractor.isHex(publicKey) ? Encoding.hex : Encoding.base64;
+        return new PublicKey(encoding, publicKey);
+    }
+
+    @Nullable
+    private static SignedReading toSignedReading(@Nullable SignedMeterValue value,
+                                                 Function<OcmfRecord, OcmfRecord.Reading> readingOf) {
+        if (value == null) {
+            return null;
+        }
+        var reading = readingOf.apply(value.ocmfRecord());
+        return new SignedReading(
+            value.meterValue().getValueTimestamp(),
+            reading.value(),
+            reading.unit(),
+            SignedDataChecker.signingMethod(value),
+            Format.OCMF,
+            value.ocmfRecord().rawInput()
+        );
+    }
 }

@@ -19,10 +19,11 @@
 package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
-import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.input.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck.Type;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -71,7 +72,7 @@ public final class SignedDataChecker {
 
     /**
      * @param begin     the signed begin value, null if missing
-     * @param end       the signed end value, null if missing or if the begin record carries both readings
+     * @param end       the signed end value, null if missing. Has the same record as begin, if that carries both readings.
      * @param publicKey of the meter in hex or base64, null if unknown
      * @return empty, if there is no signed begin or end
      */
@@ -83,34 +84,34 @@ public final class SignedDataChecker {
             return List.of();
         }
 
-        // The begin record can carry both readings
-        var endValue = (end == null && OcmfUtils.endReading(begin.ocmfRecord()) != null) ? begin : end;
-
         var checks = new ArrayList<SignedDataCheck>();
 
         if (begin == null) {
-            checks.add(new SignedDataCheck("Signed begin value", Result.Failed, "Not received"));
+            checks.add(new SignedDataCheck(Type.BeginReceived, "Signed begin value", Result.Failed, "Not received"));
         } else {
-            checks.add(signature("Signature of the begin value", begin, publicKey));
+            checks.add(signature(Type.BeginSignature, "Signature of the begin value", begin, publicKey));
             checks.add(value(
+                Type.BeginValue,
                 "Begin value equals the start value of the transaction",
                 OcmfUtils.beginReading(begin.ocmfRecord()),
                 transaction.getStartValue()
             ));
         }
 
-        if (endValue == null) {
+        if (end == null) {
             var stopped = transaction.getStopValue() != null;
             var result = stopped ? Result.Failed : Result.NotChecked;
             var note = stopped ? "Not received" : "The transaction is not stopped yet";
-            checks.add(new SignedDataCheck("Signed end value", result, note));
+            checks.add(new SignedDataCheck(Type.EndReceived, "Signed end value", result, note));
         } else {
-            if (endValue != begin) {
-                checks.add(signature("Signature of the end value", endValue, publicKey));
+            // One record with both readings: its signature is already checked
+            if (begin == null || !begin.ocmfRecord().rawInput().equals(end.ocmfRecord().rawInput())) {
+                checks.add(signature(Type.EndSignature, "Signature of the end value", end, publicKey));
             }
             checks.add(value(
+                Type.EndValue,
                 "End value equals the stop value of the transaction",
-                OcmfUtils.endReading(endValue.ocmfRecord()),
+                OcmfUtils.endReading(end.ocmfRecord()),
                 transaction.getStopValue()
             ));
         }
@@ -118,22 +119,23 @@ public final class SignedDataChecker {
         return checks;
     }
 
-    private static SignedDataCheck value(String description,
+    private static SignedDataCheck value(Type type,
+                                         String description,
                                          OcmfRecord.Reading reading,
                                          @Nullable String transactionValue) {
         var signedWh = OcmfUtils.valueInWh(reading);
         if (signedWh == null) {
-            return new SignedDataCheck(description, Result.NotChecked, "Unknown unit " + reading.unit());
+            return new SignedDataCheck(type, description, Result.NotChecked, "Unknown unit " + reading.unit());
         }
         if (transactionValue == null) {
-            return new SignedDataCheck(description, Result.NotChecked, "The transaction has no such value");
+            return new SignedDataCheck(type, description, Result.NotChecked, "The transaction has no such value");
         }
 
         BigDecimal transactionWh;
         try {
             transactionWh = new BigDecimal(transactionValue.trim());
         } catch (NumberFormatException e) {
-            return new SignedDataCheck(description, Result.NotChecked, "The transaction value is not a number");
+            return new SignedDataCheck(type, description, Result.NotChecked, "The transaction value is not a number");
         }
 
         var note = "Signed: %s %s, transaction: %s Wh"
@@ -146,17 +148,18 @@ public final class SignedDataChecker {
         // The transaction has whole Wh, the meter can have more decimals
         var equal = signedWh.subtract(transactionWh).abs().compareTo(BigDecimal.ONE) < 0;
         var result = equal ? Result.Passed : Result.Failed;
-        return new SignedDataCheck(description, result, note);
+        return new SignedDataCheck(type, description, result, note);
     }
 
     /**
      * Same as the S.A.F.E. transparency software: ECDSA with SHA-256 over the payload as received
      */
-    private static SignedDataCheck signature(String description,
+    private static SignedDataCheck signature(Type type,
+                                             String description,
                                              SignedMeterValue value,
                                              @Nullable String publicKey) {
         if (publicKey == null) {
-            return new SignedDataCheck(description, Result.NotChecked, "The public key of the meter is unknown");
+            return new SignedDataCheck(type, description, Result.NotChecked, "The public key of the meter is unknown");
         }
 
         var record = value.ocmfRecord();
@@ -164,12 +167,12 @@ public final class SignedDataChecker {
         var algorithm = signingMethod(value);
         var curve = CURVES.get(algorithm);
         if (curve == null) {
-            return new SignedDataCheck(description, Result.NotChecked, "Unsupported algorithm " + algorithm);
+            return new SignedDataCheck(type, description, Result.NotChecked, "Unsupported algorithm " + algorithm);
         }
 
         var key = MeterPublicKeyExtractor.decode(publicKey);
         if (key == null) {
-            return new SignedDataCheck(description, Result.NotChecked, "Cannot read the public key of the meter");
+            return new SignedDataCheck(type, description, Result.NotChecked, "Cannot read the public key of the meter");
         }
 
         // The key carries its own curve, which we verify with. S.A.F.E. instead uses the curve of the
@@ -178,7 +181,7 @@ public final class SignedDataChecker {
         var actual = key.getParameters();
         if (!expected.getCurve().equals(actual.getCurve()) || !expected.getG().equals(actual.getG())) {
             var note = "The public key of the meter does not match the algorithm " + algorithm;
-            return new SignedDataCheck(description, Result.Failed, note);
+            return new SignedDataCheck(type, description, Result.Failed, note);
         }
 
         try {
@@ -200,13 +203,13 @@ public final class SignedDataChecker {
             }
 
             return verifier.verify(signatureData)
-                ? new SignedDataCheck(description, Result.Passed, passedNote)
-                : new SignedDataCheck(description, Result.Failed, "The signature does not match the data");
+                ? new SignedDataCheck(type, description, Result.Passed, passedNote)
+                : new SignedDataCheck(type, description, Result.Failed, "The signature does not match the data");
 
         } catch (GeneralSecurityException | RuntimeException e) {
             var errorMsg = "Malformed signature";
             log.error(errorMsg, e);
-            return new SignedDataCheck(description, Result.Failed, errorMsg);
+            return new SignedDataCheck(type, description, Result.Failed, errorMsg);
         }
     }
 
@@ -215,7 +218,7 @@ public final class SignedDataChecker {
      * 2. Otherwise, signingMethod of the OCPP SignedMeterValue JSON (see Table 1 of the OCA application note).
      * 3. Otherwise, the default of OCMF.
      */
-    private static String signingMethod(SignedMeterValue value) {
+    static String signingMethod(SignedMeterValue value) {
         var fromOcmf = value.ocmfRecord().signature().algorithm();
         if (StringUtils.isNotBlank(fromOcmf)) {
             return fromOcmf;

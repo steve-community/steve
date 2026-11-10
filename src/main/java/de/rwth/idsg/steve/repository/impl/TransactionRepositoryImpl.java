@@ -22,7 +22,8 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.TransactionContext;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.JsonUtils;
 import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
@@ -152,7 +153,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk, boolean energyValuesOnly) {
+    public TransactionContext getContext(int transactionPk, boolean energyValuesOnly) {
 
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
@@ -237,12 +238,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             conditions.add(unitCondition);
         }
 
-        List<TransactionDetails.MeterValues> values =
+        List<TransactionMeterValue> values =
                 ctx.selectFrom(CONNECTOR_METER_VALUE)
                    .where(conditions)
                    .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                    .fetch()
-                   .map(r -> TransactionDetails.MeterValues.builder()
+                   .map(r -> TransactionMeterValue.builder()
                                                            .valueTimestamp(r.getValueTimestamp())
                                                            .value(r.getValue())
                                                            .readingContext(r.getReadingContext())
@@ -261,11 +262,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    })
                    .toList();
 
-        return new TransactionDetails(transaction, values, nextTx);
+        return new TransactionContext(transaction, values, nextTx);
     }
 
     @Override
-    public List<TransactionDetails.MeterValues> getMeterValues(int transactionPk, List<String> formats) {
+    public List<TransactionMeterValue> getMeterValues(int transactionPk, List<String> formats) {
         var conditions = new ArrayList<Condition>();
         conditions.add(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk));
 
@@ -277,7 +278,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .where(conditions)
                 .orderBy(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP)
                 .fetch()
-                .map(r -> TransactionDetails.MeterValues.builder()
+                .map(r -> TransactionMeterValue.builder()
                     .valueTimestamp(r.getValueTimestamp())
                     .value(r.getValue())
                     .readingContext(r.getReadingContext())

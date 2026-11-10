@@ -40,7 +40,7 @@
         </table>
     </center>
     <br>
-    <th:block th:replace="~{data-man/transactionDetails-signedData :: signedMeterData}"></th:block>
+    <th:block th:replace="~{data-man/transactionDetails-signedData :: signedMeterData(${details.signedMeterData})}"></th:block>
     <br>
     <section><span>Intermediate Meter Values</span></section>
     <div style="text-align: center;">

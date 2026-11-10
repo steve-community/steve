@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.service.TransactionReportService;
 import de.rwth.idsg.steve.service.TransactionService;
+import de.rwth.idsg.steve.service.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionReportRequest;
@@ -93,11 +93,15 @@ public class TransactionsRestController {
     @Operation(description = """
         Returns the details of a single transaction based on the transactionPk.
         The details are the intermediate values of the transaction.
+        With `withSignedMeterData=true`, they also contain the signed meter data (Eichrecht): the signed begin and end
+        values, the public key of the meter, and the results of basic checks. For a full verification, use the
+        S.A.F.E. XML of this transaction with the S.A.F.E. transparency software.
         """)
     @GetMapping(value = "/{transactionPk}")
     public TransactionDetails getTransactionDetails(@PathVariable("transactionPk") int transactionPk,
-                                                    @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly) {
-        return transactionService.getDetails(transactionPk, energyValuesOnly);
+                                                    @RequestParam(value = "energyValuesOnly", defaultValue = "true") boolean energyValuesOnly,
+                                                    @RequestParam(value = "withSignedMeterData", defaultValue = "false") boolean withSignedMeterData) {
+        return transactionService.getDetails(transactionPk, energyValuesOnly, withSignedMeterData);
     }
 
     @Operation(description = """

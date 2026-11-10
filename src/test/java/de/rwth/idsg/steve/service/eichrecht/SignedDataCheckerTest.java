@@ -21,9 +21,10 @@ package de.rwth.idsg.steve.service.eichrecht;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.repository.dto.MeterPublicKeySources;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedDataCheck.Result;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck.Result;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck.Type;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -93,6 +94,9 @@ public class SignedDataCheckerTest {
         Assertions.assertEquals(KEY_NOTE, checks.get(0).note());
         Assertions.assertEquals("Signed: 7753 Wh, transaction: 7753 Wh", checks.get(1).note());
         Assertions.assertEquals(KEY_NOTE, checks.get(2).note());
+
+        var types = checks.stream().map(SignedDataCheck::type).toList();
+        Assertions.assertEquals(List.of(Type.BeginSignature, Type.BeginValue, Type.EndSignature, Type.EndValue), types);
     }
 
     @Test
@@ -267,13 +271,13 @@ public class SignedDataCheckerTest {
 
     private List<SignedDataCheck> check(Transaction transaction, String publicKey, String... rawValues) {
         var meterValues = Arrays.stream(rawValues)
-            .map(v -> TransactionDetails.MeterValues.builder()
+            .map(v -> TransactionMeterValue.builder()
                 .valueTimestamp(DateTime.now())
                 .value(v)
                 .format("SignedData")
                 .build())
             .toList();
-        return eichrechtService.getSignedTransaction(transaction, sources(publicKey), meterValues).checks();
+        return eichrechtService.getSignedMeterData(transaction, sources(publicKey), meterValues).checks();
     }
 
     /**

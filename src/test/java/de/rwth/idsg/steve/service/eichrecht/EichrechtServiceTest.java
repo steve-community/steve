@@ -19,14 +19,18 @@
 package de.rwth.idsg.steve.service.eichrecht;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.service.eichrecht.model.OcmfRecord;
-import de.rwth.idsg.steve.service.eichrecht.model.SignedTransaction.SignedMeterValue;
+import de.rwth.idsg.steve.repository.dto.TransactionMeterValue;
+import de.rwth.idsg.steve.service.eichrecht.model.input.OcmfRecord;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedDataCheck.Type;
+import de.rwth.idsg.steve.service.eichrecht.model.output.SignedMeterData;
+import de.rwth.idsg.steve.service.eichrecht.model.SignedMeterValue;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -188,27 +192,70 @@ public class EichrechtServiceTest {
     }
 
     @Test
-    public void list_onlySignedDataAndLinkedToMeterValue() {
+    public void signedMeterData_onlySignedDataAndLinkedToMeterValue() {
         var raw = mv("1000", "Raw");
         var noFormat = mv("1000", null);
         var signed = mv(OCMF, "SignedData");
-        var broken = mv("<edl40/>", "SignedData");
+        var broken = TransactionMeterValue.builder()
+            .valueTimestamp(DateTime.parse("2026-04-14T10:00:00Z"))
+            .value("<edl40/>")
+            .format("SignedData")
+            .build();
 
-        List<SignedMeterValue> result = parse(List.of(raw, noFormat, signed, broken));
+        var result = signedMeterData(List.of(raw, noFormat, signed, broken));
 
-        Assertions.assertEquals(2, result.size());
-
-        Assertions.assertSame(signed, result.get(0).meterValue());
-        assertSameRecord(result.get(0).ocmfRecord());
-
-        Assertions.assertSame(broken, result.get(1).meterValue());
-        Assertions.assertNull(result.get(1).ocmfRecord());
-        Assertions.assertNotNull(result.get(1).parseError());
+        Assertions.assertEquals(2, result.receivedCount());
+        Assertions.assertEquals(1, result.unreadable().size());
+        Assertions.assertEquals(broken.getValueTimestamp(), result.unreadable().getFirst().valueTimestamp());
+        Assertions.assertEquals("Not an OCMF record", result.unreadable().getFirst().error());
     }
 
     @Test
-    public void list_empty() {
-        Assertions.assertTrue(parse(List.of()).isEmpty());
+    public void signedMeterData_beginReading() {
+        var ocmfWithoutAlgorithm = """
+            OCMF|%s|{"SD":"AB"}""".formatted(PAYLOAD);
+        var brainpool = "ECDSA-brainpool256r1-SHA256";
+
+        // The record as it goes into the S.A.F.E. XML, and the signing method that the check applied
+        var data = signedMeterData(List.of(mv(wrapper(ocmfWithoutAlgorithm, brainpool), "SignedData")));
+        Assertions.assertTrue(data.safeXmlAvailable());
+        Assertions.assertEquals(SignedMeterData.Format.OCMF, data.begin().format());
+        Assertions.assertEquals(ocmfWithoutAlgorithm, data.begin().signedData());
+        Assertions.assertEquals(new BigDecimal("2935.6"), data.begin().value());
+        Assertions.assertEquals("kWh", data.begin().unit());
+        Assertions.assertNotNull(data.begin().valueTimestamp());
+        Assertions.assertEquals(brainpool, data.begin().signingMethod());
+        Assertions.assertNull(data.end());
+
+        data = signedMeterData(List.of(mv(ocmfWithoutAlgorithm, "SignedData")));
+        Assertions.assertEquals("ECDSA-secp256r1-SHA256", data.begin().signingMethod());
+    }
+
+    @Test
+    public void signedMeterData_oneRecordWithBothReadings() {
+        var both = """
+            OCMF|{"FV":"1.0","PG":"T1","RD":[{"TX":"B","RV":1.5,"RU":"kWh"},{"TX":"E","RV":2.5,"RU":"kWh"}]}|{"SD":"AB"}""";
+
+        // Sent twice, still one record
+        var data = signedMeterData(List.of(mv(both, "SignedData"), mv(both, "SignedData")));
+
+        // Begin and end have the same record, each with its own reading
+        Assertions.assertEquals(both, data.begin().signedData());
+        Assertions.assertEquals(both, data.end().signedData());
+        Assertions.assertEquals(new BigDecimal("1.5"), data.begin().value());
+        Assertions.assertEquals(new BigDecimal("2.5"), data.end().value());
+
+        // Its signature is checked once
+        var types = data.checks().stream().map(SignedDataCheck::type).toList();
+        Assertions.assertEquals(List.of(Type.BeginSignature, Type.BeginValue, Type.EndValue), types);
+    }
+
+    @Test
+    public void signedMeterData_empty() {
+        var result = signedMeterData(List.of());
+        Assertions.assertEquals(0, result.receivedCount());
+        Assertions.assertTrue(result.unreadable().isEmpty());
+        Assertions.assertFalse(result.safeXmlAvailable());
     }
 
     private static void assertSameRecord(OcmfRecord o) {
@@ -223,17 +270,17 @@ public class EichrechtServiceTest {
             .formatted(base64(ocmf), signingMethod == null ? "null" : quote(signingMethod));
     }
 
-    private SignedMeterValue parse(String value) {
-        return parse(List.of(mv(value, "SignedData"))).getFirst();
+    private static SignedMeterValue parse(String value) {
+        return EichrechtService.parse(mv(value, "SignedData"));
     }
 
-    private List<SignedMeterValue> parse(List<TransactionDetails.MeterValues> values) {
+    private SignedMeterData signedMeterData(List<TransactionMeterValue> values) {
         var transaction = Transaction.builder().id(1).build();
-        return service.getSignedTransaction(transaction, null, values).signedMeterValues();
+        return service.getSignedMeterData(transaction, null, values);
     }
 
-    private static TransactionDetails.MeterValues mv(String value, String format) {
-        return TransactionDetails.MeterValues.builder()
+    private static TransactionMeterValue mv(String value, String format) {
+        return TransactionMeterValue.builder()
             .valueTimestamp(DateTime.now())
             .value(value)
             .format(format)

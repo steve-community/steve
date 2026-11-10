@@ -16,20 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service.eichrecht.model;
+package de.rwth.idsg.steve.service.eichrecht.model.output;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Result of one check of the signed data of a transaction.
- *
- * @param note details, e.g. why it failed
  */
+@Schema(description = "Result of one check of the signed data of a transaction")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record SignedDataCheck(
+    @Schema(description = "Stable identifier of the check")
+    Type type,
+
+    @Schema(description = "Description of the check, for humans")
     String description,
+
+    @Schema(description = "Result of the check")
     Result result,
+
+    @Schema(description = "Details, e.g. why it failed. Omitted, if there are none.")
     @Nullable String note
 ) {
+
+    public enum Type {
+        BeginReceived,
+        BeginSignature,
+        BeginValue,
+        EndReceived,
+        EndSignature,
+        EndValue
+    }
 
     public enum Result {
         Passed,

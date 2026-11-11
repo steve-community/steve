@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
+import de.rwth.idsg.steve.service.ChargeBoxActivityService;
 import de.rwth.idsg.steve.service.ChargePointService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -52,6 +53,8 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
  * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List, java.util.List)}.
  *
+ * 3. Remembers when the station last sent an OCPP message, see {@link ChargeBoxActivityService}.
+ *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
  */
@@ -61,6 +64,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     private final OcppServerRepository ocppServerRepository;
     private final ChargePointService chargePointService;
+    private final ChargeBoxActivityService chargeBoxActivityService;
     private final TaskExecutor taskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
@@ -68,10 +72,12 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository,
                                     ChargePointService chargePointService,
+                                    ChargeBoxActivityService chargeBoxActivityService,
                                     TaskExecutor taskExecutor) {
         super(Phase.PRE_INVOKE);
         this.ocppServerRepository = ocppServerRepository;
         this.chargePointService = chargePointService;
+        this.chargeBoxActivityService = chargeBoxActivityService;
         this.taskExecutor = taskExecutor;
     }
 
@@ -84,8 +90,9 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // -------------------------------------------------------------------------
 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
+        boolean isBoot = BOOT_OPERATION_NAME.equals(opName.getLocalPart());
 
-        if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
+        if (!isBoot) {
             Optional<RegistrationStatus> status = chargePointService.getRegistrationStatus(chargeBoxId);
             boolean allow = status.isPresent() && status.get() == RegistrationStatus.ACCEPTED;
             if (!allow) {
@@ -107,6 +114,16 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
                 log.error("Exception occurred", e);
             }
         });
+
+        // -------------------------------------------------------------------------
+        // 3. update last OCPP message
+        // -------------------------------------------------------------------------
+
+        // Not for a BootNotification: the boot handler saves its time for known stations, and an unknown station
+        // must not get into memory, otherwise any caller could fill it with made-up ids.
+        if (!isBoot) {
+            chargeBoxActivityService.ocppMessageReceived(chargeBoxId);
+        }
     }
 
     private String getChargeBoxId(Message message) {

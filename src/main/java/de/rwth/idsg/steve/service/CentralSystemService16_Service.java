@@ -127,7 +127,7 @@ public class CentralSystemService16_Service {
                                          .meterType(parameters.getMeterType())
                                          .meterSerial(parameters.getMeterSerialNumber())
                                          .chargeBoxId(chargeBoxIdentity)
-                                         .heartbeatTimestamp(now)
+                                         .lastOcppMessageTimestamp(now)
                                          .build();
 
             ocppServerRepository.updateChargebox(params);
@@ -294,10 +294,7 @@ public class CentralSystemService16_Service {
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        DateTime now = DateTime.now();
-        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
-
-        return new HeartbeatResponse().withCurrentTime(now);
+        return new HeartbeatResponse().withCurrentTime(DateTime.now());
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {

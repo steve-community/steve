@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
 import de.rwth.idsg.steve.repository.CertificateRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
@@ -71,6 +70,7 @@ import ocpp.cp._2015._10.GetDiagnosticsResponse;
 import ocpp.cp._2015._10.RemoteStartStopStatus;
 import ocpp.cp._2015._10.ReservationStatus;
 import ocpp.cp._2015._10.ResetStatus;
+import ocpp.cp._2015._10.SetChargingProfileRequest;
 import ocpp.cp._2015._10.TriggerMessageStatus;
 import ocpp.cp._2015._10.UnlockStatus;
 import ocpp.cp._2015._10.UpdateStatus;
@@ -199,14 +199,14 @@ public class OcppOperationsService {
     }
 
     public RestCallback<ChargingProfileStatus> setChargingProfile(SetChargingProfileParams params,
-                                                                  SetChargingProfileTaskAdhoc task) throws Exception {
-        validateChargingProfile(params.getChargingProfilePk());
+                                                                  SetChargingProfileRequest adhocRequest) throws Exception {
+        // An ad hoc request carries the complete profile; its OCPP ID is not a database primary key.
         validateTransactionId(params.getTransactionId(), params.getChargeBoxIdList());
 
         chargePointServiceClient.prepareAndCheck(params);
 
         RestCallback<ChargingProfileStatus> callback = createCallback(params);
-        int taskId = chargePointServiceClient.setChargingProfile(task, callback);
+        int taskId = chargePointServiceClient.setChargingProfile(params, adhocRequest, callback);
 
         callback.setTaskId(taskId);
         callback.waitForResponses();

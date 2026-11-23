@@ -45,7 +45,7 @@ import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskAdhoc;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskFromDB;
 import de.rwth.idsg.steve.ocpp.task.SignedUpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
@@ -107,6 +107,7 @@ import ocpp.cp._2015._10.GetDiagnosticsResponse;
 import ocpp.cp._2015._10.RemoteStartStopStatus;
 import ocpp.cp._2015._10.ReservationStatus;
 import ocpp.cp._2015._10.ResetStatus;
+import ocpp.cp._2015._10.SetChargingProfileRequest;
 import ocpp.cp._2015._10.TriggerMessageStatus;
 import ocpp.cp._2015._10.UnlockStatus;
 import ocpp.cp._2015._10.UpdateStatus;
@@ -475,10 +476,15 @@ public class ChargePointServiceClient {
         return executeForEach(task, c -> invoker.triggerMessage(c, task));
     }
 
+    /**
+     * Sends a charging profile that is not stored in the database (ad hoc).
+     */
     @SafeVarargs
-    public final int setChargingProfile(SetChargingProfileTask task,
+    public final int setChargingProfile(MultipleChargePointSelect params,
+                                        SetChargingProfileRequest request,
                                         OcppCallback<ChargingProfileStatus>... callbacks) {
-        prepareAndCheck(task.getParams());
+        prepareAndCheck(params);
+        SetChargingProfileTaskAdhoc task = new SetChargingProfileTaskAdhoc(params, request);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -490,11 +496,16 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int setChargingProfile(SetChargingProfileParams params,
                                         OcppCallback<ChargingProfileStatus>... callbacks) {
-        ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
+        var details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
+        prepareAndCheck(params);
         SetChargingProfileTaskFromDB task = new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
 
-        return setChargingProfile(task, callbacks);
+        for (var callback : callbacks) {
+            task.addCallback(callback);
+        }
+
+        return executeForEach(task, c -> invoker.setChargingProfile(c, task));
     }
 
     @SafeVarargs

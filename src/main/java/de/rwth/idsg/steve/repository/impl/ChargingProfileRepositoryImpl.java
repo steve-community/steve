@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -44,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -51,6 +53,7 @@ import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
 import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
 import static jooq.steve.db.Tables.EVSE;
+import static jooq.steve.db.Tables.EVSE_CONNECTOR;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
 /**
@@ -229,6 +232,34 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
             conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo()));
         }
 
+        if (form.getChargeBoxId() != null || form.getConnectorId() != null) {
+            // Only profiles assigned to a connector of the requested station/connector
+            Condition assignment = DSL.trueCondition();
+            if (form.getChargeBoxId() != null) {
+                assignment = assignment.and(EVSE.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
+            }
+            if (form.getConnectorId() != null) {
+                assignment = assignment.and(EVSE_CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
+            }
+            conditions = conditions.and(
+                DSL.exists(
+                    ctx.selectOne()
+                       .from(CONNECTOR_CHARGING_PROFILE)
+                       .join(EVSE).on(EVSE.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
+                       .join(EVSE_CONNECTOR).on(EVSE_CONNECTOR.EVSE_PK.eq(CONNECTOR_CHARGING_PROFILE.EVSE_PK))
+                       .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CHARGING_PROFILE.CHARGING_PROFILE_PK))
+                       .and(assignment)
+                )
+            );
+        }
+
+        if (Boolean.TRUE.equals(form.getActive())) {
+            DateTime now = DateTime.now();
+            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.le(now))
+                                   .and(CHARGING_PROFILE.VALID_TO.isNull()
+                                        .or(CHARGING_PROFILE.VALID_TO.ge(now)));
+        }
+
         return ctx.selectFrom(CHARGING_PROFILE)
                   .where(conditions)
                   .fetch()
@@ -381,6 +412,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
         List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriods()
                                                    .stream()
+                                                   .filter(Objects::nonNull)
                                                    .filter(ChargingProfileForm.SchedulePeriod::isNonEmpty)
                                                    .sorted(Comparator.comparingInt(ChargingProfileForm.SchedulePeriod::getStartPeriodInSeconds))
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)

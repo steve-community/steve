@@ -105,7 +105,7 @@ public class Issue1371Test {
         // 1. insert
         dslContext.insertInto(CHARGE_BOX)
             .set(CHARGE_BOX.CHARGE_BOX_ID, TEST_CHARGE_BOX_ID)
-            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, dtIn)
+            .set(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, dtIn)
             .execute();
 
         // 2. read
@@ -117,6 +117,6 @@ public class Issue1371Test {
         ChargeBoxRecord chargeBoxRecord = rows.get(0);
         Assertions.assertNotNull(chargeBoxRecord);
 
-        return chargeBoxRecord.getLastHeartbeatTimestamp();
+        return chargeBoxRecord.getLastOcppMessageTimestamp();
     }
 }

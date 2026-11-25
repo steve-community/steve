@@ -37,6 +37,8 @@ Connection Status for JSON Charge Points
                 <th data-sort="string">OCPP Version</th>
                 <th data-sort="date">Connected Since</th>
                 <th data-sort="date">Connection Duration</th>
+                <th data-sort="date">Last OCPP Message</th>
+                <th data-sort="date">Last Pong</th>
                 <th></th>
             </tr>
         </thead>
@@ -49,6 +51,8 @@ Connection Status for JSON Charge Points
                 <td th:text="${s.version?.value}"></td>
                 <td th:data-sort-value="${s.connectedSinceDT?.millis}" th:text="${s.connectedSince}"></td>
                 <td th:data-sort-value="${s.connectedSinceDT?.millis}" th:text="${s.connectionDuration}"></td>
+                <td th:data-sort-value="${s.lastOcppMessageDT?.millis}" th:text="${s.lastOcppMessage}"></td>
+                <td th:data-sort-value="${s.lastPongDT?.millis}" th:text="${s.lastPong}"></td>
                 <td>
                     <form th:action="@{/manager/home/ocppJsonStatus/disconnect}" method="post">
                         <input type="hidden" name="version" th:value="${s.version}"/>

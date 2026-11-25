@@ -40,13 +40,13 @@ public class ChargePointQueryForm {
     private String description;
     private String note;
     private OcppVersion ocppVersion;
-    private QueryPeriodType heartbeatPeriod;
+    private QueryPeriodType lastOcppMessagePeriod;
 
     /**
      * Init with sensible default values
      */
     public ChargePointQueryForm() {
-        heartbeatPeriod = QueryPeriodType.ALL;
+        lastOcppMessagePeriod = QueryPeriodType.ALL;
     }
 
     public boolean isSetOcppVersion() {

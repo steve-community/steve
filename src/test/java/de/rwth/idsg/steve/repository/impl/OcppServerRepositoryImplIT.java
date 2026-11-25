@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.dto.ChargeBoxActivity;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -31,12 +32,14 @@ import jooq.steve.db.tables.records.TransactionRecord;
 import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.jooq.Record2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
@@ -113,14 +116,88 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
     }
 
     @Test
-    public void updateChargeboxHeartbeat() {
-        DateTime ts = DateTime.now();
-        assertNoDatabaseException(() -> repository.updateChargeboxHeartbeat(KNOWN_CHARGE_BOX_ID, ts));
-        DateTime stored = dslContext.select(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
-            .from(CHARGE_BOX)
-            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(KNOWN_CHARGE_BOX_ID))
-            .fetchOne(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP);
-        Assertions.assertNotNull(stored);
+    public void updateChargeboxActivity() {
+        DateTime ocppMessage = DateTime.now().withMillisOfSecond(123);
+        DateTime pong = ocppMessage.plusMillis(1);
+        assertNoDatabaseException(() -> repository.updateChargeboxActivity(
+            Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ocppMessage, pong))
+        ));
+
+        var stored = fetchActivity(KNOWN_CHARGE_BOX_ID);
+        assertSameInstant(ocppMessage, stored.value1());
+        assertSameInstant(pong, stored.value2());
+    }
+
+    @Test
+    public void updateChargebox_neverMovesTheLastOcppMessageBackwards() {
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+        repository.updateChargeboxActivity(Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts, null)));
+
+        repository.updateChargebox(UpdateChargeboxParams.builder()
+            .chargeBoxId(KNOWN_CHARGE_BOX_ID)
+            .ocppProtocol(OcppProtocol.V_16_JSON)
+            .lastOcppMessageTimestamp(ts.minusMinutes(1))
+            .build());
+
+        assertSameInstant(ts, fetchActivity(KNOWN_CHARGE_BOX_ID).value1());
+    }
+
+    @Test
+    public void updateChargeboxActivity_updatesOnlyTheGivenStations() {
+        String otherChargeBoxId = KNOWN_CHARGE_BOX_ID + "_other";
+        String untouchedChargeBoxId = KNOWN_CHARGE_BOX_ID + "_untouched";
+        for (String id : List.of(otherChargeBoxId, untouchedChargeBoxId)) {
+            dslContext.insertInto(CHARGE_BOX).set(CHARGE_BOX.CHARGE_BOX_ID, id).execute();
+        }
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+
+        repository.updateChargeboxActivity(Map.of(
+            KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts, null),
+            otherChargeBoxId, new ChargeBoxActivity(null, ts)
+        ));
+
+        assertSameInstant(ts, fetchActivity(KNOWN_CHARGE_BOX_ID).value1());
+        assertSameInstant(ts, fetchActivity(otherChargeBoxId).value2());
+        Assertions.assertNull(fetchActivity(untouchedChargeBoxId).value1());
+        Assertions.assertNull(fetchActivity(untouchedChargeBoxId).value2());
+    }
+
+    @Test
+    public void getChargeboxActivity() {
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+        repository.updateChargeboxActivity(Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts, null)));
+
+        var activity = repository.getChargeboxActivity(List.of(KNOWN_CHARGE_BOX_ID, "unknown"));
+
+        Assertions.assertEquals(1, activity.size());
+        Assertions.assertEquals(ts.getMillis(), activity.get(KNOWN_CHARGE_BOX_ID).lastOcppMessage().getMillis());
+        Assertions.assertNull(activity.get(KNOWN_CHARGE_BOX_ID).lastPong());
+    }
+
+    @Test
+    public void updateChargeboxActivity_leavesNullTimestampsUntouched() {
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+        repository.updateChargeboxActivity(Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts, ts)));
+
+        repository.updateChargeboxActivity(Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(null, ts.plusMinutes(1))));
+
+        var stored = fetchActivity(KNOWN_CHARGE_BOX_ID);
+        assertSameInstant(ts, stored.value1());
+        assertSameInstant(ts.plusMinutes(1), stored.value2());
+    }
+
+    @Test
+    public void updateChargeboxActivity_neverMovesTimestampsBackwards() {
+        DateTime ts = DateTime.now().withMillisOfSecond(0);
+        repository.updateChargeboxActivity(Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts, ts)));
+
+        repository.updateChargeboxActivity(
+            Map.of(KNOWN_CHARGE_BOX_ID, new ChargeBoxActivity(ts.minusMinutes(1), ts.minusMinutes(1)))
+        );
+
+        var stored = fetchActivity(KNOWN_CHARGE_BOX_ID);
+        assertSameInstant(ts, stored.value1());
+        assertSameInstant(ts, stored.value2());
     }
 
     @Test
@@ -272,11 +349,23 @@ public class OcppServerRepositoryImplIT extends AbstractRepositoryITBase {
             .execute();
     }
 
+    private Record2<DateTime, DateTime> fetchActivity(String chargeBoxId) {
+        return dslContext.select(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP, CHARGE_BOX.LAST_PONG_TIMESTAMP)
+            .from(CHARGE_BOX)
+            .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+            .fetchOne();
+    }
+
+    private static void assertSameInstant(DateTime expected, DateTime actual) {
+        Assertions.assertNotNull(actual);
+        Assertions.assertEquals(expected.getMillis(), actual.getMillis());
+    }
+
     private static UpdateChargeboxParams updateChargeboxParams() {
         return UpdateChargeboxParams.builder()
             .chargeBoxId(KNOWN_CHARGE_BOX_ID)
             .ocppProtocol(OcppProtocol.V_16_JSON)
-            .heartbeatTimestamp(DateTime.now())
+            .lastOcppMessageTimestamp(DateTime.now())
             .vendor("vendor")
             .model("model")
             .build();

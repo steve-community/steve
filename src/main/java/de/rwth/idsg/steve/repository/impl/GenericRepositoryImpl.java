@@ -115,19 +115,19 @@ public class GenericRepositoryImpl implements GenericRepository {
         Field<Integer> heartbeatsToday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(now)))
+                   .where(date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).eq(date(now)))
                    .asField("heartbeats_today");
 
         Field<Integer> heartbeatsYesterday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(yesterdaysNow)))
+                   .where(date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).eq(date(yesterdaysNow)))
                    .asField("heartbeats_yesterday");
 
         Field<Integer> heartbeatsEarlier =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(yesterdaysNow)))
+                   .where(date(CHARGE_BOX.LAST_OCPP_MESSAGE_TIMESTAMP).lessThan(date(yesterdaysNow)))
                    .asField("heartbeats_earlier");
 
         Record8<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs =
